@@ -223,6 +223,8 @@ incsrc contrib.asm
 org $A38000
 incsrc stats/main.asm
 
+incsrc doorrando.asm
+
 org $308000 ; bank #$30
 incsrc tables.asm
 warnpc $318000
