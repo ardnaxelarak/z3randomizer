@@ -459,6 +459,7 @@ CreditsLine151:
 CreditsLine152:
     ;GAME STATS
     db $0B, $13, $06, $00, $0C, $04, $9F, $12, $13, $00, $13, $12
+print "GT Big Key Credit Start: ", pc
 CreditsLine153:
     ;GT BIG KEY           $$$$/22
     db $02, $37, $63, $70, $9F, $5E, $65, $63, $9F, $67, $61, $75, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $A2, $55, $55
