@@ -61,7 +61,7 @@ OnUncleItemGet:
 		BIT.b #$04 : BEQ + : STA !INFINITE_MAGIC : +
 		BIT.b #$02 : BEQ + : STA !INFINITE_BOMBS : +
 		BIT.b #$01 : BEQ + : STA !INFINITE_ARROWS : +
-		
+
 		LDA UncleItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
 	PLA
 	JSL Link_ReceiveItem
@@ -135,6 +135,11 @@ OnNewFile:
             DEX : DEX
         BPL -
 
+		LDX #$000E : -
+        	LDA $7EF37C, X : STA $7EF4E0, X
+			DEX : DEX
+		BPL -
+
 		SEP #$20 ; set 8-bit accumulator
 		;LDA #$FF : STA !RNG_ITEM_LOCK_IN ; reset rng item lock-in
 		LDA.l PreopenCurtains : BEQ +
@@ -151,6 +156,8 @@ OnNewFile:
 		+
 
 		LDA StartingSword : STA $7EF359 ; set starting sword type
+		LDA !INVENTORY_SWAP : STA $70038C ; copy starting equipment swaps to file select screen
+		LDA !INVENTORY_SWAP_2 : STA $70038E
 	PLP : PLX
 RTL
 ;--------------------------------------------------------------------------------
