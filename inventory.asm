@@ -260,9 +260,11 @@ AddInventory:
 	; don't count any of this stuff
 	CPY.b #$20 : BNE + : BRL .itemCounts : + ; Crystal
 	CPY.b #$26 : BNE + : BRL .itemCounts : + ; Heart Piece Completion Heart
-	CPY.b #$2E : BNE + : BRL .itemCounts : + ; Red Potion (Refill)
-	CPY.b #$2F : BNE + : BRL .itemCounts : + ; Green Potion (Refill)
-	CPY.b #$30 : BNE + : BRL .itemCounts : + ; Blue Potion (Refill)
+	LDA.l !SHOP_ENABLE_COUNT : BNE ++
+		CPY.b #$2E : BNE + : BRL .itemCounts : + ; Red Potion (Refill)
+		CPY.b #$2F : BNE + : BRL .itemCounts : + ; Green Potion (Refill)
+		CPY.b #$30 : BNE + : BRL .itemCounts : + ; Blue Potion (Refill)
+	++
 	CPY.b #$37 : BNE + : BRL .itemCounts : + ; Pendant
 	CPY.b #$38 : BNE + : BRL .itemCounts : + ; Pendant
 	CPY.b #$39 : BNE + : BRL .itemCounts : + ; Pendant
