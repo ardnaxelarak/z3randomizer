@@ -260,9 +260,11 @@ AddInventory:
 	; don't count any of this stuff
 	CPY.b #$20 : BNE + : BRL .itemCounts : + ; Crystal
 	CPY.b #$26 : BNE + : BRL .itemCounts : + ; Heart Piece Completion Heart
-	CPY.b #$2E : BNE + : BRL .itemCounts : + ; Red Potion (Refill)
-	CPY.b #$2F : BNE + : BRL .itemCounts : + ; Green Potion (Refill)
-	CPY.b #$30 : BNE + : BRL .itemCounts : + ; Blue Potion (Refill)
+	LDA.l !SHOP_ENABLE_COUNT : BNE ++
+		CPY.b #$2E : BNE + : BRL .itemCounts : + ; Red Potion (Refill)
+		CPY.b #$2F : BNE + : BRL .itemCounts : + ; Green Potion (Refill)
+		CPY.b #$30 : BNE + : BRL .itemCounts : + ; Blue Potion (Refill)
+	++
 	CPY.b #$37 : BNE + : BRL .itemCounts : + ; Pendant
 	CPY.b #$38 : BNE + : BRL .itemCounts : + ; Pendant
 	CPY.b #$39 : BNE + : BRL .itemCounts : + ; Pendant
@@ -286,8 +288,7 @@ AddInventory:
 			CMP.w #271 : BNE + : BRL .shop : + ; villiage of outcasts shop, lumberjack shop, lake hylia shop, dark world magic shop
 			CMP.w #272 : BNE + : BRL .shop : + ; red shield shop
 			CMP.w #284 : BNE + : BRL .shop : + ; bomb shop
-			;CMP.w #265 : BNE + : BRL .shop : + ; potion shop - commented this out because it's easier to just block potion refills because this one interferes with the powder item being counted
-			;CMP.w #271 : BNE + : BRL .shop : + ; lake hylia shop
+			CMP.w #265 : BNE + : BRL .shop : + ; potion shop - commented this out because it's easier to just block potion refills because this one interferes with the powder item being counted
 			CMP.w #287 : BNE + : BRL .shop : + ; kakariko shop
 			CMP.w #255 : BNE + : BRL .shop : + ; light world death mountain shop
 			CMP.w #276 : BNE + : BRL .shop : + ; waterfall fairy
@@ -295,7 +296,9 @@ AddInventory:
 			CMP.w #278 : BNE + : BRL .shop : + ; pyramid fairy
 		PLP : BRA ++
 		.shop
-		PLP : BRL .done
+		PLP
+		LDA.l !SHOP_ENABLE_COUNT : BNE ++
+		BRL .done
 	++
 
 	.dungeonCounts
@@ -959,6 +962,11 @@ LoadPowder:
 	%GetPossiblyEncryptedItem(WitchItem, SpriteItemValues)
 	STA $0DA0, Y ; Store item type
 	JSL.l PrepDynamicTile
+	STA $7F505E
+	LDA #$00
+	STA $7F505F
+	STA $7F5060
+	STA $7F5061
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -981,6 +989,7 @@ RTL
 !REDRAW = "$7F5000"
 ;--------------------------------------------------------------------------------
 DrawPowder:
+;	this fights with the shopkeep code, so had to move the powder draw there
 	LDA $02DA : BNE .defer ; defer if link is buying a potion
 	LDA.l !REDRAW : BEQ +
 		LDA.l WitchItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
@@ -989,8 +998,8 @@ DrawPowder:
 		LDA #$00 : STA.l !REDRAW ; reset redraw flag
 		BRA .defer
 	+
-	LDA $0DA0, X ; Retrieve stored item type
-	JSL.l DrawDynamicTile
+;	LDA $0DA0, X ; Retrieve stored item type
+;	JSL.l DrawDynamicTile
 	.defer
 RTL
 ;--------------------------------------------------------------------------------
@@ -1049,9 +1058,13 @@ CollectPowder:
 		; if for any reason the item value is 0 reload it, just in case
 		%GetPossiblyEncryptedItem(WitchItem, SpriteItemValues) : TAY
 	+
-	PHA : LDA WitchItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID : PLA
+	PHA
+		LDA WitchItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
+		LDA.b #$01 : STA.l !SHOP_ENABLE_COUNT
+	PLA
     STZ $02E9 ; item from NPC
     JSL.l Link_ReceiveItem
+    PHA : LDA.b #$00 : STA.l !SHOP_ENABLE_COUNT : PLA
 	;JSL.l FullInventoryExternal
 	JSL.l ItemSet_Powder
 RTL

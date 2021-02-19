@@ -152,11 +152,6 @@ incsrc clock.asm
 incsrc accessability.asm
 incsrc heartbeep.asm
 incsrc capacityupgrades.asm
-incsrc timer.asm
-incsrc doorframefixes.asm
-incsrc music.asm
-incsrc roomloading.asm
-incsrc icepalacegraphics.asm
 warnpc $A18000
 
 org $1C8000 ; text tables for translation
@@ -183,6 +178,11 @@ org $A1FF00 ; static mapping area
 incsrc init.asm
 
 org $A48000 ; code bank - PUT NEW CODE HERE
+incsrc timer.asm
+incsrc doorframefixes.asm
+incsrc music.asm
+incsrc roomloading.asm
+incsrc icepalacegraphics.asm
 incsrc glitched.asm
 incsrc hardmode.asm
 incsrc goalitem.asm

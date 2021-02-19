@@ -1463,8 +1463,8 @@ dw #9999 ; Rupee Limit
 ; $7F5042 - Tile Upload Offset Override (Low)
 ; $7F5043 - Tile Upload Offset Override (High)
 ; $7F5044 - $7F5046 - NMI Auxiliary Function
-; $7F5047 - $7F504F - Unused
-; $7F5050 - $7F506F - Shop Block
+; $7F5047 - $7F504E - Unused
+; $7F504F - $7F506F - Shop Block
 ; $7F5070 - Reserved for OneMind
 ; $7F5071 - Reserved for OneMind
 ; $7F5072 - $7F507D - Unused
@@ -1602,12 +1602,12 @@ ShopTable:
 db $01, $15, $01, $5D, $00, $12, $04, $00
 db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
 
-org $30C900 ; PC 0x184900 - 0x184FFF - max 224 entries
+org $30C900 ; PC 0x184900 - 0x184FFF - max 198 entries (9 bytes * C6 (198) = 6f6 ~ 184FF6)
 ShopContentsTable:
-;db [id][item][price-low][price-high][max][repl_id][repl_price-low][repl_price-high]
-db $01, $51, $64, $00, $07, $FF, $00, $00
-db $01, $53, $64, $00, $07, $FF, $00, $00
-db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+;db [id][item][price-low][price-high][max][repl_id][repl_price-low][repl_price-high][player]
+db $01, $51, $64, $00, $07, $FF, $00, $00, $00
+db $01, $53, $64, $00, $07, $FF, $00, $00, $00
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
 
 ; Fix spawning with more hearts than capacity when less than 3 heart containers
 LowHeartFix:
@@ -1827,6 +1827,14 @@ db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00,
 org $30E37D ; PC 0x18637D
 Enable_TerrorPin_AI_Fix:
 db #$01
+
+;Shop slot count as check
+org $30E560 ; PC 0x18650
+EnableShopItemCount:
+db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
+db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
+db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
+db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
 
 ;--------------------------------------------------------------------------------
 ; 0x186380 - 187FFF (unused)
