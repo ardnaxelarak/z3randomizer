@@ -1189,11 +1189,14 @@ JSL.l DrawMushroom
 org $05EE97 ; <- 2EE97 - sprite_mushroom.asm : 81
 NOP #14
 ;--------------------------------------------------------------------------------
-org $05F529 ; <- 2F52C - sprite_potion_shop.asm
-JSL SpritePrep_ShopKeeper
-LDX #$0
-JSR $F539 ; <- powder spawn here
-RTS
+org $06C09C ; <- - bank06.asm : 1885 (JSL SpritePrep_PotionShopLong)
+JSL SpritePrep_ShopKeeper_PotionShop
+
+org $05F521
+SpritePrep_PotionShopLong:
+
+org $05F539
+SpawnMagicPowder:
 ;--------------------------------------------------------------------------------
 org $05F568 ; <- 2F568 - sprite_potion_shop.asm
 LDA #$b0 : STA $0D00, Y : LDA #$90 : STA $0D10, Y ; manually set position of powder item
@@ -1201,12 +1204,15 @@ LDA #$21 : STA $0D20, Y : LDA #$12 : STA $0D30, Y
 JMP $F61D
 ;--------------------------------------------------------------------------------
 org $05F633 ; <- 2F633 - sprite_potion_shop.asm
-LDA $0E80, X : BNE +
-JSL Sprite_ShopKeeperPotion ;; TODO: i don't remember prices being set on top of the player
-JSR $F893 ; <- witch behavior here
-RTS : +
-JSR $F644 ; <- powder behavior here
-RTS
+JSL Sprite_ShopKeeperPotion : RTS : NOP ;; TODO: i don't remember prices being set on top of the player
+PotionShopkeeperJumpTable:
+
+org $05F893 ; <- witch behavior here
+Sprite_WitchAssistant:
+
+org $05F644 ; <- powder behavior here
+Sprite_MagicPowderItem:
+
 ;--------------------------------------------------------------------------------
 org $05EB1D ; <- 2EB1D - sprite_bottle_vendor.asm : 158
 JSL.l Multiworld_BottleVendor_GiveBottle
