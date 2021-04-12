@@ -128,6 +128,19 @@ dw $0230, $0231, $0202, $0203, $0212, $0213, $0222, $0223, $0232, $0233
 .digit_offsets
 dw 4, 0, -4, -8
 ;--------------------------------------------------------------------------------
+SpritePrep_ShopKeeper_PotionShop:
+	JSL SpritePrep_ShopKeeper
+	LDA.l !SHOP_TYPE : CMP.b #$FF : BNE +
+		JSL SpritePrep_PotionShopLong
+		RTL
+	+ LDX #$0
+    PHK : PEA.w .jslrtsreturn-1
+    PEA.w $05f527 ; an rtl address - 1 in Bank05
+    JML SpawnMagicPowder
+    .jslrtsreturn
+    RTL
+
+
 SpritePrep_ShopKeeper:
 	PHX : PHY : PHP
 	
@@ -252,7 +265,9 @@ SpritePrep_ShopKeeper:
 	PLP : PLY : PLX
 	
 	LDA.l !SHOP_TYPE : CMP.b #$FF : BNE +
-		PLA : PLA : PLA
+		LDA $A0 : CMP.b #$09 : BNE ++
+			RTL
+		++ PLA : PLA : PLA
         INC $0BA0, X
         LDA $0E40, X
 		JML.l ShopkeeperFinishInit
@@ -382,6 +397,16 @@ Shopkeeper_UploadVRAMTiles:
 		PLA : STA $4300 ; restore DMA parameters
 RTS
 ;--------------------------------------------------------------------------------
+ShopkepeerPotion_CallOriginal:
+	PLA : PLA : PLA
+	LDA.b #PotionShopkeeperJumpTable>>16 : PHA
+	LDA.b #PotionShopkeeperJumpTable>>8 : PHA
+	LDA.b #PotionShopkeeperJumpTable : PHA
+    LDA $0E80, X
+    JML.l UseImplicitRegIndexedLocalJumpTable
+;--------------------------------------------------------------------------------
+
+;--------------------------------------------------------------------------------
 Shopkepeer_CallOriginal:
 	PLA : PLA : PLA
 	LDA.b #ShopkeeperJumpTable>>16 : PHA
@@ -394,12 +419,28 @@ Shopkepeer_CallOriginal:
 ;!SHOP_CAPACITY = "$7F5020"
 ;!SCRATCH_TEMP_X = "$7F5021"
 Sprite_ShopKeeperPotion:
+	LDA.l !SHOP_TYPE : CMP.b #$FF : BNE + : JMP.w ShopkepeerPotion_CallOriginal : +
+	TXA : BEQ +
+		PHK : PEA.w .jslrtsreturn2-1
+		PEA.w $05f527 ; an rtl address - 1 in Bank05
+		JML Sprite_MagicPowderItem
+		.jslrtsreturn2
+		RTL
+	+
+
 	PHB : PHK : PLB  ;; we can just call the default shopkeeper but the potion shopkeeper refills your health
 		LDA $A0 : CMP.b #$09 : BNE +
 			JSR.w Shopkeeper_DrawItems
 			JSR.w Shopkeeper_SetupHitboxes
 		+
 	PLB
+
+	LDA $0E80, X : BNE +
+		PHK : PEA.w .jslrtsreturn-1
+		PEA.w $05f527 ; an rtl address - 1 in Bank05
+		JML Sprite_WitchAssistant
+		.jslrtsreturn
+	+
 RTL
 
 Sprite_ShopKeeper:

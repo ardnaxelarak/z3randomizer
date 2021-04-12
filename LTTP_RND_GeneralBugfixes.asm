@@ -223,7 +223,9 @@ incsrc contrib.asm
 org $A38000
 incsrc stats/main.asm
 
-incsrc doorrando.asm
+incsrc doorrando.asm ; bank 27 likely A7 in the future
+;bank 28/A8 for keydropshuffle
+incsrc enemizer/main.asm ; this is originally in bank 36, but is currently in migratory status in bank 37
 
 org $308000 ; bank #$30
 incsrc tables.asm
