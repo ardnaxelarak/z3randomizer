@@ -202,23 +202,18 @@ OWNewDestination:
 
     ;fix camera unlock
     lda $e2,x : !sub $06 : bpl +
-        pha
-        lda $06 : sta $e2,x
+        pha : lda $06 : sta $e2,x
         ldx.w OWCameraIndex,y : lda $0618,x : !sub 1,s : sta $0618,x
-        lda $061a,x : !sub 1,s : sta $061a,x
-        pla
-        bra ++
-    +
-    lda $06 : ldx.w OWCameraRangeIndex,y : !add.w OWCameraRange,x : sta $06
-    ldx.w OWBGIndex,y : !sub $e2,x : bcs ++
-        pha
-        lda $06 : sta $e2,x
+        lda $061a,x : !sub 1,s : sta $061a,x : pla
+        bra .adjustOppositeAxis
+    + lda $06 : ldx.w OWCameraRangeIndex,y : !add.w OWCameraRange,x : sta $06
+    ldx.w OWBGIndex,y : !sub $e2,x : bcs .adjustOppositeAxis
+        pha : lda $06 : sta $e2,x
         ldx.w OWCameraIndex,y : lda $0618,x : !add 1,s : sta $0618,x
-        lda $061a,x : !add 1,s : sta $061a,x
-        pla
-    ++
+        lda $061a,x : !add 1,s : sta $061a,x : pla
 
     ;opposite coord stuff
+    .adjustOppositeAxis
     rep #$30 : lda OWOppDirectionOffset,y : and #$00ff : bit #$0080 : beq +
         ora #$ff00 ;extend 8-bit negative to 16-bit negative
     + pha
