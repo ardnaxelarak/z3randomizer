@@ -173,10 +173,19 @@ OWNewDestination:
     lda.w $0014,x : sta $84;VRAM
     ;lda.w $0016,x : and #$00ff : sta $624 ;UnknownY
     ;lda.w $0017,x : and #$00ff : sta $628 ;UnknownX
-    
+
     ;;22	e0	e2	61c	61e - X
     ;;20	e6	e8	618	61a - Y
-    sep #$10 : ldy $418
+    ;keep current position if within incoming gap
+    lda.w $0000,x : and #$01ff : pha : lda.w $0002,x : and #$01ff : pha
+    ldy $20 : lda $418 : dec #2 : bpl +
+        ldy $22
+    + tya : and #$01ff : cmp 3,s : !blt .adjustMainAxis
+    dec : cmp 1,s : !bge .adjustMainAxis
+    inc : pha : lda $06 : and #$fe00 : !add 1,s : sta $06 : pla
+
+    .adjustMainAxis
+    pla : pla : sep #$10 : ldy $418
     ldx OWCoordIndex,y : lda $20,x : and #$fe00 : pha : lda $20,x : and #$01ff : pha ;s1 = relative cur, s3 = ow cur
     lda $06 : and #$fe00 : !sub 3,s : pha ;set coord, s1 = ow diff, s3 = relative cur, s5 = ow cur
     lda $06 : and #$01ff : !sub 3,s : pha ;s1 = rel diff, s3 = ow diff, s5 = relative cur, s7 = ow cur
