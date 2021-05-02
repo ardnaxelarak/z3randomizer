@@ -103,6 +103,7 @@ OWShuffle:
     pha
         jsr OWSearchTransition
         bcs .newDestination
+        txa : !add #$001a : tax
     pla : dec : bne .nextTransition : bra .noTransition
 
     .newDestination
@@ -123,82 +124,74 @@ OWSearchTransition:
 {
     ;A-16 XY-16
     lda $418 : bne + ;north
-        lda.l OWNorthEdges,x : dec : inx #2
+        lda.l OWNorthEdges,x : dec
         cmp $22 : !bge .nomatch
-        lda.l OWNorthEdges,x : cmp $22 : !blt .nomatch
+        lda.l OWNorthEdges+2,x : cmp $22 : !blt .nomatch
             ;MATCH
-            txa : !add #$0016 : tax : lda.l OWNorthEdges,x : tay ;y = record id of dest
+            lda.l OWNorthEdges+24,x : tay ;y = record id of dest
             sep #$20 : lda #OWSouthEdges>>16 : phb : pha : plb : ldx #OWSouthEdges : jsr OWNewDestination : plb ;x = address of table
-            bra .matchfound2
+            bra .matchfound
     + dec : bne + ;south
-        lda.l OWSouthEdges,x : dec : inx #2
-        cmp $22 : !bge .nomatch
-        lda.l OWSouthEdges,x : cmp $22 : !blt .nomatch
+        lda.l OWSouthEdges,x : dec
+        cmp $22 : !bge .exitloop
+        lda.l OWSouthEdges+2,x : cmp $22 : !blt .exitloop
             ;MATCH
-            txa : !add #$0016 : tax : lda.l OWSouthEdges,x : tay ;y = record id of dest
+            lda.l OWSouthEdges+24,x : tay ;y = record id of dest
             sep #$20 : lda #OWNorthEdges>>16 : phb : pha : plb : phx : ldx #OWNorthEdges : jsr OWNewDestination : plx : plb ;x = address of table
-        .matchfound2
             bra .matchfound
         .nomatch
             bra .exitloop
     + dec : bne + ; west
-        lda.l OWWestEdges,x : dec : inx #2
+        lda.l OWWestEdges,x : dec
         cmp $20 : !bge .exitloop
-        lda.l OWWestEdges,x : cmp $20 : !blt .exitloop
+        lda.l OWWestEdges+2,x : cmp $20 : !blt .exitloop
             ;MATCH
-            txa : !add #$0016 : tax : lda.l OWWestEdges,x : tay ;y = record id of dest
+            lda.l OWWestEdges+24,x : tay ;y = record id of dest
             sep #$20 : lda #OWEastEdges>>16 : phb : pha : plb : ldx #OWEastEdges : jsr OWNewDestination : plb ;x = address of table
             bra .matchfound
-    + lda.l OWEastEdges,x : dec : inx #2 ;east
+    + lda.l OWEastEdges,x : dec ;east
         cmp $20 : !bge .exitloop
-        lda.l OWEastEdges,x : cmp $20 : !blt .exitloop
+        lda.l OWEastEdges+2,x : cmp $20 : !blt .exitloop
             ;MATCH
-            txa : !add #$0016 : tax : lda.l OWEastEdges,x : tay ;y = record id of dest
+            lda.l OWEastEdges+24,x : tay ;y = record id of dest
             sep #$20 : lda #OWWestEdges>>16 : phb : pha : plb : ldx #OWWestEdges : jsr OWNewDestination : plb ;x = address of table
 
     .matchfound
     plx : pla : pea $0001 : phx
-    txa : !add #$0010 : tax : sec : rts
+    sec : rts
 
     .exitloop
-    txa : !add #$0018 : tax : clc : rts
+    clc : rts
 }
 OWNewDestination:
 {
     tya : sta $4202 : lda #26 : sta $4203
     ;do something else for 8 cycles before getting the result
-    rep #$20
-    txa : !add #$0006
-    adc $4216 : tax ;a = offset to dest record
-    lda.w $0000,x : sta $06 ; set coord
-    inx #2 : lda.w $0000,x : sta $04 ;save dest OW slot/ID
-    ;I thought I'd need some of these values below, but I likely dont need any of them
-    inx #2 ;scroll
-    inx #2 ;cam
-    inx #2 ;LinkOpp
-    inx #2 ;ScrollOpp
-    inx #2 ;CamOpp
-    inx #2 : lda.w $0000,x : sta $84;VRAM
-        SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88
-        LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
-    inx #2 ;: lda.w $0000,x : and #$00ff : sta $624 ;UnknownY
-    inx ;: lda.w $0000,x : and #$00ff : sta $628 ;UnknownX
-        
-    sep #$10 : ldy $418
-
+    rep #$20 : txa : nop : !add $4216 : tax ;a = offset to dest record
+    lda.w $0006,x : sta $06 ; set coord
+    lda.w $0008,x : sta $04 ;save dest OW slot/ID
+    lda.w $0014,x : sta $84;VRAM
+    ;lda.w $0016,x : and #$00ff : sta $624 ;UnknownY
+    ;lda.w $0017,x : and #$00ff : sta $628 ;UnknownX
+    
     ;;22	e0	e2	61c	61e - X
     ;;20	e6	e8	618	61a - Y
+    sep #$10 : ldy $418
     ldx OWCoordIndex,y : lda $20,x : and #$fe00 : pha : lda $20,x : and #$01ff : pha ;s1 = relative cur, s3 = ow cur
     lda $06 : and #$fe00 : !sub 3,s : pha ;set coord, s1 = ow diff, s3 = relative cur, s5 = ow cur
     lda $06 : and #$01ff : !sub 3,s : pha ;s1 = rel diff, s3 = ow diff, s5 = relative cur, s7 = ow cur
     lda $06 : sta $20,x : and #$fe00 : sta $06 ;set coord
-    ldx OWBGIndex,y : lda $e2,x : !add 1,s : !add 3,s : sta $e2,x
-    ldx OWCameraIndex,y : lda $618,x : !add 1,s : !add 3,s : sta $618,x
-    ldx OWCameraIndex,y : lda $61a,x : !add 1,s : !add 3,s : sta $61a,x
+    ldx OWBGIndex,y : lda $e2,x : !add 1,s : adc 3,s : sta $e2,x
+    ldx OWCameraIndex,y : lda $618,x : !add 1,s : adc 3,s : sta $618,x
+    ldx OWCameraIndex,y : lda $61a,x : !add 1,s : adc 3,s : sta $61a,x
     pla : asl : php : ror : plp : ror
     pha : ldx OWBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x
     pla : ldx OWBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x
     pla : pla : pla
+
+    ;vram adjustment
+    LDA $84 : SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88
+    LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
 
     ;fix camera unlock
     lda $e2,x : !sub $06 : bpl +
@@ -212,8 +205,8 @@ OWNewDestination:
         ldx.w OWCameraIndex,y : lda $0618,x : !add 1,s : sta $0618,x
         lda $061a,x : !add 1,s : sta $061a,x : pla
 
-    ;opposite coord stuff
     .adjustOppositeAxis
+    ;opposite coord stuff
     rep #$30 : lda OWOppDirectionOffset,y : and #$00ff : bit #$0080 : beq +
         ora #$ff00 ;extend 8-bit negative to 16-bit negative
     + pha
