@@ -171,6 +171,8 @@ OWNewDestination:
     lda.w $0006,x : sta $06 ; set coord
     lda.w $0008,x : sta $04 ;save dest OW slot/ID
     lda.w $0014,x : sta $84;VRAM
+        LDA $84 : SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88
+        LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
     ;lda.w $0016,x : and #$00ff : sta $624 ;UnknownY
     ;lda.w $0017,x : and #$00ff : sta $628 ;UnknownX
 
@@ -198,9 +200,6 @@ OWNewDestination:
     pla : ldx OWBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x
     pla : pla : pla
 
-    ;vram adjustment
-    LDA $84 : SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88
-    LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
 
     ;fix camera unlock
     lda $e2,x : !sub $06 : bpl +
