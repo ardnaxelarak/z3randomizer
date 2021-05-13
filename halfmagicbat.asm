@@ -8,8 +8,7 @@ GetMagicBatItem:
 	TAY
 	PHA : LDA MagicBatItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID : PLA
 	STZ $02E9 ; 0 = Receiving item from an NPC or message
-	JSL.l Link_ReceiveItem
-RTL
+	JML.l Link_ReceiveItem
 .normalLogic
 	LDA HalfMagic
 	STA $7EF37B

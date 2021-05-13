@@ -268,7 +268,9 @@ org $0CCE85 ; <- Bank0C.asm : 1953 (LDA $C8 : ASL A : INC #2 : STA $701FFE)
 NOP #4
 ;--------------------------------------------------------------------------------
 org $0CDB4C ; <- Bank0C.asm : 3655 (LDA $C8 : ASL A : INC #2 : STA $701FFE : TAX)
-NOP #4
+JSL OnFileCreation
+NOP
+;Additionally, display inventory swap starting equipment on file select
 ;--------------------------------------------------------------------------------
 org $09F5EA ; <- module_death.asm : 510 (LDA $701FFE : TAX : DEX #2)
 LDA.w #$0002 : NOP
@@ -437,10 +439,24 @@ JSL.l OnPrepFileSelect
 ;--------------------------------------------------------------------------------
 
 ;================================================================================
-; Agahnim 0bb
+; Light speed
 ;--------------------------------------------------------------------------------
-;org $1ED6EF ; <- F56EF - sprite_agahnim.asm : 636 (JSL GetRandomInt : AND.b #$01 : BNE BRANCH_GAMMA)
-;NOP #18
+
+; Message
+org $1ED4FF
+JSL AgahnimAsksAboutPed
+
+; Spam blue balls if ped not pulled
+org $1ED6E8
+JSL CheckAgaForPed : NOP
+
+
+; kill ganon when aga dies in light speed
+org $00F970
+JSL KillGanon
+
+
+
 ;--------------------------------------------------------------------------------
 
 ;================================================================================
@@ -725,19 +741,49 @@ dw $0000, $0002, $0004, $0032, $0004, $0006, $0030
 ;--------------------------------------------------------------------------------
 
 ;================================================================================
-; Accessability
+; Accessibility
 ;--------------------------------------------------------------------------------
 ;org $0AC574 ; <- 54574 - Bank0A.asm : 1797 (LDA $0D : STA $0802, X)
 ;JSL FlipGreenPendant
 ;NOP #6
 ;--------------------------------------------------------------------------------
-org $08AAE1 ; <- 42AE1 - ancilla_ether_spell.asm : 28 (LDA $031D : CMP.b #$0B)
-JSL.l SetEtherFlicker : NOP
+org $08AAF9 ; -< 42AF9 - ancilla_ether_spell.asm : 46 (JSL Palette_Restore_BG_From_Flash)
+JSL.l RestoreBgEther
 ;--------------------------------------------------------------------------------
-org $0CF37B ; <- 6737B - Bank0C.asm : 5055 (JSL Filter_MajorWhitenMain)
-JSL.l SetAttractMaidenFlicker : NOP #2
+org $02A3F4 ; <- 123F4 - Bank02.asm : 6222 (LDA.b #$72 : BRA .setBrightness)
+BRA + : NOP #2 : +
+org $02A3FD ; <- 123FD - Bank02.asm : 6233 (LDA.b #$32 : STA $9a)
+JSL.l ConditionalLightning
 ;--------------------------------------------------------------------------------
-
+org $1DE9CD ; <- EE9CD - Bank1D.asm : 568 (JSL Filter_Majorly_Whiten_Bg)
+JSL.l ConditionalWhitenBg
+;--------------------------------------------------------------------------------
+org $08AAED ; <- 42AED - ancilla_ether_spell.asm : 35 (JSL Filter_Majorly_Whiten_Bg)
+JSL.l ConditionalWhitenBg
+;--------------------------------------------------------------------------------
+org $02FEE6 ; <- 17EE6 - Bank0E.asm : 3907 (RTS)
+RTL         ; the whiten color routine is only JSL-ed to
+;--------------------------------------------------------------------------------
+org $07FA7B ; <- 3FA7B - Bank0E.asm : 4735 (REP #$20 : LDX.b #$02)
+JML DDMConditionalLightning
+;--------------------------------------------------------------------------------
+org $07FACB ; <- 3FACB - Bank0E.asm : 4773 (REP #$20 : LDA #$F531, Y)
+JSL.l ConditionalGTFlash : BRA + : NOP #11 : +
+;--------------------------------------------------------------------------------
+org $0AFF48 ; <- 57F48 - Bank0A.asm : 4935 (REP #$20 : LDA $7EC3DA)
+JSL.l ConditionalRedFlash : BRA + : NOP #13 : +
+;--------------------------------------------------------------------------------
+org $08C2A1 ; <- 442A3 - ancilla_sword_ceremony.asm : 54 (REP #$20)
+JSL.l ConditionalPedAncilla : BRA + : NOP #4 : +
+;--------------------------------------------------------------------------------
+org $02FDB1 ; <- 17DB1 - Bank0E.asm : 3760 (JSL LoadGearPalette)
+JSL.l ConditionalChangeGearPalette : NOP
+;--------------------------------------------------------------------------------
+org $02FDCB ; <- 17DCB - Bank0E.asm : 3775 (JSL LoadGearPalette)
+JSL.l ConditionalChangeGearPalette : NOP
+;--------------------------------------------------------------------------------
+org $02FDE6 ; <- 17DE6 - Bank0E.asm : 3789 (JSL LoadGearPalette)
+JSL.l ConditionalChangeGearPalette : NOP
 ;================================================================================
 ; Ice Floor Toggle
 ;--------------------------------------------------------------------------------
@@ -1692,7 +1738,7 @@ JSL.l ShowDungeonItems : NOP #5
 ;================================================================================
 org $0DEA5F ; <- 6EA5F - equipment.asm:1679 - (SEP #$30)
 ;NOP #5
-;BRL .skipCrystalInit
+;JMP .skipCrystalInit
 ;org $0DEAA4 ; <- 6EAA4 - equipment.asm:1706 - (LDA $7EF37A : AND.w #$0001)
 ;.skipCrystalInit
 ;================================================================================
@@ -2613,6 +2659,22 @@ CheckIfReading:
     LDA #$80 : TRB $3B
     CPX #$04
     RTS
+;================================================================================
+
+org $0DB4CA : db $40, $40 ; fire bar statis
+org $0DB4A9 : db $50, $50, $6E, $6E ; roller statis
+org $0DB4B2 : db $40, $40, $40, $40 ; cannon statis
+org $0DB4C3 : db $C0 ; anti fairy statis
+org $0DB516 : db $40 ; chain chomp statis
+
+;--------------------------------------------------------------------------------
+; Keep Firebar Damage on Same Layer
+;--------------------------------------------------------------------------------
+org $06F425
+Sprite_AttemptDamageToPlayerPlusRecoilLong:
+
+org $1ED1B6
+JSL NewFireBarDamage
 ;================================================================================
 
 ;================================================================================

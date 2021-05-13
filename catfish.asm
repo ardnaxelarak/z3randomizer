@@ -5,8 +5,7 @@
 LoadCatfishItemGFX:
 	LDA.l CatfishItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
     LDA.l $1DE185 ; location randomizer writes catfish item to
-	JSL.l PrepDynamicTile
-RTL
+	JML PrepDynamicTile
 ;--------------------------------------------------------------------------------
 DrawThrownItem:
 	LDA $8A : CMP.b #$81 : BNE .catfish
@@ -20,8 +19,7 @@ DrawThrownItem:
     LDA.l $1DE185 ; location randomizer writes catfish item to
 	
 	.draw
-	JSL.l DrawDynamicTile
-RTL
+	JML DrawDynamicTile
 ;--------------------------------------------------------------------------------
 MarkThrownItem:
 	PHA

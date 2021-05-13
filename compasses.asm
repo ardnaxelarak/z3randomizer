@@ -4,11 +4,11 @@
 
 DrawDungeonCompassCounts:
 	LDX $1B : BNE + : RTL : + ; Skip if outdoors
-	LDX $040C : CPX.b #$FF : BNE + : RTL : + ; Skip if not in a dungeon
+	LDX $040C : CPX.b #$FF : BEQ .done ; Skip if not in a dungeon
 
 	CMP.w #$0002 : BEQ ++ ; if CompassMode==2, we don't check for the compass
 		LDA $7EF364 : AND.l .item_masks, X ; Load compass values to A, mask with dungeon item masks
-		BNE + : RTL : + ; skip if we don't have compass
+		BEQ .done ; skip if we don't have compass
 	++
 
 	LDA $040C : LSR

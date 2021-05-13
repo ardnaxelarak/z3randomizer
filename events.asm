@@ -11,8 +11,7 @@ OnPrepFileSelect:
 		RTL
 	+
 	JSL.l LoadAlphabetTilemap
-	JSL.l LoadFullItemTiles
-RTL
+	JML.l LoadFullItemTiles
 ;--------------------------------------------------------------------------------
 OnDrawHud:
 	JSL.l DrawChallengeTimer ; this has to come before NewDrawHud because the timer overwrites the compass counter
@@ -81,7 +80,12 @@ RTL
 ;--------------------------------------------------------------------------------
 OnAga2Defeated:
 	JSL.l Dungeon_SaveRoomData_justKeys ; thing we wrote over, make sure this is first
-	JSL.l IncrementAgahnim2Sword
+	JML.l IncrementAgahnim2Sword
+;--------------------------------------------------------------------------------
+OnFileCreation:
+	TAX ; what we wrote over
+	LDA StartingEquipment+$4C : STA $700340+$4C ; copy starting equipment swaps to file select screen
+	LDA StartingEquipment+$4E : STA $700340+$4E
 RTL
 ;--------------------------------------------------------------------------------
 !RNG_ITEM_LOCK_IN = "$7F5090"
@@ -91,7 +95,7 @@ OnFileLoad:
 	REP #$20 : LDA.l $30F010 : STA.l $7EF33E : SEP #$20
 	LDA MultiClientFlags : STA.l $7EF33D
 
-	LDA.b #$07 : STA $210c ; Restore screen 3 to normal tile area
+	LDA.b #$07 : STA $210C ; Restore screen 3 to normal tile area
 
 	LDA !FRESH_FILE_MARKER : BNE +
 		JSL.l OnNewFile
@@ -158,8 +162,16 @@ OnNewFile:
 		+
 
 		LDA StartingSword : STA $7EF359 ; set starting sword type
-		LDA !INVENTORY_SWAP : STA $70038C ; copy starting equipment swaps to file select screen
-		LDA !INVENTORY_SWAP_2 : STA $70038E
+
+		; reset some values on new file that are otherwise only reset on hard reset
+		STZ $03C4 ; ancilla slot index
+		STZ $047A ; EG
+		STZ $0B08 : STZ $0B09 ; arc variable
+		STZ $0CFB ; enemies killed (pull trees)
+		STZ $0CFC ; times taken damage (pull trees)
+		STZ $0FC7 : STZ $0FC8 : STZ $0FC9 : STZ $0FCA : STZ $0FCB : STZ $0FCC : STZ $0FCD ; prize packs
+		LDA #$00 : STA $7EC011 ; mosaic
+		JSL InitRNGPointerTable ; boss RNG
 	PLP : PLX
 RTL
 ;--------------------------------------------------------------------------------
@@ -172,8 +184,8 @@ RTL
 ;--------------------------------------------------------------------------------
 OnLinkDamaged:
 	JSL.l FlipperKill
-	JSL.l OHKOTimer
-RTL
+	JML.l OHKOTimer
+
 ;--------------------------------------------------------------------------------
 OnEnterWater:
 	JSL.l RegisterWaterEntryScreen
@@ -188,8 +200,8 @@ OnLinkDamagedFromPit:
 RTL
 ;--------------------------------------------------------------------------------
 OnLinkDamagedFromPitOutdoors:
-	JSL.l OHKOTimer ; make sure this is last
-RTL
+	JML.l OHKOTimer ; make sure this is last
+
 ;--------------------------------------------------------------------------------
 !RNG_ITEM_LOCK_IN = "$7F5090"
 OnOWTransition:
@@ -212,16 +224,16 @@ OnLoadDuckMap:
 		RTL
 	+
 	LDA.b #$00 : STA !DARK_DUCK_TEMP
-	JSL OverworldMap_DarkWorldTilemap
-RTL
+	JML OverworldMap_DarkWorldTilemap
+
 ;--------------------------------------------------------------------------------
 PreItemGet:
 	LDA.b #$01 : STA !ITEM_BUSY ; mark item as busy
 RTL
 ;--------------------------------------------------------------------------------
 PostItemGet:
-	JSL.l MaybeWriteSRAMTrace
-RTL
+	JML.l MaybeWriteSRAMTrace
+
 ;--------------------------------------------------------------------------------
 PostItemAnimation:
 	LDA.b #$00 : STA !ITEM_BUSY ; mark item as finished
