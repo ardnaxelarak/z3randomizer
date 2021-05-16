@@ -112,6 +112,7 @@ incsrc sharedplayerpalettefix.asm
 
 ;org $208000 ; bank #$20
 org $A08000 ; bank #$A0
+incsrc newitems.asm ; LEAVE THIS AS FIRST
 incsrc itemdowngrade.asm
 incsrc bugfixes.asm
 incsrc darkworldspawn.asm
@@ -140,7 +141,6 @@ incsrc catfish.asm
 incsrc flute.asm
 incsrc dungeondrops.asm
 incsrc halfmagicbat.asm
-incsrc newitems.asm
 incsrc mantle.asm
 incsrc swordswap.asm
 incsrc scratchpad.asm
@@ -149,7 +149,7 @@ incsrc msu.asm
 incsrc dialog.asm
 incsrc entrances.asm
 incsrc clock.asm
-incsrc accessability.asm
+incsrc accessibility.asm
 incsrc heartbeep.asm
 incsrc capacityupgrades.asm
 warnpc $A18000
@@ -183,6 +183,7 @@ incsrc doorframefixes.asm
 incsrc music.asm
 incsrc roomloading.asm
 incsrc icepalacegraphics.asm
+incsrc firebarlayer.asm
 incsrc glitched.asm
 incsrc hardmode.asm
 incsrc goalitem.asm
@@ -491,6 +492,9 @@ LoadGearPalettes_bunny:
 
 org $02FD95 ; 17D95 - Bank0E.asm: 3742 Note: Different bank
 LoadGearPalettes_variable:
+
+org $02FEAB
+Filter_Majorly_Whiten_Color:
 
 org $05A51D
 Sprite_SpawnFallingItem:
