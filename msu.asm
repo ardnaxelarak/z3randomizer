@@ -365,8 +365,8 @@ SpiralStairsPreCheck:
 ; Change music on stair transition (ToH/GT)
 ;--------------------------------------------------------------------------------
 SpiralStairsPostCheck:
-    LDA $A0
     LDA.l DRMode : BNE .done ; exit if door rando enabled
+    LDA $A0
     CMP.w #$000C : BNE +
         ; Ganon's tower entrance
         LDX $0130 : CPX.b #$F1 : BNE .done  ; Check that we were fading out
