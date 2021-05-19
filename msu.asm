@@ -335,6 +335,7 @@ CheckMusicLoadRequest:
 ;--------------------------------------------------------------------------------
 SpiralStairsPreCheck:
     REP #$20    ; thing we wrote over
+    LDA.l DRMode : BNE .done ; exit if door rando enabled
     LDA $A0
     CMP.w #$000C : BNE +
         LDA !REG_CURRENT_MSU_TRACK : AND.w #$00FF : CMP.w #59 : BNE .done
@@ -365,6 +366,7 @@ SpiralStairsPreCheck:
 ;--------------------------------------------------------------------------------
 SpiralStairsPostCheck:
     LDA $A0
+    LDA.l DRMode : BNE .done ; exit if door rando enabled
     CMP.w #$000C : BNE +
         ; Ganon's tower entrance
         LDX $0130 : CPX.b #$F1 : BNE .done  ; Check that we were fading out
