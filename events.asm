@@ -18,6 +18,7 @@ OnDrawHud:
 	JSL.l DrHudOverride
 	JSL.l NewDrawHud
 	JSL.l SwapSpriteIfNecissary
+	JSL.l CuccoStorm
 	JSL.l PollService
 JML.l ReturnFromOnDrawHud
 ;--------------------------------------------------------------------------------
