@@ -340,22 +340,22 @@ org $1BD1DD : db #$A4, #$06, #$82, #$9E, #$06, #$82, #$FF, #$FF ;new data for ma
 
 ;;move pyramid exit overworld door
 org $1BB96F+$35+$35 : dw $001b
-org $1BBA71+$35+$35 : dw $06a4
+org $1BBA71+$35+$35 : dw $011c
 org $1BBB73+$35 : db $36
 
 org $02DAEE+$37+$37 : dw $0010
 org $02DB8C+$37 : db $1B
-org $02DBDB+$37+$37 : dw $0418
-org $02DC79+$37+$37 : dw $0679
-org $02DD17+$37+$37 : dw $06b4
-org $02DDB5+$37+$37 : dw $06c6
-org $02DE53+$37+$37 : dw $0728
-org $02DEF1+$37+$37 : dw $06e6
-org $02DF8F+$37+$37 : dw $0733
-org $02E02D+$37 : db $07
-org $02E07C+$37 : db $f9
+org $02DBDB+$37+$37 : dw $000e
+org $02DC79+$37+$37 : dw $0600
+org $02DD17+$37+$37 : dw $0676
+org $02DDB5+$37+$37 : dw $0604
+org $02DE53+$37+$37 : dw $06e8
+org $02DEF1+$37+$37 : dw $066d
+org $02DF8F+$37+$37 : dw $06f3
+org $02E02D+$37 : db $00
+org $02E07C+$37 : db $0a
 org $02E0CB+$37+$37 : dw $0000
-org $02E169+$37+$37 : dw $0000
+org $02E169+$37+$37 : dw $811c
 
 
 ;org $02E849 ; Fly 1 to Sanctuary
