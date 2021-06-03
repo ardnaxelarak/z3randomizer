@@ -82,14 +82,20 @@ RTS
 
 map003:
 {
-LDA #$021A : STA $29B6
-LDA #$01F3 : STA $29B8
-LDA #$00A0 : STA $29BA
-LDA #$0104 : STA $29BC
-LDA #$00C6 : STA $2A34
-STA $2A38
-STA $2A3A
-LDA #$0034 : STA $2BE0
+LDA.l OWTileMapAlt+3 : AND #$0001 : BEQ .notInverted
+    LDA #$021A : STA $29B6
+    LDA #$01F3 : STA $29B8
+    LDA #$00A0 : STA $29BA
+    LDA #$0104 : STA $29BC
+    LDA #$00C6 : STA $2A34
+    STA $2A38
+    STA $2A3A
+    LDA #$0034 : STA $2BE0
+    BRA .return
+.notInverted
+LDA.l OWTileMapAlt+3 : AND #$0002 : BEQ .return
+    LDA #$0212 : STA $38B4 ;adding convenient WDM portal in OW Shuffle
+.return
 RTS
 }
 
@@ -884,26 +890,29 @@ RTS
 
 map068:
 {
-LDA #$0E96 : STA $235E
-STA $23DE
-STA $245E
-STA $24DE
-STA $255E
-LDA #$0E97 : STA $2360
-STA $23E0
-STA $2460
-STA $24E0
-STA $2560
-LDA #$0E94 : STA $25DE
-LDA #$0E95 : STA $25E0
-LDA #$0180 : STA $275E
-LDA #$0181 : STA $2760
-LDA #$0184 : STA $27DE
-STA $285E
-LDA #$0185 : STA $27E0
-STA $2860
-LDA #$0212 : STA $2BE0
-
+LDA.l OWTileMapAlt+$43 : AND #$0001 : BEQ .return
+    LDA #$0E96 : STA $235E
+    STA $23DE
+    STA $245E
+    STA $24DE
+    STA $255E
+    LDA #$0E97 : STA $2360
+    STA $23E0
+    STA $2460
+    STA $24E0
+    STA $2560
+    LDA #$0E94 : STA $25DE
+    LDA #$0E95 : STA $25E0
+    LDA #$0180 : STA $275E
+    LDA #$0181 : STA $2760
+    LDA #$0184 : STA $27DE
+    STA $285E
+    LDA #$0185 : STA $27E0
+    STA $2860
+    LDA #$0212 : STA $2BE0
+LDA.l OWTileMapAlt+$43 : AND #$0002 : BEQ .return
+    LDA #$0212 : STA $38B4 ;adding convenient WDM portal in OW Shuffle
+.return
 RTS
 }
 
