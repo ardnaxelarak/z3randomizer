@@ -50,15 +50,15 @@ dw return, return, return, return, return, return, return, return
     ;16      17      18      19      20      21      22      23
 dw map016, return, return, return, map020, return, return, return
     ;24      25      26      27      28      29      30      31
-dw return, return, return, map027, return, return, return, return
+dw return, return, map026, map027, return, return, return, return
     ;32      33      34      35      36      37      38      39
-dw return, return, return, return, return, return, return, return
+dw return, return, map034, return, return, return, return, return
     ;40      41      42      43      44      45      46      47
 dw return, map041, return, return, return, return, return, return
     ;48      49      50      51      52      53      54      55
 dw map049, return, map050, map051, return, map053, return, return
     ;56      57      58      59      60      61      62      63
-dw return, return, map058, return, map060, return, return, return
+dw return, return, map058, return, map060, return, return, map063
 ;DW
     ;64      65      66      67      68      69      70      71
 dw return, return, return, map068, return, map078, return, map071
@@ -67,15 +67,15 @@ dw return, return, return, return, return, return, return, return
     ;80      81      82      83      84      85      86      87
 dw map080, return, return, return, map084, return, return, return
     ;88      89      90      91      92      93      94      95
-dw return, return, return, map091, return, return, return, return
+dw return, return, map090, map091, return, return, return, return
     ;96      97      98      99     100     101     102     103
-dw return, return, return, return, return, return, return, return
+dw return, return, map098, return, return, return, return, return
     ;104     105    106     107     108     109     110     111
 dw return, return, return, return, return, return, return, map111
     ;112     113    114     115     116     117     118     119
 dw map120, return, return, map115, return, map117, return, return
     ;120     121    122     123     124     125     126     127
-dw return, return, return, return, return, return, return, return
+dw return, return, return, return, return, return, return, map127
 
 return:
 RTS
@@ -204,9 +204,18 @@ STA $2524
 RTS
 }
 
+map026:
+{
+LDA.l OWTileMapAlt+$1A : AND #$0002 : BEQ .return
+    LDA #$02F8 : STA $2FBC
+    LDA #$02F9 : STA $2FBE
+.return
+RTS
+}
+
 map027: ;Castle map
 {
-
+LDA.l OWTileMapAlt+$1B : AND #$0001 : BEQ +
 ;Eye removed
 LDA #$046D : STA $243E
 STA $24BC
@@ -242,12 +251,11 @@ LDA #$04BA : STA $2CB4
 STA $2DB4
 STA $2EB4
 LDA #$00B0 : STA $2D2C
++ LDA.l OWTileMapAlt+$1B : AND #$0001 : BEQ +
 LDA #$0014 : STA $2D2E
 LDA #$0015 : STA $2D30
 LDA #$00A8 : STA $2D32
-LDA #$04BB : STA $2D34
-STA $2E34
-STA $2F34
+LDA #$04BB : STA $2D34 : STA $2E34 : STA $2F34
 LDA #$0089 : STA $2DAC
 LDA #$001C : STA $2DAE
 LDA #$001D : STA $2DB0
@@ -260,15 +268,11 @@ LDA #$009A : STA $2EAC
 LDA #$009B : STA $2EAE
 LDA #$009C : STA $2EB0
 LDA #$0095 : STA $2EB2
-
-LDA #$0034
-STA $3028
-STA $302C
-LDA #$0035 : STA $302A
-STA $3032
+LDA #$0034 : STA $3028 : STA $302C
+LDA #$0035 : STA $302A : STA $3032
 LDA #$00DA : STA $302E
++ LDA.l OWTileMapAlt+$1B : AND #$0001 : BEQ +
 LDA #$00E2 : STA $3030
-
 
 ;removing original castle ledge drop
 ;LDA #$0485 : STA $2424
@@ -323,10 +327,8 @@ LDA #$00E2 : STA $3030
 ;STA $28D2
 
 ;new HC door
-LDA #$044F : STA $201C
-LDA #$044F : STA $201E
-LDA #$0455 : STA $209C
-LDA #$0455 : STA $209E
+LDA #$044F : STA $201C  : STA $201E
+LDA #$0455 : STA $209C  : STA $209E
 LDA #$045A : STA $211A
 LDA #$045B : STA $211C
 LDA #$045C : STA $211E
@@ -336,7 +338,7 @@ LDA #$0464 : STA $219C
 LDA #$0465 : STA $219E
 LDA #$0466 : STA $21A0
 
-
++ LDA.l OWTileMapAlt+$1B : AND #$0001 : BEQ .notInverted
 ; CHECK IF AGAHNIM 2 IS DEAD AND WE HAVE ALREADY LANDED
 LDA $7EF2DB : AND #$0020 : BEQ .agahnim2Alive
 LDA #$0E3A : STA $24BC
@@ -353,9 +355,29 @@ LDA #$0491 : STA $25C0
 .agahnim2Alive
 
 ; add sign for Tower Entry
-LDA #$0101 : STA $7E222C
-LDA #$0101 : STA $7E2252
+LDA #$0101 : STA $7E222C : STA $7E2252
 
+.notInverted
+LDA.l OWTileMapAlt+$1B : AND #$0002 : BEQ .return
+    ;rocks for hardlock protection
+    LDA #$02FA : STA $2F80
+    LDA #$030A : STA $3000
+    LDA #$030D : STA $3080
+    
+    LDA #$039A : STA $2FFE
+    LDA #$039B : STA $307E
+.return
+RTS
+}
+
+map034:
+{
+LDA.l OWTileMapAlt+$22 : AND #$0002 : BEQ .return
+    ;rocks for hardlock protection
+    LDA #$02B9 : STA $203C
+    LDA #$0309 : STA $203E
+    LDA #$030E : STA $20BE
+.return
 RTS
 }
 
@@ -887,6 +909,38 @@ STA $2B86
 RTS
 }
 
+map063:
+{
+LDA.l OWTileMapAlt+$3F : AND #$0003 : CMP #$0002 : BNE +
+    LDA #$02EC : STA $29A4 : STA $2BA0 : STA $2C16 ;grass
+    LDA #$02E5 : STA $2A1A : STA $2A26 : STA $2AA6 : STA $2B20 : STA $2C9A ;blank
+    LDA #$06F5 : STA $2A1C : STA $2BA2
+    LDA #$06F6 : STA $2A1E : STA $2A20 : STA $2C20
+    LDA #$0752 : STA $2A22
+    LDA #$0753 : STA $2A24
+    LDA #$075C : STA $2A9A
+    LDA #$06F7 : STA $2A9C : STA $2C22
+    LDA #$0774 : STA $2A9E
++ LDA.l OWTileMapAlt+$3F : AND #$0003 : CMP #$0002 : BNE .return
+    LDA #$06E1 : STA $2AA0 : STA $2C9E : STA $2CA0
+    LDA #$0757 : STA $2AA2 : STA $2C1C
+    LDA #$06E3 : STA $2AA4 : STA $2C24
+    LDA #$075D : STA $2B1A
+    LDA #$0784 : STA $2B1C : STA $2B9C
+    LDA #$076E : STA $2B1E
+    LDA #$0759 : STA $2B22 : STA $2C9C
+    LDA #$0779 : STA $2B24
+    LDA #$075E : STA $2B9A
+    LDA #$076C : STA $2B9E
+    LDA #$0705 : STA $2BA4
+    LDA #$076F : STA $2C1A
+    LDA #$0704 : STA $2C1E
+    LDA #$0762 : STA $2CA2
+    LDA #$0773 : STA $2CA4
+.return
+RTS
+}
+
 map068:
 {
 LDA.l OWTileMapAlt+$43 : AND #$0001 : BEQ .notInverted
@@ -951,8 +1005,18 @@ STA $2524
 RTS
 }
 
+map090:
+{
+LDA.l OWTileMapAlt+$5A : AND #$0002 : BEQ .return
+    LDA #$02F8 : STA $2FBC
+    LDA #$02F9 : STA $2FBE
+.return
+RTS
+}
+
 map091: ;Pyramid
 {
+LDA.l OWTileMapAlt+$5B : AND #$0001 : BEQ +
 LDA #$0323 : STA $39B6
 LDA #$0324 : STA $39B8
 STA $39BA
@@ -979,6 +1043,7 @@ LDA #$046A : STA $3B38
 LDA #$0333 : STA $3B3A
 STA $3B3C
 STA $3B3E
++ LDA.l OWTileMapAlt+$5B : AND #$0001 : BEQ +
 LDA #$0034 : STA $3BB6
 STA $3BBA
 STA $3BBC
@@ -1014,6 +1079,7 @@ LDA #$00F2 : STA $3BB8
 LDA #$0108 : STA $3C38
 
 
++ LDA.l OWTileMapAlt+$5B : AND #$0001 : BEQ +
 ;Warp Tile agah defeated
 LDA #$0034 : STA $3BBE ;Tile when no warp
 LDA $7EF3C5 : AND #$00FF : CMP #$0003 : BNE .agahnimAlive
@@ -1041,6 +1107,7 @@ STA $3AC2
 STA $3AC4
 LDA #$0234 : STA $3AC6
 STA $3B48
++ LDA.l OWTileMapAlt+$5B : AND #$0001 : BEQ .notInverted
 LDA #$02F6 : STA $3AC8
 LDA #$0396 : STA $3ACA
 LDA #$0333 : STA $3B40
@@ -1074,6 +1141,27 @@ STA $3C62
 STA $3C64
 STA $3C66
 
+.notInverted
+LDA.l OWTileMapAlt+$5B : AND #$0002 : BEQ .return
+    ;rocks for hardlock protection
+    LDA #$02FA : STA $2F80
+    LDA #$030A : STA $3000
+    LDA #$030D : STA $3080
+    
+    LDA #$039A : STA $2FFE
+    LDA #$039B : STA $307E
+.return
+RTS
+}
+
+map098:
+{
+LDA.l OWTileMapAlt+$62 : AND #$0002 : BEQ .return
+    ;rocks for hardlock protection
+    LDA #$02B9 : STA $203C
+    LDA #$0309 : STA $203E
+    LDA #$030E : STA $20BE
+.return
 RTS
 }
 
@@ -1125,5 +1213,36 @@ LDA #$0BC5 : STA $3154
 LDA #$0BC8 : STA $315A
 LDA #$0BCA : STA $31D4
 LDA #$0BCD : STA $31DA
+RTS
+}
+
+map127:
+{
+LDA.l OWTileMapAlt+$7F : AND #$0003 : CMP #$0003 : BNE +
+    LDA #$02EC : STA $29A4 : STA $2BA0 : STA $2C16 ;grass
+    LDA #$02E5 : STA $2A26 : STA $2AA6 : STA $2B20 ;blank
+    LDA #$0752 : STA $2A22
+    LDA #$0753 : STA $2A24
+    LDA #$075C : STA $2A9A
+    LDA #$0774 : STA $2A9E
+    LDA #$06E1 : STA $2AA0
+    LDA #$0757 : STA $2AA2
++ LDA.l OWTileMapAlt+$7F : AND #$0003 : CMP #$0003 : BNE .return
+    LDA #$06E3 : STA $2AA4 : STA $2C24
+    LDA #$075D : STA $2B1A
+    LDA #$076E : STA $2B1E
+    LDA #$0759 : STA $2B22
+    LDA #$0779 : STA $2B24
+    LDA #$075E : STA $2B9A
+    LDA #$076C : STA $2B9E
+    LDA #$06F5 : STA $2BA2
+    LDA #$0705 : STA $2BA4
+    LDA #$076F : STA $2C1A
+    LDA #$0704 : STA $2C1E
+    LDA #$06F6 : STA $2C20
+    LDA #$06F7 : STA $2C22
+    LDA #$0762 : STA $2CA2
+    LDA #$0773 : STA $2CA4
+.return
 RTS
 }
