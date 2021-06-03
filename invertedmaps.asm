@@ -91,10 +91,9 @@ LDA.l OWTileMapAlt+3 : AND #$0001 : BEQ .notInverted
     STA $2A38
     STA $2A3A
     LDA #$0034 : STA $2BE0
-    BRA .return
 .notInverted
 LDA.l OWTileMapAlt+3 : AND #$0002 : BEQ .return
-    LDA #$0212 : STA $38B4 ;adding convenient WDM portal in OW Shuffle
+    LDA $2BE0 : STA $38B4 ;adding convenient WDM portal in OW Shuffle
 .return
 RTS
 }
@@ -890,7 +889,7 @@ RTS
 
 map068:
 {
-LDA.l OWTileMapAlt+$43 : AND #$0001 : BEQ .return
+LDA.l OWTileMapAlt+$43 : AND #$0001 : BEQ .notInverted
     LDA #$0E96 : STA $235E
     STA $23DE
     STA $245E
@@ -910,8 +909,9 @@ LDA.l OWTileMapAlt+$43 : AND #$0001 : BEQ .return
     LDA #$0185 : STA $27E0
     STA $2860
     LDA #$0212 : STA $2BE0
+.notInverted
 LDA.l OWTileMapAlt+$43 : AND #$0002 : BEQ .return
-    LDA #$0212 : STA $38B4 ;adding convenient WDM portal in OW Shuffle
+    LDA $2BE0 : STA $38B4 ;adding convenient WDM portal in OW Shuffle
 .return
 RTS
 }
