@@ -19,7 +19,7 @@ Overworld_LoadNewTiles:
     +
 
     SEP #$30
-    LDA InvertedMode : BEQ .notInverted
+    LDX $8A : LDA.l OWTileMapAlt, X : BEQ .notInverted
     PHB
 
     ; Set the data bank to $7E.

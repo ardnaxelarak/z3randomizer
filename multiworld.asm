@@ -270,7 +270,8 @@ Multiworld_Ancilla_ReceiveItem_stillInMotion:
 
 Multiworld_ConsumingFire_TransmuteToSkullWoodsFire:
 {
-	LDA $8A : AND.b #$40 : BEQ .failed ; things we wrote over
+	;LDA $8A : AND.b #$40 : BEQ .failed ; things we wrote over
+	PHX : LDX $8A : LDA.l OWTileWorldAssoc, X : PLX : AND.b #$FF : BEQ .failed
 	LDA $0C4A : CMP #$22 : BEQ .failed
 	LDA $0C4B : CMP #$22 : BEQ .failed
 	LDA $0C4C : CMP #$22 : BEQ .failed

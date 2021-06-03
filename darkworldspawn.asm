@@ -74,7 +74,7 @@ JMP DoWorldFix
 JMP DoWorldFix_Inverted_skip_mirror_check
 
 	.castle
-	LDA #$00 : STA $7EF3CA ; set flag to dark world
+	LDA #$00 : STA $7EF3CA ; set flag to light world
 	LDA $7EF3CC : CMP #$07 : BNE + : LDA.b #$08 : STA $7EF3CC : + ; convert frog to dwarf
 	.done
 RTL
@@ -84,7 +84,9 @@ RTL
 ;--------------------------------------------------------------------------------
 FakeWorldFix:
 	LDA FixFakeWorld : BEQ +
-		LDA $8A : AND.b #$40 : STA $7EF3CA
+		PHX
+			LDX $8A : LDA.l OWTileWorldAssoc, X : STA $7EF3CA
+		PLX
 	+
 RTL
 ;--------------------------------------------------------------------------------

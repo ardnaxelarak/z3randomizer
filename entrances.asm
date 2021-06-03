@@ -184,7 +184,7 @@ PreventEnterOnBonk:
 	STA $00 ; part of what we wrote over
 	LDA.l InvertedMode : AND.w #$00FF : BEQ .done
 	LDA.l $5D : AND.w #$00FF : CMP.w #$0014 : BNE .done ;in mirror mode?
-	LDA.b $8A : AND.w #$0040 : CMP $7B : BEQ .done ; Are we bonking, or doing the superbunny glitch?
+	LDA.b $8A : TAX : LDA.l OWTileWorldAssoc, X : AND.w #$00FF : CMP $7B : BEQ .done ; Are we bonking, or doing the superbunny glitch?
 
 		; If in inverted, are in mirror mode, and are bonking then do not enter
 		JML.l PreventEnterOnBonk_BRANCH_IX
@@ -202,15 +202,15 @@ TurtleRockEntranceFix:
 RTL
 ;--------------------------------------------------------------------------------
 AnimatedEntranceFix: ;when an entrance animation tries to start
-	PHA
+	PHA : PHX
 	LDA.l InvertedMode : BEQ + ;If we are in inverted mode
-	LDA $8A : AND.b #$40 : BNE + ;and in the light world
-		PLA
+	LDX $8A : LDA.l OWTileWorldAssoc, X : BNE + ;and in the light world
+		PLX : PLA
 		STZ $04C6 ; skip it.
 		LDA #$00
 		RTL
 	+
-	PLA
+	PLX : PLA
 	STA $02E4 ;what we wrote over
 	STA $0FC1 ;what we wrote over
 	STA $0710 ;what we wrote over

@@ -47,7 +47,8 @@ OnFileLoadOverride:
 MirrorCheckOverride:
     lda.l DRFlags : and #$02 : beq ++
         lda $7ef353 : cmp #$01 : beq +
-    ++ lda $8A : and #$40 ; what I wrote over
+    ;++ lda $8A : and #$40 ; what I wrote over
+    ++ phx : ldx $8A : lda.l OWTileWorldAssoc,x : plx : and.b #$ff
     rtl
     + lda.l DRScroll : rtl
 

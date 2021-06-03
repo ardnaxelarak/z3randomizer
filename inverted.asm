@@ -202,7 +202,7 @@ MirrorBonk:
 	; otherwise fall through to .normal
 		PHX : PHP
 		PHB : PHK : PLB
-		LDA $8A : AND.b #$40 : BEQ .endLoop ;World we're in? branch if we are in LW we don't want bonks
+		LDX $8A : LDA.l OWTileWorldAssoc, X : BEQ .endLoop ;World we're in? branch if we are in LW we don't want bonks
 		REP #$30
 		LDX #$0000
 		.loop

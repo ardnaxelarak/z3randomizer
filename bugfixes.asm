@@ -49,7 +49,7 @@ DecideIfBunnyByScreenIndex:
 	; superbunny work
 	LDA $1B : BNE .done
 	LDA $7EF357 : BNE .done
-	LDA $8A : AND.b #$40 : PHA
+	PHX : LDX $8A : LDA.l OWTileWorldAssoc, X : PLX : PHA
 	LDA.l InvertedMode : BNE .inverted
 	.normal
 		PLA : EOR #$40
