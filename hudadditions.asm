@@ -25,8 +25,15 @@ HudAdditions:
 		+ LDA.w #$2405 : STA !GOAL_DRAW_ADDRESS+10 : STA !GOAL_DRAW_ADDRESS+12 : STA !GOAL_DRAW_ADDRESS+14
     ++
 
-	LDX $1B : BNE + : RTS : + ; Skip if outdoors
-	ldx $040c : cpx #$ff : bne + : rts : + ; Skip if not in dungeon
+	LDX $1B : BNE + ; if outdoors
+        lda.l OWMode : and #$0100 : bne ++ : rts ; Skip if not mixed ow rando
+        ++ lda $7ef36d : and #$00ff : beq ++
+            lda $7ef3ca : and #$00ff : beq +++
+                lda #$2d60 : bra .owdisplay
+            +++ lda #$2d68 : bra .owdisplay
+        ++ lda #$207f
+        .owdisplay sta $7ec702 : rts
+	+ ldx $040c : cpx #$ff : bne + : rts : + ; Skip if not in dungeon
 	lda.l DRMode : bne + : rts : + ; Skip if not door rando
         phb : phk : plb
         lda $7ef364 : and.l $0098c0, x : beq +
