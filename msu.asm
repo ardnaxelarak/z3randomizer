@@ -149,7 +149,6 @@
 ; Extended OST/SPC fallback, decide which track to actually play
 ;--------------------------------------------------------------------------------
 CheckMusicLoadRequest:
-    PHP : REP #$10 : PHA : PHX : PHY
         LDA !REG_MUSIC_CONTROL_REQUEST : BEQ .skip+3 : BMI .skip+3
         CMP !REG_CURRENT_COMMAND : BNE .continue
         CMP.b #22 : BNE .skip   ; Check GT when mirroring from upstairs
@@ -159,7 +158,6 @@ CheckMusicLoadRequest:
 .skip
         LDA !REG_MUSIC_CONTROL_REQUEST
         STA !REG_MUSIC_CONTROL : STZ !REG_MUSIC_CONTROL_REQUEST
-    PLY : PLX : PLA : PLP
     RTL
         
 .continue
@@ -320,13 +318,11 @@ CheckMusicLoadRequest:
 
 .done
         LDA !REG_MUSIC_CONTROL_REQUEST : STA !REG_MUSIC_CONTROL : STZ !REG_MUSIC_CONTROL_REQUEST
-    PLY : PLX : PLA : PLP
     RTL
 
 .sfx_indoors
         LDA !REG_MUSIC_CONTROL_REQUEST : STA !REG_MUSIC_CONTROL : STZ !REG_MUSIC_CONTROL_REQUEST
-    PLY : PLX : PLA : PLP
-    PHP : SEP #$20 : LDA.b #$05 : STA $012D : PLP
+    SEP #$20 : LDA.b #$05 : STA $012D ; Vanilla subroutine expects 8-bit A, doesn't use X/Y
     JML Module_PreDungeon_setAmbientSfx
 ;--------------------------------------------------------------------------------
 
