@@ -56,12 +56,12 @@ dw return, return, map034, return, return, return, return, return
     ;40      41      42      43      44      45      46      47
 dw return, map041, return, return, return, return, return, return
     ;48      49      50      51      52      53      54      55
-dw map049, return, map050, map051, return, map053, return, return
+dw map048, return, map050, map051, return, map053, return, return
     ;56      57      58      59      60      61      62      63
 dw return, return, map058, return, map060, return, return, map063
 ;DW
     ;64      65      66      67      68      69      70      71
-dw return, return, return, map068, return, map078, return, map071
+dw return, return, return, map067, return, map069, return, map071
     ;72      73      74      75      76      77      78      79
 dw return, return, return, return, return, return, return, return
     ;80      81      82      83      84      85      86      87
@@ -393,7 +393,7 @@ LDA #$0036 : STA $2386
 RTS
 }
 
-map049:
+map048:
 {
 LDA #$017E : STA $2050
 STA $20CE
@@ -941,7 +941,7 @@ LDA.l OWTileMapAlt+$3F : AND #$0003 : CMP #$0002 : BNE +
 RTS
 }
 
-map068:
+map067:
 {
 LDA.l OWTileMapAlt+$43 : AND #$0001 : BEQ .notInverted
     LDA #$0E96 : STA $235E
@@ -982,7 +982,7 @@ STA $26A4
 RTS
 }
 
-map078:
+map069:
 {
 LDA #$0239 : STA $3D4A
 RTS
