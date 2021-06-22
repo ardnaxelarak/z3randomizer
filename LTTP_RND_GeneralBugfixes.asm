@@ -334,6 +334,8 @@ warnpc $B08000
 ;$22 Contrib Code
 ;$23 Stats & Credits
 ;$24 Code Bank
+;$27 DR Code Bank
+;$28 Keydrop Code bank
 ;$29 External hooks (rest of bank not used)
 ;$2E Reserved for Tournament Use
 ;$2F Static RNG (rest is reserved for tournament use)
