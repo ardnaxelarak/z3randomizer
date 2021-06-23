@@ -3,7 +3,7 @@
 ; Does tile modification for... the pyramid of power hole
 ; after Ganon slams into it in bat form?
 Overworld_CreatePyramidHoleModified:
-	LDA.l InvertedMode : BNE +
+	PHX : LDX $8A : LDA.l OWTileMapAlt, X : PLX : AND.b #$01 : BNE +
 		JMP .originalBehaviour
 +
 .invertedBehavior
@@ -80,7 +80,7 @@ Overworld_CreatePyramidHoleModified:
 RTL
 ;------------------------------------------------------------------------------
 Draw_PyramidOverlay:
-	LDA.l InvertedMode : AND.w #$00FF : BNE .done
+	PHX : LDA $8A : AND.w #$00FF : TAX : LDA.l OWTileMapAlt, X : PLX : AND.w #$0001 : BNE .done
 .normal
 	LDA.w #$0E39 : STA $23BC
 	INC A        : STA $23BE
@@ -174,7 +174,7 @@ GanonTowerInvertedCheck:
 ;Hard coded rock removed in LW for Inverted mode
 HardcodedRocks:
 
-    LDA InvertedMode : AND.w #$00FF : BEQ .normalrocks
+    LDA $8A : AND.w #$00FF : TAX : LDA.l OWTileMapAlt, X : AND.w #$0001 : BEQ .normalrocks
         BRA .noRock2
     .normalrocks
         LDA.w #$020F : LDX $8A : CPX.w #$0033 : BNE .noRock
@@ -186,7 +186,7 @@ HardcodedRocks:
 RTL
 
 TurtleRockPegSolved:
-	LDA.l InvertedMode : AND.w #$00FF : BNE +
+	PHX : LDA $8A : AND.w #$00FF : TAX : LDA.l OWTileMapAlt, X : PLX : AND.w #$0001 : BNE +
 		LDA.l $7ef287 ; What we wrote over (reading flags for this screen)
 		RTL
 	+
@@ -195,7 +195,7 @@ RTL
 
 MirrorBonk:
 	; must preserve X/Y, and must preserve $00-$0F
-	LDA.l InvertedMode : BEQ .normal
+	PHX : LDX $8A : LDA.l OWTileMapAlt, X : PLX : AND.b #$01 : BEQ .normal
 
     ; Goal: use $20 and $22 to decide to force a bonk
 	; if we want to bonk branch to .forceBonk

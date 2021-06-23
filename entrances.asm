@@ -182,7 +182,7 @@ JML Overworld_Hole_End
 ;--------------------------------------------------------------------------------
 PreventEnterOnBonk:
 	STA $00 ; part of what we wrote over
-	LDA.l InvertedMode : AND.w #$00FF : BEQ .done
+	LDA.b $8A : TAX : LDA.l OWTileMapAlt, X : AND.w #$0001 : BEQ .done
 	LDA.l $5D : AND.w #$00FF : CMP.w #$0014 : BNE .done ;in mirror mode?
 	LDA.b $8A : TAX : LDA.l OWTileWorldAssoc, X : AND.w #$00FF : CMP $7B : BEQ .done ; Are we bonking, or doing the superbunny glitch?
 
@@ -204,7 +204,8 @@ RTL
 AnimatedEntranceFix: ;when an entrance animation tries to start
 	PHA : PHX
 	LDA.l InvertedMode : BEQ + ;If we are in inverted mode
-	LDX $8A : LDA.l OWTileWorldAssoc, X : BNE + ;and in the light world
+	LDA.l OWMode+1 : CMP #$01 : BEQ + ;If we are in Mixed OW shuffle mode
+	LDA $8A : AND #$40 : BNE + ;and in the light world
 		PLX : PLA
 		STZ $04C6 ; skip it.
 		LDA #$00

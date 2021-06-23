@@ -61,7 +61,10 @@ FluteBoy:
 JML.l FluteBoy_Continue
 ;--------------------------------------------------------------------------------
 FreeDuckCheck:
+	LDA.l OWMode+1 : CMP.b #$01 : BEQ .skipInvertedCheck
 	LDA.l InvertedMode : BEQ .done
+	.skipInvertedCheck
+	
 	LDA $7EF34C : CMP.b #$03 : BEQ .done ; flute is already active
 	
     ; check the area, is it #$18 = 30?

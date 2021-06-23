@@ -93,6 +93,7 @@ LDA.l OWTileMapAlt+3 : AND #$0001 : BEQ .notInverted
     LDA #$0034 : STA $2BE0
 .notInverted
 LDA.l OWTileMapAlt+3 : AND #$0002 : BEQ .return
+LDA.l OWMode : AND #$00FF : BEQ .return
     LDA $2BE0 : STA $38B4 ;adding convenient WDM portal in OW Shuffle
 .return
 RTS
@@ -268,10 +269,10 @@ LDA #$009A : STA $2EAC
 LDA #$009B : STA $2EAE
 LDA #$009C : STA $2EB0
 LDA #$0095 : STA $2EB2
++ LDA.l OWTileMapAlt+$1B : AND #$0001 : BEQ +
 LDA #$0034 : STA $3028 : STA $302C
 LDA #$0035 : STA $302A : STA $3032
 LDA #$00DA : STA $302E
-+ LDA.l OWTileMapAlt+$1B : AND #$0001 : BEQ +
 LDA #$00E2 : STA $3030
 
 ;removing original castle ledge drop
@@ -965,10 +966,11 @@ LDA.l OWTileMapAlt+$43 : AND #$0001 : BEQ .owshuffle
     STA $285E
     LDA #$0185 : STA $27E0
     STA $2860
-    LDA #$0212 : STA $2BE0
+    LDA #$0212 : STA $2BE0 ; portal
 .owshuffle
 LDA.l OWTileMapAlt+$43 : AND #$0002 : BEQ .return
-    LDA $2BE0 : STA $38B4 ;adding convenient WDM portal in OW Shuffle
+LDA.l OWMode : AND #$00FF : BEQ .return
+    LDA $2BE0 : STA $38B4 ; adding convenient WDM portal in OW Shuffle
 .return
 RTS
 }
@@ -1020,6 +1022,33 @@ RTS
 map091: ;Pyramid
 {
 LDA.l OWTileMapAlt+$5B : AND #$0001 : BEQ +
+LDA #$0A06 : STA $2E1C ; cover up entrance
+LDA #$0A0E : STA $2E1E
+
+;Added Pegs on pyramid map
+;{
+;STA $321C
+;STA $329C
+;STA $32A0
+
+;LDA #$0071 : STA $321E
+;;LDA #$00DA : STA $3220
+;STA $329A
+;LDA #$00E1 : STA $329E
+;LDA #$0382 : STA $3318
+;LDA #$037C : STA $3322
+
+;LDA #$021B : STA $3218
+;STA $3222
+;STA $3298
+;STA $32A2
+;STA $331A
+;STA $331C
+;STA $331E
+;STA $3320
+;LDA #$00E2 : STA $321A
+;}
+
 LDA #$0323 : STA $39B6
 LDA #$0324 : STA $39B8
 STA $39BA
@@ -1039,6 +1068,7 @@ LDA #$0233 : STA $3AB8
 STA $3ABA
 STA $3ABC
 STA $3ABE
++ LDA.l OWTileMapAlt+$5B : AND #$0001 : BEQ +
 LDA #$03A2 : STA $3B32
 LDA #$0235 : STA $3B36
 STA $3BB4
@@ -1046,7 +1076,6 @@ LDA #$046A : STA $3B38
 LDA #$0333 : STA $3B3A
 STA $3B3C
 STA $3B3E
-+ LDA.l OWTileMapAlt+$5B : AND #$0001 : BEQ +
 LDA #$0034 : STA $3BB6
 STA $3BBA
 STA $3BBC
@@ -1054,33 +1083,8 @@ STA $3C3A
 STA $3C3C
 STA $3C3E
 
-;Added Pegs on pyramid map
-;{
-STA $321C
-STA $329C
-STA $32A0
-
-LDA #$0071 : STA $321E
-LDA #$00DA : STA $3220
-STA $329A
-LDA #$00E1 : STA $329E
-LDA #$0382 : STA $3318
-LDA #$037C : STA $3322
-
-LDA #$021B : STA $3218
-STA $3222
-STA $3298
-STA $32A2
-STA $331A
-STA $331C
-STA $331E
-STA $3320
-LDA #$00E2 : STA $321A
-;}
-
 LDA #$00F2 : STA $3BB8
 LDA #$0108 : STA $3C38
-
 
 + LDA.l OWTileMapAlt+$5B : AND #$0001 : BEQ +
 ;Warp Tile agah defeated
@@ -1088,7 +1092,6 @@ LDA #$0034 : STA $3BBE ;Tile when no warp
 LDA $7EF3C5 : AND #$00FF : CMP #$0003 : BNE .agahnimAlive
 LDA #$0212 : STA $3BBE ;warp
 .agahnimAlive
-
 
 LDA #$0324 : STA $39C0
 STA $39C2

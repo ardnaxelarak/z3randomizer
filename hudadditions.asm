@@ -26,7 +26,7 @@ HudAdditions:
     ++
 
 	LDX $1B : BNE + ; if outdoors
-        lda.l OWMode : and #$0100 : bne ++ : rts ; Skip if not mixed ow rando
+        lda.l OWMode : and #$0300 : bne ++ : rts ; Skip if vanilla ow rando
         ++ lda $7ef36d : and #$00ff : beq ++
             lda $7ef3ca : and #$00ff : beq +++
                 lda #$2d60 : bra .owdisplay
