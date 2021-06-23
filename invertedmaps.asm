@@ -338,7 +338,7 @@ LDA #$0464 : STA $219C
 LDA #$0465 : STA $219E
 LDA #$0466 : STA $21A0
 
-+ LDA.l OWTileMapAlt+$1B : AND #$0001 : BEQ .notInverted
++ LDA.l OWTileMapAlt+$1B : AND #$0001 : BEQ .notSwapped
 ; CHECK IF AGAHNIM 2 IS DEAD AND WE HAVE ALREADY LANDED
 LDA $7EF2DB : AND #$0020 : BEQ .agahnim2Alive
 LDA #$0E3A : STA $24BC
@@ -354,8 +354,9 @@ LDA #$0E41 : STA $2542
 LDA #$0491 : STA $25C0
 .agahnim2Alive
 
-; add sign for Tower Entry
-LDA #$0101 : STA $7E222C : STA $7E2252
+.notSwapped
+LDA.l InvertedMode : AND #$00FF : BEQ .notInverted
+    LDA #$0101 : STA $7E222C : STA $7E2252 ; add sign for Tower Entry
 
 .notInverted
 LDA.l OWTileMapAlt+$1B : AND #$0002 : BEQ .return
@@ -943,27 +944,29 @@ RTS
 
 map067:
 {
-LDA.l OWTileMapAlt+$43 : AND #$0001 : BEQ .notInverted
-    LDA #$0E96 : STA $235E
-    STA $23DE
-    STA $245E
-    STA $24DE
+LDA.l InvertedMode : AND #$00FF : BEQ .notInverted
+    LDA #$08D5 : STA $235E ; GT entrance auto-opened
+    LDA #$08E3 : STA $23DE
+    LDA #$0E90 : STA $245E
+    LDA #$0E96 : STA $24DE
     STA $255E
-    LDA #$0E97 : STA $2360
-    STA $23E0
-    STA $2460
-    STA $24E0
+    LDA #$08D6 : STA $2360
+    LDA #$08E4 : STA $23E0
+    LDA #$0E91 : STA $2460
+    LDA #$0E97 : STA $24E0
     STA $2560
     LDA #$0E94 : STA $25DE
     LDA #$0E95 : STA $25E0
-    LDA #$0180 : STA $275E
+.notInverted
+LDA.l OWTileMapAlt+$43 : AND #$0001 : BEQ .owshuffle
+    LDA #$0180 : STA $275E ; ladder
     LDA #$0181 : STA $2760
     LDA #$0184 : STA $27DE
     STA $285E
     LDA #$0185 : STA $27E0
     STA $2860
     LDA #$0212 : STA $2BE0
-.notInverted
+.owshuffle
 LDA.l OWTileMapAlt+$43 : AND #$0002 : BEQ .return
     LDA $2BE0 : STA $38B4 ;adding convenient WDM portal in OW Shuffle
 .return
