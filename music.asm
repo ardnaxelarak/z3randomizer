@@ -178,6 +178,8 @@ Overworld_FinishMirrorWarp:
 
 ;--------------------------------------------------------------------------------
 BirdTravel_LoadTargetAreaMusic:
+    LDX.b #$02 ; Default OW theme
+
     ; Skip village and lost woods checks if entering dark world or a special area
     LDA $8A : CMP.b #$43 : BEQ .endOfLightWorldChecks
     CMP.b #$40 : !BGE .notVillageOrWoods
@@ -235,7 +237,7 @@ BirdTravel_LoadTargetAreaMusic:
         LDA.b #$05 : STA $012D
         BRA .checkInverted
 
-.darkMountain
+    .darkMountain
     LDA $7EF37A : CMP.b #$7F : BEQ +
         LDX.b #$0D  ; dark death mountain theme
     + : LDA.b #$09 : STA $012D
