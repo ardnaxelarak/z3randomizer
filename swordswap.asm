@@ -149,7 +149,17 @@ CheckGanonHammerDamage:
 	LDA $0E20, X : CMP.b #$D8 ; original behavior except ganon
 RTL
 	+
+	LDA.l GanonVulnerabilityItem : CMP.b #$0C : BEQ +
 	LDA $0E20, X : CMP.b #$D6 ; original behavior
+RTL
+  +
+	LDA $0E20, X : CMP.b #$D8 : BCC +
+RTL
+  +
+  CMP.b #$D6 : BNE +
+RTL
+  +
+  CLC
 RTL
 ;================================================================================
 GetSmithSword:

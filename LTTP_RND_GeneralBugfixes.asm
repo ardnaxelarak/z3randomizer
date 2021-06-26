@@ -223,6 +223,7 @@ incsrc msu.asm
 incsrc multiworld.asm
 incsrc terrorpin.asm
 incsrc special_bombs.asm
+incsrc variable_ganon_vulnerability.asm
 warnpc $A58000
 
 ;org $228000 ; contrib area

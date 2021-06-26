@@ -303,28 +303,57 @@ DialogGanon2:
 
 	REP #$20
 	BCS +
-		LDA.w #$018D : BRA ++
+		LDA.w #$018D : JMP .done
 	+
+		LDA.l GanonVulnerabilityItem : AND #$00FF : BNE .special_item
 		LDA.l SpecialBombs
-		AND.w #$00FF : BEQ + ; branch if not special bomb mode
-		LDA.w #$0195 : BRA ++
-	+
+		AND.w #$00FF : BNE .bombs ; bombs if special bomb mode
+	.silver_arrows
 		LDA.l $7EF38E
 
 		BIT.w #$0080 : BNE + ; branch if bow
-		LDA.w #$0192 : BRA ++
+		LDA.w #$0192 : JMP .done
 	+
 		BIT.w #$0040 : BEQ + ; branch if no silvers
-		LDA.w #$0195 : BRA ++
+		LDA.w #$0195 : JMP .done
 	+
 		BIT.w #$0020 : BNE + ; branch if p bow
-		LDA.w #$0194 : BRA ++
+		LDA.w #$0194 : JMP .done
 	+
 		BIT.w #$0080 : BEQ + ; branch if no bow
-		LDA.w #$0193 : BRA ++
+		LDA.w #$0193 : JMP .done
 	+
-		LDA.w #$016E
-	++
+		LDA.w #$016E : JMP .done
+	.special_item
+		CMP.w #$0001 : BEQ .silver_arrows
+		CMP.w #$0004 : BEQ .bombs
+		CMP.w #$0005 : BEQ .powder
+		CMP.w #$0010 : BEQ .bee
+		PHX : TAX
+		LDA.l $7EF33F, X : PLX : AND #$00FF : BNE +
+		LDA.w #$0192 : JMP .done
+	+
+		LDA.w #$0195 : BRA .done
+	.bombs
+		LDA.l $7EF343 : AND #$00FF : BNE +
+		LDA.l $7F50C9 : AND #$00FF : BNE + ; check for infinite bombs
+		LDA.w #$0192 : BRA .done
+	+
+		LDA.w #$0195 : BRA .done
+	.powder
+		LDA.l $7EF38C : AND #$0010 : BNE +
+		LDA.w #$0192 : BRA .done
+	+
+		LDA.w #$0195 : BRA .done
+	.bee
+		LDA.l $7EF35C : AND #$00FF : CMP.w #$0007 : BEQ + : CMP.w #$0008 : BEQ +
+		LDA.l $7EF35D : AND #$00FF : CMP.w #$0007 : BEQ + : CMP.w #$0008 : BEQ +
+		LDA.l $7EF35E : AND #$00FF : CMP.w #$0007 : BEQ + : CMP.w #$0008 : BEQ +
+		LDA.l $7EF35F : AND #$00FF : CMP.w #$0007 : BEQ + : CMP.w #$0008 : BEQ +
+		LDA.w #$0192 : BRA .done
+	+
+		LDA.w #$0195 : BRA .done
+	.done
 	STA $1CF0
 	SEP #$20
 	JSL.l Sprite_ShowMessageMinimal_Alt
