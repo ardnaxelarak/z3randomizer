@@ -319,6 +319,18 @@ JSL.l LoadBombCount16
 org $0DDEB3 ; <- 6DEB3 - equipment.asm : 328 (LDA $7EF33F, X)
 JSL.l IsItemAvailable
 ;--------------------------------------------------------------------------------
+org $0DDDE6 ; <- 6DDE6 - equipment.asm : 146 (LDX.b #$12 ...)
+JSL.l HaveAnyItems
+BRA + : NOP #7 : +
+;--------------------------------------------------------------------------------
+org $0DDE6E ; <- 6DE6E - equipment.asm : 271 (LDX.b #$12 ...)
+JSL.l HaveAnyItems
+BRA + : NOP #7 : +
+;--------------------------------------------------------------------------------
+org $0DE39B ; <- 6E39B - equipment.asm : 1107 (LDX.b #$12 ...)
+JSL.l HaveAnyItems
+BRA + : NOP #7 : +
+;--------------------------------------------------------------------------------
 
 ;================================================================================
 ; Inverted Mode
@@ -908,12 +920,9 @@ LDA.w AddReceivedItemExpanded_item_target_addr+1, X
 org $09861F ; 4861F - ancilla_init.asm:724 (LDA .item_values, Y)
 LDA.w AddReceivedItemExpanded_item_values, Y
 
-org $098627 ; 48627 - ancilla_init.asm:731 (LDA .item_target_addr+0, X)
-LDA.w AddReceivedItemExpanded_item_target_addr+0, X
-org $09862C ; 4862C - ancilla_init.asm:722 (LDA .item_target_addr+1, X)
-LDA.w AddReceivedItemExpanded_item_target_addr+1, X
-org $098635 ; 48635 - ancilla_init.asm:727 (LDA .item_values, Y)
-LDA.w AddReceivedItemExpanded_item_values, Y
+org $098624 ; 48624 - ancilla_init.asm:728 (TYA : ASL A : TAX)
+JSL.l UpdateInventoryLocationExpanded
+BRA + : NOP #18 : +
 
 org $0986AA ; 486AA - ancilla_init.asm:848 (LDA .item_masks, X)
 LDA.w AddReceivedItemExpanded_item_masks, X
@@ -2269,9 +2278,6 @@ NOP #6
 ;--------------------------------------------------------------------------------
 org $09865E ; <- 4865E
 JSL.l $1BEE1B ; fix something i wrote over i shouldn't have
-;--------------------------------------------------------------------------------
-org $098638 ; <- 48638 - ancilla_init.asm:737 - LDA .item_values, Y : BMI .dontWrite (BMI)
-JSL.l ItemDowngradeFix
 ;================================================================================
 
 ;================================================================================
@@ -2644,3 +2650,45 @@ JSL FastCreditsCutsceneTimer
 
 org $0EE773
 JSL FastTextScroll : NOP
+
+;================================================================================
+; Bomb-Only Mode
+;--------------------------------------------------------------------------------
+org $06ECC3 ; Bank06.asm@4704 (PHX : TAX : LDA.l .damage_classes, X : PLX)
+JSL DamageClassCalc
+BRA + : NOP #29 : +
+;--------------------------------------------------------------------------------
+org $0882D4 ; Bank08.asm@445 (PHX : TYX : ... )
+JSL Utility_CheckAncillaOverlapWithSprite
+BRA + : NOP #5 : +
+;--------------------------------------------------------------------------------
+org $088DB1 ; Bank08.asm@1207 (PHY : PHX : TYX : ... )
+JSL Utility_CheckAncillaOverlapWithSprite
+BRA + : NOP #7 : +
+--------------------------------------------------------------------------------
+org $0882E8 ; Bank08.asm@456 (LDA $0DB0, Y : CMP.b #$03)
+JSL Utility_CheckHelmasaurKingCollision
+NOP
+;--------------------------------------------------------------------------------
+org $1E838C ; sprite_helmasaur_king.asm@522 (LDA $0301 : AND.b #$0A)
+JSL Utility_CheckHammerHelmasaurKingMask
+NOP
+;--------------------------------------------------------------------------------
+org $06ED94 ; Bank06.asm@4866 (LDA $0E60, X : AND.b #$40)
+JSL Utility_CheckImpervious
+NOP
+;--------------------------------------------------------------------------------
+org $068F94 ; sprite_prep.asm@1984 (INC $0BA0, X : JSL Sprite_InitializedSegmented)
+JSL AllowBombingMoldorm
+BRA + : NOP : +
+;--------------------------------------------------------------------------------
+org $0DEE05 ; equipment.asm@2065 (LDA $7EF359 : AND.w #$00FF : CMP.w #$00FF : ...)
+JSL DrawSwordInMenu
+BRA + : NOP #16 : +
+;--------------------------------------------------------------------------------
+org $0DFC51 ; is this being used? I hope not! let's find out if anything breaks!
+db $B2, $3C, $B3, $3C, $C2, $3C, $17, $3C
+db $B2, $2C, $B3, $2C, $C2, $2C, $18, $2C
+db $B2, $24, $B3, $24, $C2, $24, $19, $24
+db $B2, $28, $B3, $28, $C2, $28, $1A, $28
+db $B2, $28, $B3, $28, $C2, $28, $1B, $28

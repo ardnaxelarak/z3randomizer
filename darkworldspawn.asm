@@ -140,9 +140,10 @@ SetEscapeAssist:
 		BIT.b #$01 : BEQ + : STA !INFINITE_ARROWS : +
 		BRA ++
 	.no_train ; choo choo
-		LDA.l EscapeAssist : BIT.b #$04 : BEQ + : LDA.b #$00 : STA !INFINITE_MAGIC : +
-		LDA.l EscapeAssist : BIT.b #$02 : BEQ + : LDA.b #$00 : STA !INFINITE_BOMBS : +
-		LDA.l EscapeAssist : BIT.b #$01 : BEQ + : LDA.b #$00 : STA !INFINITE_ARROWS : +
+		LDA.l EscapeAssist
+		BIT.b #$40 : BEQ + : STA !INFINITE_MAGIC : +
+		BIT.b #$20 : BEQ + : STA !INFINITE_BOMBS : +
+		BIT.b #$10 : BEQ + : STA !INFINITE_ARROWS : +
 	++
 RTL
 ;--------------------------------------------------------------------------------

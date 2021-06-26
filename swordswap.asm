@@ -6,11 +6,11 @@
 ;GetFairySword:
 ;	CMP.b #$49 : BNE + : LDA.b #$00 : + ; convert single fighter sword to low id one
 ;	CMP.b #$50 : BNE + : LDA.b #$01 : + ; convert safe master sword to normal one
-;    CMP #$04 : !BLT + : JML.l PyramidFairy_BRANCH_IOTA : + ; for any sword, incl newer
-;    JSL ItemCheck_FairySword : BEQ + : JML.l PyramidFairy_BRANCH_IOTA : + ; skip if we already flagged getting this
+;	CMP #$04 : !BLT + : JML.l PyramidFairy_BRANCH_IOTA : + ; for any sword, incl newer
+;	JSL ItemCheck_FairySword : BEQ + : JML.l PyramidFairy_BRANCH_IOTA : + ; skip if we already flagged getting this
 ;	JSL ItemSet_FairySword ; mark as got
-;    LDA FairySword : STA $0DC0, X ; whichever sword
-;    LDA.b #$05 : STA $0EB0, X ; something we overwrote, documentation unclear on purpose
+;	LDA FairySword : STA $0DC0, X ; whichever sword
+;	LDA.b #$05 : STA $0EB0, X ; something we overwrote, documentation unclear on purpose
 ;
 ;JML.l PyramidFairy_BRANCH_GAMMA
 ;================================================================================
@@ -45,6 +45,7 @@ LookupDamageLevel:
 		LDA.l !StalfosBombDamage
 		RTL
 	+
+	LDA SpecialBombs : BNE .alt_table
 	PHP
 		REP #$20 ; set 16-bit accumulator
 		TXA : LSR : TAX : BCS .lower
@@ -56,6 +57,20 @@ RTL
 .lower
 	PLP
 	LDA.l Damage_Table, X
+	AND.b #$0F
+RTL
+.alt_table
+	PHP
+		REP #$20 ; set 16-bit accumulator
+		TXA : LSR : TAX : BCS .alt_lower
+.alt_upper
+	PLP
+	LDA.l Damage_Table_Alt, X
+	LSR #4
+RTL
+.alt_lower
+	PLP
+	LDA.l Damage_Table_Alt, X
 	AND.b #$0F
 RTL
 ;================================================================================
@@ -146,21 +161,21 @@ GetSmithSword:
 	REP #$20 : LDA $7EF360 : CMP #$000A : SEP #$20 : !BGE .buy
 	.cant_afford
 		REP #$10
-	    LDA.b #$7A
-	    LDY.b #$01
-	    JSL.l Sprite_ShowMessageUnconditional
+		LDA.b #$7A
+		LDY.b #$01
+		JSL.l Sprite_ShowMessageUnconditional
 		LDA.b #$3C : STA $012E ; error sound
 		SEP #$10
 		BRA .done
 
 	.buy
-	    LDA.l SmithItem : TAY
-	    STZ $02E9 ; Item from NPC
+		LDA.l SmithItem : TAY
+		STZ $02E9 ; Item from NPC
 		PHX : JSL Link_ReceiveItem : PLX
 
 		REP #$20 : LDA $7EF360 : !SUB.w #$000A : STA $7EF360 : SEP #$20 ; Take 10 rupees
 		JSL ItemSet_SmithSword
-	
+
 	.done
 		JML.l Smithy_AlreadyGotSword
 ;================================================================================

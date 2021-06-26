@@ -100,19 +100,19 @@ RTL
 ;DATA - Loot Identifier to Sprite ID
 {
 	.gfxSlots
-    db $06, $44, $45, $46, $2D, $20, $2E, $09
-    db $09, $0A, $08, $05, $10, $0B, $2C, $1B
+	db $06, $44, $45, $46, $2D, $20, $2E, $09
+	db $09, $0A, $08, $05, $10, $0B, $2C, $1B
 
-    db $1A, $1C, $14, $19, $0C, $07, $1D, $2F
-    db $07, $15, $12, $0D, $0D, $0E, $11, $17
+	db $1A, $1C, $14, $19, $0C, $07, $1D, $2F
+	db $07, $15, $12, $0D, $0D, $0E, $11, $17
 
-    db $28, $27, $04, $04, $0F, $16, $03, $13
-    db $01, $1E, $10, $00, $00, $00, $00, $00
+	db $28, $27, $04, $04, $0F, $16, $03, $13
+	db $01, $1E, $10, $00, $00, $00, $00, $00
 
-    db $00, $30, $22, $21, $24, $24, $24, $23
-    db $23, $23, $29, $2A, $2C, $2B, $03, $03
+	db $00, $30, $22, $21, $24, $24, $24, $23
+	db $23, $23, $29, $2A, $2C, $2B, $03, $03
 
-    db $34, $35, $31, $33, $02, $32, $36, $37
+	db $34, $35, $31, $33, $02, $32, $36, $37
 	db $2C, $43, $0C, $38, $39, $3A, $F9, $3C
 	; db $2C, $06, $0C, $38, $FF, $FF, $FF, $FF
 
@@ -146,7 +146,11 @@ RTL
 	;Ax
 	db $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F ; Free Small Key
 
-	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
+	;Bx
+	db $49 ; reserved for bee traps
+	db $13, $13, $13, $13, $13 ; Bomb Upgrades
+
+	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -181,7 +185,7 @@ GetSpritePalette:
 	;--------
 	TAX : LDA.l .gfxPalettes, X ; look up item gfx
 	PLB : PLX
-	CMP.b #$F8 : !BGE .specialHandling
+	CMP.b #$F7 : !BGE .specialHandling
 RTL
 	.specialHandling
 	CMP.b #$FD : BNE ++ ; Progressive Sword
@@ -274,7 +278,9 @@ RTL
 	;db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; *EVENT*
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Big Key
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Small Key
-	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
+	db $08 ; reserved for bee traps
+	db $0A, $0A, $0A, $0A, $0A; Bomb Upgrades
+	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
@@ -490,12 +496,12 @@ LoadModifiedTileBufferAddress:
 	PHA
 	LDA !TILE_UPLOAD_OFFSET_OVERRIDE : BEQ +
 		TAX
-    	LDY.w #$0002
+		LDY.w #$0002
 		LDA.w #$0000 : STA !TILE_UPLOAD_OFFSET_OVERRIDE
 		BRA .done
 	+
-    LDX.w #$2D40
-    LDY.w #$0002
+	LDX.w #$2D40
+	LDY.w #$0002
 	.done
 	PLA
 RTL
@@ -507,7 +513,7 @@ RTL
 ; out:	Carry - 1 = On Screen, 0 = Off Screen
 ;--------------------------------------------------------------------------------
 Sprite_IsOnscreen:
-    JSR _Sprite_IsOnscreen_DoWork
+	JSR _Sprite_IsOnscreen_DoWork
 	BCS +
 		REP #$20
 		LDA $E2 : PHA : !SUB.w #$0F : STA $E2
@@ -522,11 +528,11 @@ Sprite_IsOnscreen:
 RTL
 
 _Sprite_IsOnscreen_DoWork:
-    LDA $0D10, X : CMP $E2
-    LDA $0D30, X : SBC $E3 : BNE .offscreen
+	LDA $0D10, X : CMP $E2
+	LDA $0D30, X : SBC $E3 : BNE .offscreen
 
-    LDA $0D00, X : CMP $E8
-    LDA $0D20, X : SBC $E9 : BNE .offscreen
+	LDA $0D00, X : CMP $E8
+	LDA $0D20, X : SBC $E9 : BNE .offscreen
 	SEC
 RTS
 	.offscreen

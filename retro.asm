@@ -26,6 +26,12 @@ StoreBombCount:
 	.finite
 		PLA : STA $7EF343
 RTL
+HaveAnyItems:
+	LDX #$13
+	LDA !INFINITE_BOMBS
+	.next_item
+		ORA $7EF340, X : DEX : BPL .next_item
+RTL
 
 !INFINITE_ARROWS = "$7F50C8"
 DecrementArrows:

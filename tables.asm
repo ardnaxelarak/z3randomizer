@@ -98,7 +98,11 @@ db #$02 ; #$02 = Tempered Sword (default)
 ;org $05EBD4 ; PC 0x2EBD4 - sprite_zelda.asm:23 - (LDA $7EF359 : CMP.b #$02 : BCS .hasMasterSword) - Zelda Spawnpoint Sword Check
 ;db #$05 ; #$02 = Tempered Sword (default) - #$05 = All Swords
 ;--------------------------------------------------------------------------------
-; 0x18002B- 0x18002F (Unused)
+; 0x18002B- 0x18002E (Unused)
+;--------------------------------------------------------------------------------
+org $30802F ; PC 0x18003F
+SpecialBombs:
+db #$00 ; #$00 = Off (default) - #$01 = On
 ;--------------------------------------------------------------------------------
 org $308030 ; PC 0x180030
 EnableSRAMTrace:
@@ -223,10 +227,13 @@ db #$00 ; #$00 = Off (default) - #$01 = On (frog/smith can enter multi-entrance 
 org $30804D ; PC 0x18004D
 EscapeAssist: ; ScrubMode:
 db #$00
-;---- -mba
-;m - Infinite Magic
-;b - Infinite Bombs
-;a - Infinite Arrows
+;-MBA -mba
+;M - Infinite Magic (after escape)
+;B - Infinite Bombs (after escape)
+;A - Infinite Arrows (after escape)
+;m - Infinite Magic (during escape)
+;b - Infinite Bombs (during escape)
+;a - Infinite Arrows (during escape)
 ;--------------------------------------------------------------------------------
 org $30804E ; PC 0x18004E
 UncleRefill:
@@ -242,7 +249,7 @@ db #$01 ; #$00 = Off - #$01 = On (default)
 ;--------------------------------------------------------------------------------
 org $308050 ; PC 0x180050 - 0x18005C
 CrystalPendantFlags_2:
-    db $00 ; Sewers
+	db $00 ; Sewers
 	db $00 ; Hyrule Castle
 	db $00 ; Eastern Palace
 	db $00 ; Desert Palace
@@ -250,7 +257,7 @@ CrystalPendantFlags_2:
 	db $40 ; Swamp Palace
 	db $40 ; Palace of Darkness
 	db $40 ; Misery Mire
-    db $40 ; Skull Woods
+	db $40 ; Skull Woods
 	db $40 ; Ice Palace
 .hera
 	db $00 ; Tower of Hera
@@ -630,7 +637,7 @@ dw $6434 ; #6434 - Crystal
 ;--------------------------------------------------------------------------------
 org $02A09B ; PC 0x1209B - Bank02.asm:5802 - (pool MilestoneItem_Flags:)
 CrystalPendantFlags:
-    db $00 ; Sewers
+	db $00 ; Sewers
 	db $00 ; Hyrule Castle
 	db $04 ; Eastern Palace
 	db $02 ; Desert Palace
@@ -638,7 +645,7 @@ CrystalPendantFlags:
 	db $10 ; Swamp Palace
 	db $02 ; Palace of Darkness
 	db $01 ; Misery Mire
-    db $40 ; Skull Woods
+	db $40 ; Skull Woods
 	db $04 ; Ice Palace
 .hera
 	db $01 ; Tower of Hera
@@ -1377,6 +1384,13 @@ db $04
 ;AD - Small Key of Ganon's Tower
 ;AE - Reserved
 ;AF - Generic Small Key
+
+;B0 - reserved for bee traps
+;B1 - L-2 Bombs
+;B2 - L-3 Bombs
+;B3 - L-4 Bombs
+;B4 - L-5 Bombs
+;B5 - Progressive Bombs
 ;================================================================================
 ;;Residual Portal
 ;org $0283E0 ; PC 0x103E0 (Bank02.asm:816) (BNE)
