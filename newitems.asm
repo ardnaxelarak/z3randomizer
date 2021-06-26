@@ -40,6 +40,11 @@
 ; #$90 - Big Keys
 ; #$A0 - Small Keys
 ; #$B0 - Bee Trap
+; #$B1 - L-2 Bombs
+; #$B2 - L-3 Bombs
+; #$B3 - L-4 Bombs
+; #$B4 - L-5 Bombs
+; #$B5 - Progressive Bombs
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
 ;--------------------------------------------------------------------------------
@@ -69,23 +74,23 @@
 ;JML GetAnimatedSpriteGfxFile_return
 ;--------------------------------------------------------------------------------
 GetAnimatedSpriteGfxFile:
-    CMP.b #$0C : BNE +
+	CMP.b #$0C : BNE +
 		LDY.b #$5C : JML GetAnimatedSpriteGfxFile_return
 	+
-    CMP.b #$23 : BNE +
+	CMP.b #$23 : BNE +
 		LDY.b #$5D : JML GetAnimatedSpriteGfxFile_return
 	+
-    CMP.b #$48 : BNE +
+	CMP.b #$48 : BNE +
 		LDY.b #$60 : JML GetAnimatedSpriteGfxFile_return
 	+
 
-    CMP.b #$24 : !BGE +
+	CMP.b #$24 : !BGE +
 		LDY.b #$5B : JML GetAnimatedSpriteGfxFile_return
 	+
-    CMP.b #$37 : !BGE +
+	CMP.b #$37 : !BGE +
 		LDY.b #$5C : JML GetAnimatedSpriteGfxFile_return
 	+
-    CMP.b #$39 : !BGE +
+	CMP.b #$39 : !BGE +
 		LDY.b #$5D : JML GetAnimatedSpriteGfxFile_return
 	+
 		LDY.b #$32
@@ -276,7 +281,7 @@ AddReceivedItemExpandedGetItem:
 	+ CMP.b #$57 : BNE + ; Programmable Object 3
 		%ProgrammableItemLogic(3)
 		JMP .done
-	+ CMP.b #$58 : BNE + ; Upgrade-Only Sivler Arrows
+	+ CMP.b #$58 : BNE + ; Upgrade-Only Silver Arrows
 		LDA.l SilverArrowsUseRestriction : BNE +++
 		LDA.l SilverArrowsAutoEquip : AND.b #$01 : BEQ +++
 			LDA $7EF340 : BEQ ++ : CMP.b #$03 : !BGE ++
@@ -412,6 +417,7 @@ AddReceivedItemExpandedGetItem:
 	PLX
 	LDA $02E9 : CMP.b #$01 ; thing we wrote over
 RTL
+;--------------------------------------------------------------------------------
 ; #$70 - Maps
 ; #$80 - Compasses
 ; #$90 - Big Keys
@@ -529,9 +535,9 @@ AddReceivedItemExpanded:
 			LDA $7EF340 : INC : LSR : CMP.l ProgressiveBowLimit : !BLT +
 				LDA.l ProgressiveBowReplacement : STA $02D8 : JMP .done
 			+ LDA $7EF340 : INC : LSR : CMP.b #$00 : BNE + ; No Bow
-				LDA.b #$3A : STA $02D8 : BRA .done
+				LDA.b #$3A : STA $02D8 : JMP .done
 			+ ; Any Bow
-				LDA.b #$3B : STA $02D8 : BRA .done
+				LDA.b #$3B : STA $02D8 : JMP .done
 		++ : CMP.b #$65 : BNE ++ ; Progressive Bow 2
 			LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +++
 				LDA.l !INVENTORY_SWAP_2 : ORA #$20 : STA.l !INVENTORY_SWAP_2
@@ -552,40 +558,51 @@ AddReceivedItemExpanded:
 			LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +++
 				LDA.b #$0E : STA $02D8 : BRA .done ; Bee in a bottle
 			+++
+		++ : CMP.b #$B5 : BNE ++ ; Progressive Bombs
+			LDA $7EF4A8
+			CMP.b #$00 : BNE + ; L-1 Bombs
+				LDA.b #$B1 : STA $02D8 : JMP .done
+			+ : CMP.b #$01 : BNE + ; L-2 Bombs
+				LDA.b #$B2 : STA $02D8 : JMP .done
+			+ : CMP.b #$02 : BNE + ; L-3 Bombs
+				LDA.b #$B3 : STA $02D8 : JMP .done
+			+ ; Everything Else
+				LDA.b #$B4 : STA $02D8 : JMP .done
 		++
 		.done
 	PLX : PLA
 
-    PHB : PHK ; we're skipping the corresponding instructions to grab the data bank
+	PHB : PHK ; we're skipping the corresponding instructions to grab the data bank
 	JML.l AddReceivedItem+2
 }
 ;--------------------------------------------------------------------------------
 ;DATA AddReceivedItemExpanded
 {
 ; This is a temporary measure for Fish to have consistent addresses
+warnpc $A08800
 org $A08800
 
 .y_offsets
-    db -5, -5, -5, -5, -5, -4, -4, -5
-    db -5, -4, -4, -4, -2, -4, -4, -4
+	db -5, -5, -5, -5, -5, -4, -4, -5
+	db -5, -4, -4, -4, -2, -4, -4, -4
 
-    db -4, -4, -4, -4, -4, -4, -4, -4
-    db -4, -4, -4, -4, -4, -4, -4, -4
+	db -4, -4, -4, -4, -4, -4, -4, -4
+	db -4, -4, -4, -4, -4, -4, -4, -4
 
-    db -4, -4, -4, -5, -4, -4, -4, -4
-    db -4, -4, -2, -4, -4, -4, -4, -4
+	db -4, -4, -4, -5, -4, -4, -4, -4
+	db -4, -4, -2, -4, -4, -4, -4, -4
 
-    db -4, -4, -4, -4, -2, -2, -2, -4
-    db -4, -4, -4, -4, -4, -4, -4, -4
+	db -4, -4, -4, -4, -2, -2, -2, -4
+	db -4, -4, -4, -4, -4, -4, -4, -4
 
-    db -4, -4, -2, -2, -4, -2, -4, -4
-    db -4, -5, -4, -4
+	db -4, -4, -2, -2, -4, -2, -4, -4
+	db -4, -5, -4, -4
 	;new
 	db -4, -4, -4, -4
 	db -5 ; Master Sword (Safe)
 	db -4, -4, -4, -4 ; +5/+10 Bomb Arrows
 	db -4, -4, -4 ; 3x Programmable Item
-	db -4 ; Upgrade-Only Sivler Arrows
+	db -4 ; Upgrade-Only Silver Arrows
 	db -4 ; 1 Rupoor
 	db -4 ; Null Item
 	db -4, -4, -4 ; Red, Blue & Green Clocks
@@ -600,32 +617,33 @@ org $A08800
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Free Big Key
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Free Small Key
 	db -4 ; Bee Trap
-	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
+	db -4, -4, -4, -4, -4 ; Bomb Upgrades
+	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 
 .x_offsets
-    db  4,  4,  4,  4,  4,  0,  0,  4
-    db  4,  4,  4,  4,  5,  0,  0,  0
+	db  4,  4,  4,  4,  4,  0,  0,  4
+	db  4,  4,  4,  4,  5,  0,  0,  0
 
-    db  0,  0,  0,  4,  0,  4,  0,  0
-    db  4,  0,  0,  0,  0,  0,  0,  0
+	db  0,  0,  0,  4,  0,  4,  0,  0
+	db  4,  0,  0,  0,  0,  0,  0,  0
 
-    db  0,  0,  0,  0,  4,  0,  0,  0
-    db  0,  0,  5,  0,  0,  0,  0,  0
+	db  0,  0,  0,  0,  4,  0,  0,  0
+	db  0,  0,  5,  0,  0,  0,  0,  0
 
-    db  0,  0,  0,  0,  4,  4,  4,  0
-    db  0,  0,  0,  0,  0,  0,  0,  0
+	db  0,  0,  0,  0,  4,  4,  4,  0
+	db  0,  0,  0,  0,  0,  0,  0,  0
 
-    db  0,  0,  4,  4,  0,  4,  0,  0
-    db  0,  4,  0,  0
+	db  0,  0,  4,  4,  0,  4,  0,  0
+	db  0,  4,  0,  0
 	;new
 	db  0,  0,  0,  0
 	db  4 ; Master Sword (Safe)
 	db  0,  0,  0,  0 ; +5/+10 Bomb Arrows
 	db  0,  0,  0 ; 3x Programmable Item
-	db  0 ; Upgrade-Only Sivler Arrows
+	db  0 ; Upgrade-Only Silver Arrows
 	db  4 ; 1 Rupoor
 	db  0 ; Null Item
 	db  0, 0, 0 ; Red, Blue & Green Clocks
@@ -641,33 +659,34 @@ org $A08800
 	;db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; *EVENT*
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  0 ; Bee Trap
-	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
+	db  0, 0, 0, 0, 0 ; Bomb Upgrades
+	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 
 .item_graphics_indices
-    db $06, $18, $18, $18, $2D, $20, $2E, $09
-    db $09, $0A, $08, $05, $10, $0B, $2C, $1B
+	db $06, $18, $18, $18, $2D, $20, $2E, $09
+	db $09, $0A, $08, $05, $10, $0B, $2C, $1B
 
-    db $1A, $1C, $14, $19, $0C, $07, $1D, $2F
-    db $07, $15, $12, $0D, $0D, $0E, $11, $17
+	db $1A, $1C, $14, $19, $0C, $07, $1D, $2F
+	db $07, $15, $12, $0D, $0D, $0E, $11, $17
 
-    db $28, $27, $04, $04, $0F, $16, $03, $13
-    db $01, $1E, $10, $00, $00, $00, $00, $00
+	db $28, $27, $04, $04, $0F, $16, $03, $13
+	db $01, $1E, $10, $00, $00, $00, $00, $00
 
-    db $00, $30, $22, $21, $24, $24, $24, $23
-    db $23, $23, $29, $2A, $2C, $2B, $03, $03
+	db $00, $30, $22, $21, $24, $24, $24, $23
+	db $23, $23, $29, $2A, $2C, $2B, $03, $03
 
-    db $34, $35, $31, $33, $02, $32, $36, $37
-    db $2C, $06, $0C, $38
+	db $34, $35, $31, $33, $02, $32, $36, $37
+	db $2C, $06, $0C, $38
 	;new
 	db $39, $3A, $3B, $3C
 	;5x
 	db $18 ; Master Sword (Safe)
 	db $3D, $3E, $3F, $40 ; +5/+10 Bomb Arrows
 	db $00, $00, $00 ; 3x Programmable Item
-	db $41 ; Upgrade-Only Sivler Arrows
+	db $41 ; Upgrade-Only Silver Arrows
 	db $24 ; 1 Rupoor
 	db $47 ; Null Item
 	db $48, $48, $48 ; Red, Blue & Green Clocks
@@ -687,32 +706,33 @@ org $A08800
 	;db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; *EVENT*
 
 	db $47 ; Bee Trap
-	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
+	db $13, $13, $13, $13, $13 ; Bomb Upgrades
+	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 
 .wide_item_flag
-    db $00, $00, $00, $00, $00, $02, $02, $00
-    db $00, $00, $00, $00, $00, $02, $02, $02
+	db $00, $00, $00, $00, $00, $02, $02, $00
+	db $00, $00, $00, $00, $00, $02, $02, $02
 
-    db $02, $02, $02, $00, $02, $00, $02, $02
-    db $00, $02, $02, $02, $02, $02, $02, $02
+	db $02, $02, $02, $00, $02, $00, $02, $02
+	db $00, $02, $02, $02, $02, $02, $02, $02
 
-    db $02, $02, $02, $02, $00, $02, $02, $02
-    db $02, $02, $00, $02, $02, $02, $02, $02
+	db $02, $02, $02, $02, $00, $02, $02, $02
+	db $02, $02, $00, $02, $02, $02, $02, $02
 
-    db $02, $02, $02, $02, $00, $00, $00, $02
-    db $02, $02, $02, $02, $02, $02, $02, $02
+	db $02, $02, $02, $02, $00, $00, $00, $02
+	db $02, $02, $02, $02, $02, $02, $02, $02
 
-    db $02, $02, $00, $00, $02, $00, $02, $02
-    db $02, $00, $02, $02
+	db $02, $02, $00, $00, $02, $00, $02, $02
+	db $02, $00, $02, $02
 	;new
 	db $02, $02, $02, $02
 	db $00 ; Master Sword (Safe)
 	db $02, $02, $02, $02 ; +5/+10 Bomb Arrows
 	db $02, $02, $02 ; 3x Programmable Item
-	db $02 ; Upgrade-Only Sivler Arrows
+	db $02 ; Upgrade-Only Silver Arrows
 	db $00 ; 1 Rupoor
 	db $02 ; Null Item
 	db $02, $02, $02 ; Red, Blue & Green Clocks
@@ -727,34 +747,34 @@ org $A08800
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Free Big Key
 	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 ; Free Small Key
 	db $02 ; Bee Trap
-
-	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
+	db $02, $02, $02, $02, $02 ; Bomb Upgrades
+	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 
 .properties
-    db  5, -1,  5,  5,  5,  5,  5,  1
-    db  2,  1,  1,  1,  2,  2,  2,  4
+	db  5, -1,  5,  5,  5,  5,  5,  1
+	db  2,  1,  1,  1,  2,  2,  2,  4
 
-    db  4,  4,  1,  1,  2,  1,  1,  1
-    db  2,  1,  2,  1,  4,  4,  2,  1
+	db  4,  4,  1,  1,  2,  1,  1,  1
+	db  2,  1,  2,  1,  4,  4,  2,  1
 
-    db  6,  1,  2,  1,  2,  2,  1,  2
-    db  2,  4,  1,  1,  4,  2,  1,  4
+	db  6,  1,  2,  1,  2,  2,  1,  2
+	db  2,  4,  1,  1,  4,  2,  1,  4
 
-    db  2,  2,  4,  4,  4,  2,  1,  4
-    db  1,  2,  2,  1,  2,  2,  1,  1
+	db  2,  2,  4,  4,  4,  2,  1,  4
+	db  1,  2,  2,  1,  2,  2,  1,  1
 
-    db  4,  4,  1,  2,  2,  4,  4,  4
-    db  2,  5,  2,  1
+	db  4,  4,  1,  2,  2,  4,  4,  4
+	db  2,  5,  2,  1
 	;new
 	db  4,  4,  4,  4
 	db  5 ; Master Sword (Safe)
 	db  4,  4,  4,  4 ; +5/+10 Bomb Arrows
 	db  4,  4,  4 ; 3x Programmable Item
-	db  1 ; Upgrade-Only Sivler Arrows
+	db  1 ; Upgrade-Only Silver Arrows
 	db  3 ; 1 Rupoor
 	db  1 ; Null Item
 	db  1, 2, 4 ; Red, Blue & Green Clocks
@@ -769,7 +789,8 @@ org $A08800
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Big Key
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  1 ; Bee Trap
-	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
+	db  5, 5, 5, 5, 5 ; Bomb Upgrades
+	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
@@ -777,26 +798,26 @@ org $A08800
 
 ; \item Target SRAM addresses for items you receive
 .item_target_addr
-    dw $F359, $F359, $F359, $F359, $F35A, $F35A, $F35A, $F345
-    dw $F346, $F34B, $F342, $F340, $F341, $F344, $F35C, $F347
+	dw $F359, $F359, $F359, $F359, $F35A, $F35A, $F35A, $F345
+	dw $F346, $F34B, $F342, $F340, $F341, $F344, $F35C, $F347
 
-    dw $F348, $F349, $F34A, $F34C, $F34C, $F350, $F35C, $F36B
-    dw $F351, $F352, $F353, $F354, $F354, $F34E, $F356, $F357
+	dw $F348, $F349, $F34A, $F34C, $F34C, $F350, $F35C, $F36B
+	dw $F351, $F352, $F353, $F354, $F354, $F34E, $F356, $F357
 
-    dw $F37A, $F34D, $F35B, $F35B, $F36F, $F364, $F36C, $F375
-    dw $F375, $F344, $F341, $F35C, $F35C, $F35C, $F36D, $F36E
+	dw $F37A, $F34D, $F35B, $F35B, $F36F, $F364, $F36C, $F375
+	dw $F375, $F344, $F341, $F35C, $F35C, $F35C, $F36D, $F36E
 
-    dw $F36E, $F375, $F366, $F368, $F360, $F360, $F360, $F374
-    dw $F374, $F374, $F340, $F340, $F35C, $F35C, $F36C, $F36C
+	dw $F36E, $F375, $F366, $F368, $F360, $F360, $F360, $F374
+	dw $F374, $F374, $F340, $F340, $F35C, $F35C, $F36C, $F36C
 
-    dw $F360, $F360, $F372, $F376, $F376, $F373, $F360, $F360
-    dw $F35C, $F359, $F34C, $F355
+	dw $F360, $F360, $F372, $F376, $F376, $F373, $F360, $F360
+	dw $F35C, $F359, $F34C, $F355
 	;new
 	dw $F375, $F376, $F373, $F373
 	dw $F359 ; Master Sword (Safe)
 	dw $F375, $F375, $F376, $F376 ; +5/+10 Bomb Arrows
 	dw $F41A, $F41C, $F41E ; 3x Programmable Item
-	dw $F340 ; Upgrade-Only Sivler Arrows
+	dw $F340 ; Upgrade-Only Silver Arrows
 	dw $F360 ; 1 Rupoor
 	dw $F36A ; Null Item
 	dw $F454, $F454, $F454 ; Red, Blue & Green Clocks
@@ -811,7 +832,8 @@ org $A08800
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Big Key
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Small Key
 	dw $F36A ; Bee Trap
-	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
+	dw $F4A8, $F4A8, $F4A8, $F4A8, $F4A8 ; Bomb Upgrades
+	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
@@ -821,26 +843,26 @@ org $A08800
 ; DATA Values to write to the above SRAM locations.
 {
 .item_values
-    db $01, $02, $03, $04, $01, $02, $03, $01
-    db $01, $01, $01, $01, $01, $02, $FF, $01
+	db $01, $02, $03, $04, $01, $02, $03, $01
+	db $01, $01, $01, $01, $01, $02, $FF, $01
 
-    db $01, $01, $01, $01, $02, $01, $FF, $FF
-    db $01, $01, $02, $01, $02, $01, $01, $01
+	db $01, $01, $01, $01, $02, $01, $FF, $FF
+	db $01, $01, $02, $01, $02, $01, $01, $01
 
-    db $FF, $01, $FF, $02, $FF, $FF, $FF, $FF
-    db $FF, $FF, $02, $FF, $FF, $FF, $FF, $FF
+	db $FF, $01, $FF, $02, $FF, $FF, $FF, $FF
+	db $FF, $FF, $02, $FF, $FF, $FF, $FF, $FF
 
-    db $FF, $FF, $FF, $FF, $FF, $FB, $EC, $FF
-    db $FF, $FF, $01, $03, $FF, $FF, $FF, $FF
+	db $FF, $FF, $FF, $FF, $FF, $FB, $EC, $FF
+	db $FF, $FF, $01, $03, $FF, $FF, $FF, $FF
 
-    db $9C, $CE, $FF, $01, $0A, $FF, $FF, $FF
-    db $FF, $01, $03, $01
+	db $9C, $CE, $FF, $01, $0A, $FF, $FF, $FF
+	db $FF, $01, $03, $01
 	;new
 	db $32, $46, $80, $80
 	db $02 ; Master Sword (Safe)
 	db $FF, $FF, $FF, $FF ; +5/+10 Bomb Arrows
 	db $FF, $FF, $FF ; 3x Programmable Item
-	db $FF ; Upgrade-Only Sivler Arrows
+	db $FF ; Upgrade-Only Silver Arrows
 	db $FF ; 1 Rupoor
 	db $FF ; Null Item
 	db $FF, $FF, $FF ; Red, Blue & Green Clocks
@@ -855,31 +877,32 @@ org $A08800
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Free Big Key
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Free Small Key
 	db $FF ; Bee Trap
-	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
+	db $01, $02, $03, $04, $FF ; Bomb Upgrades
+	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 
-    ;0x00 - Sewer Passage
-    ;0x02 - Hyrule Castle
-    ;0x04 - Eastern Palace
-    ;0x06 - Desert Palace
-    ;0x08 - Hyrule Castle 2
-    ;0x0A - Swamp Palace
-    ;0x0C - Dark Palace
-    ;0x0E - Misery Mire
-    ;0x10 - Skull Woods
-    ;0x12 - Ice Palace
-    ;0x14 - Tower of Hera
-    ;0x16 - Gargoyle's Domain
-    ;0x18 - Turtle Rock
-    ;0x1A - Ganon's Tower
+	;0x00 - Sewer Passage
+	;0x02 - Hyrule Castle
+	;0x04 - Eastern Palace
+	;0x06 - Desert Palace
+	;0x08 - Hyrule Castle 2
+	;0x0A - Swamp Palace
+	;0x0C - Dark Palace
+	;0x0E - Misery Mire
+	;0x10 - Skull Woods
+	;0x12 - Ice Palace
+	;0x14 - Tower of Hera
+	;0x16 - Gargoyle's Domain
+	;0x18 - Turtle Rock
+	;0x1A - Ganon's Tower
 
 .item_masks ; these are dungeon correlations to $7EF364 - $7EF369 so it knows where to store compasses, etc
     ; sewers and castle get 2 bits active so that they can share their items elegantly
-    dw $C000, $C000, $2000, $1000, $0800, $0400, $0200, $0100
-    dw $0080, $0040, $0020, $0010, $0008, $0004, $0000, $0000
+	dw $C000, $C000, $2000, $1000, $0800, $0400, $0200, $0100
+	dw $0080, $0040, $0020, $0010, $0008, $0004, $0000, $0000
 
 	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
 	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
@@ -901,27 +924,27 @@ org $A08800
 }
 ;--------------------------------------------------------------------------------
 BottleListExpanded:
-    db $16, $2B, $2C, $2D, $3D, $3C, $48
+	db $16, $2B, $2C, $2D, $3D, $3C, $48
 
 PotionListExpanded:
-    db $2E, $2F, $30, $FF, $0E
+	db $2E, $2F, $30, $FF, $0E
 ;--------------------------------------------------------------------------------
 Link_ReceiveItemAlternatesExpanded:
 {
-    db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1
-    db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1 ; db -1,  -1,  -1,  -1, $44,  -1,  -1,  -1
+	db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1
+	db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1 ; db -1,  -1,  -1,  -1, $44,  -1,  -1,  -1
 
-    db -1,  -1, $35,  -1,  -1,  -1,  -1,  -1
-    db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1
+	db -1,  -1, $35,  -1,  -1,  -1,  -1,  -1
+	db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1
 
-    db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1
-    db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1 ; db -1,  -1, $46,  -1,  -1,  -1,  -1,  -1
+	db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1
+	db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1 ; db -1,  -1, $46,  -1,  -1,  -1,  -1,  -1
 
-    db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1
-    db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1
+	db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1
+	db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1
 
-    db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1
-    db -1,  -1,  -1,  -1
+	db -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1
+	db -1,  -1,  -1,  -1
 
 	db -1,  -1,  -1,  -1
 	db -1 ; Master Sword (Safe)
@@ -942,7 +965,8 @@ Link_ReceiveItemAlternatesExpanded:
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Free Big Key
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Free Small Key
 	db -1 ; Bee Trap
-	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
+	db -1, -1, -1, -1, -1 ; Bomb Upgrades
+	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
@@ -968,10 +992,10 @@ RTL
 ;DrawHUDSilverArrows:
 ;	LDA $7EF340 : AND.w #$00FF : BNE +
 ;		LDA !INVENTORY_SWAP_2 : AND.w #$0040 : BEQ +
-;	        LDA.w #$2810 : STA $11C8
-;	        LDA.w #$2811 : STA $11CA
-;	        LDA.w #$2820 : STA $1208
-;	        LDA.w #$2821 : STA $120A
+;			LDA.w #$2810 : STA $11C8
+;			LDA.w #$2811 : STA $11CA
+;			LDA.w #$2820 : STA $1208
+;			LDA.w #$2821 : STA $120A
 ;	+
 ;	LDA.w #$11CE : STA $00 ; thing we wrote over
 ;RTL
@@ -1152,20 +1176,20 @@ AttemptItemSubstitution:
 RTS
 ;--------------------------------------------------------------------------------
 CountBottles:
-    PHX
-        LDX.b #$00
-        LDA $7EF35C : BEQ ++ : INX
-        ++ : LDA $7EF35D : BEQ ++ : INX
-        ++ : LDA $7EF35E : BEQ ++ : INX
-        ++ : LDA $7EF35F : BEQ ++ : INX
-        ++
-        TXA
-    PLX
+	PHX
+		LDX.b #$00
+		LDA $7EF35C : BEQ ++ : INX
+		++ : LDA $7EF35D : BEQ ++ : INX
+		++ : LDA $7EF35E : BEQ ++ : INX
+		++ : LDA $7EF35F : BEQ ++ : INX
+		++
+		TXA
+	PLX
 RTS
 ;--------------------------------------------------------------------------------
 ActivateGoal:
-    STZ $11
-    STZ $B0
+	STZ $11
+	STZ $B0
 JML.l StatsFinalPrep
 ;--------------------------------------------------------------------------------
 ChestPrep:
@@ -1174,7 +1198,23 @@ ChestPrep:
 		JSL.l ChestItemServiceRequest
 		RTL
 	+
-    LDY $0C ; get item value
+	LDY $0C ; get item value
 	SEC
 RTL
 ;--------------------------------------------------------------------------------
+UpdateInventoryLocationExpanded:
+{
+	REP #$30
+	TYA : AND #$00FF : ASL A : TAX
+
+	; Tells what inventory location to write to.
+	LDA.w AddReceivedItemExpanded_item_target_addr, X : STA $00
+
+	SEP #$30
+
+	LDA.b #$7E : STA $02
+
+	LDA.w AddReceivedItemExpanded_item_values, Y
+	JSL ItemDowngradeFix
+	RTL
+}

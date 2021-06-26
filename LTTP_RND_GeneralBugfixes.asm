@@ -58,6 +58,7 @@ db #$20, #$19, #$08, #$31 ; year/month/day
 ;$7EF420 - $7EF466 - Stat Tracking Bank 1 (overlaps with RNG Item Flags)
 ;$7EF450 - $7EF45F - RNG Item (Single) Flags
 ;$7EF4A0 - $7EF4A7 - Service Request Block
+!PROGRESSIVE_BOMBS = "$7EF4A8"
 !FRESH_FILE_MARKER = "$7EF4F0" ; zero if fresh file
 ;$700500 - $70050F - Extended File Name
 ;$701000 - $70100F - Password (incorporate into log header)
@@ -221,6 +222,7 @@ incsrc fastcredits.asm
 incsrc msu.asm
 incsrc multiworld.asm
 incsrc terrorpin.asm
+incsrc special_bombs.asm
 warnpc $A58000
 
 ;org $228000 ; contrib area
@@ -299,6 +301,11 @@ org $31E000
 InvertedCastleHole: ;address used by front end. DO NOT MOVE!
 incbin sheet73.gfx
 warnpc $31E501
+
+org $31E800
+Damage_Table_Alt:
+incbin damage_table_sword_bombs.bin
+warnpc $31F001
 
 org $338000
 GFX_HUD_Palette:

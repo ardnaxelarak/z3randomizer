@@ -268,7 +268,7 @@ RTL
 DialogFairyThrow:
 	LDA.l Restrict_Ponds : BEQ .normal
 	LDA $7EF35C : ORA $7EF35D : ORA $7EF35E : ORA $7EF35F : BNE .normal
-	
+
 	.noInventory
 	LDA $0D80, X : !ADD #$08 : STA $0D80, X
 	LDA.b #$51
@@ -299,31 +299,35 @@ RTL
 ; s = silver arrow bow
 ; p = 2nd progressive bow
 DialogGanon2:
-    JSL.l CheckGanonVulnerability
-	
+	JSL.l CheckGanonVulnerability
+
 	REP #$20
 	BCS +
-        LDA.w #$018D : BRA ++
-    +
+		LDA.w #$018D : BRA ++
+	+
+		LDA.l SpecialBombs
+		AND.w #$00FF : BEQ + ; branch if not special bomb mode
+		LDA.w #$0195 : BRA ++
+	+
 		LDA.l $7EF38E
 
-        BIT.w #$0080 : BNE + ; branch if bow
-        LDA.w #$0192 : BRA ++
-    +
-        BIT.w #$0040 : BEQ + ; branch if no silvers
-        LDA.w #$0195 : BRA ++
-    +
-        BIT.w #$0020 : BNE + ; branch if p bow
-        LDA.w #$0194 : BRA ++
-    +
-        BIT.w #$0080 : BEQ + ; branch if no bow
-        LDA.w #$0193 : BRA ++
-    +
-        LDA.w #$016E
-    ++
+		BIT.w #$0080 : BNE + ; branch if bow
+		LDA.w #$0192 : BRA ++
+	+
+		BIT.w #$0040 : BEQ + ; branch if no silvers
+		LDA.w #$0195 : BRA ++
+	+
+		BIT.w #$0020 : BNE + ; branch if p bow
+		LDA.w #$0194 : BRA ++
+	+
+		BIT.w #$0080 : BEQ + ; branch if no bow
+		LDA.w #$0193 : BRA ++
+	+
+		LDA.w #$016E
+	++
 	STA $1CF0
 	SEP #$20
-    JSL.l Sprite_ShowMessageMinimal_Alt
+	JSL.l Sprite_ShowMessageMinimal_Alt
 RTL
 ;--------------------------------------------------------------------------------
 DialogEtherTablet:
@@ -361,7 +365,7 @@ DialogBombosTablet:
 		LDA $7EF359 : CMP.b #$FF : BEQ .yesText : CMP.b #$02 : !BGE .noText
 	;++
 	.yesText
-	PLA 
+	PLA
 	LDA.b #$0D
 	LDY.b #$01
 	JML Sprite_ShowMessageUnconditional ; Text From MSPedestalText (tables.asm)
@@ -373,7 +377,7 @@ RTL
 DialogSahasrahla:
 	LDA.l $7EF374 : AND #$04 : BEQ + ;Check if player has green pendant
 		LDA.b #$2F
-        LDY.b #$00
+		LDY.b #$00
 		JML Sprite_ShowMessageUnconditional
 	+
 RTL
@@ -454,7 +458,7 @@ RTL
 CalculateSignIndex:
   ; for the big 1024x1024 screens we are calculating link's effective
   ; screen area, as though the screen was 4 different 512x512 screens.
-  ; And we do this in a way that will likely give the right value even 
+  ; And we do this in a way that will likely give the right value even
   ; with major glitches.
 
   LDA $8A : ASL A : TAY ;what we wrote over
@@ -463,13 +467,13 @@ CalculateSignIndex:
 
   LDA $21 : AND.w #$0002 : ASL #2 : EOR $8A : AND.w #$0008 : BEQ +
   	TYA : !ADD.w #$0010 : TAY  ;add 16 if we are in lower half of big screen.
-  + 
+  +
 
   LDA $23 : AND.w #$0002 : LSR : EOR $8A : AND.w #$0001 : BEQ +
   TYA : INC #2 : TAY  ;add 16 if we are in lower half of big screen.
   +
   ; ensure even if things go horribly wrong, we don't read the sign out of bounds and crash:
-  TYA : AND.w #$00FF : TAY 
+  TYA : AND.w #$00FF : TAY
 
 .done
 RTL

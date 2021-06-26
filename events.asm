@@ -143,7 +143,7 @@ OnNewFile:
         BPL -
 
 		LDX #$000E : -
-        	LDA $7EF37C, X : STA $7EF4E0, X
+			LDA $7EF37C, X : STA $7EF4E0, X
 			DEX : DEX
 		BPL -
 
@@ -256,6 +256,6 @@ PostItemAnimation:
 		JML.l Ancilla_ReceiveItem_objectFinished
 	+
 
-    STZ $02E9 : LDA $0C5E, X ; thing we wrote over to get here
+	STZ $02E9 : LDA $0C5E, X ; thing we wrote over to get here
 	JML.l Ancilla_ReceiveItem_optimus+6
 ;--------------------------------------------------------------------------------
