@@ -205,6 +205,7 @@ incsrc darkroomitems.asm
 incsrc fastcredits.asm
 incsrc msu.asm
 incsrc special_bombs.asm
+incsrc variable_ganon_vulnerability.asm
 warnpc $A58000
 
 ;org $228000 ; contrib area

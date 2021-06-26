@@ -1,9 +1,17 @@
 ;--------------------------------------------------------------------------------
 !ANCILLA_DAMAGE = "$06EC84"
 !BOMB_LEVEL = "$7EF4A8"
-; start with X = sprite index, A = ancilla index
+; start with X = sprite index, A = ancilla type index
 ;--------------------------------------------------------------------------------
 DamageClassCalc:
+	PHA
+	LDA GanonVulnerabilityItem : BEQ +
+	LDA $0E20, X : CMP #$D7 : BNE +
+	PLA
+	JSL Ganon_CheckAncillaVulnerability
+	RTL
++
+	PLA
 	CMP #$01 : BEQ .cane
 	CMP #$2C : BEQ .cane
 	CMP #$31 : BEQ .cane
@@ -58,11 +66,13 @@ DamageClassCalc:
 	PLX
 	CMP.b #$06 : BNE .done ; not arrows
 	LDA $7EF340 : CMP.b #$03 : !BGE .actual_silver_arrows
+.normal_arrows
 	LDA #$06
 .done
 	RTL
 .actual_silver_arrows
 	LDA $0E20, X : CMP.b #$D7 : BNE +
+	LDA SpecialBombs : BNE .normal_arrows
 	LDA #$20 : STA $0F10, X
 	+
 	LDA #$09
@@ -195,6 +205,7 @@ Utility_CheckImpervious:
 	LDA $0CF2 : CMP #$FF : BEQ .impervious ; special "always-impervious" class
 	LDA $0E20, X : CMP.b #$CC : BEQ .sidenexx : CMP.b #$CD : BEQ .sidenexx
 	LDA $0301 : AND.b #$0A : BEQ .not_impervious ; normal behavior if not hammer
+	JSL Ganon_CheckHammerVulnerability : BCS .not_impervious
 	LDA.l SpecialBombs : BEQ .not_impervious
 	LDA $0E20, X : CMP.b #$1E : BEQ .not_impervious ; crystal switch
 	CMP.b #$40 : BEQ .not_impervious ; aga barrier
