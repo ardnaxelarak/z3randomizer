@@ -95,6 +95,8 @@ db #$20, #$19, #$08, #$31 ; year/month/day
 !ONEMIND_ID = $7F5072
 !ONEMIND_TIMER = $7F5073
 
+function hexto555(h) = ((((h&$FF)/8)<<10)|(((h>>8&$FF)/8)<<5)|(((h>>16&$FF)/8)<<0))
+
 ;================================================================================
 
 !MULTIWORLD_ITEM = "$7EF4D2"
@@ -223,6 +225,7 @@ incsrc toast.asm
 incsrc darkroomitems.asm
 incsrc fastcredits.asm
 incsrc msu.asm
+incsrc dungeonmap.asm
 incsrc multiworld.asm
 incsrc terrorpin.asm
 incsrc special_bombs.asm
@@ -319,6 +322,10 @@ warnpc $338041
 org $339000
 incbin sheet178.gfx
 warnpc $339600
+
+org $339600
+BossMapIconGFX:
+incbin bossicons.4bpp
 
 org $328000
 Extra_Text_Table:

@@ -2722,6 +2722,22 @@ org $0780C6 : JSL IncrementDamageTakenCounter_Arb
 org $07B0B1 : JSL IncrementMagicUseCounter
 
 ;================================================================================
+; Boss icons
+org $0AEEDF : db $02 ; big icon
+org $0AEAFF : db $48 ; X position
+
+org $0AEED4 ; disable flashing
+	BRA ++ : NOP #6 : ++
+
+org $0AEEF2
+	SBC.b #$03 : STA.w $0801,X
+	LDA.b #$03 : STA.w $0802,X
+	LDA.b #$31 : STA.w $0803,X
+
+org $008BE5 ; hijack stripes for boss GFX transfer
+	JSL DoDungeonMapBossIcon
+
+;================================================================================
 ; Terrorpin AI fix
 ;--------------------------------------------------------------------------------
 org $1EB2B1 ; sprite_terrorpin.asm(57) : AND.b #$03 : STA $0DE0, X ; 5 bytes
