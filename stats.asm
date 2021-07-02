@@ -1,7 +1,7 @@
 ;================================================================================
 ; Stat Tracking
 ;================================================================================
-; $7EF420 - $7EF466 - Stat Tracking
+; $7EF420 - $7EF46D - Stat Tracking
 ;--------------------------------------------------------------------------------
 ; $7EF420 - bonk counter
 ;--------------------------------------------------------------------------------
@@ -116,7 +116,9 @@
 ;--------------------------------------------------------------------------------
 ; $7EF46Bw[2] - Dungeon prizes collected by dungeon location.
 ;--------------------------------------------------------------------------------
-; $7EF46D - 7EF49F - Free space
+; $7EF46D - chest turn counter
+;--------------------------------------------------------------------------------
+; $7EF46E - 7EF49F - Free space
 ;--------------------------------------------------------------------------------
 ; $7EF4A0 - 7EF4A7 - Service Request
 ;--------------------------------------------------------------------------------
@@ -136,7 +138,7 @@
 ;--------------------------------------------------------------------------------
 ; $7EF4F1 - 7EF4FD - Free space
 ;--------------------------------------------------------------------------------
-; 7EF4FEw[2] - Save Checksum
+; $7EF4FEw[2] - Save Checksum
 ;--------------------------------------------------------------------------------
 
 
@@ -144,17 +146,14 @@
 !LOCK_STATS = "$7EF443"
 ;--------------------------------------------------------------------------------
 !BONK_COUNTER = "$7EF420"
-!BONK_REPEAT = "$7F503F"
-!LOOP_FRAMES_LOW = "$7EF42E"
 StatBonkCounter:
 	PHA
+	JSL Ancilla_CheckIfAlreadyExistsLong : BCS +
 		LDA !LOCK_STATS : BNE +
-		LDA !LOOP_FRAMES_LOW : !SUB !BONK_REPEAT : CMP #30 : !BLT +
-			LDA !LOOP_FRAMES_LOW : STA !BONK_REPEAT
 			LDA !BONK_COUNTER : INC
 			CMP.b #100 : BEQ + ; decimal 100
 				STA !BONK_COUNTER
-		+
+	+
 	PLA
 	JSL.l AddDashTremor ; thing we wrote over
 RTL
@@ -269,7 +268,7 @@ CountChestKey: ; called by neighbor functions
 		CPY #$24 : BEQ +  ; small key for this dungeon - use $040C
 			CPY #$A0 : !BLT .end ; Ignore most items
 			CPY #$AE : !BGE .end ; Ignore reserved key and generic key
-			TYA : AND.B #$0F : BNE ++ ; If this is a sewers key, instead count it as an HC key
+			TYA : AND.B #$0F : BNE ++ ; If this is an HC key, instead count it as a sewers key
 				INC
 			++ TAX : BRA .count  ; use Key id instead of $040C (Keysanity)
 		+ LDA $040C : LSR
@@ -326,6 +325,15 @@ IncrementFairyRevivalCounter:
 	PLA
 RTL
 ;--------------------------------------------------------------------------------
+!CHESTTURN_COUNTER = "$7EF46D"
+IncrementChestTurnCounter:
+	PHA
+		LDA !LOCK_STATS : BNE +
+			LDA !CHESTTURN_COUNTER : INC : STA !CHESTTURN_COUNTER
+		+
+	PLA
+RTL
+;--------------------------------------------------------------------------------
 !CHEST_COUNTER = "$7EF442"
 IncrementChestCounter:
 	LDA.b #$01 : STA $02E9 ; thing we wrote over
@@ -364,6 +372,47 @@ IncrementBigChestCounter:
 		+
 	PLA
 RTL
+;--------------------------------------------------------------------------------
+!DAMAGE_COUNTER = "$FFFFFF"
+!MAGIC_COUNTER = "$FFFFFF"
+IncrementDamageTakenCounter_Eight:
+	STA.l $7EF36D
+	PHA : PHP
+	LDA !LOCK_STATS : BNE +
+	REP #$21
+	LDA.l !DAMAGE_COUNTER
+	ADC.w #$0008
+	STA.l !DAMAGE_COUNTER
++	PLP
+	PLA
+RTL
+
+IncrementDamageTakenCounter_Arb:
+	PHP
+	LDA !LOCK_STATS : BNE +
+	REP #$21
+	LDA.b $00
+	AND.w #$00FF
+	ADC.l !DAMAGE_COUNTER
+	STA.l !DAMAGE_COUNTER
++	PLP
+
+	LDA.l $7EF36D
+RTL
+
+IncrementMagicUseCounter:
+	STA.l $7EF36E
+	PHA : PHP
+	LDA !LOCK_STATS : BNE +
+	REP #$21
+	LDA.b $00
+	AND.w #$00FF
+	ADC.l !MAGIC_COUNTER
+	STA.l !MAGIC_COUNTER
++	PLP : PLA
+
+RTL
+
 ;--------------------------------------------------------------------------------
 !OW_MIRROR_COUNTER = "$7EF43A"
 IncrementOWMirror:

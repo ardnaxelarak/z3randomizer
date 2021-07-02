@@ -423,7 +423,16 @@ db #$02 ; #$02 - 2 Bows (default)
 ProgressiveBowReplacement:
 db #$47 ; #$47 - 20 Rupees (default)
 ;--------------------------------------------------------------------------------
-; 0x18009A - 0x18009F (unused)
+; 0x18009A - 0x18009C one mind
+;--------------------------------------------------------------------------------
+org $30809A ; PC 0x18009A
+OneMindPlayerCount:
+db 0
+org $30809B ;  PC 0x18009B - 0x18009C
+OneMindTimer:
+dw 0
+;--------------------------------------------------------------------------------
+; 0x18009D - 0x18009F (unused)
 ;--------------------------------------------------------------------------------
 org $3080A0 ; PC 0x1800A0 - 0x1800A4
 Bugfix_MirrorlessSQToLW:
@@ -1489,7 +1498,7 @@ dw #9999 ; Rupee Limit
 ; $7F503C - Stats Rupee Total
 ; $7F503D - Stats Rupee Total
 ; $7F503E - Stats Item Total
-; $7F503F - Bonk Repeat
+; $7F503F - Unused
 ; $7F5040 - Free Item Dialog Temporary
 ; $7F5041 - Epilepsy Safety Timer
 ; $7F5042 - Tile Upload Offset Override (Low)
@@ -1499,7 +1508,9 @@ dw #9999 ; Rupee Limit
 ; $7F504F - $7F506F - Shop Block
 ; $7F5070 - Reserved for OneMind
 ; $7F5071 - Reserved for OneMind
-; $7F5072 - $7F507D - Unused
+; $7F5072 - OneMind player ID
+; $7F5073 - $7F5074 - OneMind timer
+; $7F5075 - $7F507D - Unused
 ; $7F507E - Clock Status
 ; $7F507F - Always Zero
 ; $7F5080 - $7F5083 - Clock Hours

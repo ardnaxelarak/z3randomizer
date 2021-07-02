@@ -55,7 +55,7 @@ db #$20, #$19, #$08, #$31 ; year/month/day
 !SRAM_SINK = "$7EF41E" ; <- change this (conflicts with Programmable item 3)
 ;$7EF418 - Goal Item Counter
 ;$7EF419 - Service Sequence
-;$7EF420 - $7EF466 - Stat Tracking Bank 1 (overlaps with RNG Item Flags)
+;$7EF420 - $7EF46D - Stat Tracking Bank 1 (overlaps with RNG Item Flags)
 ;$7EF450 - $7EF45F - RNG Item (Single) Flags
 ;$7EF4A0 - $7EF4A7 - Service Request Block
 !PROGRESSIVE_BOMBS = "$7EF4A8"
@@ -91,6 +91,9 @@ db #$20, #$19, #$08, #$31 ; year/month/day
 !REG_MUSIC_CONTROL = $012B
 ;!REG_MUSIC_CONTROL = $012C
 !REG_MUSIC_CONTROL_REQUEST = $012C
+
+!ONEMIND_ID = $7F5072
+!ONEMIND_TIMER = $7F5073
 
 ;================================================================================
 
@@ -198,7 +201,7 @@ incsrc endingsequence.asm
 incsrc cuccostorm.asm
 incsrc compression.asm
 incsrc retro.asm
-incsrc dpadinvert.asm
+incsrc controllerjank.asm
 incsrc boots.asm
 incsrc events.asm
 incsrc fileselect.asm
@@ -616,6 +619,9 @@ AddDashTremor:
 
 org $099D04
 AddAncillaLong:
+
+org $099D1A
+Ancilla_CheckIfAlreadyExistsLong:
 
 org $09AE64
 Sprite_SetSpawnedCoords:

@@ -57,6 +57,7 @@ RTL
 ;--------------------------------------------------------------------------------
 OnUncleItemGet:
 	PHA
+
 		LDA.l EscapeAssist
 		BIT.b #$04 : BEQ + : STA !INFINITE_MAGIC : +
 		BIT.b #$02 : BEQ + : STA !INFINITE_BOMBS : +
@@ -69,13 +70,13 @@ OnUncleItemGet:
 	LDA.l UncleRefill : BIT.b #$04 : BEQ + : LDA.b #$80 : STA $7EF373 : + ; refill magic
 	LDA.l UncleRefill : BIT.b #$02 : BEQ + : LDA.b #50 : STA $7EF375 : + ; refill bombs
 	LDA.l UncleRefill : BIT.b #$01 : BEQ + ; refill arrows
-		LDA.b #70 : STA $7EF376
+	LDA.b #70 : STA $7EF376
 
-		LDA.l ArrowMode : BEQ +
-			LDA !INVENTORY_SWAP_2 : ORA #$80 : STA !INVENTORY_SWAP_2 ; enable bow toggle
-			REP #$20 ; set 16-bit accumulator
-			LDA $7EF360 : !ADD.l FreeUncleItemAmount : STA $7EF360 ; rupee arrows, so also give the player some money to start
-			SEP #$20 ; set 8-bit accumulator
+	LDA.l ArrowMode : BEQ +
+		LDA !INVENTORY_SWAP_2 : ORA #$80 : STA !INVENTORY_SWAP_2 ; enable bow toggle
+		REP #$20 ; set 16-bit accumulator
+		LDA $7EF360 : !ADD.l FreeUncleItemAmount : STA $7EF360 ; rupee arrows, so also give the player some money to start
+		SEP #$20 ; set 8-bit accumulator
 	+
 RTL
 ;--------------------------------------------------------------------------------
@@ -248,6 +249,11 @@ PostItemAnimation:
 	LDA $1B : BEQ +
 		REP #$20 : LDA $A0 : STA !MULTIWORLD_ROOMID : SEP #$20
 		LDA $0403 : STA !MULTIWORLD_ROOMDATA
+	+
+
+	LDA.w $02E9 : CMP.b #$01 : BNE +
+		LDA.b $2F : BEQ +
+			JSL.l IncrementChestTurnCounter
 	+
 
 	LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
