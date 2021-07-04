@@ -424,6 +424,15 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
+%smallcredits("OVERWORLD RANDOMIZER", "green")
+
+%blankline()
+
+%bigcredits("CODEMANN8")
+
+%blankline()
+%blankline()
+
 %smallcredits("FESTIVE RANDOMIZER", "yellow")
 
 %blankline()
@@ -448,15 +457,11 @@ CreditsLineBlank:
 
 %blankline()
 
-%bigcredits("ACHY                 ARTHEAU")
+%bigcredits("ACHY    ARTHEAU    TARTHORON")
 
 %blankline()
 
-%bigcredits("GLAN                 TWROXAS")
-
-%blankline()
-
-%bigcredits("PLAGUEDONE         TARTHORON")
+%bigcredits("GLAN    PLAGUEDONE   TWROXAS")
 
 %blankline()
 %blankline()
@@ -503,15 +508,11 @@ CreditsLineBlank:
 
 %blankline()
 
-%bigcredits("MICHAELK              FOUTON")
+%bigcredits("MICHAELK    FOUTON     BONTA")
 
 %blankline()
 
-%bigcredits("BONTA                EMOSARU")
-
-%blankline()
-
-%bigcredits("SAKURATSUBASA")
+%bigcredits("EMOSARU        SAKURATSUBASA")
 
 %blankline()
 
