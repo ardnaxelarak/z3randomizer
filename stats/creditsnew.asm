@@ -424,7 +424,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("OVERWORLD RANDOMIZER", "green")
+%smallcredits("OVERWORLD RANDOMIZER", "yellow")
 
 %blankline()
 
@@ -433,7 +433,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("FESTIVE RANDOMIZER", "yellow")
+%smallcredits("FESTIVE RANDOMIZER", "green")
 
 %blankline()
 
@@ -446,7 +446,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("SPRITE DEVELOPMENT", "green")
+%smallcredits("SPRITE DEVELOPMENT", "yellow")
 
 %blankline()
 
@@ -466,7 +466,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("YOUR SPRITE BY", "yellow")
+%smallcredits("YOUR SPRITE BY", "green")
 
 %addarbline(YourSpriteCreditsHi)
 %addarbline(YourSpriteCreditsLo)
@@ -474,7 +474,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("MSU SUPPORT", "green")
+%smallcredits("MSU SUPPORT", "yellow")
 
 %blankline()
 
@@ -483,7 +483,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("PALETTE SHUFFLER", "yellow")
+%smallcredits("PALETTE SHUFFLER", "green")
 
 %blankline()
 
