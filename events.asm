@@ -55,12 +55,15 @@ OnQuit:
 RTL
 ;--------------------------------------------------------------------------------
 OnUncleItemGet:
-	JSL Link_ReceiveItem
+	PHA
 
 	LDA.l EscapeAssist
 	BIT.b #$04 : BEQ + : STA !INFINITE_MAGIC : +
 	BIT.b #$02 : BEQ + : STA !INFINITE_BOMBS : +
 	BIT.b #$01 : BEQ + : STA !INFINITE_ARROWS : +
+
+	PLA
+	JSL Link_ReceiveItem
 
 	LDA.l UncleRefill : BIT.b #$04 : BEQ + : LDA.b #$80 : STA $7EF373 : + ; refill magic
 	LDA.l UncleRefill : BIT.b #$02 : BEQ + : LDA.b #50 : STA $7EF375 : + ; refill bombs
@@ -232,6 +235,11 @@ PostItemAnimation:
 		STZ $1CF0 : STZ $1CF1 ; reset decompression buffer
 		JSL.l Main_ShowTextMessage_Alt
 		LDA.b #$00 : STA $7F509F
+	+
+
+	LDA.w $02E9 : CMP.b #$01 : BNE +
+		LDA.b $2F : BEQ +
+			JSL.l IncrementChestTurnCounter
 	+
 
 	STZ $02E9 : LDA $0C5E, X ; thing we wrote over to get here

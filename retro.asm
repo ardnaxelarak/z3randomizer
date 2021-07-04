@@ -26,11 +26,11 @@ StoreBombCount:
 	.finite
 		PLA : STA $7EF343
 RTL
-HaveAnyItems:
-	LDX #$13
-	LDA !INFINITE_BOMBS
-	.next_item
-		ORA $7EF340, X : DEX : BPL .next_item
+SearchForEquippedItem:
+	LDA !INFINITE_BOMBS : BEQ +
+		LDA.b #$01 : LDX.b #$00 : RTL
+	+
+	LDA $7EF340 ; thing we wrote over
 RTL
 
 !INFINITE_ARROWS = "$7F50C8"

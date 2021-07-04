@@ -14,6 +14,8 @@ dl Init_PostRAMClear
 org $008056 ; <- 56 - Bank00.asm : 77
 JSL.l FrameHookAction
 ;--------------------------------------------------------------------------------
+org $00805D
+JML HandleOneMindController
 
 ;================================================================================
 ; NMI Hook
@@ -48,8 +50,8 @@ ReturnCheckZSNES:
 ;--------------------------------------------------------------------------------
 ;org $0083D9 ; <- 3D9 - Bank00.asm : 611 (LDA $4219 : STA $01)
 ;JSL.l InvertDPad : NOP
-org $0083D4 ; <- 3D4 - Bank00.asm : 610 (LDA $4218 : STA $00)
-JML.l InvertDPad : SKIP 6
+org $0083D1 ; <- 3D1 - Bank00.asm (STZ.w JOYPAD - useless instruction here)
+JML.l InvertDPad : SKIP 9
 InvertDPadReturn:
 ;--------------------------------------------------------------------------------
 
@@ -319,17 +321,14 @@ JSL.l LoadBombCount16
 org $0DDEB3 ; <- 6DEB3 - equipment.asm : 328 (LDA $7EF33F, X)
 JSL.l IsItemAvailable
 ;--------------------------------------------------------------------------------
-org $0DDDE6 ; <- 6DDE6 - equipment.asm : 146 (LDX.b #$12 ...)
-JSL.l HaveAnyItems
-BRA + : NOP #7 : +
+org $0DDDE8 ; <- 6DDE8 - equipment.asm : 148 (LDA $7EF340)
+JSL.l SearchForEquippedItem
 ;--------------------------------------------------------------------------------
-org $0DDE6E ; <- 6DE6E - equipment.asm : 271 (LDX.b #$12 ...)
-JSL.l HaveAnyItems
-BRA + : NOP #7 : +
+org $0DDE70 ; <- 6DE70 - equipment.asm : 273 (LDA $7EF340)
+JSL.l SearchForEquippedItem
 ;--------------------------------------------------------------------------------
-org $0DE39B ; <- 6E39B - equipment.asm : 1107 (LDX.b #$12 ...)
-JSL.l HaveAnyItems
-BRA + : NOP #7 : +
+org $0DE39D ; <- 6E39D - equipment.asm : 1109 (LDA $7EF340)
+JSL.l SearchForEquippedItem
 ;--------------------------------------------------------------------------------
 
 ;================================================================================
@@ -2650,6 +2649,15 @@ JSL FastCreditsCutsceneTimer
 
 org $0EE773
 JSL FastTextScroll : NOP
+
+;================================================================================
+org $01FFEE : JSL IncrementDamageTakenCounter_Eight ; overworld pit
+org $079506 : JSL IncrementDamageTakenCounter_Eight ; underworld pit
+
+org $0780C6 : JSL IncrementDamageTakenCounter_Arb
+
+org $07B0B1 : JSL IncrementMagicUseCounter
+
 
 ;================================================================================
 ; Bomb-Only Mode
