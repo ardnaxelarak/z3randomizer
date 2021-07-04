@@ -21,7 +21,7 @@ def process_values(sprite, values)
   if ret[12] != 3 && sprite != 0xCC # ice rod
     ret[12] = 0
   end
-  if ret[13] != 3 && ![0xA3, 0xA1].include?(sprite) # bombos
+  if ret[13] > 0 && ![0xA3, 0xA1].include?(sprite) # bombos
     ret[13] = 0
   end
   if ret[14] != 1 # ether
