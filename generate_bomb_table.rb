@@ -27,7 +27,7 @@ def process_values(sprite, values)
   if ret[14] != 1 # ether
     ret[14] = 0
   end
-  if ret[15] != 3 # quake
+  if [1, 2].include?(ret[15]) # quake
     ret[15] = 0
   end
   if sprite == 0x53 and ret[2] == 3
