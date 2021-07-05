@@ -7,7 +7,7 @@ def process_values(sprite, values)
     ret[6] = 0
   end
   if ret[7] == 2 # hookshot
-    ret[7] = 0
+    ret[7] = 1 # still want to stun
   end
   if ret[9] > 0 && sprite != 0x84 # silver bow and not red eyegore/mimic
     ret[9] = 0
@@ -29,6 +29,9 @@ def process_values(sprite, values)
   end
   if ret[15] != 3 # quake
     ret[15] = 0
+  end
+  if sprite == 0x53 and ret[2] == 3
+    ret[2] = 1 # armos knight? let's make master bombs not suck
   end
   return ret
 end
