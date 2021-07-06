@@ -20,6 +20,7 @@ LoadBombCount16:
 	.infinite
 RTL
 StoreBombCount:
+	JSL IncrementBombsPlacedCounter
 	PHA : LDA !INFINITE_BOMBS : BEQ .finite
 	.infinite
 		PLA : LDA.b #$01 : RTL

@@ -652,6 +652,10 @@ print "GT Big Key Credit Start: ", pc
 
 %blankline()
 
+%bigcreditsleft("BOMBS PLACED")
+
+%blankline()
+
 %bigcreditsleft("SAVE AND QUITS")
 
 %blankline()
@@ -670,11 +674,6 @@ print "GT Big Key Credit Start: ", pc
 
 %bigcreditsleft("TOTAL LAG TIME")
 
-%blankline()
-%blankline()
-
-
-%blankline()
 %blankline()
 
 
@@ -732,16 +731,18 @@ print "Collection Rate Credit Start: ", pc
 !CHEST_TURNS_Y = 349
 !BONKS_X = 26
 !BONKS_Y = 352
+!BOMBS_X = 26
+!BOMBS_Y = 355
 !SAVE_AND_QUITS_X = 26
-!SAVE_AND_QUITS_Y = 355
+!SAVE_AND_QUITS_Y = 358
 !DEATHS_X = 26
-!DEATHS_Y = 358
+!DEATHS_Y = 361
 !FAERIE_REVIVALS_X = 26
-!FAERIE_REVIVALS_Y = 361
+!FAERIE_REVIVALS_Y = 364
 !TOTAL_MENU_TIME_X = 19
-!TOTAL_MENU_TIME_Y = 364
+!TOTAL_MENU_TIME_Y = 367
 !TOTAL_LAG_TIME_X = 19
-!TOTAL_LAG_TIME_Y = 367
+!TOTAL_LAG_TIME_Y = 370
 !COLLECTION_RATE_X = 22
 !COLLECTION_RATE_Y = 380
 !TOTAL_TIME_X = 19

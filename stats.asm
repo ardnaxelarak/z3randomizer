@@ -118,7 +118,7 @@
 ;--------------------------------------------------------------------------------
 ; $7EF46D - chest turn counter
 ;--------------------------------------------------------------------------------
-; $7EF46E - 7EF49F - Free space
+; $7EF46Ew[2] - bombs placed counter
 ;--------------------------------------------------------------------------------
 ; $7EF4A0 - 7EF4A7 - Service Request
 ;--------------------------------------------------------------------------------
@@ -330,6 +330,17 @@ IncrementChestTurnCounter:
 	PHA
 		LDA !LOCK_STATS : BNE +
 			LDA !CHESTTURN_COUNTER : INC : STA !CHESTTURN_COUNTER
+		+
+	PLA
+RTL
+;--------------------------------------------------------------------------------
+!BOMBS_PLACED_COUNTER = "$7EF46E"
+IncrementBombsPlacedCounter:
+	PHA
+		LDA !LOCK_STATS : BNE +
+			PHP : REP #$20
+			LDA !BOMBS_PLACED_COUNTER : INC : STA !BOMBS_PLACED_COUNTER
+			PLP
 		+
 	PLA
 RTL
