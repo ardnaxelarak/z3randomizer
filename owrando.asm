@@ -27,6 +27,10 @@ org $06b3ee ;LDA $7EF3CC : CMP #$07 : BEQ $06B42E
 jsl OWSmithAccept : nop #2
 db #$b0 ; BCS instead of BEQ
 
+; load Stumpy per screen's original world, not current world flag
+org $06907f ; < 3107f - sprite_prep.asm:2170 (LDA $7EF3CA)
+lda $8a : eor #$40
+
 ;(replacing -> LDA $8A : AND.b #$40)
 org $00d8c4  ; < ? - Bank00.asm 4068 ()
 jsl.l OWWorldCheck
