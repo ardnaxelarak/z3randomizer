@@ -55,7 +55,7 @@ db #$20, #$19, #$08, #$31 ; year/month/day
 !SRAM_SINK = "$7EF41E" ; <- change this (conflicts with Programmable item 3)
 ;$7EF418 - Goal Item Counter
 ;$7EF419 - Service Sequence
-;$7EF420 - $7EF466 - Stat Tracking Bank 1 (overlaps with RNG Item Flags)
+;$7EF420 - $7EF46D - Stat Tracking Bank 1 (overlaps with RNG Item Flags)
 ;$7EF450 - $7EF45F - RNG Item (Single) Flags
 ;$7EF4A0 - $7EF4A7 - Service Request Block
 !FRESH_FILE_MARKER = "$7EF4F0" ; zero if fresh file
@@ -90,6 +90,11 @@ db #$20, #$19, #$08, #$31 ; year/month/day
 !REG_MUSIC_CONTROL = $012B
 ;!REG_MUSIC_CONTROL = $012C
 !REG_MUSIC_CONTROL_REQUEST = $012C
+
+!ONEMIND_ID = $7F5072
+!ONEMIND_TIMER = $7F5073
+
+function hexto555(h) = ((((h&$FF)/8)<<10)|(((h>>8&$FF)/8)<<5)|(((h>>16&$FF)/8)<<0))
 
 ;================================================================================
 
@@ -197,7 +202,7 @@ incsrc endingsequence.asm
 incsrc cuccostorm.asm
 incsrc compression.asm
 incsrc retro.asm
-incsrc dpadinvert.asm
+incsrc controllerjank.asm
 incsrc boots.asm
 incsrc events.asm
 incsrc fileselect.asm
@@ -219,6 +224,7 @@ incsrc toast.asm
 incsrc darkroomitems.asm
 incsrc fastcredits.asm
 incsrc msu.asm
+incsrc dungeonmap.asm
 incsrc multiworld.asm
 incsrc terrorpin.asm
 warnpc $A58000
@@ -308,6 +314,10 @@ warnpc $338041
 org $339000
 incbin sheet178.gfx
 warnpc $339600
+
+org $339600
+BossMapIconGFX:
+incbin bossicons.4bpp
 
 org $328000
 Extra_Text_Table:
@@ -528,6 +538,9 @@ Sprite_ShowMessageUnconditional:
 org $05EC96
 Sprite_ZeldaLong:
 
+org $0680FA
+Player_ApplyRumbleToSprites:
+
 org $0683E6
 Utility_CheckIfHitBoxesOverlapLong:
 
@@ -608,6 +621,9 @@ AddDashTremor:
 
 org $099D04
 AddAncillaLong:
+
+org $099D1A
+Ancilla_CheckIfAlreadyExistsLong:
 
 org $09AE64
 Sprite_SetSpawnedCoords:

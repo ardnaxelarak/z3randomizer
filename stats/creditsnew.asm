@@ -563,7 +563,7 @@ CreditsLineBlank:
 
 ;===================================================================================================
 
-print "Line number: !CLINE | Expected: 302"
+print "Credits line number: !CLINE | Expected: 302"
 
 if !CLINE > 302
 	error "Too many credits lines. !CLINE > 302"
@@ -639,8 +639,11 @@ endif
 %blankline()
 %blankline()
 
-print "GT Big Key Credit Start: ", pc
-%bigcreditsleft("GT BIG KEY               /22")
+%bigcreditsleft("DAMAGE TAKEN")
+
+%blankline()
+
+%bigcreditsleft("MAGIC USED")
 
 %blankline()
 
@@ -686,9 +689,6 @@ print "GT Big Key Credit Start: ", pc
 
 %emptyline()
 %emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
 print "Collection Rate Credit Start: ", pc
 %bigcreditsleft("COLLECTION RATE         /216")
 
@@ -725,20 +725,22 @@ print "Collection Rate Credit Start: ", pc
 !TEMPERED_SWORD_Y = 336
 !GOLD_SWORD_X = 23
 !GOLD_SWORD_Y = 339
-!GT_BIG_KEY_X = 23
-!GT_BIG_KEY_Y = 346
+!DAMAGETAKEN_X = 26
+!DAMAGETAKEN_Y = 346
+!MAGICUSED_X = 26
+!MAGICUSED_Y = 349
 !BONKS_X = 26
-!BONKS_Y = 349
+!BONKS_Y = 352
 !SAVE_AND_QUITS_X = 26
-!SAVE_AND_QUITS_Y = 352
+!SAVE_AND_QUITS_Y = 355
 !DEATHS_X = 26
-!DEATHS_Y = 355
+!DEATHS_Y = 358
 !FAERIE_REVIVALS_X = 26
-!FAERIE_REVIVALS_Y = 358
+!FAERIE_REVIVALS_Y = 361
 !TOTAL_MENU_TIME_X = 19
-!TOTAL_MENU_TIME_Y = 361
+!TOTAL_MENU_TIME_Y = 364
 !TOTAL_LAG_TIME_X = 19
-!TOTAL_LAG_TIME_Y = 364
+!TOTAL_LAG_TIME_Y = 367
 !COLLECTION_RATE_X = 22
 !COLLECTION_RATE_Y = 380
 !TOTAL_TIME_X = 19
