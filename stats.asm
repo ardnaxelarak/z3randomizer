@@ -139,6 +139,10 @@
 ;--------------------------------------------------------------------------------
 ; $7EF468 - chest turn counter
 ;--------------------------------------------------------------------------------
+; $7EF46Aw[2] - damage counter
+;--------------------------------------------------------------------------------
+; $7EF46Cw[2] - magic counter
+;--------------------------------------------------------------------------------
 ; $7EF46Ew[2] - bombs placed counter
 ;--------------------------------------------------------------------------------
 
@@ -146,16 +150,12 @@
 !LOCK_STATS = "$7EF443"
 ;--------------------------------------------------------------------------------
 !BONK_COUNTER = "$7EF420"
-StatBonkCounter:
-	PHA
-	JSL Ancilla_CheckIfAlreadyExistsLong : BCS +
-		LDA !LOCK_STATS : BNE +
-			LDA !BONK_COUNTER : INC
-			CMP.b #100 : BEQ + ; decimal 100
-				STA !BONK_COUNTER
+IncrementBonkCounter:
+	LDA !LOCK_STATS : BNE +
+		LDA !BONK_COUNTER : INC
+		CMP.b #100 : BEQ + ; decimal 100
+			STA !BONK_COUNTER
 	+
-	PLA
-	JSL.l AddDashTremor ; thing we wrote over
 RTL
 ;--------------------------------------------------------------------------------
 !SAVE_COUNTER = "$7EF42D"
@@ -382,8 +382,8 @@ IncrementBigChestCounter:
 	PLA
 RTL
 ;--------------------------------------------------------------------------------
-!DAMAGE_COUNTER = "$FFFFFF"
-!MAGIC_COUNTER = "$FFFFFF"
+!DAMAGE_COUNTER = $7EF46A
+!MAGIC_COUNTER = $7EF46C
 IncrementDamageTakenCounter_Eight:
 	STA.l $7EF36D
 	PHA : PHP
@@ -391,10 +391,12 @@ IncrementDamageTakenCounter_Eight:
 	REP #$21
 	LDA.l !DAMAGE_COUNTER
 	ADC.w #$0008
-	STA.l !DAMAGE_COUNTER
+	BCC ++
+	LDA.w #$FFFF
+++	STA.l !DAMAGE_COUNTER
 +	PLP
 	PLA
-RTL
+	RTL
 
 IncrementDamageTakenCounter_Arb:
 	PHP
@@ -403,24 +405,41 @@ IncrementDamageTakenCounter_Arb:
 	LDA.b $00
 	AND.w #$00FF
 	ADC.l !DAMAGE_COUNTER
-	STA.l !DAMAGE_COUNTER
+	BCC ++
+	LDA.w #$FFFF
+++	STA.l !DAMAGE_COUNTER
 +	PLP
 
 	LDA.l $7EF36D
-RTL
+	RTL
 
 IncrementMagicUseCounter:
 	STA.l $7EF36E
+
+IncrementMagicUseCounterByrna:
 	PHA : PHP
 	LDA !LOCK_STATS : BNE +
 	REP #$21
 	LDA.b $00
 	AND.w #$00FF
 	ADC.l !MAGIC_COUNTER
-	STA.l !MAGIC_COUNTER
+	BCC ++
+	LDA.w #$FFFF
+++	STA.l !MAGIC_COUNTER
 +	PLP : PLA
 
-RTL
+	RTL
+
+IncrementMagicUseCounterOne:
+	LDA !LOCK_STATS : BNE +
+	REP #$20
+	LDA.l !MAGIC_COUNTER
+	INC
+	BEQ ++
+	STA.l !MAGIC_COUNTER
+++	SEP #$20
++	LDA.l $7EF36E
+	RTL
 
 ;--------------------------------------------------------------------------------
 !OW_MIRROR_COUNTER = "$7EF43A"
