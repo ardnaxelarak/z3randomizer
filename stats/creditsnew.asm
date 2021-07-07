@@ -424,7 +424,16 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("FESTIVE RANDOMIZER", "yellow")
+%smallcredits("OVERWORLD RANDOMIZER", "yellow")
+
+%blankline()
+
+%bigcredits("CODEMANN8")
+
+%blankline()
+%blankline()
+
+%smallcredits("FESTIVE RANDOMIZER", "green")
 
 %blankline()
 
@@ -437,7 +446,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("SPRITE DEVELOPMENT", "green")
+%smallcredits("SPRITE DEVELOPMENT", "yellow")
 
 %blankline()
 
@@ -448,20 +457,16 @@ CreditsLineBlank:
 
 %blankline()
 
-%bigcredits("ACHY                 ARTHEAU")
+%bigcredits("ACHY    ARTHEAU    TARTHORON")
 
 %blankline()
 
-%bigcredits("GLAN                 TWROXAS")
-
-%blankline()
-
-%bigcredits("PLAGUEDONE         TARTHORON")
+%bigcredits("GLAN    PLAGUEDONE   TWROXAS")
 
 %blankline()
 %blankline()
 
-%smallcredits("YOUR SPRITE BY", "yellow")
+%smallcredits("YOUR SPRITE BY", "green")
 
 %addarbline(YourSpriteCreditsHi)
 %addarbline(YourSpriteCreditsLo)
@@ -469,7 +474,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("MSU SUPPORT", "green")
+%smallcredits("MSU SUPPORT", "yellow")
 
 %blankline()
 
@@ -478,7 +483,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("PALETTE SHUFFLER", "yellow")
+%smallcredits("PALETTE SHUFFLER", "green")
 
 %blankline()
 
@@ -503,15 +508,11 @@ CreditsLineBlank:
 
 %blankline()
 
-%bigcredits("MICHAELK              FOUTON")
+%bigcredits("MICHAELK    FOUTON     BONTA")
 
 %blankline()
 
-%bigcredits("BONTA                EMOSARU")
-
-%blankline()
-
-%bigcredits("SAKURATSUBASA")
+%bigcredits("EMOSARU        SAKURATSUBASA")
 
 %blankline()
 
