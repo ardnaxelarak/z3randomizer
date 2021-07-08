@@ -167,7 +167,7 @@ db #$00 ; #$00 = Off (default) - #$01 = On
 ;--------------------------------------------------------------------------------
 org $308041 ; PC 0x180041
 AllowSwordlessMedallionUse:
-db #$00 ; #$00 = Off (default) - #$01 = Medallion Pads - #$02 = Always (Not Implemented)
+db #$00 ; #$00 = Off (default) - #$01 = Medallion Pads - #$02 = Always
 ;--------------------------------------------------------------------------------
 org $308042 ; PC 0x180042
 PermitSQFromBosses:
@@ -388,7 +388,11 @@ org $30808D ; PC 0x18008D
 InstantPostAgaWorldState:
 db $00 ; #$00 = Off (default) - #$01 = On
 ;--------------------------------------------------------------------------------
-; 0x18008E - 0x18008F (unused)
+org $30808E ; PC 0x18008E
+FakeBoots:
+db $00 ; #$00 = Off (default) - #$01 = On
+;--------------------------------------------------------------------------------
+; 0x18008F (unused)
 ;--------------------------------------------------------------------------------
 org $308090 ; PC 0x180090 - 0x180097
 ProgressiveSwordLimit:
@@ -412,7 +416,25 @@ db #$02 ; #$02 - 2 Bows (default)
 ProgressiveBowReplacement:
 db #$47 ; #$47 - 20 Rupees (default)
 ;--------------------------------------------------------------------------------
-; 0x18009A - 0x18009F (unused)
+; 0x18009A - 0x18009C one mind
+;--------------------------------------------------------------------------------
+org $30809A ; PC 0x18009A
+OneMindPlayerCount:
+db 0
+org $30809B ;  PC 0x18009B - 0x18009C
+OneMindTimer:
+dw 0
+;--------------------------------------------------------------------------------
+; 0x18009D - Dungeon map icons
+; .... ...b
+;
+;  b - boss icon
+;--------------------------------------------------------------------------------
+org $30809D
+DungeonMapIcons:
+db $01
+;--------------------------------------------------------------------------------
+; 0x18009E - 0x18009F (unused)
 ;--------------------------------------------------------------------------------
 org $3080A0 ; PC 0x1800A0 - 0x1800A4
 Bugfix_MirrorlessSQToLW:
@@ -1471,7 +1493,7 @@ dw #9999 ; Rupee Limit
 ; $7F503C - Stats Rupee Total
 ; $7F503D - Stats Rupee Total
 ; $7F503E - Stats Item Total
-; $7F503F - Bonk Repeat
+; $7F503F - Unused
 ; $7F5040 - Free Item Dialog Temporary
 ; $7F5041 - Epilepsy Safety Timer
 ; $7F5042 - Tile Upload Offset Override (Low)
@@ -1481,7 +1503,9 @@ dw #9999 ; Rupee Limit
 ; $7F504F - $7F506F - Shop Block
 ; $7F5070 - Reserved for OneMind
 ; $7F5071 - Reserved for OneMind
-; $7F5072 - $7F507D - Unused
+; $7F5072 - OneMind player ID
+; $7F5073 - $7F5074 - OneMind timer
+; $7F5075 - $7F507D - Unused
 ; $7F507E - Clock Status
 ; $7F507F - Always Zero
 ; $7F5080 - $7F5083 - Clock Hours

@@ -240,7 +240,12 @@ RTL
 		+ ; Everything Else
 			LDA.b #$08 : RTL
 	++ : CMP.b #$F8 : BNE ++ ; Progressive Bow
-		LDA $7EF354 : BNE + ; No Bow
+		LDA $7EF340 : INC : LSR
+		CMP.l ProgressiveBowLimit : !BLT +
+			LDA.l ProgressiveBowReplacement
+			JSL.l GetSpritePalette
+			RTL
+		+ : CMP.b #$00 : BNE + ; No Bow
 			LDA.b #$08 : RTL
 		+ ; Any Bow
 			LDA.b #$02 : RTL
