@@ -57,7 +57,6 @@ RTL
 ;--------------------------------------------------------------------------------
 OnUncleItemGet:
 	PHA
-
 		LDA.l EscapeAssist
 		BIT.b #$04 : BEQ + : STA !INFINITE_MAGIC : +
 		BIT.b #$02 : BEQ + : STA !INFINITE_BOMBS : +
