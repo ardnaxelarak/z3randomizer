@@ -52,7 +52,8 @@ PreOverworld_LoadProperties_ChooseMusic:
 
     .endOfLightWorldChecks
     ; if we are in the light world go ahead and set chosen selection
-    LDA $7EF3CA : BEQ .checkInverted+4
+    ;LDA $7EF3CA : BEQ .checkInverted+4
+    JSL OWWorldCheck : BEQ .checkInverted+4
 
     LDX.b #$0F ; dark woods theme
 
@@ -68,7 +69,7 @@ PreOverworld_LoadProperties_ChooseMusic:
 
     ; if not inverted and light world, or inverted and dark world, skip moon pearl check
     .checkInverted
-    LDA $7EF3CA : CLC : ROL #$03 : CMP InvertedMode : BEQ .lastCheck
+    JSL OWWorldCheck : CLC : ROL #$03 : CMP InvertedMode : BEQ .lastCheck
 
     ; Does Link have a moon pearl?
     LDA $7EF357 : BNE +
