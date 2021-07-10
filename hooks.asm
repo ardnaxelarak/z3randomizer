@@ -2730,7 +2730,7 @@ BRA + : NOP #5 : +
 org $088DB1 ; Bank08.asm@1207 (PHY : PHX : TYX : ... )
 JSL Utility_CheckAncillaOverlapWithSprite
 BRA + : NOP #7 : +
---------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------
 org $0882E8 ; Bank08.asm@456 (LDA $0DB0, Y : CMP.b #$03)
 JSL Utility_CheckHelmasaurKingCollision
 NOP
@@ -2746,6 +2746,10 @@ NOP
 org $068F94 ; sprite_prep.asm@1984 (INC $0BA0, X : JSL Sprite_InitializedSegmented)
 JSL AllowBombingMoldorm
 BRA + : NOP : +
+;--------------------------------------------------------------------------------
+org $06892F ; sprite_prep.asm@548 (LDA $0D00, X : SUB #$0C : STA $0D00, X : ...)
+JSL AllowBombingBarrier
+RTS : NOP #7
 ;--------------------------------------------------------------------------------
 org $0DEE05 ; equipment.asm@2065 (LDA $7EF359 : AND.w #$00FF : CMP.w #$00FF : ...)
 JSL DrawSwordInMenu

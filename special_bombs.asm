@@ -239,14 +239,24 @@ AllowBombingMoldorm:
 	JSL !SPRITE_INITIALIZED_SEGMENTED
 	RTL
 ;--------------------------------------------------------------------------------
+AllowBombingBarrier:
+	; what we wrote over
+	LDA $0D00, X : !SUB.b #$0C : STA $0D00, X
+	LDA $0E20, X : CMP #$40 : BNE .disable_projectiles
+	LDA SpecialBombs : BNE .no_disable_projectiles
+.disable_projectiles
+	INC $0BA0, X
+.no_disable_projectiles
+	RTL
+;--------------------------------------------------------------------------------
 DrawSwordInMenu:
+	LDA SpecialBombs : AND.w #$00FF : BNE .bombSword
 	LDA $7EF359 : AND.w #$00FF : CMP.w #$00FF : BEQ .noSword
 .hasSword
 	STA $02
 	LDA.w #$F859 : STA $04
 	RTL
 .noSword
-	LDA SpecialBombs : AND.w #$00FF : BNE .bombSword
 	LDA.w #$0000 : STA $02
 	LDA.w #$F859 : STA $04
 	RTL

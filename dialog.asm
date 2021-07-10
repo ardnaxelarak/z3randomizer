@@ -366,11 +366,8 @@ DialogEtherTablet:
 	PLA : JML Sprite_ShowMessageUnconditional ; Wacky Hylian Text
 	+
 	BIT $F4 : BVC - ; Show normal text if Y is not pressed
-	LDA.l AllowHammerTablets : BEQ ++
-		LDA $7EF34B : BEQ .yesText : BRA .noText
-	++
-		LDA $7EF359 : CMP.b #$FF : BEQ .yesText : CMP.b #$02 : BCS .noText
-	;++
+	JSL CheckTabletSword : BMI .yesText
+	CMP.b #$02 : !BGE .noText
 	.yesText
 	PLA
 	LDA.b #$0C
@@ -388,11 +385,8 @@ DialogBombosTablet:
 	PLA : JML Sprite_ShowMessageUnconditional ; Wacky Hylian Text
 	+
 	BIT $F4 : BVC - ; Show normal text if Y is not pressed
-	LDA.l AllowHammerTablets : BEQ ++
-		LDA $7EF34B : BEQ .yesText : BRA .noText
-	++
-		LDA $7EF359 : CMP.b #$FF : BEQ .yesText : CMP.b #$02 : !BGE .noText
-	;++
+	JSL CheckTabletSword : BMI .yesText
+	CMP.b #$02 : !BGE .noText
 	.yesText
 	PLA
 	LDA.b #$0D
