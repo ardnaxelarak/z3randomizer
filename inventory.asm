@@ -553,6 +553,10 @@ AddInventory:
 	  CPY.b #$B0 : !BGE +
 		JSR .incrementKey
 		JMP .done
+	+ CPY.b #$B1 : !BLT + ; Items $B1 - $B6 - Bomb Upgrades
+	  CPY.b #$B7 : !BGE +
+		JSR .incrementBombLevel
+		JMP .done
 	+
 	.done
 	PLP : PLX : PLA
@@ -620,6 +624,10 @@ RTS
 	+
 
 	LDA $7EF422 : !ADD #$20 : STA $7EF422 ; increment sword counter
+RTS
+
+.incrementBombLevel
+	JSR .stampSword ; update "first bomb" timestamp
 RTS
 
 .incrementShield
@@ -718,7 +726,10 @@ RTS
 RTL
 
 .incrementBossSword
-	LDA $7EF359
+	LDA SpecialBombs : BEQ +
+	LDA $7EF4A8 : BRA ++
+	+ : LDA $7EF359
+	++
 	BNE + : -
 		%TopHalf($7EF452) : RTS
 	+ CMP #$FF : BEQ -

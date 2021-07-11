@@ -9,26 +9,28 @@ RTL
 ItemDowngradeFixMain:
 	JSL.l AddInventory
 	BMI .dontWrite ; thing we wrote over part 1
-	
+
 	CPY.b #$1B : BEQ .isPowerGloves ; Power Gloves
 	CPY.b #$05 : BEQ .isRedShield ; Red Shield
 	CPY.b #$04 : BEQ .isBlueShield ; Blue Shield
 	CPY.b #$0C : BEQ .isBlueBoomerang ; Blue Boomerang
 	CPY.b #$0B : BEQ .isBow ; Bow
 	CPY.b #$3A : BEQ .isBowAndArrows ; Bow
-	
+
 	CPY.b #$49 : BEQ .isFightersSword ; Fighter's Sword
 	CPY.b #$01 : BEQ .isMasterSword ; Master Sword
 	CPY.b #$50 : BEQ .isMasterSword ; Master Sword (Safe)
 	CPY.b #$02 : BEQ .isTemperedSword ; Tempered Sword
-	
+
 	CPY.b #$3B : BEQ .isSilverArrowBow ; Silver Arrow Bow
 	CPY.b #$2A : BEQ .isRedBoomerang ; Red Boomerang
 	CPY.b #$0D : BEQ .isMagicPowder ; Magic Powder
 	CPY.b #$14 : BEQ .isFlute ; Flute
 	CPY.b #$13 : BEQ .isShovel ; Shovel
 	CPY.b #$29 : BEQ .isMushroom ; Mushroom
-	
+
+	CPY.b #$B1 : !BLT + : CPY.b #$B6 : !BLT .isBombUpgrade : +
+
 	.done
 	STA [$00] ; thing we wrote over part 2
 	.dontWrite
@@ -66,6 +68,17 @@ RTS
 		INC : CMP !HIGHEST_SWORD_LEVEL : !BGE + ; skip if highest is lower (this is an upgrade)
 			LDA !HIGHEST_SWORD_LEVEL : DEC ; convert to item id
 			TAY : PLA : LDA !HIGHEST_SWORD_LEVEL ; put sword id into the thing to write
+			JMP .done
+		+
+	PLA
+JMP .done
+	.isBombUpgrade
+	PHA
+		TYA ; load bomb upgrade item
+		!SUB #$B0 ; convert to bomb level
+		CMP.l $7EF4A8 : !BGE + ; skip if highest is lower (this is an upgrade)
+			LDA.l $7EF4A8 : !ADD #$B0 ; convert to item id
+			TAY : PLA : LDA.l $7EF4A8 ; put bomb level into the thing to write
 			JMP .done
 		+
 	PLA
