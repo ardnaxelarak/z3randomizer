@@ -1412,11 +1412,12 @@ db $04
 ;AF - Generic Small Key
 
 ;B0 - reserved for bee traps
-;B1 - L-2 Bombs
-;B2 - L-3 Bombs
-;B3 - L-4 Bombs
-;B4 - L-5 Bombs
-;B5 - Progressive Bombs
+;B1 - L-1 Bombs
+;B2 - L-2 Bombs
+;B3 - L-3 Bombs
+;B4 - L-4 Bombs
+;B5 - L-5 Bombs
+;B6 - Progressive Bombs
 ;================================================================================
 ;;Residual Portal
 ;org $0283E0 ; PC 0x103E0 (Bank02.asm:816) (BNE)
