@@ -29,15 +29,16 @@ DamageClassCalc:
 .not_cane
 	CMP #$07 : BNE .no_change
 	LDA SpecialBombs : BEQ .normal_bombs
+	LDA !BOMB_LEVEL : BEQ .normal_bombs
 	LDA $0E20, X : CMP.b #$D6 : BEQ .unstunned_ganon
 	CMP.b #$D7 : BEQ .stunned_ganon
 	CMP.b #$88 : BEQ .mothula
 	CMP.b #$92 : BEQ .helmasaur_king
 .bomb_level
-	LDA !BOMB_LEVEL : INC A
+	LDA !BOMB_LEVEL
 	BRA .done
 .mothula
-	LDA !BOMB_LEVEL : INC A
+	LDA !BOMB_LEVEL
 	CMP #$04 : !BGE .fix_mothula
 	BRA .done
 .fix_mothula

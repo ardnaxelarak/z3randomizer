@@ -40,11 +40,12 @@
 ; #$90 - Big Keys
 ; #$A0 - Small Keys
 ; #$B0 - Bee Trap
-; #$B1 - L-2 Bombs
-; #$B2 - L-3 Bombs
-; #$B3 - L-4 Bombs
-; #$B4 - L-5 Bombs
-; #$B5 - Progressive Bombs
+; #$B1 - L-1 Bombs
+; #$B2 - L-2 Bombs
+; #$B3 - L-3 Bombs
+; #$B4 - L-4 Bombs
+; #$B5 - L-5 Bombs
+; #$B6 - Progressive Bombs
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
 ;--------------------------------------------------------------------------------
@@ -412,6 +413,11 @@ AddReceivedItemExpandedGetItem:
 		LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI + ; DashBeeHive_SpawnBee
 		LDA $22 : STA $0D10, Y : LDA $23 : STA $0D30, Y ; from enemizer's Spawn_Bees
 		LDA $20 : STA $0D00, Y : LDA $21 : STA $0D20, Y
+	+ CMP.b #$B1 : !BLT + : CMP.b #$B6 : !BGE + ; Bomb Upgrades
+		LDA.l SpecialBombs : BEQ ++
+			LDA #$01 : STA $7F50C9 ; infinite bombs
+		++
+		BRA .done
 	+
 	.done
 	PLX
@@ -558,16 +564,18 @@ AddReceivedItemExpanded:
 			LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +++
 				LDA.b #$0E : STA $02D8 : BRA .done ; Bee in a bottle
 			+++
-		++ : CMP.b #$B5 : BNE ++ ; Progressive Bombs
+		++ : CMP.b #$B6 : BNE ++ ; Progressive Bombs
 			LDA $7EF4A8
-			CMP.b #$00 : BNE + ; L-1 Bombs
+			CMP.b #$00 : BNE + ; have no Bombs
 				LDA.b #$B1 : STA $02D8 : JMP .done
-			+ : CMP.b #$01 : BNE + ; L-2 Bombs
+			+ : CMP.b #$01 : BNE + ; have L-1 Bombs
 				LDA.b #$B2 : STA $02D8 : JMP .done
-			+ : CMP.b #$02 : BNE + ; L-3 Bombs
+			+ : CMP.b #$02 : BNE + ; have L-2 Bombs
 				LDA.b #$B3 : STA $02D8 : JMP .done
-			+ ; Everything Else
+			+ : CMP.b #$03 : BNE + ; have L-3 Bombs
 				LDA.b #$B4 : STA $02D8 : JMP .done
+			+ ; Everything Else
+				LDA.b #$B5 : STA $02D8 : JMP .done
 		++
 		.done
 	PLX : PLA
@@ -578,10 +586,6 @@ AddReceivedItemExpanded:
 ;--------------------------------------------------------------------------------
 ;DATA AddReceivedItemExpanded
 {
-; This is a temporary measure for Fish to have consistent addresses
-warnpc $A08800
-org $A08800
-
 .y_offsets
 	db -5, -5, -5, -5, -5, -4, -4, -5
 	db -5, -4, -4, -4, -2, -4, -4, -4
@@ -617,8 +621,8 @@ org $A08800
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Free Big Key
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Free Small Key
 	db -4 ; Bee Trap
-	db -4, -4, -4, -4, -4 ; Bomb Upgrades
-	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
+	db -4, -4, -4, -4, -4, -4 ; Bomb Upgrades
+	db -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
@@ -659,8 +663,8 @@ org $A08800
 	;db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; *EVENT*
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  0 ; Bee Trap
-	db  0, 0, 0, 0, 0 ; Bomb Upgrades
-	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
+	db  0, 0, 0, 0, 0, 0; Bomb Upgrades
+	db  0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
@@ -706,8 +710,8 @@ org $A08800
 	;db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; *EVENT*
 
 	db $47 ; Bee Trap
-	db $13, $13, $13, $13, $13 ; Bomb Upgrades
-	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
+	db $13, $13, $13, $13, $13, $13 ; Bomb Upgrades
+	db $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -747,8 +751,8 @@ org $A08800
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Free Big Key
 	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 ; Free Small Key
 	db $02 ; Bee Trap
-	db $02, $02, $02, $02, $02 ; Bomb Upgrades
-	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
+	db $02, $02, $02, $02, $02, $02; Bomb Upgrades
+	db $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
@@ -789,8 +793,8 @@ org $A08800
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Big Key
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  1 ; Bee Trap
-	db  5, 5, 5, 5, 5 ; Bomb Upgrades
-	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
+	db  5, 5, 5, 5, 5, 5 ; Bomb Upgrades
+	db  4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
@@ -832,8 +836,8 @@ org $A08800
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Big Key
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Small Key
 	dw $F36A ; Bee Trap
-	dw $F4A8, $F4A8, $F4A8, $F4A8, $F4A8 ; Bomb Upgrades
-	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
+	dw $F4A8, $F4A8, $F4A8, $F4A8, $F4A8, $F4A8 ; Bomb Upgrades
+	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
@@ -877,8 +881,8 @@ org $A08800
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Free Big Key
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Free Small Key
 	db $FF ; Bee Trap
-	db $01, $02, $03, $04, $FF ; Bomb Upgrades
-	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
+	db $01, $02, $03, $04, $05, $FF ; Bomb Upgrades
+	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
@@ -965,8 +969,8 @@ Link_ReceiveItemAlternatesExpanded:
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Free Big Key
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Free Small Key
 	db -1 ; Bee Trap
-	db -1, -1, -1, -1, -1 ; Bomb Upgrades
-	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
+	db -1, -1, -1, -1, -1, -1 ; Bomb Upgrades
+	db -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused

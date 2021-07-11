@@ -147,6 +147,11 @@ SetEscapeAssist:
 		BIT.b #$20 : BEQ + : STA !INFINITE_BOMBS : +
 		BIT.b #$10 : BEQ + : STA !INFINITE_ARROWS : +
 	++
+
+	LDA.l SpecialBombs : BEQ +
+	LDA.l $7EF4A8 : BEQ +
+	LDA #$01 : STA !INFINITE_BOMBS
+	+
 RTL
 ;--------------------------------------------------------------------------------
 SetSilverBowMode:

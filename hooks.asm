@@ -2827,6 +2827,7 @@ JSL DrawSwordInMenu
 BRA + : NOP #16 : +
 ;--------------------------------------------------------------------------------
 org $0DFC51 ; is this being used? I hope not! let's find out if anything breaks!
+db $F5, $20, $F5, $20, $F5, $20, $F5, $20
 db $B2, $3C, $B3, $3C, $C2, $3C, $17, $3C
 db $B2, $2C, $B3, $2C, $C2, $2C, $18, $2C
 db $B2, $24, $B3, $24, $C2, $24, $19, $24
