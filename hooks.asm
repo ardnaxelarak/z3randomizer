@@ -1671,6 +1671,10 @@ dw !REG_MUSIC_CONTROL
 
 org $0CF05F
 dw !REG_MUSIC_CONTROL
+
+; Conditionally disable UW music changes in Door Rando
+org $028ADB ; <- Bank02.asm:2088 (LDX.b #$14 : LDA $A0)
+JSL.l Underworld_DoorDown_Entry
 ;--------------------------------------------------------------------------------
 
 ;================================================================================
