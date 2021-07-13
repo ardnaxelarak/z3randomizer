@@ -718,7 +718,7 @@ RTL
 
 .incrementBossSword
 	LDA SpecialBombs : BEQ +
-	LDA $7EF4A8 : BRA ++
+	LDA !BOMB_LEVEL : BRA ++
 	+ : LDA $7EF359
 	++
 	BNE + : -

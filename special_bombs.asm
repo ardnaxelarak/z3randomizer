@@ -1,6 +1,5 @@
 ;--------------------------------------------------------------------------------
 !ANCILLA_DAMAGE = "$06EC84"
-!BOMB_LEVEL = "$7EF4A8"
 ; start with X = sprite index, A = ancilla type index
 ;--------------------------------------------------------------------------------
 DamageClassCalc:
@@ -262,7 +261,7 @@ DrawSwordInMenu:
 	LDA.w #$F859 : STA $04
 	RTL
 .bombSword
-	LDA $7EF4A8 : AND.w #$00FF : STA $02
+	LDA !BOMB_LEVEL : AND.w #$00FF : STA $02
 	LDA.w #$FC51 : STA $04
 	RTL
 ;--------------------------------------------------------------------------------

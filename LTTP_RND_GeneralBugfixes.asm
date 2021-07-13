@@ -36,8 +36,9 @@ db #$20, #$19, #$08, #$31 ; year/month/day
 
 ; Rando Specific SRAM assignments
 !SHOP_PURCHASE_COUNTS = "$7EF302" ;$7EF302 - $7EF33F (temporary home)
-!INVENTORY_SWAP = "$7EF38C" ; [w]
-!INVENTORY_SWAP_2 = "$7EF38E" ; [w]
+!INVENTORY_SWAP = "$7EF38C"
+!INVENTORY_SWAP_2 = "$7EF38E"
+!BOMB_LEVEL = "$7EF38F"
 !ITEM_LIMIT_COUNTS = "$7EF390" ; $7EF390 - ????
 !NPC_FLAGS   = "$7EF410"
 !NPC_FLAGS_2 = "$7EF411"
@@ -58,7 +59,6 @@ db #$20, #$19, #$08, #$31 ; year/month/day
 ;$7EF420 - $7EF46F - Stat Tracking Bank 1 (overlaps with RNG Item Flags)
 ;$7EF450 - $7EF45F - RNG Item (Single) Flags
 ;$7EF4A0 - $7EF4A7 - Service Request Block
-!PROGRESSIVE_BOMBS = "$7EF4A8"
 ;$7EF4AA - $7EF4AD = Stat Tracking Bank 2
 !FRESH_FILE_MARKER = "$7EF4F0" ; zero if fresh file
 ;$700500 - $70050F - Extended File Name

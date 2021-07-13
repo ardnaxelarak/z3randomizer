@@ -149,7 +149,7 @@ SetEscapeAssist:
 	++
 
 	LDA.l SpecialBombs : BEQ +
-	LDA.l $7EF4A8 : BEQ +
+	LDA.l !BOMB_LEVEL : BEQ +
 	LDA #$01 : STA !INFINITE_BOMBS
 	+
 RTL

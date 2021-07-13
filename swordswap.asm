@@ -135,7 +135,7 @@ CheckTabletSword:
 		LDA.b #$02 : RTL
 	+
 	LDA.l SpecialBombs : BEQ +
-	LDA $7EF4A8 : CMP #$02 : !BLT + ; check for master bombs
+	LDA !BOMB_LEVEL : CMP #$02 : !BLT + ; check for master bombs
 		LDA.b #$02 : RTL
 	+
 	LDA $7EF359 ; get actual sword value
