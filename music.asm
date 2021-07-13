@@ -292,10 +292,14 @@ Overworld_MosaicDarkWorldChecks:
 ; 
 ; On entry, A=16bit XY=8bit, A & X safe to mod, Y unknown
 Underworld_DoorDown_Entry:
-    LDA.l DRMode : TAX : LDA.w #0 : CPX #0 : BNE .done
+    LDA.l DRMode : TAX : LDA $A0 : CPX #0 : BNE .done
 
-.vanilla
-    LDX #$14 : LDA $A0  ; thing we wrote over - prepare Sanc music track, load current room ID
+.vanilla ; thing we wrote over
+    LDX #$14 ;: LDA $A0
+    CMP.w #$0012 : BEQ .done
+    
+    LDX.b #$10 ; value for Hyrule Castle music
+    CMP.w #$0002 : BEQ .done
 
 .done
     RTL
