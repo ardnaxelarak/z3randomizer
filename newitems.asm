@@ -533,7 +533,7 @@ AddReceivedItemExpanded:
 			LDA #$FF : STA !LOCK_IN ; clear lock-in
 			BRA .done
 		++ : CMP.b #$B6 : BNE ++ ; Progressive Bombs
-			LDA $7EF4A8
+			LDA !BOMB_LEVEL
 			CMP.b #$00 : BNE + ; have no Bombs
 				LDA.b #$B1 : STA $02D8 : JMP .done
 			+ : CMP.b #$01 : BNE + ; have L-1 Bombs
@@ -807,7 +807,7 @@ org $A08800
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Big Key
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Small Key
 	dw $F36A ; reserved for bee traps
-	dw $F4A8, $F4A8, $F4A8, $F4A8, $F4A8, $F4A8 ; Bomb Upgrades
+	dw $F38F, $F38F, $F38F, $F38F, $F38F, $F38F ; Bomb Upgrades
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
