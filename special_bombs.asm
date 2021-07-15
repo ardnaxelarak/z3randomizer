@@ -265,3 +265,20 @@ DrawSwordInMenu:
 	LDA.w #$FC51 : STA $04
 	RTL
 ;--------------------------------------------------------------------------------
+BombIcon:
+	dw $207F, $207F, $3C88, $3C89, $2C88, $2C89, $2488, $2489, $2888, $2889,$2888, $2889
+DrawBombOnHud:
+	PHB
+	LDA.w #$0149
+	LDX.w #$86B0
+	LDY.w #$C700
+	MVN $7E, $21
+	PLB
+
+	LDA.l SpecialBombs : AND.w #$00FF : BEQ .regularBombs
+	LDA.l !BOMB_LEVEL : AND.w #$00FF : ASL #2 : TAX
+	LDA.l BombIcon, X : STA.l $7EC71A
+	LDA.l BombIcon+2, X : STA.l $7EC71C
+.regularBombs
+	RTL
+;--------------------------------------------------------------------------------
