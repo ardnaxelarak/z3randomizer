@@ -1,15 +1,61 @@
 ;===================================================================================================
 ; LEAVE THIS HERE FOR PHP WRITES
 ;===================================================================================================
+table "creditscharmapbighi.txt"
 YourSpriteCreditsHi:
-db 2
-db 55
-db "                            " ; $238002
+db 2, 55, "                            " ; $238002
 
+table "creditscharmapbiglo.txt"
 YourSpriteCreditsLo:
-db 2
-db 55
-db "                            " ; $238020
+db 2, 55, "                            " ; $238020
+
+table "creditscharmapbighi.txt"
+FirstSwordStatsHi:
+db 2, 55, "FIRST SWORD                 " ; $23803E
+
+table "creditscharmapbiglo.txt"
+FirstSwordStatsLo:
+db 2, 55, "FIRST SWORD                 " ; $23805C
+
+table "creditscharmapbighi.txt"
+SwordlessKillsHi:
+db 2, 55, "SWORDLESS                /13" ; $23807A
+
+table "creditscharmapbiglo.txt"
+SwordlessKillsLo:
+db 2, 55, "SWORDLESS                /13" ; $238098
+
+table "creditscharmapbighi.txt"
+FighterSwordKillsHi:
+db 2, 55, "FIGHTER'S SWORD          /13" ; $2380B6
+
+table "creditscharmapbiglo.txt"
+FighterSwordKillsLo:
+db 2, 55, "FIGHTER'S SWORD          /13" ; $2380D4
+
+table "creditscharmapbighi.txt"
+MasterSwordKillsHi:
+db 2, 55, "MASTER SWORD             /13" ; $2380F2
+
+table "creditscharmapbiglo.txt"
+MasterSwordKillsLo:
+db 2, 55, "MASTER SWORD             /13" ; $238110
+
+table "creditscharmapbighi.txt"
+TemperedSwordKillsHi:
+db 2, 55, "TEMPERED SWORD           /13" ; $23812E
+
+table "creditscharmapbiglo.txt"
+TemperedSwordKillsLo:
+db 2, 55, "TEMPERED SWORD           /13" ; $23814C
+
+table "creditscharmapbighi.txt"
+GoldSwordKillsHi:
+db 2, 55, "GOLD SWORD               /13" ; $23816A
+
+table "creditscharmapbiglo.txt"
+GoldSwordKillsLo:
+db 2, 55, "GOLD SWORD               /13" ; $238188
 
 ;===================================================================================================
 
@@ -591,7 +637,8 @@ endif
 %blankline()
 %blankline()
 
-%bigcreditsleft("FIRST SWORD")
+%addarbline(FirstSwordStatsHi)
+%addarbline(FirstSwordStatsLo)
 
 %blankline()
 
@@ -614,23 +661,28 @@ endif
 %blankline()
 %blankline()
 
-%bigcreditsleft("SWORDLESS                /13")
+%addarbline(SwordlessKillsHi)
+%addarbline(SwordlessKillsLo)
 
 %blankline()
 
-%bigcreditsleft("FIGHTER'S SWORD          /13")
+%addarbline(FighterSwordKillsHi)
+%addarbline(FighterSwordKillsLo)
 
 %blankline()
 
-%bigcreditsleft("MASTER SWORD             /13")
+%addarbline(MasterSwordKillsHi)
+%addarbline(MasterSwordKillsLo)
 
 %blankline()
 
-%bigcreditsleft("TEMPERED SWORD           /13")
+%addarbline(TemperedSwordKillsHi)
+%addarbline(TemperedSwordKillsLo)
 
 %blankline()
 
-%bigcreditsleft("GOLD SWORD               /13")
+%addarbline(GoldSwordKillsHi)
+%addarbline(GoldSwordKillsLo)
 
 %blankline()
 %blankline()
