@@ -52,7 +52,8 @@ PreOverworld_LoadProperties_ChooseMusic:
 
     .endOfLightWorldChecks
     ; if we are in the light world go ahead and set chosen selection
-    LDA $7EF3CA : BEQ .checkInverted+4
+    ;LDA $7EF3CA : BEQ .checkInverted+4
+    JSL OWWorldCheck : BEQ .checkInverted+4
 
     LDX.b #$0F ; dark woods theme
 
@@ -68,7 +69,7 @@ PreOverworld_LoadProperties_ChooseMusic:
 
     ; if not inverted and light world, or inverted and dark world, skip moon pearl check
     .checkInverted
-    LDA $7EF3CA : CLC : ROL #$03 : CMP InvertedMode : BEQ .lastCheck
+    JSL OWWorldCheck : CLC : ROL #$03 : CMP InvertedMode : BEQ .lastCheck
 
     ; Does Link have a moon pearl?
     LDA $7EF357 : BNE +
@@ -281,6 +282,24 @@ Overworld_MosaicDarkWorldChecks:
 
 .doFade
     LDA.b #$F1 : STA $012C  ; thing we wrote over, fade out music
+
+.done
+    RTL
+;--------------------------------------------------------------------------------
+
+;--------------------------------------------------------------------------------
+; This is the where the music can change due to an UW transition
+; 
+; On entry, A=16bit XY=8bit, A & X safe to mod, Y unknown
+Underworld_DoorDown_Entry:
+    LDA.l DRMode : TAX : LDA $A0 : CPX #0 : BNE .done
+
+.vanilla ; thing we wrote over
+    LDX #$14 ;: LDA $A0
+    CMP.w #$0012 : BEQ .done
+    
+    LDX.b #$10 ; value for Hyrule Castle music
+    CMP.w #$0002 : BEQ .done
 
 .done
     RTL
