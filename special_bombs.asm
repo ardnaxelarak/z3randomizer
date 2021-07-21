@@ -32,6 +32,7 @@ DamageClassCalc:
 	LDA $0E20, X : CMP.b #$D6 : BEQ .unstunned_ganon
 	CMP.b #$D7 : BEQ .stunned_ganon
 	CMP.b #$88 : BEQ .mothula
+	CMP.b #$91 : BEQ .stalfos_knight
 	CMP.b #$92 : BEQ .helmasaur_king
 .bomb_level
 	LDA !BOMB_LEVEL
@@ -42,6 +43,10 @@ DamageClassCalc:
 	BRA .done
 .fix_mothula
 	LDA #$03
+	BRA .done
+.stalfos_knight
+	LDA !StalfosBombDamage : BEQ .bomb_level
+	LDA #$08
 	BRA .done
 .helmasaur_king
 	LDA $0DB0, X : CMP #$03 : !BGE .bomb_level
