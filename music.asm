@@ -283,3 +283,21 @@ Overworld_MosaicDarkWorldChecks:
 .done
     RTL
 ;--------------------------------------------------------------------------------
+
+;--------------------------------------------------------------------------------
+; This is the where the music can change due to an UW transition
+; 
+; On entry, A=16bit XY=8bit, A & X safe to mod, Y unknown
+Underworld_DoorDown_Entry:
+    LDA.l DRMode : TAX : LDA $A0 : CPX #0 : BNE .done
+
+.vanilla ; thing we wrote over
+    LDX #$14 ;: LDA $A0
+    CMP.w #$0012 : BEQ .done
+    
+    LDX.b #$10 ; value for Hyrule Castle music
+    CMP.w #$0002 : BEQ .done
+
+.done
+    RTL
+;--------------------------------------------------------------------------------
