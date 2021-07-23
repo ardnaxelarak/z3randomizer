@@ -11,6 +11,20 @@ db 2
 db 55
 db "                            " ; $238020
 
+CollectionRateHi:
+db 2, 55
+db $5F, $6B, $68, $68, $61, $5F, $70, $65, $6B, $6A, $9F, $6E, $5D, $70, $61  ; "Collection Rate"
+db $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $A2 ; "         /"
+print "Collection Rate High Start: ", pc
+db $55, $54, $59 ; 216
+
+CollectionRateLo:
+db 2, 55
+db $85, $91, $8E, $8E, $87, $85, $96, $8B, $91, $90, $9F, $94, $83, $96, $87  ; "Collection Rate"
+db $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F, $C2 ; "         /"
+print "Collection Rate Low Start: ", pc
+db $7B, $7A, $7F ; 216
+
 ;===================================================================================================
 
 CreditsLineTable:
@@ -689,8 +703,8 @@ endif
 
 %emptyline()
 %emptyline()
-print "Collection Rate Credit Start: ", pc
-%bigcreditsleft("COLLECTION RATE         /216")
+%addarbline(CollectionRateHi)
+%addarbline(CollectionRateLo)
 
 %blankline()
 
