@@ -10,52 +10,60 @@ YourSpriteCreditsLo:
 db 2, 55, "                            " ; $238020
 
 table "creditscharmapbighi.txt"
+CollectionRateHi:
+db 2, 55, "COLLECTION RATE         /216" ; $23803E, "216" at $238057
+
+table "creditscharmapbiglo.txt"
+CollectionRateLo:
+db 2, 55, "COLLECTION RATE         /216" ; $23805C, "216" at $238075
+
+table "creditscharmapbighi.txt"
 FirstSwordStatsHi:
-db 2, 55, "FIRST SWORD                 " ; $23803E
+db 2, 55, "FIRST SWORD                 " ; $23807A
 
 table "creditscharmapbiglo.txt"
 FirstSwordStatsLo:
-db 2, 55, "FIRST SWORD                 " ; $23805C
+db 2, 55, "FIRST SWORD                 " ; $238098
 
 table "creditscharmapbighi.txt"
 SwordlessKillsHi:
-db 2, 55, "SWORDLESS                /13" ; $23807A
+db 2, 55, "SWORDLESS                /13" ; $2380B6
 
 table "creditscharmapbiglo.txt"
 SwordlessKillsLo:
-db 2, 55, "SWORDLESS                /13" ; $238098
+db 2, 55, "SWORDLESS                /13" ; $2380D4
 
 table "creditscharmapbighi.txt"
 FighterSwordKillsHi:
-db 2, 55, "FIGHTER'S SWORD          /13" ; $2380B6
+db 2, 55, "FIGHTER'S SWORD          /13" ; $2380F2
 
 table "creditscharmapbiglo.txt"
 FighterSwordKillsLo:
-db 2, 55, "FIGHTER'S SWORD          /13" ; $2380D4
+db 2, 55, "FIGHTER'S SWORD          /13" ; $238110
 
 table "creditscharmapbighi.txt"
 MasterSwordKillsHi:
-db 2, 55, "MASTER SWORD             /13" ; $2380F2
+db 2, 55, "MASTER SWORD             /13" ; $23812E
 
 table "creditscharmapbiglo.txt"
 MasterSwordKillsLo:
-db 2, 55, "MASTER SWORD             /13" ; $238110
+db 2, 55, "MASTER SWORD             /13" ; $23814C
 
 table "creditscharmapbighi.txt"
 TemperedSwordKillsHi:
-db 2, 55, "TEMPERED SWORD           /13" ; $23812E
+db 2, 55, "TEMPERED SWORD           /13" ; $23816A
 
 table "creditscharmapbiglo.txt"
 TemperedSwordKillsLo:
-db 2, 55, "TEMPERED SWORD           /13" ; $23814C
+db 2, 55, "TEMPERED SWORD           /13" ; $238188
 
 table "creditscharmapbighi.txt"
 GoldSwordKillsHi:
-db 2, 55, "GOLD SWORD               /13" ; $23816A
+db 2, 55, "GOLD SWORD               /13" ; $2381A6
 
 table "creditscharmapbiglo.txt"
 GoldSwordKillsLo:
-db 2, 55, "GOLD SWORD               /13" ; $238188
+db 2, 55, "GOLD SWORD               /13" ; $2381C4
 
 ;===================================================================================================
 
@@ -741,8 +749,8 @@ endif
 
 %emptyline()
 %emptyline()
-print "Collection Rate Credit Start: ", pc
-%bigcreditsleft("COLLECTION RATE         /216")
+%addarbline(CollectionRateHi)
+%addarbline(CollectionRateLo)
 
 %blankline()
 
