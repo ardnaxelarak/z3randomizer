@@ -210,7 +210,7 @@ incsrc darkroomitems.asm
 incsrc fastcredits.asm
 incsrc msu.asm
 incsrc dungeonmap.asm
-incsrc special_bombs.asm
+incsrc special_weapons.asm
 incsrc variable_ganon_vulnerability.asm
 warnpc $A58000
 
@@ -287,9 +287,14 @@ incbin sheet73.gfx
 warnpc $31E501
 
 org $31E800
-Damage_Table_Alt:
+Damage_Table_Bombs:
 incbin damage_table_sword_bombs.bin
-warnpc $31F001
+warnpc $31F000
+
+org $31F000
+Damage_Table_Pseudo:
+incbin damage_table_pseudo_sword.bin
+warnpc $31F800
 
 org $338000
 GFX_HUD_Palette:

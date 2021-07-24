@@ -402,7 +402,7 @@ AddReceivedItemExpandedGetItem:
 			++
 			JMP .done
 	+ CMP.b #$B1 : !BLT + : CMP.b #$B6 : !BGE + ; Bomb Upgrades
-		LDA.l SpecialBombs : BEQ ++
+		LDA.l SpecialWeapons : CMP #$01 : BNE ++
 			LDA #$01 : STA $7F50C9 ; infinite bombs
 		++
 		BRA .done

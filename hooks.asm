@@ -2789,3 +2789,9 @@ NOP
 org $0DD677 ; Bank0D.asm@1303 (JSL Ancilla_CheckSpriteDamage.preset_class)
 JSL Ganon_CheckBeeVulnerability
 ;--------------------------------------------------------------------------------
+
+;================================================================================
+; Pseudo-Sword Mode
+;--------------------------------------------------------------------------------
+org $06ED70 ; Bank06.asm@4842 (LDA $06ED39, X : STA $0CF2)
+JSL StoreSwordDamage
