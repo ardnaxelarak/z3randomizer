@@ -414,7 +414,7 @@ AddReceivedItemExpandedGetItem:
 		LDA $22 : STA $0D10, Y : LDA $23 : STA $0D30, Y ; from enemizer's Spawn_Bees
 		LDA $20 : STA $0D00, Y : LDA $21 : STA $0D20, Y
 	+ CMP.b #$B1 : !BLT + : CMP.b #$B6 : !BGE + ; Bomb Upgrades
-		LDA.l SpecialBombs : BEQ ++
+		LDA.l SpecialWeapons : CMP #$01 : BNE ++
 			LDA #$01 : STA $7F50C9 ; infinite bombs
 		++
 		BRA .done

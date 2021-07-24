@@ -105,8 +105,8 @@ GanonVulnerabilityItem:
 db #$00 ; #$00 = Default behavior (silver arrows)
 ;--------------------------------------------------------------------------------
 org $30802F ; PC 0x18003F
-SpecialBombs:
-db #$00 ; #$00 = Off (default) - #$01 = On
+SpecialWeapons:
+db #$00 ; #$00 = Off (default) - #$01 = Bomb-Only mode - #$02 = Pseudosword mode
 ;--------------------------------------------------------------------------------
 org $308030 ; PC 0x180030
 EnableSRAMTrace:
