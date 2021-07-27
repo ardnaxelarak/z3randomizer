@@ -292,12 +292,11 @@ Underworld_DoorDown_Entry:
     LDA.l DRMode : TAX : LDA $A0 : CPX #0 : BNE .done
 
 .vanilla ; thing we wrote over
-    LDX #$14 ;: LDA $A0
-    CMP.w #$0012 : BEQ .done
-    
-    LDX.b #$10 ; value for Hyrule Castle music
-    CMP.w #$0002 : BEQ .done
-
+    CMP.w #$0012 : BNE +
+        LDX.b #$14 ; value for Sanc music
+        BRA .done
+    + CMP.w #$0002 : BNE .done
+        LDX.b #$10 ; value for Hyrule Castle music
 .done
     RTL
 ;--------------------------------------------------------------------------------
