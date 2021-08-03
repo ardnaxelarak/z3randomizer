@@ -263,7 +263,7 @@ CheckMusicLoadRequest:
 .darkwoods
             PHA
                 LDA $7EF37A : CMP.b #$7F : BEQ -
-                LDA $7EF3CA : BEQ --
+                ;LDA $7EF3CA : BEQ --
                 LDA $8A : CMP #$40 : BNE --
             PLA
             LDA.b #15 : BRA .check_fallback-3
