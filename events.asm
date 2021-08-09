@@ -184,6 +184,7 @@ OnInitFileSelect:
 RTL
 ;--------------------------------------------------------------------------------
 OnLinkDamaged:
+	JSL.l IncrementDamageTakenCounter_Arb
 	JSL.l FlipperKill
 	JML.l OHKOTimer
 
