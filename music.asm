@@ -16,7 +16,7 @@ PreOverworld_LoadProperties_ChooseMusic:
 
     ; if we are in the light world go ahead and set chosen selection
     ;LDA $7EF3CA : BEQ .checkInverted+4
-    + JSL Overworld_DetermineMusicSFX
+    + JSL Overworld_DetermineMusic
 
     .lastCheck
     LDA $0132 : CMP.b #$F2 : BNE +
@@ -57,7 +57,8 @@ Overworld_FinishMirrorWarp:
 
     LDA.b #$80 : STA $9B
 
-    JSL Overworld_DetermineMusicSFX
+    JSL Overworld_DetermineAmbientSFX
+    JSL Overworld_DetermineMusic
 
 .done
     STX $012C
@@ -74,14 +75,14 @@ Overworld_FinishMirrorWarp:
 
 ;--------------------------------------------------------------------------------
 BirdTravel_LoadTargetAreaMusic:
-    JSL Overworld_DetermineMusicSFX
+    JSL Overworld_DetermineAmbientSFX
+    JSL Overworld_DetermineMusic
     RTL
 ;--------------------------------------------------------------------------------
 
 ;--------------------------------------------------------------------------------
 ;X to be set to music track to load
-;$012D to be set to any ambient SFX for the area
-Overworld_DetermineMusicSFX:
+Overworld_DetermineMusic:
     LDA $7EF3C5 : CMP.b #$02 : !BGE +
         LDX.b #$03 ; If phase < 2, play the rain music
         BRA .done
@@ -91,7 +92,6 @@ Overworld_DetermineMusicSFX:
     CMP.b #$47 : BEQ .darkMountain
 
     LDX.b #$02  ; hyrule field theme
-    LDA.b #$05 : STA $012D
 
     LDA $7EF3CA : BEQ +
         LDX.b #$09  ; default dark world theme
@@ -113,15 +113,7 @@ Overworld_DetermineMusicSFX:
         LDX #$0F    ; dark woods theme
         BRA .bunny
 
-    ; Misery Mire rain SFX
-    + CMP.b #$70 : BNE .bunny
-        LDA $7EF2F0 : AND.b #$20 : BNE .bunny
-            LDA.b #$01 : CMP $0131 : BEQ +
-                STA $012D : BRA .bunny
-            + STZ $012D : BRA .bunny
-
 .darkMountain
-    LDA.b #$09 : STA $012D    ; set storm ambient SFX
     LDX.b #$0D  ; dark mountain theme
 
 .bunny
@@ -129,6 +121,36 @@ Overworld_DetermineMusicSFX:
     LDA $7EF3CA : CLC : ROL #$03 : CMP InvertedMode : BEQ .done
         LDA $7EF357 : BNE .done
             LDX #$04    ; bunny theme
+
+.done
+    RTL
+;--------------------------------------------------------------------------------
+
+;--------------------------------------------------------------------------------
+;$012D to be set to any ambient SFX for the area
+Overworld_DetermineAmbientSFX:
+    LDA $7EF3C5 : CMP.b #$02 : !BGE +
+        BRA .done ; rain state sfx handled elsewhere
+    
+    + LDA $8A : CMP.b #$43 : BEQ .darkMountain
+    CMP.b #$45 : BEQ .darkMountain
+    CMP.b #$47 : BEQ .darkMountain
+
+    CMP.b #$70 : BEQ .mire
+
+    LDA.b #$05 : BRA .setSfx ; silence
+
+.mire
+    LDA $7EF2F0 : AND.b #$20 : BNE .done
+        LDA.b #$01 : BRA .setSfx ; Misery Mire rain SFX
+
+.darkMountain
+    LDA.b #$09 : BRA .setSfx ; set storm ambient SFX
+
+.setSfx
+    CMP $0131 : BEQ +
+        STA $012D
+    + STZ $012D
 
 .done
     RTL
