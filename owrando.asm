@@ -338,7 +338,7 @@ OWNewDestination:
     sep #$30 : lda OWOppSlotOffset,y : !add $04 : asl : and #$7f : sta $700
     
     ; crossed OW shuffle
-    lda.l OWMode+1 : and #$ff : cmp #$02 : bne .return
+    lda.l OWMode+1 : and.b #$02 : beq .return
         ldx $05 : lda.l OWTileWorldAssoc,x : sta.l $7ef3ca ; change world
 
         ; toggle bunny mode
@@ -350,7 +350,7 @@ OWNewDestination:
             ; turn into bunny
             lda $5d : cmp #$17 : beq .return
             lda #$17 : sta $5d
-            lda #$01 : sta $02e0
+            lda #$01 : sta $2e0
             bra .return
         .nobunny
         lda $5d : cmp #$17 : bne .return
