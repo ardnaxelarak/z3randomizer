@@ -204,7 +204,7 @@ RTL
 AnimatedEntranceFix: ;when an entrance animation tries to start
 	PHA : PHX
 	LDA.l InvertedMode : BEQ + ;If we are in inverted mode
-	LDA.l OWMode+1 : CMP #$01 : BEQ + ;If we are in Mixed OW shuffle mode
+	LDA.l OWMode+1 : CMP #$04 : BEQ + ;If we are in Mixed OW shuffle mode
 	LDA $8A : AND #$40 : BNE + ;and in the light world
 		PLX : PLA
 		STZ $04C6 ; skip it.
