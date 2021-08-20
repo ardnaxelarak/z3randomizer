@@ -26,7 +26,7 @@ HudAdditions:
     ++
 
 	LDX $1B : BNE + ; if outdoors
-        lda.l OWMode : and #$06ff : bne ++ : rts ; Skip if vanilla ow rando
+        lda.l OWMode : and.w #((!FLAG_OW_CROSSED+!FLAG_OW_MIXED)<<8)+$ff : bne ++ : rts ; Skip if vanilla ow rando
         ++ lda $7ef36d : and #$00ff : beq ++
             lda $7ef3ca : and #$00ff : beq +++
                 lda #$2d60 : bra .owdisplay

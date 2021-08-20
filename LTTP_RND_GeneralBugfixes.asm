@@ -114,6 +114,9 @@ function hexto555(h) = ((((h&$FF)/8)<<10)|(((h>>8&$FF)/8)<<5)|(((h>>16&$FF)/8)<<
 !MULTIWORLD_HUD_DELAY = "#120"
 !Dungeon_ChestData = "$01E96C"
 
+!FLAG_OW_MIXED = $04
+!FLAG_OW_CROSSED = $02
+
 incsrc hooks.asm
 incsrc treekid.asm
 incsrc spriteswap.asm
