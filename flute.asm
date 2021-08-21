@@ -61,7 +61,7 @@ FluteBoy:
 JML.l FluteBoy_Continue
 ;--------------------------------------------------------------------------------
 FreeDuckCheck:
-	LDA.l OWMode+1 : AND.w #!FLAG_OW_MIXED : BNE .skipInvertedCheck
+	LDA.l OWMode+1 : AND.b #!FLAG_OW_MIXED : BNE .skipInvertedCheck
 		LDA.l InvertedMode : BEQ .done
 	.skipInvertedCheck
 	
