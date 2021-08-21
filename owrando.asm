@@ -354,7 +354,7 @@ OWNewDestination:
             bra .return
 
         .nobunny
-        lda $5d : cmp #$04 : beq + ; if swimming, continue
+        lda $5d : cmp #$17 : bne + ; retain current state unless bunny
             stz $5d
         + stz $02e0 : stz $56
 
