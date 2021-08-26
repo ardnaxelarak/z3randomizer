@@ -1093,8 +1093,15 @@ db $00, $00, $00, $00, $00, $00, $00, $00
 org $308350 ; PC 0x180350
 ShouldStartatExit:
 db $00, $00, $00
+;--------------------------------------------------------------------------------
+; $308358 (0x180358) fixes major glitches
+; 0x00 - fix
+; otherwise dont fix various major glitches
+org $308358
+AllowAccidentalMajorGlitch:
+db $00
 ;================================================================================
-; 0x180350 - 0x1814FF (unused)
+; 0x180359 - 0x1814FF (unused)
 ;================================================================================
 ; $309500 (0x181500) - $309FFF (0x181FFF) original 0x39C bytes
 ; Replacement Ending Sequence Text Data

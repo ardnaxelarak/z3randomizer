@@ -1488,6 +1488,9 @@ org $1DBAB1 ; <- EBAB1 - sprite_sidenexx.asm : 314 (JSL GetRandomInt : AND.b #$0
 JSL.l RNG_Trinexx
 org $1DBAC3 ; <- EBAC3 - sprite_sidenexx.asm : 323 (JSL GetRandomInt : AND.b #$0F : ADD.b #$0C : STA $02 : STZ $03)
 JSL.l RNG_Trinexx
+;--------------------------------------------------------------------------------
+org $6F9B8 ; <- 379B8 - bank06.asm : 6693 (JSL GetRandomInt : PLY  : AND $FA5C, Y : BNE BRANCH_MU)
+JSL.l RNG_Enemy_Drops
 ;================================================================================
 ; HUD Changes
 ;--------------------------------------------------------------------------------
@@ -2717,6 +2720,25 @@ org $0AEEF2
 org $008BE5 ; hijack stripes for boss GFX transfer
 	JSL DoDungeonMapBossIcon
 
+;================================================================================
+; Fix quadrant glitch
+org $07A879
+	JSR SwordSpinQuadrantFix
+
+org $07F877 ; free rom
+SwordSpinQuadrantFix:
+	LDA.l AllowAccidentalMajorGlitch
+	BEQ ++
+	JMP.w $07E8D9 ; HandleIndoorCameraAndDoors
+
+++	RTS
+
+;================================================================================
+
+org $01C4B8 : JSL FixJingleGlitch
+org $01C536 : JSL FixJingleGlitch
+org $01C592 : JSL FixJingleGlitch
+org $01C65F : JSL FixJingleGlitch
 ;================================================================================
 ; Bomb-Only Mode
 ;--------------------------------------------------------------------------------
