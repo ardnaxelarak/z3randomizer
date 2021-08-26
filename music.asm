@@ -77,6 +77,7 @@ Overworld_FinishMirrorWarp:
 BirdTravel_LoadTargetAreaMusic:
     JSL Overworld_DetermineAmbientSFX
     JSL Overworld_DetermineMusic
+    STZ $04C8 ; Clear peg puzzle count
     RTL
 ;--------------------------------------------------------------------------------
 
