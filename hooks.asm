@@ -2486,7 +2486,7 @@ JSL BirdTravel_LoadTargetAreaMusic
 BRA + : NOP #14 : +
 ;--------------------------------------------------------------------------------
 org $02B027 ; <- Bank02.asm:7535-7541
-JSL Overworld_DetermineMusicSFX
+JSL Overworld_DetermineMusic
 BRA + : NOP #42 : +
 ;================================================================================
 

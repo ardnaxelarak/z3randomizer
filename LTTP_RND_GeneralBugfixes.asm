@@ -114,7 +114,11 @@ function hexto555(h) = ((((h&$FF)/8)<<10)|(((h>>8&$FF)/8)<<5)|(((h>>16&$FF)/8)<<
 !MULTIWORLD_SPRITEITEM_PLAYER_ID = "$7EC099"
 !MULTIWORLD_HUD_TIMER = "$7EC09A"
 !MULTIWORLD_HUD_DELAY = "#120"
+!MULTIWORLD_ITEM_ID = "$7EC09B" ; for lua scripts?
 !Dungeon_ChestData = "$01E96C"
+
+!FLAG_OW_MIXED = $04
+!FLAG_OW_CROSSED = $02
 
 incsrc hooks.asm
 incsrc treekid.asm

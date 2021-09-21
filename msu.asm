@@ -76,7 +76,7 @@
 ;
 ; Additional tracks
 ;
-; 60 - Light World OW (after ped pull)
+; 60 - Light World OW (after aga kill)
 ; 61 - Dark World OW (with all crystals)
 ;
 ;=======================================
@@ -250,7 +250,8 @@ CheckMusicLoadRequest:
             BRA .check_fallback-3
 .lightworld
             PHA
-                LDA $7EF300 : AND.b #$40 : BEQ +
+                ;LDA $7EF300 : AND.b #$40 : BEQ + ; ped pull
+                LDA $7EF3C5 : CMP.b #03 : BNE + ; aga1 killed
                     PLA
                     LDA.b #60 : BRA .check_fallback-3
                 +
