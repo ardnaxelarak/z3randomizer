@@ -217,11 +217,11 @@ AnimatedEntranceFix: ;when an entrance animation tries to start
 	PHA : PHX
 	LDA.l InvertedMode : BEQ + ;If we are in inverted mode
 		LDA.l OWMode+1 : AND.b #!FLAG_OW_MIXED : BNE + ;If we are in Mixed OW shuffle mode
-			LDA $8A : AND #$40 : BNE + ;and in the light world
-				PLX : PLA
-				STZ $04C6 ; skip it.
-				LDA #$00
-				RTL
+	LDA $8A : AND #$40 : BNE + ;and in the light world
+		PLX : PLA
+		STZ $04C6 ; skip it.
+		LDA #$00
+		RTL
 	+
 	PLX : PLA
 	STA $02E4 ;what we wrote over
