@@ -39,40 +39,34 @@ LoadSwordForDamage:
 	JSR.w LoadModifiedSwordLevel ; load normal sword value
 RTL
 ;================================================================================
+macro LookupDamageSubclass(table_address)
+	PHP
+	REP #$20 ; set 16-bit accumulator
+	TXA : LSR : TAX : BCS +
+		PLP
+		LDA.l <table_address>, X
+		LSR #4
+		BRA ++
+	+
+		PLP
+		LDA.l <table_address>, X
+		AND.b #$0F
+	++
+endmacro
+;================================================================================
 ;!StalfosBombDamage = "$7F509D"
 LookupDamageLevel:
 	CPX.w #$0918 : BNE +
 		LDA.l !StalfosBombDamage
 		RTL
 	+
-	LDA SpecialBombs : BNE .alt_table
-	PHP
-		REP #$20 ; set 16-bit accumulator
-		TXA : LSR : TAX : BCS .lower
-.upper
-	PLP
-	LDA.l Damage_Table, X
-	LSR #4
-RTL
-.lower
-	PLP
-	LDA.l Damage_Table, X
-	AND.b #$0F
-RTL
-.alt_table
-	PHP
-		REP #$20 ; set 16-bit accumulator
-		TXA : LSR : TAX : BCS .alt_lower
-.alt_upper
-	PLP
-	LDA.l Damage_Table_Alt, X
-	LSR #4
-RTL
-.alt_lower
-	PLP
-	LDA.l Damage_Table_Alt, X
-	AND.b #$0F
-RTL
+	LDA SpecialWeapons : CMP #$01 : BEQ .bomb_table
+	                     CMP #$02 : BEQ .pseudo_table
+		%LookupDamageSubclass(Damage_Table) : RTL
+	.bomb_table
+		%LookupDamageSubclass(Damage_Table_Bombs) : RTL
+	.pseudo_table
+		%LookupDamageSubclass(Damage_Table_Pseudo) : RTL
 ;================================================================================
 ; $7F50C0 - Sword Modifier
 LoadModifiedSwordLevel: ; returns short
@@ -134,7 +128,7 @@ CheckTabletSword:
 	LDA $7EF34B : BEQ + ; check for hammer
 		LDA.b #$02 : RTL
 	+
-	LDA.l SpecialBombs : BEQ +
+	LDA.l SpecialWeapons : CMP #$01 : BNE +
 	LDA !BOMB_LEVEL : CMP #$02 : !BLT + ; check for master bombs
 		LDA.b #$02 : RTL
 	+

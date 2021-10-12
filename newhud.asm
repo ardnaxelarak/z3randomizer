@@ -8,7 +8,7 @@ SEP #$30
 
 	LDA !INFINITE_BOMBS : BNE .infinite_bombs
 	.finite_bombs
-		LDA.l SpecialBombs : BEQ .normal
+		LDA.l SpecialWeapons : CMP #$01 : BNE .normal
 		LDA.l !BOMB_LEVEL : BEQ .no_bombs
 	.normal
 		LDA.l $7EF343 ; bombs

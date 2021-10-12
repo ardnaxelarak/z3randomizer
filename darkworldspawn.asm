@@ -147,7 +147,7 @@ SetEscapeAssist:
 		BIT.b #$10 : BEQ + : STA !INFINITE_ARROWS : +
 	++
 
-	LDA.l SpecialBombs : BEQ +
+	LDA.l SpecialWeapons : CMP #$01 : BNE +
 	LDA.l !BOMB_LEVEL : BEQ +
 	LDA #$01 : STA !INFINITE_BOMBS
 	+

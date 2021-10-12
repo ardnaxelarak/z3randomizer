@@ -20,7 +20,7 @@ EndRainState:
 		CMP #$01 : BNE + : LDA #$00 : STA !INFINITE_ARROWS : +
 		CMP #$10 : BNE + : STA !INFINITE_ARROWS : +
 
-		LDA.l SpecialBombs : BEQ +
+		LDA.l SpecialWeapons : CMP #$01 : BNE +
 		LDA.l !BOMB_LEVEL : BEQ +
 		LDA #$01 : STA !INFINITE_BOMBS
 		+

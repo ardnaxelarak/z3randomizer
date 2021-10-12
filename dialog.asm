@@ -306,8 +306,8 @@ DialogGanon2:
 		LDA.w #$018D : JMP .done
 	+
 		LDA.l GanonVulnerabilityItem : AND #$00FF : BNE .special_item
-		LDA.l SpecialBombs
-		AND.w #$00FF : BNE .bombs ; bombs if special bomb mode
+		LDA.l SpecialWeapons : AND.w #$00FF
+		CMP.w #$0001 : BEQ .bombs ; bombs if special bomb mode
 	.silver_arrows
 		LDA.l $7EF38E
 
