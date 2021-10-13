@@ -109,13 +109,18 @@ RTL
 ; Out: A = RNG Result
 ;--------------------------------------------------------------------------------
 !RNG_POINTERS = "$7F5200"
+!static_rng ?= 1
 GetStaticRNG:
-	PHX : PHP
-	REP #$30 ; set 16-bit accumulator and index registers
-	AND.w #$000F
-	ASL : TAX : LDA !RNG_POINTERS, X : INC : AND.w #$03FF : STA !RNG_POINTERS, X : TAX ; increment pointer and move value to X
-	LDA Static_RNG, X ; load RNG value
-	PLP : PLX
+	if !static_rng
+		PHX : PHP
+		REP #$30 ; set 16-bit accumulator and index registers
+		AND.w #$000F
+		ASL : TAX : LDA !RNG_POINTERS, X : INC : AND.w #$03FF : STA !RNG_POINTERS, X : TAX ; increment pointer and move value to X
+		LDA Static_RNG, X ; load RNG value
+		PLP : PLX
+	else
+		JML GetRandomInt
+	endif
 RTL
 ;--------------------------------------------------------------------------------
 InitRNGPointerTable:

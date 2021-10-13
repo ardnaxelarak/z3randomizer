@@ -301,3 +301,22 @@ StoreSwordDamage:
 	LDA #$05
 	RTL
 ;--------------------------------------------------------------------------------
+CheckDetonateBomb:
+	LDA.l SpecialWeapons : CMP.b #$01 : BNE .not_bomb_mode
+.detonate_bombs
+	LDX.b #09
+.check_ancilla
+	LDA.w $0C4A, X
+	CMP.b #$07
+	BNE .next_ancilla
+	LDA.b #03
+	STA.w $039F, X
+.next_ancilla
+	DEX
+	BPL .check_ancilla
+.not_bomb_mode
+	; what we wrote over
+	LDA.b #$80
+	TSB.b $3A
+	RTL
+;--------------------------------------------------------------------------------
