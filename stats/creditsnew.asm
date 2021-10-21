@@ -1,11 +1,13 @@
 ;===================================================================================================
 ; LEAVE THIS HERE FOR PHP WRITES
 ;===================================================================================================
+table "creditscharmapbighi.txt"
 YourSpriteCreditsHi:
 db 2
 db 55
 db "                            " ; $238002
 
+table "creditscharmapbiglo.txt"
 YourSpriteCreditsLo:
 db 2
 db 55
@@ -501,6 +503,15 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
+%smallcredits("WEBSITE LOGO", "green")
+
+%blankline()
+
+%bigcredits("PLEASURE")
+
+%blankline()
+%blankline()
+
 %smallcredits("SPECIAL THANKS", "red")
 
 %blankline()
@@ -546,12 +557,6 @@ CreditsLineBlank:
 
 %blankline()
 
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
 %emptyline()
 %emptyline()
 %emptyline()
