@@ -1879,7 +1879,7 @@ db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00,
 
 org $30E37D ; PC 0x18637D
 Enable_TerrorPin_AI_Fix:
-db #$01
+db #$00
 
 ;Shop slot count as check
 org $30E560 ; PC 0x18650
