@@ -248,10 +248,6 @@ PHX
 PLX
 RTS
 
-;LDA $7EF3CA : AND #$40 : BNE + ; is the compass position on LW or DW?
-;		LDA.l WorldCompassMask, X : BNE .unset : BRA .continue
-;	+ LDA.l WorldCompassMask, X : BEQ .unset
-
 ; X - which compass in question
 ; CLC - should not move indicator
 ; SEC - yep indicator can move
