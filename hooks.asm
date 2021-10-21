@@ -1822,13 +1822,13 @@ LDA CrystalPendantFlags_2, X
 ;NOP #10
 ;CLC
 ;================================================================================
-org $0AC5BB ; < 545BB - Bank0A.asm:1856 - (LDA $7EF3C7 : CMP.b #$03 : BNE .fail)
-JSL.l OverworldMap_CheckObject : RTS
-org $0AC5D8 ; < 545D8 - Bank0A.asm:1885 - (LDA $7EF3C7 : CMP.b #$07 : BNE OverworldMap_CheckPendant_fail)
-JSL.l OverworldMap_CheckObject : RTS
+;org $0AC5BB ; < 545BB - Bank0A.asm:1856 - (LDA $7EF3C7 : CMP.b #$03 : BNE .fail)
+;JSL.l OverworldMap_CheckObject : RTS
+;org $0AC5D8 ; < 545D8 - Bank0A.asm:1885 - (LDA $7EF3C7 : CMP.b #$07 : BNE OverworldMap_CheckPendant_fail)
+;JSL.l OverworldMap_CheckObject : RTS
 ;================================================================================
 org $0AC53e ; <- 5453E - Bank0A.asm:1771 - (LDA $0AC50D, X : STA $0D)
-JSL.l GetCrystalNumber
+LDA.l CrystalNumberTable, X
 ;================================================================================
 ; EVERY INSTANCE OF STA $7EF3C7 IN THE ENTIRE CODEBASE
 org $029D51 ; <- 11D51
@@ -1864,34 +1864,35 @@ JSL.l GetMapMode
 
 org $0AC01A ; <- 5401A
 JSL.l GetMapMode
-org $0AC037 ; <- 54037
-JSL.l GetMapMode
-org $0AC079 ; <- 54079
-JSL.l GetMapMode
-org $0AC0B8 ; <- 540B8 x
-JSL.l GetMapMode
-org $0AC0F8 ; <- 540F8
-JSL.l GetMapMode
-org $0AC137 ; <- 54137
-JSL.l GetMapMode
-org $0AC179 ; <- 54179
-JSL.l GetMapMode
-org $0AC1B3 ; <- 541B3
-JSL.l GetMapMode
-org $0AC1F5 ; <- 541F5
-JSL.l GetMapMode
-org $0AC22F ; <- 5422F
-JSL.l GetMapMode
-org $0AC271 ; <- 54271
-JSL.l GetMapMode
-org $0AC2AB ; <- 542AB
-JSL.l GetMapMode
-org $0AC2ED ; <- 542ED
-JSL.l GetMapMode
-org $0AC327 ; <- 54327
-JSL.l GetMapMode
-org $0AC369 ; <- 54369
-JSL.l GetMapMode
+;Overwritten
+;org $0AC037 ; <- 54037
+;JSL.l GetMapMode
+;org $0AC079 ; <- 54079
+;JSL.l GetMapMode
+;org $0AC0B8 ; <- 540B8 x
+;JSL.l GetMapMode
+;org $0AC0F8 ; <- 540F8
+;JSL.l GetMapMode
+;org $0AC137 ; <- 54137
+;JSL.l GetMapMode
+;org $0AC179 ; <- 54179
+;JSL.l GetMapMode
+;org $0AC1B3 ; <- 541B3
+;JSL.l GetMapMode
+;org $0AC1F5 ; <- 541F5
+;JSL.l GetMapMode
+;org $0AC22F ; <- 5422F
+;JSL.l GetMapMode
+;org $0AC271 ; <- 54271
+;JSL.l GetMapMode
+;org $0AC2AB ; <- 542AB
+;JSL.l GetMapMode
+;org $0AC2ED ; <- 542ED
+;JSL.l GetMapMode
+;org $0AC327 ; <- 54327
+;JSL.l GetMapMode
+;org $0AC369 ; <- 54369
+;JSL.l GetMapMode
 
 org $0DC849 ; <- 6C849
 JSL.l GetMapMode

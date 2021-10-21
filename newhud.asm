@@ -98,7 +98,7 @@ SEP #$30
 ; Draw Dungeon Compass Counts
 ;================================================================================
 	REP #$20
-	LDA.l CompassMode : AND #$00FF : BEQ + ; skip if CompassMode is 0.
+	LDA.l CompassMode : AND #$003F : BEQ + ; skip if CompassMode is 0.
 		JSL.l DrawDungeonCompassCounts ; compasses.asm
 	+
 

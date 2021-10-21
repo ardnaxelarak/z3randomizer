@@ -139,6 +139,8 @@ MapMode:
 db #$00 ; #$00 = Always On (default) - #$01 = Require Map Item
 CompassMode:
 db #$00 ; #$00 = Off (default) - #$01 = Display Dungeon Count w/Compass - #$02 = Display Dungeon Count Always
+        ; #$8x = Moves prize indicator to a special position if bit on
+        ; #$4x = Compasses are shuffled and must be obtained to show position if bit on
 ;--------------------------------------------------------------------------------
 org $30803D ; PC 0x18003D
 PersistentFloodgate:
@@ -240,13 +242,13 @@ org $30804F ; PC 0x18004F
 ByrnaInvulnerability:
 db #$01 ; #$00 = Off - #$01 = On (default)
 ;--------------------------------------------------------------------------------
-org $308050 ; PC 0x180050 - 0x18005C
+org $308050 ; PC 0x180050 - 0x18005D
 CrystalPendantFlags_2:
-    db $00 ; Sewers
-	db $00 ; Hyrule Castle
+    db $02 ; Ganons Tower - because 5D is not available right now - sewers doesn't get one
+	db $04 ; Hyrule Castle
 	db $00 ; Eastern Palace
 	db $00 ; Desert Palace
-	db $00 ; Agahnim's Tower
+	db $01 ; Agahnim's Tower
 	db $40 ; Swamp Palace
 	db $40 ; Palace of Darkness
 	db $40 ; Misery Mire
@@ -258,6 +260,9 @@ CrystalPendantFlags_2:
 	db $40 ; Turtle Rock
 ;Pendant: $00
 ;Crystal: $40
+;Aga1:    $01
+;Aga2:    $02
+;HC special check $04
 ;--------------------------------------------------------------------------------
 org $30805E ; PC 0x18005E - Number of crystals required to enter GT
 NumberOfCrystalsRequiredForTower:
@@ -288,20 +293,20 @@ dl #$000000
 ;--------------------------------------------------------------------------------
 org $308070 ; PC 0x180070 - 0x18007F
 CrystalNumberTable:
-db $00 ;
+db $69 ; Eastern
+db $69 ; Hera
+db $69 ; Desert
+db $7F ; Darkness
+db $6C ; Skull
+db $7C ; TRock
+db $6D ; Thieves
+db $6F ; Mire
+db $6E ; Ice
 db $79 ; Swamp
 db $00 ;
-db $6E ; Ice
 db $00 ;
-db $6F ; Mire
 db $00 ;
-db $6D ; Thieves
-db $69 ; Desert
-db $7C ; TRock
-db $69 ; Hera
-db $6C ; Skull
-db $69 ; Eastern
-db $7F ; Darkness
+db $00 ;
 db $00 ;
 db $00 ;
 
@@ -1555,6 +1560,8 @@ dw #9999 ; Rupee Limit
 ; $7F5400 - $7F540F - MSU Block
 
 ; $7F5410 - $7F56FF - Unused
+; $7F5420 - MapCompass flag - used during Overworld Map processing
+; $7F5421 - $7F56FF - Unused
 
 ; $7F5700 - $7F57FF - Dialog Buffer
 ;
