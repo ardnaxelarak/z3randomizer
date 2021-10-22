@@ -259,6 +259,10 @@ CrystalPendantFlags_2:
 ;Pendant: $00
 ;Crystal: $40
 ;--------------------------------------------------------------------------------
+org $30805D ; PC 0x18005D
+SmithDeleteOnSave:
+db #$00 ; #$00 = Off (default) - #$01 = On (frog/smith gets deleted on S+Q)
+;--------------------------------------------------------------------------------
 org $30805E ; PC 0x18005E - Number of crystals required to enter GT
 NumberOfCrystalsRequiredForTower:
 db #$07 ; #$07 = 7 Crystals
