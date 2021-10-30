@@ -2787,8 +2787,8 @@ org $0AEEF2
 org $008BE5 ; hijack stripes for boss GFX transfer
 	JSL DoDungeonMapBossIcon
 
-;================================================================================
-; Terrorpin AI fix
+	;================================================================================
+	; Terrorpin AI fix
 ;--------------------------------------------------------------------------------
 org $1EB2B1 ; sprite_terrorpin.asm(57) : AND.b #$03 : STA $0DE0, X ; 5 bytes
 JSL FixTerrorpin ; 4 bytes

@@ -18,6 +18,14 @@ DoWorldFix:
 	LDA #$00
 	.noMirror
 	STA $7EF3CA ; set flag to light world
+	LDA.l SmithDeleteOnSave : BEQ .transform
+		LDA $7EF3CC
+		CMP #$07 : BEQ .clear ; clear frog
+		CMP #$08 : BEQ .clear ; clear dwarf - consider flute implications
+		BRA .done
+		.clear
+		LDA.b #$00 : STA $7EF3CC : BRA .done ; clear follower
+	.transform
 	LDA $7EF3CC : CMP #$07 : BNE .done : INC : STA $7EF3CC ; convert frog to dwarf
 	.done
 RTL
@@ -52,12 +60,15 @@ DoWorldFix_Inverted:
 	.noMirror
 	.aga1Alive
 	LDA #$40 : STA $7EF3CA ; set flag to dark world
-	LDA $7EF3CC
-	CMP #$07 : BEQ .clear ; clear frog
-	CMP #$08 : BEQ .clear ; clear dwarf - consider flute implications
-	BRA .done
-	.clear
-	LDA.b #$00 : STA $7EF3CC ; clear follower
+	LDA.l SmithDeleteOnSave : BEQ .transform
+		LDA $7EF3CC
+		CMP #$07 : BEQ .clear ; clear frog
+		CMP #$08 : BEQ .clear ; clear dwarf - consider flute implications
+		BRA .done
+		.clear
+		LDA.b #$00 : STA $7EF3CC : BRA .done ; clear follower
+	.transform
+	LDA $7EF3CC : CMP #$07 : BNE .done : INC : STA $7EF3CC ; convert frog to dwarf
 	.done
 RTL
 ;--------------------------------------------------------------------------------
