@@ -150,15 +150,14 @@ LoadRoomVert:
     .notEdge
     lda $01 : and #$03 : cmp #$03 : bne .normal
         jsr ScrollToInroomStairs
+        stz $046d
         bra .end
     .normal
 	ldy #$01 : jsr ShiftVariablesMainDir
     jsr PrepScrollToNormal
     .scroll
-    lda $01 : and #$40 : pha
+    lda $01 : and #$40 : sta $046d
     jsr ScrollX
-    pla : beq .end
-        ldy #$00 : jsr ApplyScroll
     .end
     plb ; restore db register
     rts
@@ -291,6 +290,11 @@ StraightStairsAdj:
     stx $0464 : sty $012e ; what we wrote over
     lda.l DRMode : beq +
         lda $045e : bne .toInroom
+        lda $046d : beq .noScroll
+            sta $22
+            ldy #$00 : jsr ApplyScroll
+            stz $046d
+        .noScroll
         jsr GetTileAttribute : tax
         lda $11 : cmp #$12 : beq .goingNorth
             lda $a2 : cmp #$51 : bne ++
