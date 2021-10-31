@@ -342,9 +342,10 @@ db $d0, $f6, $10, $1a, $f0, $00
 
 StraightStairsFix:
 {
+    pha
     lda.l DRMode : bne +
-        !add $20 : sta $20 ;what we wrote over
-    + rtl
+        pla : !add $20 : sta $20 : rtl ;what we wrote over
+    + pla : rtl
 }
 
 StraightStairLayerFix:
