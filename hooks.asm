@@ -2319,8 +2319,17 @@ JSL.l OnLinkDamagedFromPit
 org $01FFE7 ; <- FFE7 - Bank01.asm:16375 (LDA $7EF36D)
 JSL.l OnLinkDamagedFromPitOutdoors
 ;--------------------------------------------------------------------------------
-org $078F27 ; <- 38F27
-JSL.l FlipperReset
+org $02B468
+dw FakeFlipperProtection
+
+org $02FFC7
+FakeFlipperProtection:
+	JSR.w $029485
+	JSL protectff
+	RTS
+;--------------------------------------------------------------------------------
+;org $078F27 ; <- 38F27
+;JSL.l FlipperReset
 ;--------------------------------------------------------------------------------
 org $09F40B ; <- 4F40B - module_death.asm:222 (LDX.b #$00)
 JSL.l IgnoreFairyCheck
