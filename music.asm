@@ -193,10 +193,11 @@ Overworld_MosaicDarkWorldChecks:
 ; 
 ; On entry, A=16bit XY=8bit, A & X safe to mod, Y unknown
 Underworld_DoorDown_Entry:
-    LDA.l DRMode : TAX : LDA $A0 : CPX #0 : BNE .done
+    LDA.l $7EF3C5 : TAX : CPX #2 : !BLT .vanilla
+    LDA.l DRMode : BNE .done
 
 .vanilla ; thing we wrote over
-    CMP.w #$0012 : BNE +
+    LDA $A0 : CMP.w #$0012 : BNE +
         LDX.b #$14 ; value for Sanc music
         BRA .done
     + CMP.w #$0002 : BNE .done
