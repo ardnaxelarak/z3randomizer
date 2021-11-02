@@ -204,5 +204,5 @@ Underworld_DoorDown_Entry:
     + LDA $A2 : CMP.w #$0012 : BNE .done
         LDX.b #$10 ; value for Hyrule Castle music
 .done
-    RTL
+    LDA $A0 : RTL
 ;--------------------------------------------------------------------------------
