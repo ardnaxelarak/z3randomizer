@@ -261,6 +261,22 @@ AllowBombingBarrier:
 .no_disable_projectiles
 	RTL
 ;--------------------------------------------------------------------------------
+DrawBombInMenu:
+	JSL LoadBombCount16 : AND.w #$00FF : BEQ .noBombs
+	LDA SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BNE .vanillaBombs
+	LDA.l !BOMB_LEVEL : AND.w #$00FF : BEQ .noBombs : STA $02
+	LDA.w #$FC51 : STA $04
+	BRA .done
+.vanillaBombs
+	LDA.w #$0001 : STA $02
+	LDA.w #$F699 : STA $04
+	BRA .done
+.noBombs
+	LDA.w #$0000 : STA $02
+	LDA.w #$F699 : STA $04
+.done
+	RTL
+;--------------------------------------------------------------------------------
 DrawSwordInMenu:
 	LDA SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BEQ .bombSword
 	LDA $7EF359 : AND.w #$00FF : CMP.w #$00FF : BEQ .noSword
@@ -275,6 +291,15 @@ DrawSwordInMenu:
 .bombSword
 	LDA !BOMB_LEVEL : AND.w #$00FF : STA $02
 	LDA.w #$FC51 : STA $04
+	RTL
+;--------------------------------------------------------------------------------
+DrawBombInYBox:
+	CPX.w #$0004 : BNE .done
+	LDA SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BNE .vanilla
+	LDA !BOMB_LEVEL : AND.w #$00FF : CLC : ADC.w #$00B7 : BRA .done
+.vanilla
+	LDA.w #$0001
+.done
 	RTL
 ;--------------------------------------------------------------------------------
 BombIcon:
@@ -292,6 +317,17 @@ DrawBombOnHud:
 	LDA.l BombIcon, X : STA.l $7EC71A
 	LDA.l BombIcon+2, X : STA.l $7EC71C
 .regularBombs
+	RTL
+;--------------------------------------------------------------------------------
+BombSpriteColor:
+	db $04, $08, $04, $02, $0A, $0A
+SetBombSpriteColor:
+	PHX
+	LDA.l !BOMB_LEVEL
+	TAX
+	LDA.l BombSpriteColor, X
+	STA $0B
+	PLX
 	RTL
 ;--------------------------------------------------------------------------------
 StoreSwordDamage:
