@@ -193,7 +193,7 @@ GetSpritePalette:
 	;--------
 	TAX : LDA.l .gfxPalettes, X ; look up item gfx
 	PLB : PLX
-	CMP.b #$F7 : !BGE .specialHandling
+	CMP.b #$F6 : !BGE .specialHandling
 RTL
 	.specialHandling
 	CMP.b #$FD : BNE ++ ; Progressive Sword
@@ -242,6 +242,16 @@ RTL
 			LDA.b #$08 : RTL
 		+ ; Any Bow
 			LDA.b #$02 : RTL
+	++ : CMP.b #$F7 : BNE ++ ; Progressive Bombs
+		LDA !BOMB_LEVEL
+			CMP.b #$00 : BNE + ; No Bombs
+			LDA.b #$08 : RTL
+		+ : CMP.b #$01 : BNE + ; L1 Bombs
+			LDA.b #$04 : RTL
+		+ : CMP.b #$02 : BNE + ; L2 Bombs
+			LDA.b #$02 : RTL
+		+ ; Everything Else
+			LDA.b #$0A : RTL
 	++ : CMP.b #$FA : BNE ++ ; RNG Item (Single)
 		JSL.l GetRNGItemSingle : JMP GetSpritePalette
 	++ : CMP.b #$FB : BNE ++ ; RNG Item (Multi)
@@ -288,7 +298,7 @@ RTL
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Big Key
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Small Key
 	db $04 ; Bee Trap
-	db $0A, $0A, $0A, $0A, $0A, $0A ; Bomb Upgrades
+	db $08, $04, $02, $0A, $0A, $F7 ; Bomb Upgrades
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused

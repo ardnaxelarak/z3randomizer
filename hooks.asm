@@ -367,9 +367,6 @@ JSL.l LoadBombCount
 org $098133 ; <- 48133 - ancilla_init.asm : 211 (STA $7EF343 : BNE .bombs_left_over)
 JSL.l StoreBombCount
 ;--------------------------------------------------------------------------------
-org $0DE4BF ; <- 6E4BF - equipment.asm : 1249 (LDA $7EF343 : AND.w #$00FF : BEQ .gotNoBombs)
-JSL.l LoadBombCount16
-;--------------------------------------------------------------------------------
 org $0DDEB3 ; <- 6DEB3 - equipment.asm : 328 (LDA $7EF33F, X)
 JSL.l IsItemAvailable
 ;--------------------------------------------------------------------------------
@@ -2830,6 +2827,14 @@ org $06892F ; sprite_prep.asm@548 (LDA $0D00, X : SUB #$0C : STA $0D00, X : ...)
 JSL AllowBombingBarrier
 RTS : NOP #7
 ;--------------------------------------------------------------------------------
+org $0DE4BF ; equipment.asm@1247 (LDA $7EF343 : AND.w #$00FF : BEQ .gotNoBombs : ...)
+JSL DrawBombInMenu
+BRA + : NOP #13 : +
+;--------------------------------------------------------------------------------
+org $0DFB6A ; headsup_display@727 (CPX #$0004 : BNE .bombsNotEquipped : LDA #$0001)
+JSL DrawBombInYBox
+BRA + : NOP #2 : +
+;--------------------------------------------------------------------------------
 org $0DEE05 ; equipment.asm@2065 (LDA $7EF359 : AND.w #$00FF : CMP.w #$00FF : ...)
 JSL DrawSwordInMenu
 BRA + : NOP #16 : +
@@ -2837,6 +2842,9 @@ BRA + : NOP #16 : +
 org $0DFA92 ; headsup_display.asm@622 (PDB : LDA.w #$0149 : ...)
 JSL DrawBombOnHud
 BRA + : NOP #8 : +
+;--------------------------------------------------------------------------------
+org $089EF8 ; ancilla_bomb@1438 (LDA.w #$04 : STA $0B)
+JSL SetBombSpriteColor
 ;--------------------------------------------------------------------------------
 org $0DFC51 ; is this being used? I hope not! let's find out if anything breaks!
 db $F5, $20, $F5, $20, $F5, $20, $F5, $20
