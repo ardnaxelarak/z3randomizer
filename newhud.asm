@@ -8,13 +8,20 @@ SEP #$30
 
 	LDA !INFINITE_BOMBS : BNE .infinite_bombs
 	.finite_bombs
+		LDA.l SpecialWeapons : CMP #$01 : BNE .normal
+		LDA.l !BOMB_LEVEL : BEQ .no_bombs
+	.normal
 		LDA.l $7EF343 ; bombs
 		JSR HudHexToDec2Digit ;requires 8 bit registers!
 		REP #$20
 		LDX.b $06 : TXA : ORA.w #$2400 : STA !BOMBCOUNT_DRAW_ADDRESS ; Draw bombs 10 digit
 		LDX.b $07 : TXA : ORA.w #$2400 : STA !BOMBCOUNT_DRAW_ADDRESS+2 ; Draw bombs 1 digit
 		BRA +
-
+	.no_bombs
+		REP #$20
+		LDA.w #$207F : STA !BOMBCOUNT_DRAW_ADDRESS ; blank
+		STA !BOMBCOUNT_DRAW_ADDRESS+2 ; blank
+		BRA +
 	.infinite_bombs
 		REP #$20
 		LDA.w #$2431 : STA !BOMBCOUNT_DRAW_ADDRESS ; infinity (left half)
