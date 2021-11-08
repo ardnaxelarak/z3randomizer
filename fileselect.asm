@@ -272,15 +272,16 @@ DrawPlayerFileShared:
 	%fs_drawBottle($70035F,9,23)
 
 	; Sword
+	LDA.l SpecialWeapons : AND.w #$00FF : CMP #$0001 : BEQ .bombSword
 	LDA.l $700359 : AND.w #$00FF : BNE +
 		%fs_drawItemGray(3,26,FileSelectItems_fighters_sword)
-		BRA ++
+		JMP ++
 	+ : DEC : BNE +
 		%fs_drawItem(3,26,FileSelectItems_fighters_sword)
-		BRA ++
+		JMP ++
 	+ : DEC : BNE +
 		%fs_drawItem(3,26,FileSelectItems_master_sword)
-		BRA ++
+		JMP ++
 	+ : DEC : BNE +
 		%fs_drawItem(3,26,FileSelectItems_tempered_sword)
 		BRA ++
@@ -290,6 +291,28 @@ DrawPlayerFileShared:
 	+
 		; a sword value above 4 is either corrupted or 0xFF (a.k.a. swordless)
 		%fs_drawItemGray(3,26,FileSelectItems_fighters_sword)
+	.bombSword
+	LDA.l $70038F : AND.w #$00FF : BNE +
+		%fs_drawItemGray(3,26,FileSelectItems_fighters_bombs)
+		BRA ++
+	+ : DEC : BNE +
+		%fs_drawItem(3,26,FileSelectItems_fighters_bombs)
+		BRA ++
+	+ : DEC : BNE +
+		%fs_drawItem(3,26,FileSelectItems_master_bombs)
+		BRA ++
+	+ : DEC : BNE +
+		%fs_drawItem(3,26,FileSelectItems_tempered_bombs)
+		BRA ++
+	+ : DEC : BNE +
+		%fs_drawItem(3,26,FileSelectItems_gold_bombs)
+		BRA ++
+	+ : DEC : BNE +
+		%fs_drawItem(3,26,FileSelectItems_extra_gold_bombs)
+		BRA ++
+	+
+		; a bomb value above 5 is... who knows, let's just pretend it's 5
+		%fs_drawItem(3,26,FileSelectItems_extra_gold_bombs)
 	++
 
 	; Shield
@@ -560,6 +583,18 @@ FileSelectItems:
 	.good_bee_bottle
 	dw #$0240|!FS_COLOR_BW, #$0241|!FS_COLOR_BW, #$0254|!FS_COLOR_YELLOW, #$0246|!FS_COLOR_YELLOW
 
+	.fighters_bombs
+	dw #$020C|!FS_COLOR_GREEN, #$020D|!FS_COLOR_GREEN, #$021C|!FS_COLOR_GREEN, #$01B1|!FS_COLOR_GREEN
+	.master_bombs
+	dw #$020C|!FS_COLOR_BLUE, #$020D|!FS_COLOR_BLUE, #$021C|!FS_COLOR_RED, #$01B2|!FS_COLOR_BLUE
+	.tempered_bombs
+	dw #$020C|!FS_COLOR_RED, #$020D|!FS_COLOR_RED, #$021C|!FS_COLOR_GREEN, #$01B3|!FS_COLOR_RED
+	.gold_bombs
+	dw #$020C|!FS_COLOR_YELLOW, #$020D|!FS_COLOR_YELLOW, #$021C|!FS_COLOR_BLUE, #$01B4|!FS_COLOR_YELLOW
+	.extra_gold_bombs
+	dw #$020C|!FS_COLOR_YELLOW, #$020D|!FS_COLOR_YELLOW, #$021C|!FS_COLOR_BLUE, #$01B5|!FS_COLOR_YELLOW
+
+
 ;--------------------------------------------------------------------------------
 FileSelectDrawHudBar:
 	LDA #$029B|!FS_COLOR_GREEN : %fs_draw16x8(0,10)
@@ -570,11 +605,29 @@ FileSelectDrawHudBar:
 	LDA $7F5006 : AND.w #$00FF : !ADD.w #$210+!FS_COLOR_BW : %fs_draw8x8(1,11)
 	LDA $7F5007 : AND.w #$00FF : !ADD.w #$210+!FS_COLOR_BW : %fs_draw8x8(1,12)
 
+	LDA SpecialWeapons : AND.w #$00FF : CMP #$0001 : BEQ .colorBombs
 	LDA #$028B|!FS_COLOR_BLUE : %fs_draw16x8(0,14)
 	LDA $700343 : AND.w #$00FF
 	JSL.l HexToDec
 	LDA $7F5006 : AND.w #$00FF : !ADD.w #$210+!FS_COLOR_BW : %fs_draw8x8(1,14)
 	LDA $7F5007 : AND.w #$00FF : !ADD.w #$210+!FS_COLOR_BW : %fs_draw8x8(1,15)
+	BRA ++
+	.colorBombs
+	LDA $70038F : AND.w #$00FF : BNE +
+	; no bombs, draw no icon
+	BRA ++
+	+ : DEC : BNE +
+	LDA #$028B|!FS_COLOR_GREEN : %fs_draw16x8(0,14)
+	BRA ++
+	+ : DEC : BNE +
+	LDA #$028B|!FS_COLOR_BLUE : %fs_draw16x8(0,14)
+	BRA ++
+	+ : DEC : BNE +
+	LDA #$028B|!FS_COLOR_RED : %fs_draw16x8(0,14)
+	BRA ++
+	+
+	LDA #$028B|!FS_COLOR_YELLOW : %fs_draw16x8(0,14)
+	++
 
 	LDA.l !FS_INVENTORY_SWAP_2 : AND.w #$0040 : BEQ +
 		LDA #$0299|!FS_COLOR_RED : %fs_draw16x8(0,17)
