@@ -265,7 +265,7 @@ DrawBombInMenu:
 	JSL LoadBombCount16 : AND.w #$00FF : BEQ .noBombs
 	LDA SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BNE .vanillaBombs
 	LDA.l !BOMB_LEVEL : AND.w #$00FF : BEQ .noBombs : STA $02
-	LDA.w #$FC51 : STA $04
+	LDA.w #$FC81 : STA $04
 	BRA .done
 .vanillaBombs
 	LDA.w #$0001 : STA $02
@@ -296,7 +296,7 @@ DrawSwordInMenu:
 DrawBombInYBox:
 	CPX.w #$0004 : BNE .done
 	LDA SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BNE .vanilla
-	LDA !BOMB_LEVEL : AND.w #$00FF : CLC : ADC.w #$00B7 : BRA .done
+	LDA !BOMB_LEVEL : AND.w #$00FF : CLC : ADC.w #$00BD : BRA .done
 .vanilla
 	LDA.w #$0001
 .done

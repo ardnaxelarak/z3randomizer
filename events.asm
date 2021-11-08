@@ -87,6 +87,7 @@ OnFileCreation:
 	TAX ; what we wrote over
 	LDA StartingEquipment+$4C : STA $700340+$4C ; copy starting equipment swaps to file select screen
 	LDA StartingEquipment+$4E : STA $700340+$4E
+	LDA StartingEquipment+$4F : STA $700340+$4F ; copy starting bomb level
 RTL
 ;--------------------------------------------------------------------------------
 !RNG_ITEM_LOCK_IN = "$7F5090"
@@ -132,7 +133,7 @@ OnNewFile:
 		LDA.l StartingTime : STA $7EF454
 		LDA.l StartingTime+2 : STA $7EF454+2
 
-		LDX.w #$004E : - ; copy over starting equipment
+		LDX.w #$004F : - ; copy over starting equipment
 			LDA StartingEquipment, X : STA $7EF340, X
 			DEX : DEX
 		BPL -
