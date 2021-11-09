@@ -1,7 +1,7 @@
 def process_values(sprite, values)
   ret = values.clone
   if [1, 2].include?(ret[0]) # boomerang
-    ret[0] = 0
+    ret[0] = 4 # still want to stun
   end
   if ret[6] > 0 && sprite != 0x84 # bow and not red eyegore/mimic
     ret[6] = 0
