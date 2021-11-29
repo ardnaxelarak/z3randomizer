@@ -1,23 +1,38 @@
 Overworld_LoadNewTiles:
 {
-    ; add sign to EDM for OWG people to read
     LDA $040A : AND #$00FF : CMP #$0005 : BNE +
+        ; add sign to EDM for OWG people to read
         LDA #$0101 : STA $7E2E18 ; #$0101 is the sign tile16 id, $7E2D98 is the position of the tile16 on map
-    +
+        BRA .invertedMods
+    + CMP #$005B : BNE .invertedMods
+        ; add Goal sign to Pyramid
+        LDA #$0101 : STA $7E27B6 ; Moved sign near statue
+        LDA #$05C2 : STA $7E27B4 ; added a pyramid peg on the left of the sign
+    
+    .invertedMods
+    LDA InvertedMode : AND #$00FF : BEQ ++ ; forced inverted changes
+        LDA $040A : AND #$00FF : CMP #$0043 : BNE +
+            LDA #$08D5 : STA $7E235E ; GT entrance auto-opened
+            LDA #$08E3 : STA $7E23DE
+            LDA #$0E90 : STA $7E245E
+            LDA #$0E96 : STA $7E24DE
+            STA $7E255E
+            LDA #$08D6 : STA $7E2360
+            LDA #$08E4 : STA $7E23E0
+            LDA #$0E91 : STA $7E2460
+            LDA #$0E97 : STA $7E24E0
+            STA $7E2560
+            LDA #$0E94 : STA $7E25DE
+            LDA #$0E95 : STA $7E25E0
+            BRA .postInverted
+        + CMP #$001B : BNE .postInverted
+            LDA #$0101 : STA $7E222C ; add sign for Tower Entry at HC
+            BRA .postInverted
+    ++ ; forced non-inverted changes
+        LDA $040A : AND #$00FF : CMP #$0043 : BNE .postInverted
+            LDA #$0101 : STA $7E2550 ; GT sign
 
-    ; GT sign
-    LDA InvertedMode : AND #$00FF : BNE +
-    LDA $040A : AND #$00FF : CMP #$0043 : BNE +
-        LDA #$0101 : STA $7E2550
-    +
-
-    ; Pyramid sign
-    LDA InvertedMode : AND #$00FF : BNE +
-    LDA $040A : AND #$00FF : CMP #$005B : BNE +
-        LDA #$0101 : STA $7E27B6 ;Moved sign near statue
-        LDA #$05C2 : STA $7E27B4 ;added a pyramid peg on the left of the sign
-    +
-
+    .postInverted
     SEP #$30
     LDX $8A : LDA.l OWTileMapAlt, X : BEQ .notInverted
     PHB
@@ -340,6 +355,8 @@ LDA #$0465 : STA $219E
 LDA #$0466 : STA $21A0
 
 + LDA.l OWTileMapAlt+$1B : AND #$0001 : BEQ .notSwapped
+LDA #$0101 : STA $2252 ; add sign for Goal at HC
+
 ; CHECK IF AGAHNIM 2 IS DEAD AND WE HAVE ALREADY LANDED
 LDA $7EF2DB : AND #$0020 : BEQ .agahnim2Alive
 LDA #$0E3A : STA $24BC
@@ -356,10 +373,6 @@ LDA #$0491 : STA $25C0
 .agahnim2Alive
 
 .notSwapped
-LDA.l InvertedMode : AND #$00FF : BEQ .notInverted
-    LDA #$0101 : STA $7E222C : STA $7E2252 ; add sign for Tower Entry
-
-.notInverted
 LDA.l OWTileMapAlt+$1B : AND #$0002 : BEQ .return
     ;rocks for hardlock protection
     LDA #$02FA : STA $2F80
@@ -945,20 +958,6 @@ RTS
 
 map067:
 {
-LDA.l InvertedMode : AND #$00FF : BEQ .notInverted
-    LDA #$08D5 : STA $235E ; GT entrance auto-opened
-    LDA #$08E3 : STA $23DE
-    LDA #$0E90 : STA $245E
-    LDA #$0E96 : STA $24DE
-    STA $255E
-    LDA #$08D6 : STA $2360
-    LDA #$08E4 : STA $23E0
-    LDA #$0E91 : STA $2460
-    LDA #$0E97 : STA $24E0
-    STA $2560
-    LDA #$0E94 : STA $25DE
-    LDA #$0E95 : STA $25E0
-.notInverted
 LDA.l OWTileMapAlt+$43 : AND #$0001 : BEQ .owshuffle
     LDA #$0180 : STA $275E ; ladder
     LDA #$0181 : STA $2760
@@ -1022,6 +1021,10 @@ RTS
 map091: ;Pyramid
 {
 LDA.l OWTileMapAlt+$5B : AND #$0001 : BEQ +
+; delete Goal sign
+LDA #$09F1 : STA $27B6 ; remove sign
+LDA #$09F0 : STA $27B4 ; remove the added pyramid peg on the left of the sign
+
 LDA #$0A06 : STA $2E1C ; cover up entrance
 LDA #$0A0E : STA $2E1E
 
