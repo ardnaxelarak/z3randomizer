@@ -135,3 +135,20 @@ protectff:
 .spow
 	db $80, $81, $81, $FF, $FF, $FF, $FF, $FF
 	db $FF, $81, $81, $FF, $FF, $FF, $FF, $FF
+
+FlipperScrollWarp:
+	STZ $00 : STZ $02 ; what we wrote over
+	LDA $308358 : BEQ .checkX : RTL
+	.checkX
+		LDA $22 : CMP.w $0604 : BCC +
+		CMP.w $0616 : BCS +
+		BRA .checkY
+		+ LDA $7EC186
+		STA $22
+	.checkY
+		LDA $20 : CMP.w $0600 : BCC +
+		CMP.w $0612 : BCS +
+			RTL
+		+ LDA $7EC184
+		STA $20
+RTL
