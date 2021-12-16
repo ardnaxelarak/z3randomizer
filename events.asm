@@ -37,7 +37,7 @@ RTL
 OnDungeonExit:
 	PHA : PHP
 		SEP #$20 ; set 8-bit accumulator
-		JSL.l PodEGFix
+		JSL.l SQEGFix
 	PLP : PLA
 
 	STA $040C : STZ $04AC ; thing we wrote over
@@ -50,8 +50,8 @@ OnDungeonExit:
 RTL
 ;--------------------------------------------------------------------------------
 OnQuit:
-	JSL.l PodEGFix
-
+	JSL.l SQEGFix
+	LDA.b #$00 : STA $7F5035 ; bandaid patch bug with mirroring away from text
 	LDA.b #$10 : STA $1C ; thing we wrote over
 RTL
 ;--------------------------------------------------------------------------------
@@ -184,6 +184,7 @@ OnInitFileSelect:
 RTL
 ;--------------------------------------------------------------------------------
 OnLinkDamaged:
+	JSL.l IncrementDamageTakenCounter_Arb
 	JSL.l FlipperKill
 	JML.l OHKOTimer
 
@@ -197,8 +198,17 @@ RTL
 ;--------------------------------------------------------------------------------
 OnLinkDamagedFromPit:
 	JSL.l OHKOTimer
-	LDA.b #$14 : STA $11 ; thing we wrote over
-RTL
+
+	LDA.l AllowAccidentalMajorGlitch
+	BEQ ++
+--	LDA.b #$14 : STA $11 ; thing we wrote over
+
+	RTL
+
+++	LDA.b $10 : CMP.b #$12 : BNE --
+
+	STZ.b $11
+	RTL
 ;--------------------------------------------------------------------------------
 OnLinkDamagedFromPitOutdoors:
 	JML.l OHKOTimer ; make sure this is last

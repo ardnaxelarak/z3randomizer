@@ -237,6 +237,7 @@ incsrc contrib.asm
 org $A38000
 incsrc stats/main.asm
 
+incsrc menu/overworldmap.asm ; overwrites some code in bank 0A
 incsrc doorrando.asm ; bank 27 likely A7 in the future
 ;bank 28/A8 for keydropshuffle
 incsrc keydrop/potsanity.asm
