@@ -9,6 +9,7 @@
 ; Normal doors use $FE to store the trap door indicator
 ; Normal doors use $045e to store Y coordinate when transitioning to in-room stairs
 ; Normal doors use $045f to determine the order in which supertile quadrants are drawn
+; Straight stairs use $046d to store X coordinate on animation start
 ; Spiral doors use $045e to store stair type
 ; Gfx uses $b1 to for sub-sub-sub-module thing
 
@@ -41,6 +42,3 @@ warnpc $279C00
 
 incsrc doortables.asm
 warnpc $288000
-
-; deals with own hooks
-incsrc keydropshuffle.asm

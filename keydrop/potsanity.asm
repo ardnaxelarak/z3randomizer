@@ -1,23 +1,37 @@
 ; hooks
-; todo: look up this hook in jpdasm
 org $01E6B0
 	JSL RevealPotItem
 	RTS
 
+org $09C2BB
+	JSL ClearSpriteData
+
+org $09C327
+	JSL LoadSpriteData
+
+org $06EF7A
+	JSL RevealSpriteDrop : NOP
+
 org $06926e ; <- 3126e - sprite_prep.asm : 2664 (LDA $0B9B : STA $0CBA, X)
-JSL SpriteKeyPrep : NOP #2
+	JSL SpriteKeyPrep : NOP #2
 
 org $06d049 ; <- 35049 sprite_absorbable : 31-32 (JSL Sprite_DrawRippleIfInWater : JSR Sprite_DrawAbsorbable)
-JSL SpriteKeyDrawGFX : BRA + : NOP : +
+	JSL SpriteKeyDrawGFX : BRA + : NOP : +
+
+org $06d03d
+	JSL ShouldSpawnItem : NOP #2
+
+org $06D19F
+	JSL MarkSRAMForItem : NOP #2
 
 org $06d180
-JSL BigKeyGet : BCS $07 : NOP #5
+	JSL BigKeyGet : BCS $07 : NOP #5
 
 org $06d18d ; <- 3518D - sprite_absorbable.asm : 274 (LDA $7EF36F : INC A : STA $7EF36F)
-JSL KeyGet
+	JSL KeyGet
 
 org $06f9f3 ; bank06.asm : 6732 (JSL Sprite_LoadProperties)
-JSL LoadProperties_PreserveItemMaybe
+	JSL LoadProperties_PreserveItemMaybe
 
 
 ; refs to other functions
@@ -29,29 +43,78 @@ org $0db818
 Sprite_LoadProperties:
 
 ; defines
+; Ram usage
 SpawnedItemID = $7E0720 ; 0x02
-SpawnedItemPotIndex = $7E0722 ; 0x02
+SpawnedItemIndex = $7E0722 ; 0x02
 SpawnedItemIsMultiWorld = $7E0724 ; 0x02
-SpawnedItemFlag = $7E0726 ; 0x02
-PotItems = $01DDE7 ;original secret table?
+SpawnedItemFlag = $7E0726 ; 0x02 - one for pot, 2 for sprite drop
+SpawnedItemMWPlayer = $7E0728 ; 0x02
+; todo : clear these for any sprite that spawns, maybe should clear all of them in a loop during room load
+SprDropsItem = $7E0730 ; 0x16
+SprItemReceipt = $7E0740 ; 0x16
+SprItemIndex = $7E0750
+SprItemMWPlayer = $7E0760 ; 0x16
+SprItemFlags = $7E0770 ; 0x16 (used for both pots and drops) (combine with SprDropsItem?)
 
-RoomData_PotItems_Pointers = $01DB67
+; 70:0600-70:084F ($250 or 592 bytes) for pots and 70:0850-70:0A9F ($250 or 592 bytes) for sprites
 
-org $AA8000
+PotItemSRAM = $7F6600
+SpriteItemSRAM = $7F6850
+
+; todo: move sprites
+;org $09D62E
+;UWSpritesPointers ; 0x250 bytes for 0x128 rooms' 16-bit pointers
+
+;org $09D87E
+;UWPotsPointers ; 0x250 bytes for 0x128 rooms' 16-bit pointers
+
+;org $09DACE
+;UWPotsData ; variable number of bytes (max 0x11D1) for all pots data
+
+;org $A88000
+;UWSpritesData ; variable number of bytes (max 0x2800) for all sprites and sprite drop data
+; First $2800 bytes of this bank (28) is reserved for the sprite tables
+
+;org $09C297
+;LDA.w UWSpritesPointers,Y
+;org $01E6BF  ; not sure this code is reachable anymore
+;LDA.l UWPotsPointers,X
+;STA.b $00
+;LDA.w #UWPotsPointers>>16
+
+; $2800 bytes reserved for sprites
+
+; temporary pot table until sprites get moved:
+org $A88000
+UWPotsPointers: ; 0x250 bytes for 0x128 rooms' 16-bit pointers
+
+org $A88250
+UWPotsData:
+
+org $A8A800
 ;tables:
-MultiWorldTable:
-; Reserve $200 256 * 2
+PotMultiWorldTable:
+; Reserve $250 296 * 2
 
-org $A98200
+org $A8AA50
+ShuffleKeyDrops: ; 142A50  # todo : combine these flags?
+db 0
+StandingItemsOn: ; 142A51
+db 0
+MultiClientFlags: ; 142A52 -> stored in SRAM at 7ef33d
+db 0
+
+
 RevealPotItem:
 	STA.b $04 ; save tilemap coordinates
 	STZ.w SpawnedItemFlag
+	STZ.w SpawnedItemMWPlayer
 	LDA.w $0B9C : AND.w #$FF00 : STA.w $0B9C
 
 	LDA.b $A0 : ASL : TAX
 
-	LDA.l RoomData_PotItems_Pointers,X : STA.b $00 ; we may move this
-	LDA.w #RoomData_PotItems_Pointers>>16 : STA.b $02
+	LDA.l UWPotsPointers,X : STA.b $00 ; we may move this
+	LDA.w #UWPotsPointers>>16 : STA.b $02
 
 	LDY.w #$FFFD : LDX.w #$FFFF
 
@@ -63,17 +126,19 @@ RevealPotItem:
 
 	INX
 
-	STA.w $06 ; remember the exact value
+	STA.w $08 ; remember the exact value
 	AND.w #$3FFF
 	CMP.b $04 : BNE .next_pot ; not the correct value
 
 	STZ.w SpawnedItemIsMultiWorld
-	BIT.b $06
+	BIT.b $08
 	BVS LoadMultiWorldPotItem
 	BMI LoadMajorPotItem
 
 .normal_secret
-	PLX ; remove the JSL return lower 16 bits
+	STA $08
+	PLA ; remove the JSL return lower 16 bits
+	LDA $08
 	PEA.w $01E6E2-1 ; change return address to go back to the vanilla routine
 .exit
 	RTL
@@ -86,9 +151,9 @@ LoadMultiWorldPotItem:
 	PHX
 	ASL : TAX
 
-	LDA.l MultiWorldTable+1,X : AND.w #$00FF : STA.w !MULTIWORLD_SPRITEITEM_PLAYER_ID
+	LDA.l PotMultiWorldTable+1,X : AND.w #$00FF : STA.w SpawnedItemMWPlayer
 
-	LDA.l MultiWorldTable+0,X : AND.w #$00FF
+	LDA.l PotMultiWorldTable+0,X : AND.w #$00FF
 
 	PLX
 
@@ -102,14 +167,114 @@ SaveMajorItemDrop:
 	; A currently holds the item receipt ID
 	; X currently holds the pot item index
 	STA.w SpawnedItemID
-	STX.w SpawnedItemPotIndex
+	STX.w SpawnedItemIndex
 	INC SpawnedItemFlag
 	LDA.w #$0008 : STA $0B9C ; indicates we should use the key routines
 	RTL
 
+ClearSpriteData:
+	STZ.b $02 : STZ.b $03 ; what we overrode
+	PHX
+		LDA #$00 : LDX #$00
+		.loop
+			STA SprDropsItem, X :  STA SprItemReceipt, X : STA SprItemIndex, X
+			STA SprItemMWPlayer, X : STA SprItemFlags, X
+			INX : CPX #$10 : BCC .loop
+	PLX
+	RTL
+
+; Runs during sprite load of the room
+LoadSpriteData:
+	INY : INY
+	LDA.b ($00), Y
+	CMP #$F3 : BCC .normal
+		PHA
+			DEC.b $02 ; standing items shouldn't consume a sprite slot
+			LDX.b $02
+			CMP #$F9 : BNE .not_multiworld
+				DEY : LDA.b ($00), Y : STA.l SprItemMWPlayer, X
+				LDA.b #$02 : STA.l SprDropsItem, X : BRA .common
+			.not_multiworld
+			LDA.b #$00 : STA.l SprItemMWPlayer, X
+			LDA.b #$01 : STA.l SprDropsItem, X
+			DEY
+			.common
+			DEY : LDA.b ($00), Y : STA.l SprItemReceipt, X
+		INY : INY
+		PLA
+		PLA : PLA ; remove the JSL return lower 16 bits
+		PEA.w $09C344-1 ; change return address to exit from Underworld_LoadSingleSprite
+		RTL
+	.normal
+	RTL
+
+; Run when a sprite dies ... Sets Flag to #$02 and Index to sprite slot for
+RevealSpriteDrop:
+	LDA.l SprDropsItem, X : BEQ .normal
+		LDA #$02 : STA.l SpawnedItemFlag
+		STX SpawnedItemIndex
+		LDA.l SprItemReceipt, X : STA SpawnedItemID
+		LDA.b #$01 : STA $0CBA, X : RTL ; trigger the small key routines
+	.normal
+	LDA.w $0CBA, X : BNE .no_forced_drop
+		RTL
+	.no_forced_drop
+	PLY : PLY ; remove the JSL return lower 16 bits
+	PEA.w $06EF9A-1 ; change return address to .no_forced_drop of (Sprite_ApplyCalculatedDamage)
+	RTL
+
+BitFieldMasks:
+dw $8000, $4000, $2000, $1000, $0800, $0400, $0200, $0100
+dw $0080, $0040, $0020, $0010, $0008, $0004, $0002, $0001
+
+KeyRoomFlagMasks:
+db $40, $20
+
+; Runs during Sprite_E4_SmallKey and duning Sprite_E5_BigKey spawns
+ShouldSpawnItem:
+	LDA.l StandingItemsOn : BEQ .normal
+		; todo: check our sram table
+		PHX : PHY
+			REP #$30
+			LDA.b $A0 : ASL : TAY
+			LDA.l SpawnedItemIndex : ASL
+			TAX : LDA.l BitFieldMasks, X : STA $00
+			TYX
+			LDA.w SpawnedItemFlag : CMP #$0001 : BEQ +
+				LDA.l SpriteItemSRAM, X : BIT $00 : BEQ .notObtained
+				BRA .obtained
+			+ LDA.l PotItemSRAM, X : BIT $00 : BEQ .notObtained
+				.obtained
+				SEP #$30 : PLY : PLX : LDA #$01 : RTL ; already obtained
+		.notObtained
+		SEP #$30 : PLY : PLX
+		LDA.w SpawnedItemIndex : STA SprItemIndex, X
+		LDA.w SpawnedItemFlag : STA SprItemFlags, X
+		LDA.w SpawnedItemMWPlayer : STA SprItemMWPlayer, X
+		LDA #$00 : RTL
+	.normal
+	LDA.w $0403
+	AND.w KeyRoomFlagMasks,Y
+	RTL
+
+MarkSRAMForItem:
+	LDA.l StandingItemsOn : BEQ .normal
+		PHX : PHY : REP #$30
+			LDA.b $A0 : ASL : TAY
+			LDA.l SpawnedItemIndex : ASL
+			TAX : LDA.l BitFieldMasks, X : STA $00
+			TYX
+			LDA.w SpawnedItemFlag : CMP #$01 : BEQ +
+				LDA SpriteItemSRAM, X : ORA $00 : STA SpriteItemSRAM, X
+			+ LDA PotItemSRAM, X : ORA $00 : STA PotItemSRAM, X
+		SEP #$30 : PLY : PLX
+		LDA.w $0403 : RTL
+	.normal
+	LDA.w $0403 : ORA.w KeyRoomFlagMasks,Y
+	RTL
 
 SpriteKeyPrep:
-	LDA.w $0B9B : STA.w $0CBA, x ; what we wrote over
+	LDA.w $0B9B : STA.w $0CBA, X ; what we wrote over
 	PHA
 		LDA.l SpawnedItemFlag : BEQ +
 		LDA.l SpawnedItemID : STA $0E80, X
@@ -117,16 +282,14 @@ SpriteKeyPrep:
 			LDA $A0 : CMP.b #$80 : BNE +
 			LDA SpawnedItemFlag : BNE +
 				LDA #$24  ; it's the big key drop?
-		++ JSL PrepDynamicTile
+		++ JSL PrepDynamicTile  ; todo: RequestStandingItemVRAMSlot instead?
 	+ PLA
 	RTL
 
 SpriteKeyDrawGFX:
     JSL Sprite_DrawRippleIfInWater
     PHA
-        BRA +
-            -
-    + LDA $0E80, X
+    LDA $0E80, X
    	CMP.b #$24 : BNE +
    		LDA $A0 : CMP #$80 : BNE ++
    		LDA SpawnedItemFlag : BNE ++
@@ -137,6 +300,7 @@ SpriteKeyDrawGFX:
 		   JML Sprite_DrawAbsorbable
 		   .jslrtsreturn
 		   RTL
+	; todo : SpriteDraw_DynamicStandingItem here?
     + JSL DrawDynamicTile ; see DrawHeartPieceGFX if problems
     CMP #$03 : BNE +
         PHA : LDA $0E60, X : ORA.b #$20 : STA $0E60, X : PLA
@@ -147,6 +311,8 @@ KeyGet:
     LDA $7EF36F ; what we wrote over
     PHA
     	LDY $0E80, X
+    	LDA SprItemIndex, X : STA SpawnedItemIndex
+    	LDA SprItemFlags, X : STA SpawnedItemFlag
     	; todo: may need to check if we are in a dungeon or not $FF
     	LDA $A0 : CMP #$87 : BNE + ;check for hera cage
     	LDA SpawnedItemFlag : BNE + ; if it came from a pot, it's fine
@@ -154,7 +320,7 @@ KeyGet:
 			JSL CountChestKeyLong
     		++ PLA : RTL
     	+ STY $00
-    	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE .receive
+    	LDA SprItemMWPlayer, X : STA !MULTIWORLD_ITEM_PLAYER_ID : BNE .receive
     	PHX
     		; todo: may need to check if we are in a dungeon or not $FF
     		LDA $040C : LSR : TAX
@@ -196,14 +362,46 @@ LoadProperties_PreserveItemMaybe:
     PLA : STA $0e80, X
     RTL
 
-org $01E676
-db $14, $14, $07 ; Blue rupee   xyz:{ 0x050, 0x140, U }
-db $28, $94, $08 ; Blue rupee   xyz:{ 0x0A0, 0x140, U }
-db $24, $95, $1F ; Blue rupee   xyz:{ 0x050, 0x150, U }
-db $28, $95, $4E ; Blue rupee   xyz:{ 0x0A0, 0x150, U }
-db $14, $96, $5E ; Blue rupee   xyz:{ 0x050, 0x160, U }
-db $28, $96, $64 ; Blue rupee   xyz:{ 0x0A0, 0x160, U }
-db $18, $98, $4B ; Blue rupee   xyz:{ 0x060, 0x180, U }
-db $1C, $98, $44 ; Blue rupee   xyz:{ 0x070, 0x180, U }
-db $20, $98, $07 ; Blue rupee   xyz:{ 0x080, 0x180, U }
-db $24, $98, $11 ; Blue rupee   xyz:{ 0x090, 0x180, U }
+;===================================================================================================
+; Pot items
+;===================================================================================================
+;Vanilla:
+;	Data starts at $01DDE7 formatted:
+;	dw aaaa : db i
+
+;	aaaa is a 14 bit number: ..tt tttt tttt tttt indicating the tilemap ID
+;	i is the secrets ID
+
+;Drop shuffle changes:
+;	normal secrets stay vanilla
+
+;	major items (anything not a secret) use the bits 14 and 15 to produce different behavior
+
+;	aaaa is now a 16 bit number:
+;	imtt tttt tttt tttt
+
+;	t - is still tilemap id (aaaa & #$3FFF)
+;	i - flag indicates a major item
+;	m - indicates a multiworld item
+
+;	for major items (non multiworld), i indicates the item receipt ID
+
+;	for multi world items, i indicates the multiworld id
+;	multiworld id indexes a new table of 256 entries of 2 bytes each
+
+;	MultiWorldTable:
+;		db <item receipt ID>, <player ID>
+
+
+
+;===================================================================================================
+; Sprite items
+;===================================================================================================
+;Vanilla:
+;If this value appears in the sprite table, then the sprite that preceded it is given a key drop
+;	db $FE, $00, $E4
+
+;Drop shuffle changes:
+;	db <receipt id>, $00, $F8 ; this denotes the previous sprite is given a major item (non MW)
+
+;   db <receipt id>, <player>, $F9 ; this denotes the previous sprite is given a MW item
