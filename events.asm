@@ -178,7 +178,7 @@ RTL
 ;--------------------------------------------------------------------------------
 OnLinkDamaged:
 	JSL.l IncrementDamageTakenCounter_Arb
-	JSL.l FlipperKill
+	;JSL.l FlipperKill
 	JML.l OHKOTimer
 
 ;--------------------------------------------------------------------------------
