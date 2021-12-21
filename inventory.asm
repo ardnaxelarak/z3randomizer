@@ -717,9 +717,11 @@ RTS
 RTL
 
 .incrementBossSword
-	LDA SpecialWeapons : CMP #$01 : BNE +
-	LDA !BOMB_LEVEL : BRA ++
-	+ : LDA $7EF359
+	LDA SpecialWeapons : CMP #$01 : BEQ +
+	                     CMP #$03 : BEQ +
+	                     CMP #$04 : BEQ +
+	LDA $7EF359 : BRA ++
+	+ : LDA !WEAPON_LEVEL
 	++
 	BNE + : -
 		%TopHalf($7EF452) : RTS

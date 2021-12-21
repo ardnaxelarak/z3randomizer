@@ -2855,7 +2855,7 @@ BRA + : NOP #8 : +
 org $089EF8 ; ancilla_bomb@1438 (LDA.w #$04 : STA $0B)
 JSL SetBombSpriteColor
 ;--------------------------------------------------------------------------------
-; icons with numbers
+; bomb icons with numbers
 org $0DFC51 ; is this being used? I hope not! let's find out if anything breaks!
 db $F5, $20, $F5, $20, $F5, $20, $F5, $20
 db $B2, $3C, $B3, $3C, $C2, $3C, $17, $3C
@@ -2864,7 +2864,7 @@ db $B2, $24, $B3, $24, $C2, $24, $19, $24
 db $B2, $28, $B3, $28, $C2, $28, $1A, $28
 db $B2, $28, $B3, $28, $C2, $28, $1B, $28
 
-; icons without numbers
+; bomb icons without numbers
 org $0DFC81
 db $F5, $20, $F5, $20, $F5, $20, $F5, $20
 db $B2, $3C, $B3, $3C, $C2, $3C, $C2, $7C

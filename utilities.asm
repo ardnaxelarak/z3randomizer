@@ -159,7 +159,8 @@ RTL
 	db $2C ; Bee Trap
 	db $13, $13, $13, $13, $13, $13 ; Bomb Upgrades
 
-	db $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
+	db $07, $07, $07, $07, $07, $07 ; Cane Upgrades
+	db $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -243,7 +244,7 @@ RTL
 		+ ; Any Bow
 			LDA.b #$02 : RTL
 	++ : CMP.b #$F7 : BNE ++ ; Progressive Bombs
-		LDA !BOMB_LEVEL
+		LDA !WEAPON_LEVEL
 			CMP.b #$00 : BNE + ; No Bombs
 			LDA.b #$08 : RTL
 		+ : CMP.b #$01 : BNE + ; L1 Bombs
@@ -299,7 +300,8 @@ RTL
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Small Key
 	db $04 ; Bee Trap
 	db $08, $04, $02, $0A, $0A, $F7 ; Bomb Upgrades
-	db $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
+	db $0A, $0A, $0A, $0A, $0A, $0A ; Cane Upgrades
+	db $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
@@ -355,12 +357,12 @@ IsNarrowSprite:
 	++ CMP.b #$63 : BNE ++ ; RNG Item (Multi)
 		JSL.l GetRNGItemMulti
 	++ CMP.b #$64 : BEQ +               ; Progressive Bow
-           CMP.b #$65 : BNE .continue       ; Progressive Bow (alt)
-                + : LDA $7EF340 : INC : LSR
-                CMP.l ProgressiveBowLimit : !BLT +
+	   CMP.b #$65 : BNE .continue       ; Progressive Bow (alt)
+		+ : LDA $7EF340 : INC : LSR
+		CMP.l ProgressiveBowLimit : !BLT +
 			LDA.l ProgressiveBowReplacement
 			JSL.l IsNarrowSprite
-                        JMP .done
+			JMP .done
 	.continue
 	;--------
 

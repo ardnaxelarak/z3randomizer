@@ -76,9 +76,9 @@ JMP .done
 	PHA
 		TYA ; load bomb upgrade item
 		!SUB #$B0 ; convert to bomb level
-		CMP.l !BOMB_LEVEL : !BGE + ; skip if highest is lower (this is an upgrade)
-			LDA.l !BOMB_LEVEL : !ADD #$B0 ; convert to item id
-			TAY : PLA : LDA.l !BOMB_LEVEL ; put bomb level into the thing to write
+		CMP.l !WEAPON_LEVEL : !BGE + ; skip if highest is lower (this is an upgrade)
+			LDA.l !WEAPON_LEVEL : !ADD #$B0 ; convert to item id
+			TAY : PLA : LDA.l !WEAPON_LEVEL ; put bomb level into the thing to write
 			JMP .done
 		+
 	PLA

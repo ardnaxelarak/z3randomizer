@@ -1429,6 +1429,11 @@ db $04
 ;B4 - L-4 Bombs
 ;B5 - L-5 Bombs
 ;B6 - Progressive Bombs
+;B7 - L-1 Cane
+;B8 - L-2 Cane
+;B9 - L-3 Cane
+;BA - L-4 Cane
+;BB - L-5 Cane
 ;================================================================================
 ;;Residual Portal
 ;org $0283E0 ; PC 0x103E0 (Bank02.asm:816) (BNE)
