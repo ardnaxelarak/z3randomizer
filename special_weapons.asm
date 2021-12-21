@@ -33,11 +33,10 @@ DamageClassCalc:
 	PLA
 	BRA .impervious
 .special_cane
-	LDA !WEAPON_LEVEL
+	PLA
 	LDA $0E20, X : CMP.b #$D6 : BEQ .unstunned_ganon
 	CMP.b #$D7 : BEQ .stunned_ganon
 	CMP.b #$88 : BEQ .mothula
-	PLA
 	BRA .special_level
 .impervious
 	LDA #$FF
