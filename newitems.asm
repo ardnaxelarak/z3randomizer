@@ -46,6 +46,12 @@
 ; #$B4 - L-4 Bombs
 ; #$B5 - L-5 Bombs
 ; #$B6 - Progressive Bombs
+; #$B7 - L-1 Cane
+; #$B8 - L-2 Cane
+; #$B9 - L-3 Cane
+; #$BA - L-4 Cane
+; #$BB - L-5 Cane
+; #$BC - Progressive Cane
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
 ;--------------------------------------------------------------------------------
@@ -401,10 +407,20 @@ AddReceivedItemExpandedGetItem:
 				LDA $7EF36F : INC : STA $7EF36F
 			++
 			JMP .done
-	+ CMP.b #$B1 : !BLT + : CMP.b #$B6 : !BGE + ; Bomb Upgrades
-		LDA.l SpecialWeapons : CMP #$01 : BNE ++
+	+ CMP.b #$B1 : !BLT + : CMP.b #$B7 : !BGE + ; Bomb Upgrades
+		LDA.l SpecialWeapons : CMP #$01 : BNE .done
 			LDA #$01 : STA $7F50C9 ; infinite bombs
-		++
+			JMP .done
+	+ : CMP.b #$B7 : !BLT + : CMP.b #$BD : !BGE + ; Cane Upgrades
+		LDA.l SpecialWeapons : CMP #$03 : BEQ .blue_cane
+		                       CMP #$04 : BEQ .red_cane
+			BRA .done
+		.blue_cane
+			LDA #$01 : STA $7EF351
+			BRA .done
+		.red_cane
+			LDA #$01 : STA $7EF350
+			BRA .done
 		BRA .done
 	+
 	.done
@@ -516,7 +532,7 @@ AddReceivedItemExpanded:
 			+ : CMP.b #$00 : BNE + ; No Bow
 				LDA.b #$3A : STA $02D8 : JMP .done
 			+ ; Any Bow
-				LDA.b #$3B : STA $02D8 : BRA .done
+				LDA.b #$3B : STA $02D8 : JMP .done
 		++ : CMP.b #$65 : BNE ++ ; Progressive Bow 2
 			LDA.l !INVENTORY_SWAP_2 : ORA #$20 : STA.l !INVENTORY_SWAP_2
 			BRA --
@@ -527,13 +543,13 @@ AddReceivedItemExpanded:
 			JSL.l GetRNGItemSingle : STA $02D8
 			XBA : JSR.w MarkRNGItemSingle
 			LDA #$FF : STA !LOCK_IN ; clear lock-in
-			BRA .done
+			JMP .done
 		++ : CMP.b #$63 : BNE ++ ; RNG Item (Multi)
 			JSL.l GetRNGItemMulti : STA $02D8
 			LDA #$FF : STA !LOCK_IN ; clear lock-in
-			BRA .done
+			JMP .done
 		++ : CMP.b #$B6 : BNE ++ ; Progressive Bombs
-			LDA !BOMB_LEVEL
+			LDA !WEAPON_LEVEL
 			CMP.b #$00 : BNE + ; have no Bombs
 				LDA.b #$B1 : STA $02D8 : JMP .done
 			+ : CMP.b #$01 : BNE + ; have L-1 Bombs
@@ -544,6 +560,18 @@ AddReceivedItemExpanded:
 				LDA.b #$B4 : STA $02D8 : JMP .done
 			+ ; Everything Else
 				LDA.b #$B5 : STA $02D8 : JMP .done
+		++ : CMP.b #$BC : BNE ++ ; Progressive Cane
+			LDA !WEAPON_LEVEL
+			CMP.b #$00 : BNE + ; have no Cane
+				LDA.b #$B7 : STA $02D8 : JMP .done
+			+ : CMP.b #$01 : BNE + ; have L-1 Cane
+				LDA.b #$B8 : STA $02D8 : JMP .done
+			+ : CMP.b #$02 : BNE + ; have L-2 Cane
+				LDA.b #$B9 : STA $02D8 : JMP .done
+			+ : CMP.b #$03 : BNE + ; have L-3 Cane
+				LDA.b #$BA : STA $02D8 : JMP .done
+			+ ; Everything Else
+				LDA.b #$BB : STA $02D8 : JMP .done
 		++
 		.done
 	PLX : PLA
@@ -554,10 +582,6 @@ AddReceivedItemExpanded:
 ;--------------------------------------------------------------------------------
 ;DATA AddReceivedItemExpanded
 {
-; This is a temporary measure for Fish to have consistent addresses
-warnpc $A08800
-org $A08800
-
 .y_offsets
 	db -5, -5, -5, -5, -5, -4, -4, -5
 	db -5, -4, -4, -4, -2, -4, -4, -4
@@ -594,7 +618,8 @@ org $A08800
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Free Small Key
 	db -4 ; reserved for bee traps
 	db -4, -4, -4, -4, -4, -4 ; Bomb Upgrades
-	db -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
+	db -4, -4, -4, -4, -4, -4 ; Cane Upgrades
+	db -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
@@ -635,8 +660,9 @@ org $A08800
 	;db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; *EVENT*
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  0 ; reserved for bee traps
-	db  0, 0, 0, 0, 0, 0; Bomb Upgrades
-	db  0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
+	db  0, 0, 0, 0, 0, 0 ; Bomb Upgrades
+	db  4, 4, 4, 4, 4, 4 ; Cane Upgrades
+	db  0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
@@ -682,7 +708,8 @@ org $A08800
 	;db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; *EVENT*
 	db $49 ; reserved for bee traps
 	db $13, $13, $13, $13, $13, $13 ; Bomb Upgrades
-	db $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
+	db $07, $07, $07, $07, $07, $07 ; Cane Upgrades
+	db $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -722,8 +749,9 @@ org $A08800
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Free Big Key
 	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 ; Free Small Key
 	db $02 ; reserved for bee traps
-	db $02, $02, $02, $02, $02, $02; Bomb Upgrades
-	db $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
+	db $02, $02, $02, $02, $02, $02 ; Bomb Upgrades
+	db $00, $00, $00, $00, $00, $00 ; Cane Upgrades
+	db $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
@@ -765,7 +793,8 @@ org $A08800
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  4 ; reserved for bee traps
 	db  4, 2, 1, 5, 5, 5 ; Bomb Upgrades
-	db  4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
+	db  5, 5, 5, 5, 5, 5 ; Cane Upgrades
+	db  4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
@@ -808,7 +837,8 @@ org $A08800
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Small Key
 	dw $F36A ; reserved for bee traps
 	dw $F38F, $F38F, $F38F, $F38F, $F38F, $F38F ; Bomb Upgrades
-	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
+	dw $F38F, $F38F, $F38F, $F38F, $F38F, $F38F ; Cane Upgrades
+	dw $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
@@ -853,7 +883,8 @@ org $A08800
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Free Small Key
 	db $FF ; reserved for bee traps
 	db $01, $02, $03, $04, $05, $FF ; Bomb Upgrades
-	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
+	db $01, $02, $03, $04, $05, $FF ; Cane Upgrades
+	db $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
@@ -941,7 +972,8 @@ Link_ReceiveItemAlternatesExpanded:
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Free Small Key
 	db -1 ; reserved for bee traps
 	db -1, -1, -1, -1, -1, -1 ; Bomb Upgrades
-	db -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
+	db -1, -1, -1, -1, -1, -1 ; Cane Upgrades
+	db -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused

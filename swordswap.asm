@@ -62,6 +62,8 @@ LookupDamageLevel:
 	+
 	LDA SpecialWeapons : CMP #$01 : BEQ .bomb_table
 	                     CMP #$02 : BEQ .pseudo_table
+	                     CMP #$03 : BEQ .bomb_table
+	                     CMP #$04 : BEQ .bomb_table
 		%LookupDamageSubclass(Damage_Table) : RTL
 	.bomb_table
 		%LookupDamageSubclass(Damage_Table_Bombs) : RTL
@@ -128,10 +130,14 @@ CheckTabletSword:
 	LDA $7EF34B : BEQ + ; check for hammer
 		LDA.b #$02 : RTL
 	+
-	LDA.l SpecialWeapons : CMP #$01 : BNE +
-	LDA !BOMB_LEVEL : CMP #$02 : !BLT + ; check for master bombs
+	LDA.l SpecialWeapons : CMP #$01 : BEQ .check_special
+	LDA.l SpecialWeapons : CMP #$03 : BEQ .check_special
+	LDA.l SpecialWeapons : CMP #$04 : BEQ .check_special
+	BRA .normal
+	.check_special
+	LDA !WEAPON_LEVEL : CMP #$02 : !BLT + ; check for master bombs
 		LDA.b #$02 : RTL
-	+
+	.normal
 	LDA $7EF359 ; get actual sword value
 RTL
 ;================================================================================

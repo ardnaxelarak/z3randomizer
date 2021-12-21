@@ -148,7 +148,7 @@ SetEscapeAssist:
 	++
 
 	LDA.l SpecialWeapons : CMP #$01 : BNE +
-	LDA.l !BOMB_LEVEL : BEQ +
+	LDA.l !WEAPON_LEVEL : BEQ +
 	LDA #$01 : STA !INFINITE_BOMBS
 	+
 RTL
