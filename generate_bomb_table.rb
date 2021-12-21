@@ -9,6 +9,9 @@ def process_values(sprite, values)
   if ret[7] == 2 # hookshot
     ret[7] = 1 # still want to stun
   end
+  if [1, 2, 7].include?(ret[8]) && sprite != 0x92 # bomb and not helmasaur king
+    ret[8] = 0
+  end
   if ret[9] > 0 && sprite != 0x84 # silver bow and not red eyegore/mimic
     ret[9] = 0
   end
