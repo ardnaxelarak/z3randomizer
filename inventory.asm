@@ -548,6 +548,10 @@ AddInventory:
 	  CPY.b #$B7 : !BGE +
 		JSR .incrementBombLevel
 		JMP .done
+	+ CPY.b #$B7 : !BLT + ; Items $B7 - $BC - Cane Upgrades
+	  CPY.b #$BD : !BGE +
+		JSR .incrementCaneLevel
+		JMP .done
 	+
 	.done
 	PLP : PLX : PLA
@@ -619,6 +623,10 @@ RTS
 
 .incrementBombLevel
 	JSR .stampSword ; update "first bomb" timestamp
+RTS
+
+.incrementCaneLevel
+	JSR .stampSword ; update "first cane" timestamp
 RTS
 
 .incrementShield
@@ -720,6 +728,7 @@ RTL
 	LDA SpecialWeapons : CMP #$01 : BEQ +
 	                     CMP #$03 : BEQ +
 	                     CMP #$04 : BEQ +
+	                     CMP #$05 : BEQ +
 	LDA $7EF359 : BRA ++
 	+ : LDA !WEAPON_LEVEL
 	++

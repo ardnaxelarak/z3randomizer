@@ -106,7 +106,7 @@ db #$00 ; #$00 = Default behavior (silver arrows)
 ;--------------------------------------------------------------------------------
 org $30802F ; PC 0x18003F
 SpecialWeapons:
-db #$00 ; #$00 = Off (default) - #$01 = Bomb-Only mode - #$02 = Pseudosword mode
+db #$00 ; #$00 = Off (default) - #$01 = Bomb-Only mode - #$02 = Pseudosword mode - #$03 = Byrna-Only mode - #$04 = Somaria-Only mode - #$05 = Canes-Only mode
 ;--------------------------------------------------------------------------------
 org $308030 ; PC 0x180030
 EnableSRAMTrace:

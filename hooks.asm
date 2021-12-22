@@ -2816,6 +2816,10 @@ org $088DB1 ; Bank08.asm@1207 (PHY : PHX : TYX : ... )
 JSL Utility_CheckAncillaOverlapWithSprite
 BRA + : NOP #7 : +
 ;--------------------------------------------------------------------------------
+org $08E252 ; Bank08.asm@1770 (PHY : PHX : TYX : ... )
+JSL Utility_CheckAncillaOverlapWithSprite
+BRA + : NOP #7 : +
+;--------------------------------------------------------------------------------
 org $0882E8 ; Bank08.asm@456 (LDA $0DB0, Y : CMP.b #$03)
 JSL Utility_CheckHelmasaurKingCollision
 NOP

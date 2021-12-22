@@ -30,6 +30,7 @@ ItemDowngradeFixMain:
 	CPY.b #$29 : BEQ .isMushroom ; Mushroom
 
 	CPY.b #$B1 : !BLT + : CPY.b #$B6 : !BLT .isBombUpgrade : +
+	CPY.b #$B7 : !BLT + : CPY.b #$BC : !BLT .isCaneUpgrade : +
 
 	.done
 	STA [$00] ; thing we wrote over part 2
@@ -79,6 +80,17 @@ JMP .done
 		CMP.l !WEAPON_LEVEL : !BGE + ; skip if highest is lower (this is an upgrade)
 			LDA.l !WEAPON_LEVEL : !ADD #$B0 ; convert to item id
 			TAY : PLA : LDA.l !WEAPON_LEVEL ; put bomb level into the thing to write
+			JMP .done
+		+
+	PLA
+JMP .done
+	.isCaneUpgrade
+	PHA
+		TYA ; load cane upgrade item
+		!SUB #$B6 ; convert to cane level
+		CMP.l !WEAPON_LEVEL : !BGE + ; skip if highest is lower (this is an upgrade)
+			LDA.l !WEAPON_LEVEL : !ADD #$B6 ; convert to item id
+			TAY : PLA : LDA.l !WEAPON_LEVEL ; put cane level into the thing to write
 			JMP .done
 		+
 	PLA
