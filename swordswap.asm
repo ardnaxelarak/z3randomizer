@@ -108,23 +108,23 @@ LoadModifiedMagicLevel:
 RTL
 ;================================================================================
 ; $7E0348 - Ice Value
-; $7F50C7 - Ice Modifier
+; $7F50C7 - Temporary Ice Modifier
+; $30802D - Permanent Ice Modifier ($01 bit)
+LoadModifiedIceFloorValue:
+	LDA $A0 : CMP #$91 : BEQ + : CMP #$92 : BEQ + : CMP #$93 : BEQ + ; mire basement currently broken - not sure why
+	LDA $5D : CMP #$01 : BEQ + : CMP #$17 : BEQ + : CMP #$1C : BEQ +
+	LDA $5E : CMP #$02 : BEQ +
+	LDA $5B : BNE +
+	LDA.l $30802D : BIT #$01 : BEQ ++
+	LDA $A0 : CMP #$16 : BEQ ++ ; swamp supertile with current -- fine for temporary physics but impossible without boots for permanent
+	LDA.w $0348 : ORA $7F50C7 : ORA #$10 : RTS
+	++ : LDA.w $0348 : ORA $7F50C7 : RTS
+	+ : LDA.w $0348
+RTS
 LoadModifiedIceFloorValue_a11:
-	LDA $A0 : CMP #$91 : BEQ + : CMP #$92 : BEQ + : CMP #$93 : BEQ + ; mire basement currently broken - not sure why
-	LDA $5D : CMP #$01 : BEQ + : CMP #$17 : BEQ + : CMP #$1C : BEQ +
-	LDA $5E : CMP #$02 : BEQ +
-	LDA $5B : BNE +
-		LDA.w $0348 : ORA $7F50C7 : AND.b #$11 : RTL
-	+ : LDA.w $0348 : AND.b #$11
-RTL
+  JSR LoadModifiedIceFloorValue : AND.b #$11 : RTL
 LoadModifiedIceFloorValue_a01:
-	LDA $A0 : CMP #$91 : BEQ + : CMP #$92 : BEQ + : CMP #$93 : BEQ + ; mire basement currently broken - not sure why
-	LDA $5D : CMP #$01 : BEQ + : CMP #$17 : BEQ + : CMP #$1C : BEQ +
-	LDA $5E : CMP #$02 : BEQ +
-	LDA $5B : BNE +
-		LDA.w $0348 : ORA $7F50C7 : AND.b #$01 : RTL
-	+ : LDA.w $0348 : AND.b #$01
-RTL
+  JSR LoadModifiedIceFloorValue : AND.b #$01 : RTL
 ;================================================================================
 CheckTabletSword:
 	LDA.l AllowHammerTablets : BEQ +
