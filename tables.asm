@@ -98,7 +98,13 @@ db #$02 ; #$02 = Tempered Sword (default)
 ;org $05EBD4 ; PC 0x2EBD4 - sprite_zelda.asm:23 - (LDA $7EF359 : CMP.b #$02 : BCS .hasMasterSword) - Zelda Spawnpoint Sword Check
 ;db #$05 ; #$02 = Tempered Sword (default) - #$05 = All Swords
 ;--------------------------------------------------------------------------------
-; 0x18002B- 0x18002D (Unused)
+; 0x18002B- 0x18002C (Unused)
+;--------------------------------------------------------------------------------
+org $30802D ; PC 0x18003D
+ChallengeModes:
+; ---- ---i
+; i: Permanent Ice Physics
+db #$00 ; #$00 = Default behavior;
 ;--------------------------------------------------------------------------------
 org $30802E ; PC 0x18003E
 GanonVulnerabilityItem:
