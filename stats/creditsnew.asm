@@ -511,11 +511,15 @@ CreditsLineBlank:
 
 %blankline()
 
-%bigcredits("ACHY    ARTHEAU    TARTHORON")
+%bigcredits("ACHY                 ARTHEAU")
 
 %blankline()
 
-%bigcredits("GLAN    PLAGUEDONE   TWROXAS")
+%bigcredits("GLAN                 TWROXAS")
+
+%blankline()
+
+%bigcredits("PLAGUEDONE         TARTHORON")
 
 %blankline()
 %blankline()
@@ -571,11 +575,15 @@ CreditsLineBlank:
 
 %blankline()
 
-%bigcredits("MICHAELK    FOUTON     BONTA")
+%bigcredits("MICHAELK              FOUTON")
 
 %blankline()
 
-%bigcredits("EMOSARU        SAKURATSUBASA")
+%bigcredits("BONTA                EMOSARU")
+
+%blankline()
+
+%bigcredits("SAKURATSUBASA")
 
 %blankline()
 
@@ -596,12 +604,6 @@ CreditsLineBlank:
 
 %blankline()
 
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
 %emptyline()
 %emptyline()
 %emptyline()
