@@ -9,7 +9,6 @@ SprSIChar = $7E07F0 ; standing item character for draw routine
 
 ;===================================================================================================
 
-org somewhere ; todo
 
 SpriteDraw_DynamicStandingItem:
 	JSL Sprite_PrepOAMCoord_long ; 06E41C

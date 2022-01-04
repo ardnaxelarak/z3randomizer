@@ -7,7 +7,8 @@ DrawDungeonCompassCounts:
 	LDX $040C : CPX.b #$FF : BEQ .done ; Skip if not in a dungeon
 
 	CMP.w #$0002 : BEQ ++ ; if CompassMode==2, we don't check for the compass
-		LDA $7EF364 : AND.l DungeonItemMasks, X ; Load compass values to A, mask with dungeon item masks
+		TXY : TXA : LSR : TAX : LDA.l ExistsTransfer, X : TAX : LDA CompassExists, X : BEQ ++
+		TYX : LDA $7EF364 : AND.l DungeonItemMasks, X ; Load compass values to A, mask with dungeon item masks
 		BEQ .done ; skip if we don't have compass
 	++
 
@@ -39,6 +40,10 @@ RTL
 DungeonItemMasks: ; these are dungeon correlations to $7EF364 - $7EF369 so it knows where to store compasses, etc
     dw $8000, $4000, $2000, $1000, $0800, $0400, $0200, $0100
     dw $0080, $0040, $0020, $0010, $0008, $0004
+
+; maps from $040C to the odd order used in overworld map
+ExistsTransfer:
+db $0C, $0C, $00, $02, $0B, $09, $03, $07, $04, $08, $01, $06, $05, $0A
 
 ;--------------------------------------------------------------------------------
 ; $7EF4C0-7EF4CF - item locations checked indexed by $040C >> 1

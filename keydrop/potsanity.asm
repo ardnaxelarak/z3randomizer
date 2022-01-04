@@ -49,14 +49,14 @@ SpawnedItemIndex = $7E0722 ; 0x02
 SpawnedItemIsMultiWorld = $7E0724 ; 0x02
 SpawnedItemFlag = $7E0726 ; 0x02 - one for pot, 2 for sprite drop
 SpawnedItemMWPlayer = $7E0728 ; 0x02
-; todo : clear these for any sprite that spawns, maybe should clear all of them in a loop during room load
+; clear all of them in a loop during room load
 SprDropsItem = $7E0730 ; 0x16
 SprItemReceipt = $7E0740 ; 0x16
 SprItemIndex = $7E0750
 SprItemMWPlayer = $7E0760 ; 0x16
 SprItemFlags = $7E0770 ; 0x16 (used for both pots and drops) (combine with SprDropsItem?)
 
-; 70:0600-70:084F ($250 or 592 bytes) for pots and 70:0850-70:0A9F ($250 or 592 bytes) for sprites
+; 7F:6600-7F:684F ($250 or 592 bytes) for pots and 7F:6850-7F:6A9F ($250 or 592 bytes) for sprites
 
 PotItemSRAM = $7F6600
 SpriteItemSRAM = $7F6850
@@ -94,7 +94,7 @@ UWPotsData:
 org $A8A800
 ;tables:
 PotMultiWorldTable:
-; Reserve $250 296 * 2
+; Reserved $250 296 * 2
 
 org $A8AA50
 ShuffleKeyDrops: ; 142A50  # todo : combine these flags?
@@ -251,6 +251,7 @@ ShouldSpawnItem:
 		LDA.w SpawnedItemIndex : STA SprItemIndex, X
 		LDA.w SpawnedItemFlag : STA SprItemFlags, X
 		LDA.w SpawnedItemMWPlayer : STA SprItemMWPlayer, X
+		; todo: RequestStandingItemVRAMSlot instead? - need to see how often this is called
 		LDA #$00 : RTL
 	.normal
 	LDA.w $0403
@@ -282,7 +283,7 @@ SpriteKeyPrep:
 			LDA $A0 : CMP.b #$80 : BNE +
 			LDA SpawnedItemFlag : BNE +
 				LDA #$24  ; it's the big key drop?
-		++ JSL PrepDynamicTile  ; todo: RequestStandingItemVRAMSlot instead?
+		++ JSL PrepDynamicTile  ; todo: remove in favor of RequestStandingItemVRAMSlot
 	+ PLA
 	RTL
 
