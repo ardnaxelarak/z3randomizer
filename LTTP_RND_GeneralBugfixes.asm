@@ -28,6 +28,15 @@ org $1FFFF8 ; <- FFFF8 timestamp rom
 db #$20, #$19, #$08, #$31 ; year/month/day
 
 ;================================================================================
+!ROM_VERSION_LOW ?= 1  ; ROM version (two 16-bit integers)
+!ROM_VERSION_HIGH ?= 1 ;
+
+org $00FFE0 ; Unused hardware vector
+RomVersion:
+dw !ROM_VERSION_LOW
+dw !ROM_VERSION_HIGH
+
+;================================================================================
 
 !ADD = "CLC : ADC"
 !SUB = "SEC : SBC"
@@ -360,8 +369,7 @@ warnpc $B08000
 ;$31 Graphics Bank
 ;$32 Text Bank
 ;$33 Graphics Bank
-;$37 Don't Use ZSNES Graphics
-;$38 Don't Use ZSNES Graphics (continued)
+;$36 reserved for Enemizer
 ;$3A reserved for downstream use
 ;$3B reserved for downstream use
 ;$3F reserved for internal debugging
