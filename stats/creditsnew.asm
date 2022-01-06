@@ -537,7 +537,11 @@ CreditsLineBlank:
 
 %blankline()
 
-%bigcredits("EMOSARU        SAKURATSUBASA")
+%bigcredits("PINKUS              YUZUHARA")
+
+%blankline()
+
+%bigcredits("SAKURATSUBASA")
 
 %blankline()
 
@@ -558,9 +562,6 @@ CreditsLineBlank:
 
 %blankline()
 
-%emptyline()
-%emptyline()
-%emptyline()
 %emptyline()
 %emptyline()
 %emptyline()

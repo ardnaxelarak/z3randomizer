@@ -2319,6 +2319,9 @@ JSL.l OnLinkDamagedFromPit
 org $01FFE7 ; <- FFE7 - Bank01.asm:16375 (LDA $7EF36D)
 JSL.l OnLinkDamagedFromPitOutdoors
 ;--------------------------------------------------------------------------------
+;org $078F27 ; <- 38F27
+;JSL.l FlipperReset
+;--------------------------------------------------------------------------------
 org $02B468
 dw FakeFlipperProtection
 
@@ -2331,11 +2334,8 @@ FakeFlipperProtection:
 org $02B46C ; <- bank_02.asm:9722 (STZ.b $00 : STZ.b $02)
 JSL FlipperScrollWarp
 ;--------------------------------------------------------------------------------
-;org $078F27 ; <- 38F27
-;JSL.l FlipperReset
-;--------------------------------------------------------------------------------
-org $09F40B ; <- 4F40B - module_death.asm:222 (LDX.b #$00)
-JSL.l IgnoreFairyCheck
+;org $09F40B ; <- 4F40B - module_death.asm:222 (LDX.b #$00)
+;JSL.l IgnoreFairyCheck
 ;--------------------------------------------------------------------------------
 org $078F51 ; <- 38F51 - Bank07.asm:2444 (JSR $AE54 ; $3AE54 IN ROM)
 JSL.l OnEnterWater : NOP
@@ -2606,13 +2606,13 @@ org $0DA9C8 ; <- 06A9C8 - player_oam.asm: 1663 (AND.w #$00FF : CMP.w #$00F8 : BC
 LDA $02 ; always zero! (this replaces the BCC)
 ADC.w #0000 ; put the carry bit into the accumulator instead of a hardcoded 1.
 ;-------------------------------------------------------------------------------
-org $02fd6f ; <- 017d6f - bank0E.asm: 3694 (LoadActualGearPalettes:) Note: Overflow of bank02 moved to 0e in US Rom
+org $02FD6F ; <- 017d6f - bank0E.asm: 3694 (LoadActualGearPalettes:) Note: Overflow of bank02 moved to 0e in US Rom
 JSL LoadActualGearPalettesWithGloves
 RTL
 ;--------------------------------------------------------------------------------
 ; Bunny Palette/Overworld Map Bugfix
 ;--------------------------------------------------------------------------------
-org $02fdf0 ; <- 017df0 - bank0E (LDA [$00] : STA $7EC300, X : STA $7EC500, X)
+org $02FDF0 ; <- 017df0 - bank0E (LDA [$00] : STA $7EC300, X : STA $7EC500, X)
 JSL LoadGearPalette_safe_for_bunny
 RTS
 ;================================================================================
