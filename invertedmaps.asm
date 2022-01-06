@@ -212,29 +212,58 @@ RTS
 
 map007:
 {
-LDA #$021B : STA $259E
-STA $25A2
-STA $25A4
-STA $261C
-STA $2626
-STA $269A
-STA $26A8
-STA $271A
-STA $2728
-STA $279A
-STA $27A8
-STA $281E
-STA $2820
-STA $2822
-STA $2824
-STA $2828
-STA $289C
-STA $28A6
-STA $291E
-STA $2924
-LDA #$0134 : STA $269E
-STA $26A4
-LDA #$0034 : STA $2826
+; hammerpeg barrier
+; LDA #$021B : STA $259E
+; STA $25A2
+; STA $25A4
+; STA $261C
+; STA $2626
+; STA $269A
+; STA $26A8
+; STA $271A
+; STA $2728
+; STA $279A
+; STA $27A8
+; STA $281E
+; STA $2820
+; STA $2822
+; STA $2824
+; STA $2828
+; STA $289C
+; STA $28A6
+; STA $291E
+; STA $2924
+; LDA #$0134 : STA $269E
+; STA $26A4
+; LDA #$0034 : STA $2826
+
+; ledge barrier
+LDA #$0163 : STA $251C : STA $259A : STA $2618
+LDA #$0152 : STA $251E : STA $2520 : STA $2522 : STA $2524 : STA $2A1E : STA $2A24
+LDA #$01F2 : STA $2526 : STA $25A8 : STA $262A
+LDA #$011C : STA $259C : STA $261A
+LDA #$011D : STA $259E : STA $25A0 : STA $25A2 : STA $25A4
+LDA #$011E : STA $25A6 : STA $2628
+LDA #$0125 : STA $261C : STA $269A
+LDA #$021B : STA $2620
+LDA #$0126 : STA $2626 : STA $26A8
+LDA #$0124 : STA $2698 : STA $2718 : STA $2798 : STA $2818 : STA $2898
+LDA #$0127 : STA $26AA : STA $272A : STA $27AA : STA $282A : STA $28AA
+LDA #$0139 : STA $289A : STA $291C
+LDA #$014B : STA $28A8 : STA $2926
+LDA #$0161 : STA $2918 : STA $299A : STA $2A1C
+LDA #$0141 : STA $291A : STA $299C
+LDA #$014F : STA $2928 : STA $29A6
+LDA #$0150 : STA $292A : STA $29A8 : STA $2A26
+LDA #$014E : STA $299E : STA $29A4
+
+; remove ladder
+LDA $7EF287 : CMP.w #$0010 : BNE .ladder
+RTS
+.ladder
+LDA #$014E : STA $29A0 : STA $29A2
+LDA #$0152 : STA $2A20 : STA $2A22
+LDA #$00E3 : STA $2AA0 : STA $2AA2
 RTS
 }
 
@@ -1015,8 +1044,7 @@ LDA #$0398 : STA $25A0
 LDA #$0522 : STA $25A2
 LDA #$0125 : STA $2620
 LDA #$0126 : STA $2622
-LDA #$0239 : STA $269E
-STA $26A4
+LDA #$0239 : STA $269E : STA $26A4
 
 RTS
 }
@@ -1289,4 +1317,29 @@ LDA.l OWTileMapAlt+$7F : AND #$0003 : CMP #$0003 : BNE +
     LDA #$0773 : STA $2CA4
 .return
 RTS
+}
+
+Overworld_InvertedTRPuzzle:
+{
+    SEP #$20 : PHB
+    LDA.l OWTileMapAlt+07 : BNE .inverted
+        LDA.b #$7E : PHA : PLB ; Set the data bank to $7E
+        REP #$30
+        LDA.w #$0212 : LDX.w #$0720 : STA.l $2000,X ; what we wrote over
+        JSL.l Overworld_MemorizeMap16Change : JSL.l Overworld_DrawPersistentMap16+4 ; what we wrote over
+        SEP #$20 : PLB : REP #$30
+        RTL
+
+    .inverted
+    LDA.b #$A4 : PHA : PLB ; Set the data bank to $7E
+    REP #$30
+    ; removes barriers from TR Peg Puzzle Ledge
+    LDA.w #$0180 : LDX.w #$09A0 : JSL.l Overworld_DrawPersistentMap16
+    LDA.w #$0181 : LDX.w #$09A2 : JSL.l Overworld_DrawPersistentMap16
+    LDA.w #$0184 : LDX.w #$0A20 : JSL.l Overworld_DrawPersistentMap16
+    LDA.w #$0184 : LDX.w #$0AA0 : JSL.l Overworld_DrawPersistentMap16
+    LDA.w #$0185 : LDX.w #$0A22 : JSL.l Overworld_DrawPersistentMap16
+    LDA.w #$0185 : LDX.w #$0AA2 : JSL.l Overworld_DrawPersistentMap16
+    SEP #$20 : PLB : REP #$30
+    RTL
 }

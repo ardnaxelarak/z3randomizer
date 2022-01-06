@@ -526,6 +526,9 @@ LoadGearPalettes_variable:
 org $02FEAB
 Filter_Majorly_Whiten_Color:
 
+org $04E780
+Overworld_MemorizeMap16Change:
+
 org $05A51D
 Sprite_SpawnFallingItem:
 

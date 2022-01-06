@@ -427,8 +427,12 @@ org $02EC8D ; <- bank02.asm : 11981 (LDA.w #$020F : LDX $8A : CPX.w #$0033 : BNE
 JSL HardcodedRocks
 NOP #19 ;23 bytes removed with the JSL
 ;--------------------------------------------------------------------------------
-org $04E7AE ; <- bank0E.asm : 4230 (LDA $7EF287 : AND.w #$0020)
-JSL.l TurtleRockPegSolved
+;org $04E7AE ; <- bank0E.asm : 4230 (LDA $7EF287 : AND.w #$0020)
+;JSL.l TurtleRockPegSolved
+;--------------------------------------------------------------------------------
+org $1BCAA1 ; <- bank_1B.asm (LDA.w #$0212 : LDX.w #$0720 : STA.l $7E2000,X : JSL : JSL)
+JSL.l Overworld_InvertedTRPuzzle
+BRA + : NOP #12 : +
 
 org $04E7B9 ; <- bank0E.asm : 4237 (LDX $04C8)
 JMP.w TurtleRockTrollPegs
