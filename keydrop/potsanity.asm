@@ -31,7 +31,13 @@ org $06d18d ; <- 3518D - sprite_absorbable.asm : 274 (LDA $7EF36F : INC A : STA 
 	JSL KeyGet
 
 org $06f9f3 ; bank06.asm : 6732 (JSL Sprite_LoadProperties)
-	JSL LoadProperties_PreserveItemMaybe
+	JSL LoadProperties_PreserveCertainProps
+
+org $008BAA ; NMI hook
+	JSL TransferPotGFX
+
+org $06828A
+	JSL CheckSprite_Spawn
 
 
 ; refs to other functions
@@ -214,7 +220,8 @@ RevealSpriteDrop:
 		LDA #$02 : STA.l SpawnedItemFlag
 		STX SpawnedItemIndex
 		LDA.l SprItemReceipt, X : STA SpawnedItemID
-		LDA.b #$01 : STA $0CBA, X : RTL ; trigger the small key routines
+		LDA.b #$01 : STA $0CBA, X ; trigger the small key routines
+		LDA.b #$09 : STA $0DD0, X : RTL ; unstun if stunned
 	.normal
 	LDA.w $0CBA, X : BNE .no_forced_drop
 		RTL
@@ -233,25 +240,22 @@ db $40, $20
 ; Runs during Sprite_E4_SmallKey and duning Sprite_E5_BigKey spawns
 ShouldSpawnItem:
 	LDA.l StandingItemsOn : BEQ .normal
-		; todo: check our sram table
+		; checking our sram table
 		PHX : PHY
 			REP #$30
 			LDA.b $A0 : ASL : TAY
-			LDA.l SpawnedItemIndex : ASL
-			TAX : LDA.l BitFieldMasks, X : STA $00
-			TYX
-			LDA.w SpawnedItemFlag : CMP #$0001 : BEQ +
-				LDA.l SpriteItemSRAM, X : BIT $00 : BEQ .notObtained
+			LDA.w SprItemIndex, X : AND #$00FF : ASL
+			PHX
+				TAX : LDA.l BitFieldMasks, X : STA $00
+			PLX ; restore X again
+			LDA.w SprItemFlags, X : AND #$00FF : CMP #$0001 : BEQ +
+				TYX : LDA.l SpriteItemSRAM, X : BIT $00 : BEQ .notObtained
 				BRA .obtained
-			+ LDA.l PotItemSRAM, X : BIT $00 : BEQ .notObtained
+			+ TYX : LDA.l PotItemSRAM, X : BIT $00 : BEQ .notObtained
 				.obtained
 				SEP #$30 : PLY : PLX : LDA #$01 : RTL ; already obtained
 		.notObtained
 		SEP #$30 : PLY : PLX
-		LDA.w SpawnedItemIndex : STA SprItemIndex, X
-		LDA.w SpawnedItemFlag : STA SprItemFlags, X
-		LDA.w SpawnedItemMWPlayer : STA SprItemMWPlayer, X
-		; todo: RequestStandingItemVRAMSlot instead? - need to see how often this is called
 		LDA #$00 : RTL
 	.normal
 	LDA.w $0403
@@ -277,13 +281,18 @@ MarkSRAMForItem:
 SpriteKeyPrep:
 	LDA.w $0B9B : STA.w $0CBA, X ; what we wrote over
 	PHA
-		LDA.l SpawnedItemFlag : BEQ +
+		LDA.w SpawnedItemIndex : STA SprItemIndex, X
+		LDA.w SpawnedItemMWPlayer : STA SprItemMWPlayer, X
+		LDA.w SpawnedItemFlag : STA SprItemFlags, X : BEQ +
 		LDA.l SpawnedItemID : STA $0E80, X
-		CMP #$24 : BNE ++ ; todo: check how the big key drop flows through this
+		PHA
+			JSL.l GetSpritePalette : STA $0F50, X ; setup the palette
+		PLA
+		CMP #$24 : BNE ++ ;
 			LDA $A0 : CMP.b #$80 : BNE +
 			LDA SpawnedItemFlag : BNE +
 				LDA #$24  ; it's the big key drop?
-		++ JSL PrepDynamicTile  ; todo: remove in favor of RequestStandingItemVRAMSlot
+		++ JSL RequestStandingItemVRAMSlot
 	+ PLA
 	RTL
 
@@ -301,8 +310,7 @@ SpriteKeyDrawGFX:
 		   JML Sprite_DrawAbsorbable
 		   .jslrtsreturn
 		   RTL
-	; todo : SpriteDraw_DynamicStandingItem here?
-    + JSL DrawDynamicTile ; see DrawHeartPieceGFX if problems
+	+ JSL DrawPotItem
     CMP #$03 : BNE +
         PHA : LDA $0E60, X : ORA.b #$20 : STA $0E60, X : PLA
     + JSL.l Sprite_DrawShadowLong
@@ -357,11 +365,29 @@ BigKeyGet:
 		CLC : RTL
 	+ SEC : RTL
 
-LoadProperties_PreserveItemMaybe:
+LoadProperties_PreserveCertainProps:
+	LDA.l StandingItemsOn : BNE +
+		JML Sprite_LoadProperties
+	+ LDA $0F50, X : PHA
     LDA $0E80, X : PHA
     JSL Sprite_LoadProperties
-    PLA : STA $0e80, X
+    PLA : STA $0E80, X
+    PLA : STA $0F50, X
     RTL
+
+CheckSprite_Spawn:
+	JSL Sprite_SpawnDynamically
+	BMI .check
+RTL
+.check
+	PHA
+		LDA $0D : CMP #$08 : BNE +
+			LDA.b #$3C ; SFX2_3C - error beep
+			STA.w $012E
+	+ PLA
+RTL
+
+incsrc dynamic_si_vram.asm
 
 ;===================================================================================================
 ; Pot items

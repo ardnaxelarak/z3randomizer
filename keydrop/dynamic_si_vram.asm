@@ -1,180 +1,173 @@
+; where we shove the decompressed graphics to send to WRAM
+DynamicDropGFX = $7EF500
 
-StandItemGFXIDs = $7E07E0 ; 0x8 bytes for IDs
-StandingItemTransferGFX = $7E07E8 ; bit field for item transfers
-SICharRecID = $7E07E9 ; ID of receipt item for temp use
-SICharSource = $7E07EA ; source address of the sprite's graphics
-SIVRAMAddr = $7E07ED ; VRAM address to write the next slot to
-SIVRAMSlot = $7E07EF ; current vram slot to ask for
-SprSIChar = $7E07F0 ; standing item character for draw routine
+; this will just count from 0 to 4 to determine which slot we're using
+; we're expecting 5 items max per room, and order is irrelevant
+; we just need to keep track of where they go
+DynamicDropGFXIndex = $7E1E70
 
-;===================================================================================================
+; this will keep track of the above for each item
+SprItemGFX = $7E0780
 
+; this is the item requested and a flag
+DynamicDropRequest = $7E1E71
+DynamicDropQueue = $7E1E72
 
-SpriteDraw_DynamicStandingItem:
-	JSL Sprite_PrepOAMCoord_long ; 06E41C
-
-	LDA.b $00 : STA.b ($90),Y
-
-	LDA.b $01 : CMP.b #$01
-	LDA.b #$01 : ROL : STA.b ($92)
-
-	INY
-
-	REP #$21
-
-	LDA.b $02 : ADC.w #$0010
-	CMP.w #$0100
-
-	SEP #$20 : BCS .off_screen
-
-	SBC.b #$0F : STA.b ($90),Y
-
-	INY
-
-	LDA.w SprDropsItem,X : STA.b ($90),Y
-
-	INY
-
-	LDA.b $05 : STA.b ($90),Y
-
-.off_screen
-	JML SpriteDraw_Shadow_long ; 06DC5C
-
-; Call from standing/dropped items to request a free slot in VRAM in underworld
-; Enter with
-;   A = receipt ID
-;   X = sprite slot
+; Come in with
+;   A = item receipt ID
+;   X = slot
 RequestStandingItemVRAMSlot:
-	JSR SetSISource
-	JSR GetSIVRAMSlot
-	RTL
+	STA.w DynamicDropQueue
+	LDA.b #$01
+	STA.w DynamicDropRequest
 
-; Take 8-bit receipt ID and turn it into a 24-bit source graphics address
-; how we use this is TBD
-; we could set up a buffer of 8 24-bit addresses to reference during NMI
-; and we may or may not do decompression from here
-SetSISource:
-	STA.w SICharRecID
-	PHX ; make sure X is preserved during this
-
-	PLX
-	STA.w SICharSource+1
-	STY.w SICharSource+2 ; don't need to use Y, but just as an example
-
-	RTS
-
-GetSIVRAMSlot:
-	SEP #$30
-
-	PHX
-
-	LDA.w SIVRAMSlot : TAX
-
+	LDA.w DynamicDropGFXIndex
 	INC
-	CMP.b #$07 : BCC .fine
+	CMP.b #$05 : BCC .fine
 
 	LDA.b #$00
 
 .fine
-	STA.w SIVRAMSlot
+	STA.w DynamicDropGFXIndex
+	STA.w SprItemGFX,X
 
-	; flag this slot for a transfer
-	LDA.l .eightbits,X
-	ORA.l StandingItemTransferGFX
-	STA.l StandingItemTransferGFX
 
-	; set grapgics ID to look up for NMI transfer
-	LDA.w SICharRecID
-	STA.w StandItemGFXIDs,X
+	; decompress graphics
+	PHX
+	LDX.w DynamicDropQueue
 
-	LDA.l .char,X
+	REP #$20
+	LDA.w #DynamicDropGFX-$7E9000
+	STA.l !TILE_UPLOAD_OFFSET_OVERRIDE
+	SEP #$20
+
+	LDA.w DynamicDropQueue
+	JSL.l GetSpriteID
+	JSL.l GetAnimatedSpriteTile_variable
+
+	SEP #$30
 	PLX
 
-	STA.w SprSIChar,X
+	RTL
 
-	RTS
-
-
-
-.char
-	db $20
-	db $22
-	db $2C
-	db $CB
-	db $E0
-	db $E5
-	db $EE
-
-.eightbits
-	db 1<<0
-	db 1<<1
-	db 1<<2
-	db 1<<3
-	db 1<<4
-	db 1<<5
-	db 1<<6
-	db 1<<7
 
 ;===================================================================================================
 
-NMI_TransferSIGFX:
-	LDA.l StandingItemTransferGFX
-	BEQ .exit
-
+TransferPotGFX:
+	SEP #$10
 	REP #$20
-	AND.w #$00FF
-	STA.b $00
+	LDX.w DynamicDropRequest
+	BEQ .no
 
-	LDY.b #$80 : STY.w $2115
+	STZ.w DynamicDropRequest
 
-	LDX.b #$00
+	LDA.w DynamicDropGFXIndex
+	ASL
+	TAX
+	LDA.l FreeUWGraphics,X
+	STA.w $2116
 
-.next
-	LSR.b $00 : BEQ .done : BCC .skip
+	; calculate bottom row now
+	CLC : ADC.w #$0200>>1 : PHA
 
-	PHX
+	LDX.b #$7E : STX.w $4314
+	LDA.w #DynamicDropGFX : STA.w $4302
 
-	TXY
-	TXA : ASL : TAX
+	LDX.b #$80 : STX.w $2115
+	LDA.w #$1801 : STA.w $4300
 
-	LDA.l .addr,X : STA.w $2116
+	LDA.w #$0040 : STA.w $4305
+	LDY.b #$01
 
-	; get source address based on ID
-	LDA.w StandItemGFXIDs,Y
-	; code
-	STA.b $04 ; source address
-	STY.w $4344 ; source bank
+	STY.w $420B
+	STA.w $4305
 
-	LDY.b #$10 ; DMA trigger
-
-	STA.w $4342 ; save address
-	LDA.w #$1801 : STA.w $4340 ; DMA type
-	LDA.w #64 : STA.w $4345 ; DMA size
+	PLA
+	STA.w $2116
 	STY.w $420B
 
-	STA.w $4345 ; DMA size again
-	CLC
-	LDA.b $04 : ADC.w #$0200 : STA.w $4344 ; assuming we've got things in squares in ROM
-	STY.w $420B
-
-	PLX
-
-.skip
-	INX
-	BRA .next
-
-
-.done
-	SEP #$20
-
-.exit
+.no
 	RTL
 
-.addr
+
+FreeUWGraphics:
 	dw $8800>>1
 	dw $8840>>1
 	dw $8980>>1
 	dw $9960>>1
-	dw $9C00>>1
-	dw $9CA0>>1
 	dw $9DC0>>1
+
+
+;===================================================================================================
+
+DrawPotItem:
+
+	JSL.l IsNarrowSprite : BCS .narrow
+
+	.full
+	LDA.b #$01 : STA $06
+	LDA #$0C : JSL.l OAM_AllocateFromRegionC
+	LDA #$02 : PHA
+		REP #$20
+		LDA.w #DynamicOAMTile_full
+	BRA .draw
+
+	.narrow
+	LDA.b #$02 : STA $06
+	LDA #$10 : JSL.l OAM_AllocateFromRegionC
+	LDA #$03 : PHA
+		 REP #$20
+		 LDA.w #DynamicOAMTile_thin
+    .draw
+	PHB : PHK : PLB
+
+	STA.b $08
+	LDA.w SprItemGFX,X
+	AND.w #$00FF
+	ASL : ASL : ASL : ASL
+	ADC.b $08
+	STA.b $08
+	SEP #$20
+	STZ.b $07
+
+	JSL Sprite_DrawMultiple_quantity_preset
+
+	LDA.b $90 : CLC : ADC.b #$08 : STA.b $90
+	INC.b $92
+	INC.b $92
+
+	PLB
+	PLA
+	RTL
+
+DynamicOAMTile_thin:
+	dw 0, 0 : db $40, $00, $20, $00
+	dw 0, 8 : db $50, $00, $20, $00
+
+	dw 0, 0 : db $42, $00, $20, $00
+	dw 0, 8 : db $52, $00, $20, $00
+
+	dw 0, 0 : db $4C, $00, $20, $00
+	dw 0, 8 : db $5C, $00, $20, $00
+
+	dw 0, 0 : db $CB, $00, $20, $00
+	dw 0, 8 : db $DB, $00, $20, $00
+
+	dw 0, 0 : db $EE, $00, $20, $00
+	dw 0, 8 : db $FE, $00, $20, $00
+
+DynamicOAMTile_full:
+	dw -4, -1 : db $40, $00, $20, $02
+	dd 0, 0
+
+	dw -4, -1 : db $42, $00, $20, $02
+	dd 0, 0
+
+	dw -4, -1 : db $4C, $00, $20, $02
+	dd 0, 0
+
+	dw -4, -1 : db $CB, $00, $20, $02
+	dd 0, 0
+
+	dw -4, -1 : db $EE, $00, $20, $02
+	dd 0, 0
