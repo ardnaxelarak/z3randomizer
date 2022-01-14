@@ -154,13 +154,19 @@ OnNewFile:
 			LDA.b #$80 : STA $7EF093 ; open skull woods curtain
 		+
 
-		LDA.l PreopenPyramid : BEQ +
-			LDA.b #$20 : STA $7EF2DB ; pyramid hole already open
-		+
+		LDX.b #$7f : - ; copy over starting overworld event data
+			LDA StartingOverworldEvents, X : STA $7EF280, X
+			DEX
+		BPL -
 
-		LDA.l PreopenGanonsTower : BEQ +
-			LDA.b #$20 : STA $7EF2C3 ; Ganons Tower already open
-		+
+		; below (indented) is obsoleted by StartingOverworldEvents table copy above
+			LDA.l PreopenPyramid : BEQ +
+				LDA.b #$20 : STA $7EF2DB ; pyramid hole already open
+			+
+
+			LDA.l PreopenGanonsTower : BEQ +
+				LDA.b #$20 : STA $7EF2C3 ; Ganons Tower already open
+			+
 
 		LDA StartingSword : STA $7EF359 ; set starting sword type
 
