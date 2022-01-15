@@ -80,7 +80,7 @@ dw return, return, return, map067, return, map069, return, map071
     ;72      73      74      75      76      77      78      79
 dw return, return, return, return, return, return, return, return
     ;80      81      82      83      84      85      86      87
-dw map080, return, return, return, map084, return, return, return
+dw map080, return, return, return, return, return, return, return
     ;88      89      90      91      92      93      94      95
 dw return, return, map090, map091, return, return, return, return
     ;96      97      98      99     100     101     102     103
@@ -1061,17 +1061,7 @@ LDA #$020F : STA $2B2E
 RTS
 }
 
-map084:
 {
-LDA #$02F3 : STA $2422
-STA $2424
-LDA #$00C9 : STA $24A2
-STA $24A4
-LDA #$00E3 : STA $2522
-STA $2524
-RTS
-}
-
 map090:
 {
 LDA.l OWTileMapAlt+$5A : AND #$0002 : BEQ .return
