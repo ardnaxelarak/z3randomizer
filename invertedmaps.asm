@@ -255,13 +255,12 @@ LDA #$0161 : STA $2918 : STA $299A : STA $2A1C
 LDA #$0141 : STA $291A : STA $299C
 LDA #$014F : STA $2928 : STA $29A6
 LDA #$0150 : STA $292A : STA $29A8 : STA $2A26
-LDA #$014E : STA $299E : STA $29A4
+LDA #$014E : STA $299E : STA $29A0 : STA $29A2 : STA $29A4
 
 ; remove ladder
 LDA $7EF287 : CMP.w #$0010 : BNE .ladder
 RTS
 .ladder
-LDA #$014E : STA $29A0 : STA $29A2
 LDA #$0152 : STA $2A20 : STA $2A22
 LDA #$00E3 : STA $2AA0 : STA $2AA2
 RTS
@@ -1335,8 +1334,6 @@ Overworld_InvertedTRPuzzle:
     LDA.b #$A4 : PHA : PLB ; Set the data bank to $7E
     REP #$30
     ; removes barriers from TR Peg Puzzle Ledge
-    LDA.w #$0180 : LDX.w #$09A0 : JSL.l Overworld_DrawPersistentMap16
-    LDA.w #$0181 : LDX.w #$09A2 : JSL.l Overworld_DrawPersistentMap16
     LDA.w #$0184 : LDX.w #$0A20 : JSL.l Overworld_DrawPersistentMap16
     LDA.w #$0184 : LDX.w #$0AA0 : JSL.l Overworld_DrawPersistentMap16
     LDA.w #$0185 : LDX.w #$0A22 : JSL.l Overworld_DrawPersistentMap16
