@@ -1023,12 +1023,13 @@ RTS
 map067:
 {
 LDA.l OWTileMapAlt+$43 : AND #$0001 : BEQ .owshuffle
-    LDA #$0180 : STA $275E ; ladder
-    LDA #$0181 : STA $2760
-    LDA #$0184 : STA $27DE
-    STA $285E
-    LDA #$0185 : STA $27E0
-    STA $2860
+    ; ladder
+    ; LDA #$0180 : STA $275E
+    ; LDA #$0181 : STA $2760
+    ; LDA #$0184 : STA $27DE
+    ; STA $285E
+    ; LDA #$0185 : STA $27E0
+    ; STA $2860
     LDA #$0212 : STA $2BE0 ; portal
 .owshuffle
 LDA.l OWTileMapAlt+$43 : AND #$0002 : BEQ .return
