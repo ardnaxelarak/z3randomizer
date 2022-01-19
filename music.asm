@@ -209,7 +209,7 @@ Underworld_DoorDown_Entry:
 ; This is for changing to/from ToH dungeon/boss music
 ;
 ; A=16bit XY=8bit
-Hera_Boss_Defeated:
+CheckHeraBossDefeated:
 LDA $7EF00F : AND.w #$00FF : BEQ +
     SEC : RTL
 + CLC : RTL
