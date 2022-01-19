@@ -1915,15 +1915,11 @@ NOP #8
 ;org $0AC012 ; <- 54012 - Bank0A.asm:1039 - (LDA $7EF2DB)
 ;JSL.l OnLoadMap
 ;================================================================================
-org $028B8F ; <- 10B8F - Bank02.asm:2236 (LDA $7EF374 : LSR A : BCS BRANCH_BETA)
-LDA $7EF00F : BNE + : NOP
-LDX.b #$F1 : STX $012C
-+
+org $028B8F ; <- 10B8F - Bank02.asm:2236 (LDA $7EF374 : LSR A)
+JSL Hera_Boss_Defeated : NOP
 ;================================================================================
-org $029090 ; <- 11090 - Bank02.asm:3099 (LDA $7EF374 : LSR A : BCS BRANCH_GAMMA)
-LDA $7EF00F : BNE + : NOP
-STX $012C ; DON'T MOVE THIS FORWARD OR MADNESS AWAITS
-+
+org $029090 ; <- 11090 - Bank02.asm:3099 (LDA $7EF374 : LSR A)
+JSL Hera_Boss_Defeated : NOP
 ;================================================================================
 org $029798 ; <- 11798 - Bank02.asm:4287 (CMP $02895C, X : BNE BRANCH_ALPHA)
 NOP #6 ; remove crystal room cutscene check that causes softlocks
