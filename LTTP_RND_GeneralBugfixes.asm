@@ -248,8 +248,8 @@ incsrc stats/main.asm
 
 incsrc menu/overworldmap.asm ; overwrites some code in bank 0A
 incsrc doorrando.asm ; bank 27 likely A7 in the future
-;bank 28/A8 for keydropshuffle
-incsrc keydrop/potsanity.asm
+;bank 28/A8 for keydropshuffle / standing items
+incsrc keydrop/standing_items.asm
 incsrc enemizer/main.asm ; this is originally in bank 36, but is currently in migratory status in bank 37
 
 org $308000 ; bank #$30
@@ -363,7 +363,7 @@ warnpc $B08000
 ;$23 Stats & Credits
 ;$24 Code Bank
 ;$27 DR Code Bank
-;$28 Keydrop Code bank
+;$28 Keydrop / Standing Items Code bank
 ;$29 External hooks (rest of bank not used)
 ;$2E Reserved for Tournament Use
 ;$2F Static RNG (rest is reserved for tournament use)

@@ -245,7 +245,7 @@ IncrementSmallKeysNoPrimary:
 				LDA $048E : CMP.w #$0087 : BNE ++ ; check for hera basement cage
 				LDA $A8 : AND #$0003 : CMP #$0002 : BNE ++ ; must be quadrant 2
 					PLP : PHY : LDY.b #$24 : JSL.l FullInventoryExternal
-					LDA ShuffleKeyDrops : BNE +++
+					LDA StandingItemsOn : BNE +++
 						JSR CountChestKey
 					+++ PLY : BRA +
 				++

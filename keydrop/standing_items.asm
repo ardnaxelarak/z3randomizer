@@ -9,7 +9,7 @@ org $09C2BB
 org $09C327
 	JSL LoadSpriteData
 
-org $06EF7A
+org $06F976
 	JSL RevealSpriteDrop : NOP
 
 org $06926e ; <- 3126e - sprite_prep.asm : 2664 (LDA $0B9B : STA $0CBA, X)
@@ -103,12 +103,14 @@ PotMultiWorldTable:
 ; Reserved $250 296 * 2
 
 org $A8AA50
-ShuffleKeyDrops: ; 142A50  # todo : combine these flags?
+StandingItemsOn: ; 142A50
 db 0
-StandingItemsOn: ; 142A51
-db 0
-MultiClientFlags: ; 142A52 -> stored in SRAM at 7ef33d
-db 0
+MultiClientFlags: ; 142A51-2 -> stored in SRAM at 7ef33d (for now)
+dw 0
+SwampDrain1HasItem: ; 142A53
+db 1
+SwampDrain2HasItem: ; 142A54
+db 1
 
 
 RevealPotItem:
@@ -220,14 +222,18 @@ RevealSpriteDrop:
 		LDA #$02 : STA.l SpawnedItemFlag
 		STX SpawnedItemIndex
 		LDA.l SprItemReceipt, X : STA SpawnedItemID
-		LDA.b #$01 : STA $0CBA, X ; trigger the small key routines
-		LDA.b #$09 : STA $0DD0, X : RTL ; unstun if stunned
+		LDA.l SprItemMWPlayer, X : STA SpawnedItemMWPlayer
+		LDY.b #$01 ; trigger the small key routines
+		LDA SpawnedItemID : CMP #$32 : BNE +
+		LDA.l StandingItemsOn : BNE +
+			INY ; big key routine
+		+ RTL ; unstun if stunned
 	.normal
-	LDA.w $0CBA, X : BNE .no_forced_drop
+	LDY.w $0CBA, X : BEQ .no_forced_drop
 		RTL
 	.no_forced_drop
-	PLY : PLY ; remove the JSL return lower 16 bits
-	PEA.w $06EF9A-1 ; change return address to .no_forced_drop of (Sprite_ApplyCalculatedDamage)
+	PLA : PLA ; remove the JSL reswamturn lower 16 bits
+	PEA.w $06F996-1 ; change return address to .no_forced_drop of (Sprite_DoTheDeath)
 	RTL
 
 BitFieldMasks:
@@ -239,43 +245,37 @@ db $40, $20
 
 ; Runs during Sprite_E4_SmallKey and duning Sprite_E5_BigKey spawns
 ShouldSpawnItem:
-	LDA.l StandingItemsOn : BEQ .normal
-		; checking our sram table
-		PHX : PHY
-			REP #$30
-			LDA.b $A0 : ASL : TAY
-			LDA.w SprItemIndex, X : AND #$00FF : ASL
-			PHX
-				TAX : LDA.l BitFieldMasks, X : STA $00
-			PLX ; restore X again
-			LDA.w SprItemFlags, X : AND #$00FF : CMP #$0001 : BEQ +
-				TYX : LDA.l SpriteItemSRAM, X : BIT $00 : BEQ .notObtained
-				BRA .obtained
-			+ TYX : LDA.l PotItemSRAM, X : BIT $00 : BEQ .notObtained
-				.obtained
-				SEP #$30 : PLY : PLX : LDA #$01 : RTL ; already obtained
-		.notObtained
-		SEP #$30 : PLY : PLX
-		LDA #$00 : RTL
-	.normal
-	LDA.w $0403
-	AND.w KeyRoomFlagMasks,Y
+	; checking our sram table
+	PHX : PHY
+		REP #$30
+		LDA.b $A0 : ASL : TAY
+		LDA.w SprItemIndex, X : AND #$00FF : ASL
+		PHX
+			TAX : LDA.l BitFieldMasks, X : STA $00
+		PLX ; restore X again
+		LDA.w SprItemFlags, X : AND #$00FF : CMP #$0001 : BEQ +
+			TYX : LDA.l SpriteItemSRAM, X : BIT $00 : BEQ .notObtained
+			BRA .obtained
+		+ TYX : LDA.l PotItemSRAM, X : BIT $00 : BEQ .notObtained
+			.obtained
+			SEP #$30 : PLY : PLX : LDA #$01 : RTL ; already obtained
+	.notObtained
+	SEP #$30 : PLY : PLX
+	LDA #$00
 	RTL
 
 MarkSRAMForItem:
-	LDA.l StandingItemsOn : BEQ .normal
-		PHX : PHY : REP #$30
-			LDA.b $A0 : ASL : TAY
-			LDA.l SpawnedItemIndex : ASL
-			TAX : LDA.l BitFieldMasks, X : STA $00
-			TYX
-			LDA.w SpawnedItemFlag : CMP #$01 : BEQ +
-				LDA SpriteItemSRAM, X : ORA $00 : STA SpriteItemSRAM, X
-			+ LDA PotItemSRAM, X : ORA $00 : STA PotItemSRAM, X
-		SEP #$30 : PLY : PLX
-		LDA.w $0403 : RTL
-	.normal
-	LDA.w $0403 : ORA.w KeyRoomFlagMasks,Y
+	PHX : PHY : REP #$30
+		LDA.b $A0 : ASL : TAY
+		LDA.l SpawnedItemIndex : ASL
+		TAX : LDA.l BitFieldMasks, X : STA $00
+		TYX
+		LDA.w SpawnedItemFlag : CMP #$0001 : BEQ +
+			LDA SpriteItemSRAM, X : ORA $00 : STA SpriteItemSRAM, X : BRA .end
+		+ LDA PotItemSRAM, X : ORA $00 : STA PotItemSRAM, X
+	.end
+	SEP #$30 : PLY : PLX
+	LDA.w $0403
 	RTL
 
 SpriteKeyPrep:
@@ -319,10 +319,11 @@ SpriteKeyDrawGFX:
 KeyGet:
     LDA $7EF36F ; what we wrote over
     PHA
-    	LDY $0E80, X
+    	LDA.l StandingItemsOn : BNE +
+    		PLA : RTL
+    	+ LDY $0E80, X
     	LDA SprItemIndex, X : STA SpawnedItemIndex
     	LDA SprItemFlags, X : STA SpawnedItemFlag
-    	; todo: may need to check if we are in a dungeon or not $FF
     	LDA $A0 : CMP #$87 : BNE + ;check for hera cage
     	LDA SpawnedItemFlag : BNE + ; if it came from a pot, it's fine
     		JSR ShouldKeyBeCountedForDungeon : BCC ++
@@ -331,12 +332,11 @@ KeyGet:
     	+ STY $00
     	LDA SprItemMWPlayer, X : STA !MULTIWORLD_ITEM_PLAYER_ID : BNE .receive
     	PHX
-    		; todo: may need to check if we are in a dungeon or not $FF
-    		LDA $040C : LSR : TAX
-    		LDA $00 : CMP.l KeyTable, X : BNE +
-    			- JSL.l FullInventoryExternal : JSL CountChestKeyLong : PLX : PLA : RTL
-    		+ CMP.b #$AF : beq - ; universal key
-    		CMP.b #$24 : beq -   ; small key for this dungeon
+			LDA $040C : LSR : TAX
+			LDA $00 : CMP.l KeyTable, X : BNE +
+				- JSL.l FullInventoryExternal : JSL CountChestKeyLong : PLX : PLA : RTL
+			+ CMP.b #$AF : beq - ; universal key
+			CMP.b #$24 : beq -   ; small key for this dungeon
     	PLX
     	.receive
     	JSL $0791b3 ; Player_HaltDashAttackLong
@@ -366,7 +366,8 @@ BigKeyGet:
 	+ SEC : RTL
 
 LoadProperties_PreserveCertainProps:
-	LDA.l StandingItemsOn : BNE +
+	LDA $0E20, X : CMP #$E4 : BEQ +
+	CMP #$E5 : BEQ +
 		JML Sprite_LoadProperties
 	+ LDA $0F50, X : PHA
     LDA $0E80, X : PHA
