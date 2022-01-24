@@ -1,7 +1,11 @@
 def process_values(sprite, values)
   ret = values.clone
   if [1, 2].include?(ret[0]) # boomerang
-    ret[0] = 5 # stun very briefly instead of damage
+    if sprite == 0x53 # armos knight
+      ret[0] = 0 # do nothing
+    else
+      ret[0] = 5 # stun very briefly instead of damage
+    end
   end
   if ret[6] > 0 && sprite != 0x84 # bow and not red eyegore/mimic
     ret[6] = 0
@@ -34,7 +38,7 @@ def process_values(sprite, values)
     ret[15] = 0
   end
   if sprite == 0x53 and ret[2] == 3
-    ret[2] = 1 # armos knight? let's make master bombs not suck
+    ret[2] = 1 # armos knight? let's make class 2 not suck
   end
   return ret
 end
