@@ -54,6 +54,7 @@ SpawnedItemID = $7E0720 ; 0x02
 SpawnedItemIndex = $7E0722 ; 0x02
 SpawnedItemIsMultiWorld = $7E0724 ; 0x02
 SpawnedItemFlag = $7E0726 ; 0x02 - one for pot, 2 for sprite drop
+; (flag used as a bitmask in conjunction with StandingItemCounterMask)
 SpawnedItemMWPlayer = $7E0728 ; 0x02
 ; clear all of them in a loop during room load
 SprDropsItem = $7E0730 ; 0x16
@@ -111,6 +112,8 @@ SwampDrain1HasItem: ; 142A53
 db 1
 SwampDrain2HasItem: ; 142A54
 db 1
+StandingItemCounterMask: ; 142A55
+db 0 ; if 0x01 is set then pot should be counted, if 0x02 then sprite drops, 0x03 (both bits for both)
 
 
 RevealPotItem:
@@ -332,12 +335,19 @@ KeyGet:
     	+ STY $00
     	LDA SprItemMWPlayer, X : STA !MULTIWORLD_ITEM_PLAYER_ID : BNE .receive
     	PHX
-			LDA $040C : LSR : TAX
+			LDA $040C : CMP #$FF : BNE +
+				LDA $00 : CMP.b #$AF : BNE .skip
+				LDA $7EF38B : INC : STA $7EF38B
+				LDA $00 : BRA .countIt
+			+ LSR : TAX
 			LDA $00 : CMP.l KeyTable, X : BNE +
-				- JSL.l FullInventoryExternal : JSL CountChestKeyLong : PLX : PLA : RTL
-			+ CMP.b #$AF : beq - ; universal key
-			CMP.b #$24 : beq -   ; small key for this dungeon
-    	PLX
+				.countIt
+				LDA.l StandingItemCounterMask : AND SpawnedItemFlag : BEQ ++
+					JSL.l FullInventoryExternal : JSL CountChestKeyLong
+				++ PLX : PLA : RTL
+			+ CMP.b #$AF : beq .countIt ; universal key
+			CMP.b #$24 : beq .countIt   ; small key for this dungeon
+    	.skip PLX
     	.receive
     	JSL $0791b3 ; Player_HaltDashAttackLong
     	JSL.l Link_ReceiveItem
@@ -349,11 +359,12 @@ db $A0, $A0, $A2, $A3, $A4, $A5, $A6, $A7, $A8, $A9, $AA, $AB, $AC, $AD
 ; Input Y - the item type
 ShouldKeyBeCountedForDungeon:
 	PHX
-		; todo: may need to check if we are in a dungeon or not $FF
-		LDA $040C : LSR : TAX
+		LDA $040C : CMP #$FF : BEQ .done
+		LSR : TAX
 		TYA : cmp KeyTable, X : BNE +
 			- PLX : SEC : RTS
 		+ CMP.B #$24 : BEQ -
+	.done
 	PLX : CLC : RTS
 
 
