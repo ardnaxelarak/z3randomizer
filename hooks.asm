@@ -1901,12 +1901,12 @@ NOP #8
 ;JSL.l OnLoadMap
 ;================================================================================
 org $028B8F ; <- 10B8F - Bank02.asm:2236 (LDA $7EF374 : LSR A : BCS BRANCH_BETA)
-LDA $7EF00F : BNE + : NOP
+JSL CheckHeraBossDefeated : BNE + : NOP
 LDX.b #$F1 : STX $012C
 +
 ;================================================================================
 org $029090 ; <- 11090 - Bank02.asm:3099 (LDA $7EF374 : LSR A : BCS BRANCH_GAMMA)
-LDA $7EF00F : BNE + : NOP
+JSL CheckHeraBossDefeated : BNE + : NOP
 STX $012C ; DON'T MOVE THIS FORWARD OR MADNESS AWAITS
 +
 ;================================================================================
@@ -2313,8 +2313,11 @@ JSL.l OnLinkDamagedFromPit
 org $01FFE7 ; <- FFE7 - Bank01.asm:16375 (LDA $7EF36D)
 JSL.l OnLinkDamagedFromPitOutdoors
 ;--------------------------------------------------------------------------------
+;org $078F27 ; <- 38F27
+;JSL.l FlipperReset
+;--------------------------------------------------------------------------------
 org $02B468
-dw FakeFlipperProtection
+	dw FakeFlipperProtection
 
 org $02FFC7
 FakeFlipperProtection:
@@ -2325,11 +2328,8 @@ FakeFlipperProtection:
 org $02B46C ; <- bank_02.asm:9722 (STZ.b $00 : STZ.b $02)
 JSL FlipperScrollWarp
 ;--------------------------------------------------------------------------------
-;org $078F27 ; <- 38F27
-;JSL.l FlipperReset
-;--------------------------------------------------------------------------------
-org $09F40B ; <- 4F40B - module_death.asm:222 (LDX.b #$00)
-JSL.l IgnoreFairyCheck
+;org $09F40B ; <- 4F40B - module_death.asm:222 (LDX.b #$00)
+;JSL.l IgnoreFairyCheck
 ;--------------------------------------------------------------------------------
 org $078F51 ; <- 38F51 - Bank07.asm:2444 (JSR $AE54 ; $3AE54 IN ROM)
 JSL.l OnEnterWater : NOP
@@ -2587,6 +2587,22 @@ NOP
 ;================================================================================
 
 ;================================================================================
+; Resolve conflict between race game and witch item
+;--------------------------------------------------------------------------------
+; Change race game to use $021B instead of $0ABF for detecting cheating
+org $0DCB9D ; STZ.w $0ABF
+STZ $021B
+
+org $0DCBFE ; LDA.w $0ABF
+LDA $021B
+
+org $02BFE0 ; LDA.b #$01 : STA.w $0ABF
+JSL SetOverworldTransitionFlags
+NOP
+; For mirroring, the new flag is set in IncrementOWMirror in stats.asm
+;================================================================================
+
+;================================================================================
 ; Player Sprite Fixes
 ;--------------------------------------------------------------------------------
 org $0DA9C8 ; <- 06A9C8 - player_oam.asm: 1663 (AND.w #$00FF : CMP.w #$00F8 : BCC BRANCH_MARLE)
@@ -2597,13 +2613,13 @@ org $0DA9C8 ; <- 06A9C8 - player_oam.asm: 1663 (AND.w #$00FF : CMP.w #$00F8 : BC
 LDA $02 ; always zero! (this replaces the BCC)
 ADC.w #0000 ; put the carry bit into the accumulator instead of a hardcoded 1.
 ;-------------------------------------------------------------------------------
-org $02fd6f ; <- 017d6f - bank0E.asm: 3694 (LoadActualGearPalettes:) Note: Overflow of bank02 moved to 0e in US Rom
+org $02FD6F ; <- 017d6f - bank0E.asm: 3694 (LoadActualGearPalettes:) Note: Overflow of bank02 moved to 0e in US Rom
 JSL LoadActualGearPalettesWithGloves
 RTL
 ;--------------------------------------------------------------------------------
 ; Bunny Palette/Overworld Map Bugfix
 ;--------------------------------------------------------------------------------
-org $02fdf0 ; <- 017df0 - bank0E (LDA [$00] : STA $7EC300, X : STA $7EC500, X)
+org $02FDF0 ; <- 017df0 - bank0E (LDA [$00] : STA $7EC300, X : STA $7EC500, X)
 JSL LoadGearPalette_safe_for_bunny
 RTS
 ;================================================================================
@@ -2928,3 +2944,36 @@ org $01C4B8 : JSL FixJingleGlitch
 org $01C536 : JSL FixJingleGlitch
 org $01C592 : JSL FixJingleGlitch
 org $01C65F : JSL FixJingleGlitch
+
+;================================================================================
+; Text Renderer
+;--------------------------------------------------------------------------------
+if !FEATURE_NEW_TEXT
+    org $0EF51B
+        JML RenderCharExtended
+    org $0EF520
+        RenderCharExtended_returnOriginal:
+    org $0EF567
+        RenderCharExtended_returnUncompressed:
+
+    org $0EF356
+        JSL RenderCharLookupWidth
+    org $0EF3BA
+        JSL RenderCharLookupWidth
+    org $0EF48E
+        JML RenderCharLookupWidthDraw
+    org $0EF499
+        RenderCharLookupWidthDraw_return:
+
+    org $0EF6AA
+        JML RenderCharToMapExtended
+    org $0EF6C2
+        RenderCharToMapExtended_return:
+
+    org $0EFA50
+        JSL RenderCharSetColorExtended
+    org $0EEE5D
+        JSL RenderCharSetColorExtended_init
+    org $0EF285
+        JSL RenderCharSetColorExtended_close : NOP
+endif

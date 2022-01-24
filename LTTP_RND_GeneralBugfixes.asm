@@ -28,6 +28,15 @@ org $1FFFF8 ; <- FFFF8 timestamp rom
 db #$20, #$19, #$08, #$31 ; year/month/day
 
 ;================================================================================
+!ROM_VERSION_LOW ?= 1  ; ROM version (two 16-bit integers)
+!ROM_VERSION_HIGH ?= 1 ;
+
+org $00FFE0 ; Unused hardware vector
+RomVersion:
+dw !ROM_VERSION_LOW
+dw !ROM_VERSION_HIGH
+
+;================================================================================
 
 !ADD = "CLC : ADC"
 !SUB = "SEC : SBC"
@@ -97,6 +106,9 @@ db #$20, #$19, #$08, #$31 ; year/month/day
 !ONEMIND_TIMER = $7F5073
 
 function hexto555(h) = ((((h&$FF)/8)<<10)|(((h>>8&$FF)/8)<<5)|(((h>>16&$FF)/8)<<0))
+
+; Feature flags, run asar with -DFEATURE_X=1 to enable
+!FEATURE_NEW_TEXT ?= 0
 
 ;================================================================================
 
@@ -235,6 +247,9 @@ incsrc multiworld.asm
 incsrc terrorpin.asm
 incsrc special_weapons.asm
 incsrc variable_ganon_vulnerability.asm
+if !FEATURE_NEW_TEXT
+    incsrc textrenderer.asm
+endif
 warnpc $A58000
 
 ;org $228000 ; contrib area
@@ -337,6 +352,14 @@ org $339600
 BossMapIconGFX:
 incbin bossicons.4bpp
 
+if !FEATURE_NEW_TEXT
+    org $339C00
+    NewFont:
+    incbin newfont.bin
+    NewFontInverted:
+    incbin newfont_inverted.bin
+endif
+
 org $328000
 Extra_Text_Table:
 incsrc itemtext.asm
@@ -382,7 +405,8 @@ warnpc $B08000
 ;$3B reserved for downstream use
 ;$3F reserved for internal debugging
 ;================================================================================
-;RAM 
+;RAM
+;$7E021B[0x1]: Used by race game instead of $0ABF to avoid witch item conflict
 ;$7EC900[0x1F00]: BIGRAM buffer
 ;$7EF000[0x500]: SRAM mirror First 0x500 bytes of SRAM
 ;$7F5000[0x800]: Rando's main free ram region
