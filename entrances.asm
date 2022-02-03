@@ -20,7 +20,7 @@ LockAgahnimDoors:
 		!BGE .crystalOrUnlock
 		LDA #$0001 : RTL
 		.crystalOrUnlock
-		LDA InvertedMode : AND.w #$00FF : BEQ .unlock
+		LDA SwapAgaGanonsTower : AND.w #$00FF : BEQ .unlock
 
 		LDA $7EF2C3 : AND.w #$0020 : BNE .unlock ; Check if GT overlay is already on or not
 		LDA $0308 : AND.w #$0080 : BEQ ++ ;If we are holding an item
@@ -42,7 +42,7 @@ LockAgahnimDoors:
 RTL
 ;---------------------------------------------------------------------------------
 FlagAgahnimDoor:
-	LDA.l InvertedMode : BEQ .vanilla
+	LDA.l SwapAgaGanonsTower : BEQ .vanilla
 
 	LDA $7EF2C3 : ORA #$20 : STA $7EF2C3 ; activate GT overlay
 

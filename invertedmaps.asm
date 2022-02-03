@@ -3,14 +3,14 @@ Overworld_LoadNewTiles:
     LDA $040A : AND #$00FF : CMP #$0005 : BNE +
         ; add sign to EDM for OWG people to read
         LDA #$0101 : STA $7E2E18 ; #$0101 is the sign tile16 id, $7E2D98 is the position of the tile16 on map
-        BRA .invertedMods
-    + CMP #$005B : BNE .invertedMods
+        BRA .atgtSwap
+    + CMP #$005B : BNE .atgtSwap
         ; add Goal sign to Pyramid
         LDA #$0101 : STA $7E27B6 ; Moved sign near statue
         LDA #$05C2 : STA $7E27B4 ; added a pyramid peg on the left of the sign
     
-    .invertedMods
-    LDA InvertedMode : AND #$00FF : BEQ ++ ; forced inverted changes
+    .atgtSwap
+    LDA.l SwapAgaGanonsTower : AND #$00FF : BEQ ++ ; forced inverted changes
         LDA $040A : AND #$00FF : CMP #$0043 : BNE +
             LDA #$08D5 : STA $7E235E ; GT entrance auto-opened
             LDA #$08E3 : STA $7E23DE
@@ -24,15 +24,15 @@ Overworld_LoadNewTiles:
             STA $7E2560
             LDA #$0E94 : STA $7E25DE
             LDA #$0E95 : STA $7E25E0
-            BRA .postInverted
-        + CMP #$001B : BNE .postInverted
+            BRA .postAtGtSwap
+        + CMP #$001B : BNE .postAtGtSwap
             LDA #$0101 : STA $7E222C ; add sign for Tower Entry at HC
-            BRA .postInverted
+            BRA .postAtGtSwap
     ++ ; forced non-inverted changes
-        LDA $040A : AND #$00FF : CMP #$0043 : BNE .postInverted
+        LDA $040A : AND #$00FF : CMP #$0043 : BNE .postAtGtSwap
             LDA #$0101 : STA $7E2550 ; GT sign
 
-    .postInverted
+    .postAtGtSwap
     SEP #$30
     LDX $8A : LDA.l OWTileMapAlt, X : BEQ .notInverted
     PHB

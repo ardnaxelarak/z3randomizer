@@ -164,6 +164,7 @@ OnNewFile:
 				LDA.b #$20 : STA $7EF2DB ; pyramid hole already open
 			+
 
+			LDA.l SwapAgaGanonsTower : BNE +
 			LDA.l PreopenGanonsTower : BEQ +
 				LDA.b #$20 : STA $7EF2C3 ; Ganons Tower already open
 			+
