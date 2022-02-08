@@ -1334,23 +1334,17 @@ RTS
 
 Overworld_InvertedTRPuzzle:
 {
-    SEP #$20 : PHB
+    REP #$30
     LDA.l OWTileMapAlt+07 : BNE .inverted
-        REP #$30
         LDA.w #$0212 : LDX.w #$0720 : STA.l $7E2000,X ; what we wrote over
         JSL.l Overworld_MemorizeMap16Change : JSL.l Overworld_DrawPersistentMap16+4 ; what we wrote over
-        BRA .return
+        RTL
 
     .inverted
-    LDA.b #$A4 : PHA : PLB ; Set the data bank to $7E
-    REP #$30
     ; removes barriers from TR Peg Puzzle Ledge
     LDA.w #$0184 : LDX.w #$0A20 : JSL.l Overworld_DrawPersistentMap16
     LDA.w #$0184 : LDX.w #$0AA0 : JSL.l Overworld_DrawPersistentMap16
     LDA.w #$0185 : LDX.w #$0A22 : JSL.l Overworld_DrawPersistentMap16
     LDA.w #$0185 : LDX.w #$0AA2 : JSL.l Overworld_DrawPersistentMap16
-    
-    .return
-    SEP #$20 : PLB : REP #$30
     RTL
 }
