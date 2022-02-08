@@ -1336,9 +1336,8 @@ Overworld_InvertedTRPuzzle:
 {
     SEP #$20 : PHB
     LDA.l OWTileMapAlt+07 : BNE .inverted
-        LDA.b #$7E : PHA : PLB ; Set the data bank to $7E
         REP #$30
-        LDA.w #$0212 : LDX.w #$0720 : STA.l $2000,X ; what we wrote over
+        LDA.w #$0212 : LDX.w #$0720 : STA.l $7E2000,X ; what we wrote over
         JSL.l Overworld_MemorizeMap16Change : JSL.l Overworld_DrawPersistentMap16+4 ; what we wrote over
         BRA .return
 
