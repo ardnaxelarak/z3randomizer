@@ -101,7 +101,6 @@ FreeUWGraphics:
 ;===================================================================================================
 
 DrawPotItem:
-
 	JSL.l IsNarrowSprite : BCS .narrow
 
 	.full
@@ -130,6 +129,7 @@ DrawPotItem:
 	SEP #$20
 	STZ.b $07
 
+	LDA.b #$00 : STA.l !SKIP_EOR
 	JSL Sprite_DrawMultiple_quantity_preset
 
 	LDA.b $90 : CLC : ADC.b #$08 : STA.b $90
