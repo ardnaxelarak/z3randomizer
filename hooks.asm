@@ -1908,12 +1908,12 @@ NOP #8
 ;JSL.l OnLoadMap
 ;================================================================================
 org $028B8F ; <- 10B8F - Bank02.asm:2236 (LDA $7EF374 : LSR A : BCS BRANCH_BETA)
-LDA $7EF00F : BNE + : NOP
+JSL CheckHeraBossDefeated : BNE + : NOP
 LDX.b #$F1 : STX $012C
 +
 ;================================================================================
 org $029090 ; <- 11090 - Bank02.asm:3099 (LDA $7EF374 : LSR A : BCS BRANCH_GAMMA)
-LDA $7EF00F : BNE + : NOP
+JSL CheckHeraBossDefeated : BNE + : NOP
 STX $012C ; DON'T MOVE THIS FORWARD OR MADNESS AWAITS
 +
 ;================================================================================
@@ -2590,6 +2590,22 @@ NOP
 ;================================================================================
 
 ;================================================================================
+; Resolve conflict between race game and witch item
+;--------------------------------------------------------------------------------
+; Change race game to use $021B instead of $0ABF for detecting cheating
+org $0DCB9D ; STZ.w $0ABF
+STZ $021B
+
+org $0DCBFE ; LDA.w $0ABF
+LDA $021B
+
+org $02BFE0 ; LDA.b #$01 : STA.w $0ABF
+JSL SetOverworldTransitionFlags
+NOP
+; For mirroring, the new flag is set in IncrementOWMirror in stats.asm
+;================================================================================
+
+;================================================================================
 ; Player Sprite Fixes
 ;--------------------------------------------------------------------------------
 org $0DA9C8 ; <- 06A9C8 - player_oam.asm: 1663 (AND.w #$00FF : CMP.w #$00F8 : BCC BRANCH_MARLE)
@@ -2814,3 +2830,36 @@ org $1EB2B1 ; sprite_terrorpin.asm(57) : AND.b #$03 : STA $0DE0, X ; 5 bytes
 JSL FixTerrorpin ; 4 bytes
 NOP				 ; 1 byte
 ;--------------------------------------------------------------------------------
+
+;================================================================================
+; Text Renderer
+;--------------------------------------------------------------------------------
+if !FEATURE_NEW_TEXT
+    org $0EF51B
+        JML RenderCharExtended
+    org $0EF520
+        RenderCharExtended_returnOriginal:
+    org $0EF567
+        RenderCharExtended_returnUncompressed:
+
+    org $0EF356
+        JSL RenderCharLookupWidth
+    org $0EF3BA
+        JSL RenderCharLookupWidth
+    org $0EF48E
+        JML RenderCharLookupWidthDraw
+    org $0EF499
+        RenderCharLookupWidthDraw_return:
+
+    org $0EF6AA
+        JML RenderCharToMapExtended
+    org $0EF6C2
+        RenderCharToMapExtended_return:
+
+    org $0EFA50
+        JSL RenderCharSetColorExtended
+    org $0EEE5D
+        JSL RenderCharSetColorExtended_init
+    org $0EF285
+        JSL RenderCharSetColorExtended_close : NOP
+endif
