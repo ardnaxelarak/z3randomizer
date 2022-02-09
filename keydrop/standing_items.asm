@@ -63,10 +63,10 @@ SprItemIndex = $7E0750
 SprItemMWPlayer = $7E0760 ; 0x16
 SprItemFlags = $7E0770 ; 0x16 (used for both pots and drops) (combine with SprDropsItem?)
 
-; 7F:6600-7F:684F ($250 or 592 bytes) for pots and 7F:6850-7F:6A9F ($250 or 592 bytes) for sprites
+; 7F:6018-7F:6267 ($250 or 592 bytes) for pots and 7F:6268-7F:64B7 ($250 or 592 bytes) for sprites
 
-PotItemSRAM = $7F6600
-SpriteItemSRAM = $7F6850
+PotItemSRAM = $7F6018
+SpriteItemSRAM = $7F6268
 
 ; todo: move sprites
 ;org $09D62E
