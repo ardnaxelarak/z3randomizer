@@ -206,10 +206,10 @@ Underworld_DoorDown_Entry:
 .done
     LDA $A0 : RTL
 ;--------------------------------------------------------------------------------
-
-;--------------------------------------------------------------------------------
-; Check if the boss in ToH has been defeated (16-bit accumulator)
+; This is for changing to/from ToH dungeon/boss music
+;
+; A=16bit XY=8bit
 CheckHeraBossDefeated:
-    LDA $7EF00F : AND #$00FF
-    RTL
-;--------------------------------------------------------------------------------
+LDA $7EF00F : AND.w #$00FF : BEQ +
+    SEC : RTL
++ CLC : RTL

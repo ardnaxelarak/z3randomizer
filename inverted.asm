@@ -130,7 +130,7 @@ db $02, $02, $02, $00, $08, $02, $02, $00, $00, $00, $00, $01, $00, $00, $20, $0
 db $02, $02, $02, $02, $02, $02, $02, $00, $00, $01, $01, $01, $02, $00, $08, $00
 
 Electric_Barrier:
-	LDA InvertedMode : BEQ .done
+	LDA SwapAgaGanonsTower : BEQ .done
 		LDA $7EF280, X : ORA #$40 : STA $7EF280, X ;set barrier dead
 	.done
 	LDA $7EF280, X ; what we wrote over
@@ -138,7 +138,7 @@ RTL
 
 
 GanonTowerAnimation:
-	LDA InvertedMode : BEQ .done
+	LDA SwapAgaGanonsTower : BEQ .done
 		LDA.b #$1B : STA $012F
         STZ $04C6
         STZ $B0
@@ -162,7 +162,7 @@ RTL
 
 GanonTowerInvertedCheck:
 {
-	LDA InvertedMode : BEQ .done
+	LDA SwapAgaGanonsTower : BEQ .done
 		LDA #$01 ; Load a random value so it doesn't BEQ
 	RTL
 	.done
@@ -202,7 +202,10 @@ MirrorBonk:
 	; otherwise fall through to .normal
 		PHX : PHP
 		PHB : PHK : PLB
-		LDX $8A : LDA.l OWTileWorldAssoc, X : BNE .endLoop ;World we're in? branch if we are in LW we don't want bonks
+		LDX $8A : LDA.l OWTileWorldAssoc, X
+			TAX : LDA.l InvertedMode : BEQ +
+				TXA : EOR #$40 : TAX
+			+ TXA : BNE .endLoop ;World we're in? branch if we are in LW we don't want bonks
 		REP #$30
 		LDX #$0000
 		.loop

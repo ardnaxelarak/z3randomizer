@@ -10,6 +10,7 @@ DoWorldFix:
 	LDA InvertedMode : BEQ +
 		JMP DoWorldFix_Inverted
 	+
+	LDA $7EF3CC : CMP #$04 : BEQ .aga1Alive ; if old man following, skip mirror/aga check
 	LDA.l Bugfix_MirrorlessSQToLW : BEQ .skip_mirror_check
 		LDA $7EF353 : AND #$02 : BEQ .noMirror ; check if we have the mirror
 	.skip_mirror_check ; alt entrance point
@@ -53,6 +54,7 @@ JMP DoWorldFix_skip_mirror_check
 RTL
 ;================================================================================
 DoWorldFix_Inverted:
+	LDA $7EF3CC : CMP #$04 : BEQ .aga1Alive ; if old man following, skip mirror/aga check
 	LDA.l Bugfix_MirrorlessSQToLW : BEQ .skip_mirror_check
 		LDA $7EF353 : AND #$02  : BEQ .noMirror ; check if we have the mirror
 	.skip_mirror_check ; alt entrance point
@@ -79,7 +81,7 @@ SetDeathWorldChecked_Inverted:
 			LDA GanonPyramidRespawn : BNE .castle ; if flag is set, force respawn at pyramid on death to ganon
 		++
 	.outdoors
-JMP DoWorldFix
+JMP DoWorldFix_Inverted
 
 	.dungeon
 	LDA Bugfix_PreAgaDWDungeonDeathToFakeDW : BNE .done ; if the bugfix is enabled, we do nothing on death in dungeon

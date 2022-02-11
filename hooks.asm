@@ -424,8 +424,12 @@ org $02EC8D ; <- bank02.asm : 11981 (LDA.w #$020F : LDX $8A : CPX.w #$0033 : BNE
 JSL HardcodedRocks
 NOP #19 ;23 bytes removed with the JSL
 ;--------------------------------------------------------------------------------
-org $04E7AE ; <- bank0E.asm : 4230 (LDA $7EF287 : AND.w #$0020)
-JSL.l TurtleRockPegSolved
+;org $04E7AE ; <- bank0E.asm : 4230 (LDA $7EF287 : AND.w #$0020)
+;JSL.l TurtleRockPegSolved
+;--------------------------------------------------------------------------------
+org $1BCAA1 ; <- bank_1B.asm (LDA.w #$0212 : LDX.w #$0720 : STA.l $7E2000,X : JSL : JSL)
+JSL.l Overworld_InvertedTRPuzzle
+BRA + : NOP #12 : +
 
 org $04E7B9 ; <- bank0E.asm : 4237 (LDX $04C8)
 JMP.w TurtleRockTrollPegs
@@ -1011,6 +1015,11 @@ NOP
 org $07B57D ; 3B57D - Bank07.asm:8527 (LDA Link_ReceiveItemAlternates, Y : STA $03)
 JSL.l Link_ReceiveItemAlternatesExpanded_loadAlternate
 NOP
+
+org $08C563
+JML ItemGetAlternateSFX : NOP
+org $0988A5
+JSL ItemGetOverworldAlternateSFX : NOP #5
 ;--------------------------------------------------------------------------------
 org $09892E ; 4892E - ancilla_init.asm:1307 (LDA BottleList, X)
 LDA.w BottleListExpanded, X
@@ -1900,15 +1909,11 @@ NOP #8
 ;org $0AC012 ; <- 54012 - Bank0A.asm:1039 - (LDA $7EF2DB)
 ;JSL.l OnLoadMap
 ;================================================================================
-org $028B8F ; <- 10B8F - Bank02.asm:2236 (LDA $7EF374 : LSR A : BCS BRANCH_BETA)
-JSL CheckHeraBossDefeated : BNE + : NOP
-LDX.b #$F1 : STX $012C
-+
+org $028B8F ; <- 10B8F - Bank02.asm:2236 (LDA $7EF374 : LSR A)
+JSL CheckHeraBossDefeated : NOP
 ;================================================================================
-org $029090 ; <- 11090 - Bank02.asm:3099 (LDA $7EF374 : LSR A : BCS BRANCH_GAMMA)
-JSL CheckHeraBossDefeated : BNE + : NOP
-STX $012C ; DON'T MOVE THIS FORWARD OR MADNESS AWAITS
-+
+org $029090 ; <- 11090 - Bank02.asm:3099 (LDA $7EF374 : LSR A)
+JSL CheckHeraBossDefeated : NOP
 ;================================================================================
 org $029798 ; <- 11798 - Bank02.asm:4287 (CMP $02895C, X : BNE BRANCH_ALPHA)
 NOP #6 ; remove crystal room cutscene check that causes softlocks
@@ -2317,7 +2322,7 @@ JSL.l OnLinkDamagedFromPitOutdoors
 ;JSL.l FlipperReset
 ;--------------------------------------------------------------------------------
 org $02B468
-	dw FakeFlipperProtection
+dw FakeFlipperProtection
 
 org $02FFC7
 FakeFlipperProtection:

@@ -362,7 +362,11 @@ endif
 
 org $328000
 Extra_Text_Table:
-incsrc itemtext.asm
+if !FEATURE_NEW_TEXT
+    incsrc itemtext_lower.asm
+else
+    incsrc itemtext.asm
+endif  
 warnpc $32E000
 
 org $32DFD0	; PC 0x195FD0
@@ -554,6 +558,9 @@ LoadGearPalettes_variable:
 
 org $02FEAB
 Filter_Majorly_Whiten_Color:
+
+org $04E780
+Overworld_MemorizeMap16Change:
 
 org $05A51D
 Sprite_SpawnFallingItem:
