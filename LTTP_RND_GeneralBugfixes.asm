@@ -242,6 +242,7 @@ warnpc $A58000
 ;org $228000 ; contrib area
 org $A28000 ; contrib area
 incsrc contrib.asm
+warnpc $A38000
 
 org $A38000
 incsrc stats/main.asm

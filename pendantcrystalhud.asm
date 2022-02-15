@@ -397,10 +397,13 @@ DrawHUDDungeonItems:
 
 .next_map
 		BIT.w .dungeon_bitmasks,X
-		BEQ ..skip_map
+		BNE ..draw_map
+		; MapMode indicates if maps are needed for the info
+		LDA.l MapMode : AND #$00FF : BNE ..skip_map
 
+..draw_map
 		LDY.w .dungeon_positions,X
-		LDA.w #$2826
+		JSL MapIndicatorLong
 		STA.w $1686,Y
 
 		; reload

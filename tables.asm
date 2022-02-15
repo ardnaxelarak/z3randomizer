@@ -1511,7 +1511,8 @@ dw #9999 ; Rupee Limit
 ; $7F5042 - Tile Upload Offset Override (Low)
 ; $7F5043 - Tile Upload Offset Override (High)
 ; $7F5044 - $7F5046 - NMI Auxiliary Function
-; $7F5047 - $7F504E - Unused
+; $7F5047 - $7F5048 - Multiworld NMI Flags
+; $7F5049 - $7F504E - Unused
 ; $7F504F - $7F506F - Shop Block
 ; $7F5070 - Reserved for OneMind
 ; $7F5071 - Reserved for OneMind
@@ -1892,6 +1893,25 @@ db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00,
 ;--------------------------------------------------------------------------------
 ; 0x186380 - 187FFF (unused)
 ;--------------------------------------------------------------------------------
+
+org $30EFE0 ; PC 0x186FE0-0x186FEF
+CrystalPendantFlags_3:
+    db $00 ; Sewers
+	db $00 ; Hyrule Castle
+	db $01 ; Eastern Palace
+	db $02 ; Desert Palace
+	db $00 ; Agahnim's Tower
+	db $04 ; Swamp Palace
+	db $04 ; Palace of Darkness
+	db $03 ; Misery Mire
+    db $04 ; Skull Woods
+	db $03 ; Ice Palace
+	db $02 ; Tower of Hera
+	db $04 ; Thieves' Town
+	db $04 ; Turtle Rock
+	db $00 ; Ganons Tower
+; 00 - No Prize. 01 - Green Pendant. 02 - Other Pendant, 03 - Special Crystal, 04 - Other Crystal
+
 
 org $30EFFF ; PC 0x186FFF
 BallNChainDungeon:

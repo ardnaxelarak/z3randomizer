@@ -181,3 +181,5 @@ Sprite_ShowSolicitedMessageIfPlayerFacing_PreserveMessage:
 	RTL
 }
 ;================================================================
+
+incsrc menu/hudalpha.asm

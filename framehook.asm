@@ -44,28 +44,23 @@ FrameHookAction:
 		++
 	REP #$30 : PLA : PLP
 RTL
+
+!NMI_MW = "$7F5047"
 ;--------------------------------------------------------------------------------
 NMIHookAction:
 	PHA : PHX : PHY : PHD ; thing we wrote over, push stuff
 
-	LDA !NMI_AUX : BEQ ++
+	LDA !NMI_MW : BEQ ++
 		PHP
 		SEP #$30
 
-		LDA #$00 : STA !NMI_AUX
+		LDA #$00 : STA !NMI_MW
 
 		; Multiworld text
-		LDA !NMI_AUX+1 : BEQ +
-			LDA #$00 : STA !NMI_AUX+1
+		LDA !NMI_MW+1 : BEQ +
+			LDA #$00 : STA !NMI_MW+1
 			JSL.l WriteText
 		+
-
-		; Shops
-		LDA !NMI_AUX+2 : BEQ +
-			LDA #$00 : STA !NMI_AUX+2
-			JSL.l Shopkeeper_UploadVRAMTilesLong
-		+
-
 		PLP
 	++
 	
@@ -78,27 +73,27 @@ NMIHookAction:
 JML.l NMIHookReturn
 ;--------------------------------------------------------------------------------
 !NMI_AUX = "$7F5044"
+
 PostNMIHookAction:
-	LDA !NMI_AUX : BEQ +
-		LDA $00 : PHA ; preserve DP ram
-		LDA $01 : PHA
-		LDA $02 : PHA
-		
-		LDA !NMI_AUX+2 : STA $02 ; set up jump pointer
-		LDA !NMI_AUX+1 : STA $01
-		LDA !NMI_AUX+0 : STA $00
-		
-		PHK : PER .return-1 ; push stack for RTL return
-		JMP [$0000]
-		
-		.return
-		LDA.b #$00 : STA !NMI_AUX ; zero bank byte of NMI hook pointer
-		
-		PLA : STA $02
-		PLA : STA $01
-		PLA : STA $00
-	+
-	
-	LDA $13 : STA $2100 ; thing we wrote over, turn screen back on
-JML.l PostNMIHookReturn
+    LDA.l !NMI_AUX+2 : BEQ .return
+
+    PHK
+    PEA .return-1
+
+    PHA
+
+    LDA.b #$00 : STA.l !NMI_AUX+2
+
+    REP #$20
+    LDA.l !NMI_AUX+0 : DEC : PHA
+    SEP #$20
+
+    RTL
+
+.return
+    LDA.b $13 : STA.w $2100
+
+    JML.l PostNMIHookReturn
+
+
 ;--------------------------------------------------------------------------------
