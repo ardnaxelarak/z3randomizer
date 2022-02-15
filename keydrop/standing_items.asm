@@ -284,6 +284,12 @@ MarkSRAMForItem:
 SpriteKeyPrep:
 	LDA.w $0B9B : STA.w $0CBA, X ; what we wrote over
 	PHA
+		LDA $A0 : CMP #$87 : BNE .continue
+			LDA $A9 : ORA $AA : AND #$03 : CMP #$02 : BNE .continue
+				LDA #$00 : STA.w SpawnedItemFlag : STA SprItemFlags, X
+				LDA #$24 : STA $0E80, X
+				BRA +
+		.continue
 		LDA.w SpawnedItemIndex : STA SprItemIndex, X
 		LDA.w SpawnedItemMWPlayer : STA SprItemMWPlayer, X
 		LDA.w SpawnedItemFlag : STA SprItemFlags, X : BEQ +
