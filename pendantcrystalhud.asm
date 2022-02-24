@@ -406,10 +406,9 @@ DrawHUDDungeonItems:
 		JSL MapIndicatorLong
 		STA.w $1686,Y
 
+..skip_map
 		; reload
 		LDA.l $7EF368
-
-..skip_map
 		INX : INX
 		CPX.w #26 : BCC .next_map
 
