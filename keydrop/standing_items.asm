@@ -39,6 +39,12 @@ org $008BAA ; NMI hook
 org $06828A
 	JSL CheckSprite_Spawn
 
+org $07B169
+	JSL PreventPotSpawn : NOP
+
+org $07B17D
+	JSL PreventPotSpawn2
+
 
 ; refs to other functions
 org $06d23a
@@ -148,6 +154,26 @@ RevealPotItem:
 
 .normal_secret
 	STA $08
+
+	PHY : PHX
+		INY : INY : LDA [$00], Y : AND #$00FF : CMP #$0080 : BCS .obtained
+		; set bit and count if first time lifting this pot
+		LDA.b $A0 : ASL : TAY
+		TXA : ASL : TAX : LDA.l BitFieldMasks, X : STA $0A
+		TYX : LDA.l PotItemSRAM, X : BIT $0A : BNE .obtained
+			ORA $0A : STA PotItemSRAM, X
+			SEP #$30
+			; increment dungeon counts
+			LDA $040C : CMP #$FF : BEQ +
+				BNE ++
+				 	INC #2 ; treat sewers as HC
+				++ LSR : TAX : LDA $7EF4BF, X : INC : STA $7EF4BF, X
+				; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
+			+ REP #$30
+			LDA $7EF423 : INC : STA $7EF423 ; Increment Item Total
+		.obtained
+	PLX : PLY
+
 	PLA ; remove the JSL return lower 16 bits
 	LDA $08
 	PEA.w $01E6E2-1 ; change return address to go back to the vanilla routine
@@ -398,12 +424,36 @@ CheckSprite_Spawn:
 	BMI .check
 RTL
 .check
-	PHA
-		LDA $0D : CMP #$08 : BNE +
-			LDA.b #$3C ; SFX2_3C - error beep
-			STA.w $012E
-	+ PLA
+	LDA $0D : CMP #$08 : BNE +
+		LDX #$0F
+
+		; loop looking for EC
+		- LDA $0E20, X : CMP #$EC : BEQ .foundIt
+		DEX : BMI .error : BRA -
+
+		.foundIt
+		LDA #$00 : STZ $0DD0, X
+		LDA #$E4 : JSL Sprite_SpawnDynamically
+		BMI .error
+		LDA #$40 : TSB $0308 : RTL
+
+		.error
+		LDA.b #$3C ; SFX2_3C - error beep
+		STA.w $012E
+	+ LDA #$FF
 RTL
+
+PreventPotSpawn:
+	LDA #$40 : BIT $0308 : BEQ +
+		STZ $0308 : RTL
+	+ LDA.b #$80 : STA.w $0308  ; what we wrote over
+RTL
+
+PreventPotSpawn2:
+	LDA $0308 : BEQ +
+		LDA.b #$01 : TSB.b $50 ; what we wrote over
++ RTL
+
 
 incsrc dynamic_si_vram.asm
 

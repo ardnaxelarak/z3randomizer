@@ -10,33 +10,42 @@ DrawDungeonCompassCounts:
 	LDA.w $040C : AND.w #$00FE : TAX ; force dungeon ID to be multiple of 2
 	PLA
 
-	CPX.b #$1B : BCS .done ; Skip if not in a valid dungeon ID
-
+	CPX.b #$1B : BCC + ; Skip if not in a valid dungeon ID
+		JMP .done
+	+
 	CMP.w #$0002 : BEQ ++ ; if CompassMode==2, we don't check for the compass
 		TXY : TXA : LSR : TAX : LDA.l ExistsTransfer, X : TAX : LDA CompassExists, X : BEQ ++
 		TYX : LDA $7EF364 : AND.l DungeonItemMasks, X ; Load compass values to A, mask with dungeon item masks
-		BEQ .done ; skip if we don't have compass
+		BNE ++
+			JMP .done ; skip if we don't have compass
 	++
 
 	LDA $040C : LSR
 	BNE +
 		INC
 	+ TAX : LDA.l CompassTotal, X : AND #$00FF
-	SEP #$20
-	JSR HudHexToDec3Digit
-	REP #$20
 	PHX
-		LDX.b $06 : TXA : ORA #$2400 : STA $7EC79A
-		LDX.b $07 : TXA : ORA #$2400 : STA $7EC79C
+		PHA
+			JSL HexToDec_fast
+		PLA : CMP.w #100 : !BLT .two_digit
+			LDX.b $05 : TXA : ORA #$2490 : STA $7EC79A
+			LDX.b $06 : TXA : ORA #$2490 : STA $7EC79C
+			LDX.b $07 : TXA : ORA #$2490 : STA $7EC79E
+			BRA .end_total
+		.two_digit
+		LDX.b $06 : TXA : ORA #$2490 : STA $7EC79A
+		LDX.b $07 : TXA : ORA #$2490 : STA $7EC79C
+	.end_total
 	PLX
 
 	LDA $7EF4BF, X : AND #$00FF
-	SEP #$20
-	JSR HudHexToDec3Digit
-	REP #$20
-
-	LDX.b $06 : TXA : ORA #$2400 : STA $7EC794 ; Draw the item count
-	LDX.b $07 : TXA : ORA #$2400 : STA $7EC796
+	PHA
+		JSL HexToDec_fast
+	PLA : CMP.w #100 : !BLT +
+		LDX.b $05 : TXA : ORA #$2490 : STA $7EC792 ; Draw the 100's digit
+	+
+	LDX.b $06 : TXA : ORA #$2490 : STA $7EC794 ; Draw the item count
+	LDX.b $07 : TXA : ORA #$2490 : STA $7EC796
 	
 	LDA.w #$2830 : STA $7EC798 ; draw the slash
 

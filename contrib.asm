@@ -183,3 +183,4 @@ Sprite_ShowSolicitedMessageIfPlayerFacing_PreserveMessage:
 ;================================================================
 
 incsrc menu/hudalpha.asm
+incsrc util/utils.asm
