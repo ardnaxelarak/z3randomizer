@@ -120,6 +120,8 @@ SwampDrain2HasItem: ; 142A54
 db 1
 StandingItemCounterMask: ; 142A55
 db 0 ; if 0x01 is set then pot should be counted, if 0x02 then sprite drops, 0x03 (both bits for both)
+PotCountMode: ; 28AA56-7
+dw 0 ; # 0 is don't count pots, bit 1 for cave pots and bit 2 for dungeon pots
 
 
 RevealPotItem:
@@ -156,14 +158,14 @@ RevealPotItem:
 	STA $08
 
 	PHY : PHX
-		INY : INY : LDA [$00], Y : AND #$00FF : CMP #$0080 : BCS .obtained
 		; set bit and count if first time lifting this pot
 		LDA.b $A0 : ASL : TAY
 		TXA : ASL : TAX : LDA.l BitFieldMasks, X : STA $0A
 		TYX : LDA.l PotItemSRAM, X : BIT $0A : BNE .obtained
 			ORA $0A : STA PotItemSRAM, X
-			SEP #$30
+			JSR ShouldCountNormalPot : BCC .obtained
 			; increment dungeon counts
+			SEP #$30
 			LDA $040C : CMP #$FF : BEQ +
 				BNE ++
 				 	INC #2 ; treat sewers as HC
@@ -208,6 +210,22 @@ SaveMajorItemDrop:
 	INC SpawnedItemFlag
 	LDA.w #$0008 : STA $0B9C ; indicates we should use the key routines
 	RTL
+
+ShouldCountNormalPot:
+	INY : INY : LDA [$00], Y : AND #$00FF : CMP #$0080 : BCS .clear
+	LDA.l PotCountMode : BEQ .clear
+	CMP.w #$0003 : BEQ .set
+	CMP.w #$0001 : BEQ .check_cave
+		.in_dungeon
+		LDA $040C : CMP.w #$00FF : BEQ .clear : BRA .set
+	.check_cave
+	LDA $040C : CMP.w #$00FF : BEQ .set : BRA .clear
+.set
+	SEC
+RTS
+.clear
+	CLC
+RTS
 
 ClearSpriteData:
 	STZ.b $02 : STZ.b $03 ; what we overrode
@@ -427,8 +445,8 @@ RTL
 	LDA $0D : CMP #$08 : BNE +
 		LDX #$0F
 
-		; loop looking for EC
-		- LDA $0E20, X : CMP #$EC : BEQ .foundIt
+		; loop looking for a Sprite with state 0A (carried by the player)
+		- LDA $0DD0, X : CMP #$0A : BEQ .foundIt
 		DEX : BMI .error : BRA -
 
 		.foundIt
