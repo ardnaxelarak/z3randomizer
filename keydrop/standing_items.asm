@@ -157,12 +157,13 @@ RevealPotItem:
 .normal_secret
 	STA $08
 
-	PHY : PHX
+	PHX : PHY
 		; set bit and count if first time lifting this pot
 		LDA.b $A0 : ASL : TAY
 		TXA : ASL : TAX : LDA.l BitFieldMasks, X : STA $0A
 		TYX : LDA.l PotItemSRAM, X : BIT $0A : BNE .obtained
 			ORA $0A : STA PotItemSRAM, X
+			PLY : PHY
 			JSR ShouldCountNormalPot : BCC .obtained
 			; increment dungeon counts
 			SEP #$30
@@ -174,7 +175,7 @@ RevealPotItem:
 			+ REP #$30
 			LDA $7EF423 : INC : STA $7EF423 ; Increment Item Total
 		.obtained
-	PLX : PLY
+	PLY : PLX
 
 	PLA ; remove the JSL return lower 16 bits
 	LDA $08
