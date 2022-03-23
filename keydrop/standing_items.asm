@@ -12,6 +12,9 @@ org $09C327
 org $06F976
 	JSL RevealSpriteDrop : NOP
 
+org $06E3C4
+	JSL RevealSpriteDrop2 : NOP
+
 org $06926e ; <- 3126e - sprite_prep.asm : 2664 (LDA $0B9B : STA $0CBA, X)
 	JSL SpriteKeyPrep : NOP #2
 
@@ -284,6 +287,17 @@ RevealSpriteDrop:
 	PEA.w $06F996-1 ; change return address to .no_forced_drop of (Sprite_DoTheDeath)
 	RTL
 
+RevealSpriteDrop2:
+	LDY.w SprDropsItem, X : BEQ .normal
+		BRA .no_forced_drop
+	.normal
+	LDY.w $0CBA, X : BEQ .no_forced_drop
+		RTL
+	.no_forced_drop
+	PLA : PLA ; remove the JSL reswamturn lower 16 bits
+	PEA.w $06E3CE-1 ; change return address to .no_forced_drop of (Sprite_DoTheDeath)
+	RTL
+
 BitFieldMasks:
 dw $8000, $4000, $2000, $1000, $0800, $0400, $0200, $0100
 dw $0080, $0040, $0020, $0010, $0008, $0004, $0002, $0001
@@ -444,6 +458,7 @@ CheckSprite_Spawn:
 RTL
 .check
 	LDA $0D : CMP #$08 : BNE +
+	LDA $0372 : BNE .error
 		LDX #$0F
 
 		; loop looking for a Sprite with state 0A (carried by the player)
