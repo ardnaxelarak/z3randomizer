@@ -154,7 +154,7 @@ OnNewFile:
 			LDA.b #$80 : STA $7EF093 ; open skull woods curtain
 		+
 
-		LDX.w #$007f : - ; copy over starting overworld event data
+		LDX.w #$007F : - ; copy over starting overworld event data
 			LDA StartingOverworldEvents, X : STA $7EF280, X
 			DEX
 		BPL -
