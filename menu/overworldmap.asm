@@ -239,7 +239,7 @@ PHX
 	CLC : BRA .done
 
 	.checkAga2
-	LDA $7EF2DB : AND #$20 : BNE .fail
+	LDA $7EF01B : AND #$08 : BNE .fail
 	CLC : BRA .done
 
 	.fail
