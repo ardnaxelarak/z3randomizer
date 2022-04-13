@@ -140,7 +140,8 @@ db #$00 ; #$00 = Always On (default) - #$01 = Require Map Item
 CompassMode:
 db #$00 ; #$00 = Off (default) - #$01 = Display Dungeon Count w/Compass - #$02 = Display Dungeon Count Always
         ; #$8x = Moves prize indicator to a special position if bit on
-        ; #$4x = Compasses are shuffled and must be obtained to show position if bit on
+        ; #$4x = Compasses or Maps are shuffled and must be obtained to show position if bit on
+        ; #$2x = Use Compass for position if bit on, otherwise use Map
 ;--------------------------------------------------------------------------------
 org $30803D ; PC 0x18003D
 PersistentFloodgate:
