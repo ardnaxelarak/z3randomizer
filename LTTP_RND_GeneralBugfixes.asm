@@ -353,7 +353,7 @@ if !FEATURE_NEW_TEXT
     incsrc itemtext_lower.asm
 else
     incsrc itemtext.asm
-endif  
+endif
 warnpc $32E000
 
 org $32DFD0	; PC 0x195FD0

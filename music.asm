@@ -190,7 +190,7 @@ Overworld_MosaicDarkWorldChecks:
 
 ;--------------------------------------------------------------------------------
 ; This is the where the music can change due to an UW transition
-; 
+;
 ; On entry, A=16bit XY=8bit, A & X safe to mod, Y unknown
 Underworld_DoorDown_Entry:
     LDX #$FF ; some junk value to be used later to determine if the below lines will change the track

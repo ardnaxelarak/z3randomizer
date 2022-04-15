@@ -239,7 +239,7 @@ PHX
 	CLC : BRA .done
 
 	.checkAga2
-	LDA $7EF01B : AND #$08 : BNE .fail
+	LDA $7EF01B : AND #$80 : BNE .fail
 	CLC : BRA .done
 
 	.fail
@@ -252,16 +252,16 @@ RTS
 ; CLC - should not move indicator
 ; SEC - yep indicator can move
 OverworldMap_CheckForCompass:
-    LDA.l CompassMode : AND #$80 : BEQ .unset ; should I check for compass logic
-    LDA.l CompassMode : AND #$40 : BEQ .set ; compasses aren't shuffled
-    LDA.l CompassMode : AND #$20 : BNE +
-        JSR OverworldMap_CheckForMap : BCC .unset : BRA .set
-    + LDA.l CompassExists, X : BEQ .set ; compass doesn't exits
-    PHX
-        LDA.l MC_SRAM_Offsets, X : TAX ; put compass offset into X
-        LDA !INVENTORY_COMPASS, X : ORA !MAP_OVERLAY, X
-    PLX
-    AND.l MC_Masks, X : BNE .set ; is the compass obtained
+	LDA.l CompassMode : AND #$80 : BEQ .unset ; should I check for compass logic
+	LDA.l CompassMode : AND #$40 : BEQ .set ; compasses aren't shuffled
+	LDA.l CompassMode : AND #$20 : BNE +
+		JSR OverworldMap_CheckForMap : BCC .unset : BRA .set
+	+ LDA.l CompassExists, X : BEQ .set ; compass doesn't exits
+	PHX
+		LDA.l MC_SRAM_Offsets, X : TAX ; put compass offset into X
+		LDA !INVENTORY_COMPASS, X : ORA !MAP_OVERLAY, X
+	PLX
+	AND.l MC_Masks, X : BNE .set ; is the compass obtained
 .unset
 CLC
 RTS
