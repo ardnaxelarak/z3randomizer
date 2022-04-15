@@ -50,6 +50,10 @@ jsl OWOldManSpeed
 org $0283dc
 jsl.l OWLightWorldOrCrossed
 
+; override world check when viewing overworld (incl. title screen portion)
+org $0aba6c  ; < ? - Bank0a.asm:474 ()
+jsl.l OWMapWorldCheck16 : nop
+
 ;(replacing -> LDA $8A : AND.b #$40)
 org $00d8c4  ; < ? - Bank00.asm:4068 ()
 jsl.l OWWorldCheck
@@ -75,8 +79,6 @@ org $07aa34  ; < ? - Bank07.asm:6718 ()
 jsl.l OWWorldCheck
 org $08d408  ; < ? - ancilla_morph_poof.asm:48 ()
 jsl.l OWWorldCheck
-org $0aba6c  ; < ? - Bank0a.asm:474 ()
-jsl.l OWWorldCheck16 : nop
 org $0aba99  ; < ? - Bank0a.asm:515 ()
 jsl.l OWWorldCheck
 org $0bfeab  ; < ? - Bank0b.asm:36 ()
@@ -132,6 +134,13 @@ OWWorldCheck16:
     phx
         ldx $8a : lda.l OWTileWorldAssoc,x
     plx : and.w #$00ff : rtl
+}
+OWMapWorldCheck16:
+{
+    lda $10 : cmp #$0014 : beq .return ; attract module, return with Z flag cleared
+        jsl OWWorldCheck16
+    .return
+    rtl
 }
 
 OWWhirlpoolUpdate:
@@ -462,6 +471,11 @@ OWWorldUpdate: ; x = owid of destination screen
     .return
     rts
 }
+;OWSpecialTransition:
+;{
+;    LDX #$9E
+;    - DEX : DEX : CMP $DAEE,X : BNE -
+;}
 
 ;Data
 org $aaa000
