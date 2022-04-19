@@ -48,6 +48,15 @@ org $07B169
 org $07B17D
 	JSL PreventPotSpawn2
 
+org $00A9DC
+dw $1928, $1938, $5928, $5938 ; change weird ugly black diagonal pot to blue-ish pot
+
+org $018650
+dw $B395 ; change tile type to normal pot
+
+org $01B3D5
+JSL CheckIfPotIsSpecial
+
 
 ; refs to other functions
 org $06d23a
@@ -124,8 +133,15 @@ db 1
 StandingItemCounterMask: ; 142A55
 db 0 ; if 0x01 is set then pot should be counted, if 0x02 then sprite drops, 0x03 (both bits for both)
 PotCountMode: ; 28AA56-7
-dw 0 ; # 0 is don't count pots, bit 1 for cave pots and bit 2 for dungeon pots
+; 0 is don't count pots
+; 1 for check PotCollectionRateTable
+dw 0
 
+org $A8AA60
+PotCollectionRateTable:
+; Reserved $250 296 * 2
+
+org $A8ACB0
 
 RevealPotItem:
 	STA.b $04 ; save tilemap coordinates
@@ -218,12 +234,7 @@ SaveMajorItemDrop:
 ShouldCountNormalPot:
 	INY : INY : LDA [$00], Y : AND #$00FF : CMP #$0080 : BCS .clear
 	LDA.l PotCountMode : BEQ .clear
-	CMP.w #$0003 : BEQ .set
-	CMP.w #$0001 : BEQ .check_cave
-		.in_dungeon
-		LDA $040C : CMP.w #$00FF : BEQ .clear : BRA .set
-	.check_cave
-	LDA $040C : CMP.w #$00FF : BEQ .set : BRA .clear
+	LDA.l PotCollectionRateTable, X : BIT $0A : BEQ .clear ; don't count if clear
 .set
 	SEC
 RTS
@@ -487,6 +498,16 @@ PreventPotSpawn2:
 	LDA $0308 : BEQ +
 		LDA.b #$01 : TSB.b $50 ; what we wrote over
 + RTL
+
+CheckIfPotIsSpecial:
+	TXA ; give index to A so we can do a CMP.l
+	CMP.l $018550 ; see if our current index is that of object 230
+	BEQ .specialpot
+
+    ; Normal pot, so run the vanilla code
+	LDA.l $7EF3CA ; check for dark world
+	.specialpot ; zero flag already set, so gtg
+RTL
 
 
 incsrc dynamic_si_vram.asm
