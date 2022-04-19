@@ -159,6 +159,7 @@ LDX.b #$FF
 	LDA.l WorldMapIcon_posy_located+1, X : STA.l $7EC109
 	LDA.l WorldMapIcon_posy_located, X : STA.l $7EC108
     .adjustment
+    LDA.l WorldMapIcon_tile, X : CMP #$FF : BEQ .skip_draw
    	LDA.l WorldMapIcon_tile+1, X : BEQ .dont_adjust
    	CMP.b #$64 : BEQ .is_crystal
    	LDA.b $1A : AND.b #$10 : BNE .skip_draw
@@ -253,10 +254,10 @@ RTS
 ; SEC - yep indicator can move
 OverworldMap_CheckForCompass:
 	LDA.l CompassMode : AND #$80 : BEQ .unset ; should I check for compass logic
-	LDA.l CompassMode : AND #$40 : BEQ .set ; compasses aren't shuffled
+	LDA.l CompassMode : AND #$40 : BEQ .set ; compasses/maps aren't shuffled
 	LDA.l CompassMode : AND #$20 : BNE +
 		JSR OverworldMap_CheckForMap : BCC .unset : BRA .set
-	+ LDA.l CompassExists, X : BEQ .set ; compass doesn't exits
+	+ LDA.l CompassExists, X : BEQ .set ; compass doesn't exist
 	PHX
 		LDA.l MC_SRAM_Offsets, X : TAX ; put compass offset into X
 		LDA !INVENTORY_COMPASS, X : ORA !MAP_OVERLAY, X
