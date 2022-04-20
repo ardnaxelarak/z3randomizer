@@ -65,6 +65,8 @@ org $1eff81
 Sprite_DrawRippleIfInWater:
 org $0db818
 Sprite_LoadProperties:
+org $06D038
+KeyRoomFlagMasks:
 
 ; defines
 ; Ram usage
@@ -313,11 +315,12 @@ BitFieldMasks:
 dw $8000, $4000, $2000, $1000, $0800, $0400, $0200, $0100
 dw $0080, $0040, $0020, $0010, $0008, $0004, $0002, $0001
 
-KeyRoomFlagMasks:
-db $40, $20
-
 ; Runs during Sprite_E4_SmallKey and duning Sprite_E5_BigKey spawns
 ShouldSpawnItem:
+	LDA $048E : CMP.b #$87 : BNE + ; check for hera basement cage
+	LDA $A8 : AND.b #$03 : CMP.b #$02 : BNE + ; we're not in that quadrant
+			LDA.w $0403 : AND.w KeyRoomFlagMasks,Y : RTL
+	+
 	; checking our sram table
 	PHX : PHY
 		REP #$30
@@ -338,7 +341,11 @@ ShouldSpawnItem:
 	RTL
 
 MarkSRAMForItem:
-	PHX : PHY : REP #$30
+	LDA.l StandingItemsOn : BNE +
+		- LDA.w $0403 : ORA.w KeyRoomFlagMasks, Y : RTL
+	+ LDA $048E : CMP.b #$87 : BNE + ; check for hera basement cage
+		LDA $A8 : AND.b #$03 : CMP.b #$02 : BEQ -
+	+ PHX : PHY : REP #$30
 		LDA.b $A0 : ASL : TAY
 		LDA.l SpawnedItemIndex : ASL
 		TAX : LDA.l BitFieldMasks, X : STA $00
