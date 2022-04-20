@@ -1834,7 +1834,7 @@ LDA CrystalPendantFlags_2, X
 ;JSL.l OverworldMap_CheckObject : RTS
 ;================================================================================
 org $0AC53e ; <- 5453E - Bank0A.asm:1771 - (LDA $0AC50D, X : STA $0D)
-LDA.l CrystalNumberTable, X
+LDA.l CrystalNumberTable-1, X
 ;================================================================================
 ; EVERY INSTANCE OF STA $7EF3C7 IN THE ENTIRE CODEBASE
 org $029D51 ; <- 11D51
