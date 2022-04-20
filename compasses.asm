@@ -15,7 +15,7 @@ DrawDungeonCompassCounts:
 	+
 	CMP.w #$0002 : BEQ ++ ; if CompassMode==2, we don't check for the compass
 		TXY : TXA : LSR : TAX : LDA.l ExistsTransfer, X : TAX : LDA CompassExists, X : BEQ ++
-		TYX : LDA $7EF364 : AND.l DungeonItemMasks, X ; Load compass values to A, mask with dungeon item masks
+		TYX : LDA CompassField : AND.l DungeonItemMasks, X ; Load compass values to A, mask with dungeon item masks
 		BNE ++
 			JMP .done ; skip if we don't have compass
 	++
@@ -23,7 +23,7 @@ DrawDungeonCompassCounts:
 	LDA $040C : LSR
 	BNE +
 		INC
-	+ TAX : LDA.l CompassTotal, X : AND #$00FF
+	+ TAX : LDA.l CompassTotalsWRAM, X : AND #$00FF
 	PHX
 		PHA
 			JSL HexToDec_fast
@@ -38,7 +38,7 @@ DrawDungeonCompassCounts:
 	.end_total
 	PLX
 
-	LDA $7EF4BF, X : AND #$00FF
+	LDA DungeonLocationsChecked, X : AND #$00FF
 	PHA
 		JSL HexToDec_fast
 	PLA : CMP.w #100 : !BLT +
@@ -46,7 +46,6 @@ DrawDungeonCompassCounts:
 	+
 	LDX.b $06 : TXA : ORA #$2490 : STA $7EC794 ; Draw the item count
 	LDX.b $07 : TXA : ORA #$2490 : STA $7EC796
-	
 	LDA.w #$2830 : STA $7EC798 ; draw the slash
 
 	.done
@@ -63,3 +62,10 @@ db $0C, $0C, $00, $02, $0B, $09, $03, $07, $04, $08, $01, $06, $05, $0A
 ;--------------------------------------------------------------------------------
 ; $7EF4C0-7EF4CF - item locations checked indexed by $040C >> 1
 ;--------------------------------------------------------------------------------
+InitCompassTotalsRAM:
+        LDX #$00
+        -
+                LDA CompassTotalsROM, X : STA CompassTotalsWRAM, X
+                INX
+                CPX #$0F : !BLT -
+RTL

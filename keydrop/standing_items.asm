@@ -115,7 +115,7 @@ PotMultiWorldTable:
 org $A8AA50
 StandingItemsOn: ; 142A50
 db 0
-MultiClientFlags: ; 142A51-2 -> stored in SRAM at 7ef33d (for now)
+MultiClientFlagsROM: ; 142A51-2 -> stored in SRAM at 7ef33d (for now)
 dw 0
 SwampDrain1HasItem: ; 142A53
 db 1
@@ -173,10 +173,10 @@ RevealPotItem:
 			LDA $040C : CMP #$FF : BEQ +
 				BNE ++
 				 	INC #2 ; treat sewers as HC
-				++ LSR : TAX : LDA $7EF4BF, X : INC : STA $7EF4BF, X
+				++ LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
 				; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 			+ REP #$30
-			LDA $7EF423 : INC : STA $7EF423 ; Increment Item Total
+			LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
 		.obtained
 	PLY : PLX
 
@@ -211,7 +211,7 @@ SaveMajorItemDrop:
 	; X currently holds the pot item index
 	STA.w SpawnedItemID
 	STX.w SpawnedItemIndex
-	INC SpawnedItemFlag
+	INC.w SpawnedItemFlag
 	LDA.w #$0008 : STA $0B9C ; indicates we should use the key routines
 	RTL
 
@@ -271,7 +271,7 @@ LoadSpriteData:
 RevealSpriteDrop:
 	LDA.l SprDropsItem, X : BEQ .normal
 		LDA #$02 : STA.l SpawnedItemFlag
-		STX SpawnedItemIndex
+		STX.w SpawnedItemIndex
 		LDA.l SprItemReceipt, X : STA SpawnedItemID
 		LDA.l SprItemMWPlayer, X : STA SpawnedItemMWPlayer
 		LDY.b #$01 ; trigger the small key routines
@@ -385,7 +385,7 @@ SpriteKeyDrawGFX:
     PLA : RTL
 
 KeyGet:
-    LDA $7EF36F ; what we wrote over
+    LDA CurrentSmallKeys ; what we wrote over
     PHA
     	LDA.l StandingItemsOn : BNE +
     		PLA : RTL
@@ -402,7 +402,7 @@ KeyGet:
     	PHX
 			LDA $040C : CMP #$FF : BNE +
 				LDA $00 : CMP.b #$AF : BNE .skip
-				LDA $7EF38B : INC : STA $7EF38B
+				LDA CurrentGenericKeys : INC : STA CurrentGenericKeys
 				LDA $00 : BRA .countIt
 			+ LSR : TAX
 			LDA $00 : CMP.l KeyTable, X : BNE +
