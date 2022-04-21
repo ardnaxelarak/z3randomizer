@@ -181,7 +181,7 @@ LDX.b #$FF
     .continue
     STA.b $0B
     PLX : PHX
-    JSR WorldMap_HandleSpriteBlink
+    INX : JSR WorldMap_HandleSpriteBlink
     .skip_draw
 	; end of loop
 	PLX : CPX #12 : BCS + : JMP .loopStart : +
