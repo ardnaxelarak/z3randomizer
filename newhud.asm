@@ -1,8 +1,64 @@
+NewDrawHud:
+        SEP #$30
+;================================================================================
+; Draw bomb count
+!BOMBCOUNT_DRAW_ADDRESS = "$7EC75A"
+!INFINITE_BOMBS = "$7F50C9"
+;================================================================================
+
+	LDA !INFINITE_BOMBS : BNE .infinite_bombs
+	.finite_bombs
+		LDA.l $7EF343 ; bombs
+		JSR HudHexToDec2Digit ;requires 8 bit registers!
+		REP #$20
+		LDX.b $06 : TXA : ORA.w #$2400 : STA !BOMBCOUNT_DRAW_ADDRESS ; Draw bombs 10 digit
+		LDX.b $07 : TXA : ORA.w #$2400 : STA !BOMBCOUNT_DRAW_ADDRESS+2 ; Draw bombs 1 digit
+		BRA +
+
+	.infinite_bombs
+		REP #$20
+		LDA.w #$2431 : STA !BOMBCOUNT_DRAW_ADDRESS ; infinity (left half)
+		INC A        : STA !BOMBCOUNT_DRAW_ADDRESS+2 ; infinity (right half)
+	+
+
+;================================================================================
+; Draw rupee counter
+!RUPEE_DRAW_ADDRESS = "$7EC750"
+;================================================================================
+
+	LDA.l $7EF362 ; Drawing bombs (above) always ends with 16-bit A, so, no need to REP here
+	JSR HudHexToDec4Digit
+	LDX.b $04 : TXA : ORA.w #$2400 : STA !RUPEE_DRAW_ADDRESS	; 1000s
+	LDX.b $05 : TXA : ORA.w #$2400 : STA !RUPEE_DRAW_ADDRESS+2	;  100s
+	LDX.b $06 : TXA : ORA.w #$2400 : STA !RUPEE_DRAW_ADDRESS+4	;   10s
+	LDX.b $07 : TXA : ORA.w #$2400 : STA !RUPEE_DRAW_ADDRESS+6	;    1s
+
+;================================================================================
+; Draw arrow count
+!ARROWCOUNT_DRAW_ADDRESS = "$7EC760"
+!INFINITE_ARROWS = "$7F50C8"
+;================================================================================
+
+	SEP #$20
+	LDA.l ArrowMode : BNE +
+		LDA !INFINITE_ARROWS : BNE .infinite_arrows
+		.finite_arrows
+			LDA.l $7EF377 ; arrows
+			JSR HudHexToDec2Digit
+			REP #$20
+			LDX.b $06 : TXA : ORA.w #$2400 : STA !ARROWCOUNT_DRAW_ADDRESS ; Draw arrows 10 digit
+			LDX.b $07 : TXA : ORA.w #$2400 : STA !ARROWCOUNT_DRAW_ADDRESS+2 ; Draw arrows  1 digit
+			BRA +
+
+		.infinite_arrows
+			REP #$20
+			LDA.w #$2431 : STA !ARROWCOUNT_DRAW_ADDRESS ; infinity (left half)
+			INC A        : STA !ARROWCOUNT_DRAW_ADDRESS+2 ; infinity (right half)
+	+
 ;================================================================================
 ; Draw Goal Item Indicator
 !GOAL_DRAW_ADDRESS = "$7EC72A"
 ;================================================================================
-NewDrawHud:
 	REP #$20
 	LDA.l GoalItemRequirement : BNE + : JMP .done : + ; Star Meter
 

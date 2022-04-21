@@ -3,6 +3,7 @@
 ;--------------------------------------------------------------------------------
 
 DrawDungeonCompassCounts:
+        SEP #$10
 	LDX $1B : BNE + : RTL : + ; Skip if outdoors
 
 	; extra hard safeties for getting dungeon ID to prevent crashes

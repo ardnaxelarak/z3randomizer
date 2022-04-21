@@ -7,6 +7,7 @@ DrHudOverride:
 
 HudAdditions:
 {
+    SEP #$10
     LDA.l DRFlags : AND #$0008 : BNE + : JMP .end_item_count : +
 		LDA.l TotalItemCounter : PHA : CMP #1000 : !BLT +
 			JSL HexToDec4Digit_fast
