@@ -237,8 +237,7 @@ PHX
 	CLC : BRA .done
 
 	.checkAga2
-	LDA RoomDataWRAM[$1B].high : AND #$20 : BNE .fail
-	LDA $7EF01B : AND #$80 : BNE .fail
+	LDA RoomDataWRAM[$0D].high : AND #$08 : BNE .fail
 	CLC : BRA .done
 
 	.fail
