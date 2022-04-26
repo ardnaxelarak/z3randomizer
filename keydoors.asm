@@ -27,7 +27,7 @@ CheckIfDoorsOpen: {
     lda.w PairedDoorTable, x : beq .skipDoor
     sta $02 : and #$00ff : asl a : tax
     lda $02 : and #$ff00 : sta $03
-    lda $7ef000, x : and #$f000 : and $03 : beq .skipDoor
+    lda RoomDataWRAM[$00].l : and #$f000 : and $03 : beq .skipDoor
     tyx : lda $068c : ora $0098c0,x  : sta $068c
     .skipDoor
     iny #2 : cpy $00 : bne .nextDoor

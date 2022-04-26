@@ -83,11 +83,6 @@ SprItemIndex = $7E0750
 SprItemMWPlayer = $7E0760 ; 0x16
 SprItemFlags = $7E0770 ; 0x16 (used for both pots and drops) (combine with SprDropsItem?)
 
-; 7F:6600-7F:684F ($250 or 592 bytes) for pots and 7F:6850-7F:6A9F ($250 or 592 bytes) for sprites
-
-PotItemSRAM = $7F6600
-SpriteItemSRAM = $7F6850
-
 ; todo: move sprites
 ;org $09D62E
 ;UWSpritesPointers ; 0x250 bytes for 0x128 rooms' 16-bit pointers
@@ -126,7 +121,7 @@ PotMultiWorldTable:
 org $A8AA50
 StandingItemsOn: ; 142A50
 db 0
-MultiClientFlags: ; 142A51-2 -> stored in SRAM at 7ef33d (for now)
+MultiClientFlagsROM: ; 142A51-2 -> stored in SRAM at 7ef33d (for now)
 dw 0
 SwampDrain1HasItem: ; 142A53
 db 1
@@ -182,8 +177,8 @@ RevealPotItem:
 		; set bit and count if first time lifting this pot
 		LDA.b $A0 : ASL : TAY
 		TXA : ASL : TAX : LDA.l BitFieldMasks, X : STA $0A
-		TYX : LDA.l PotItemSRAM, X : BIT $0A : BNE .obtained
-			ORA $0A : STA PotItemSRAM, X
+		TYX : LDA.l RoomPotData, X : BIT $0A : BNE .obtained
+			ORA $0A : STA RoomPotData, X
 			PLY : PHY
 			JSR ShouldCountNormalPot : BCC .obtained
 			; increment dungeon counts
@@ -191,10 +186,10 @@ RevealPotItem:
 			LDA $040C : CMP #$FF : BEQ +
 				BNE ++
 				 	INC #2 ; treat sewers as HC
-				++ LSR : TAX : LDA $7EF4BF, X : INC : STA $7EF4BF, X
+				++ LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
 				; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 			+ REP #$30
-			LDA $7EF423 : INC : STA $7EF423 ; Increment Item Total
+			LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
 		.obtained
 	PLY : PLX
 
@@ -229,7 +224,7 @@ SaveMajorItemDrop:
 	; X currently holds the pot item index
 	STA.w SpawnedItemID
 	STX.w SpawnedItemIndex
-	INC SpawnedItemFlag
+	INC.w SpawnedItemFlag
 	LDA.w #$0008 : STA $0B9C ; indicates we should use the key routines
 	RTL
 
@@ -284,7 +279,7 @@ LoadSpriteData:
 RevealSpriteDrop:
 	LDA.l SprDropsItem, X : BEQ .normal
 		LDA #$02 : STA.l SpawnedItemFlag
-		STX SpawnedItemIndex
+		STX.w SpawnedItemIndex
 		LDA.l SprItemReceipt, X : STA SpawnedItemID
 		LDA.l SprItemMWPlayer, X : STA SpawnedItemMWPlayer
 		LDY.b #$01 ; trigger the small key routines
@@ -330,9 +325,9 @@ ShouldSpawnItem:
 			TAX : LDA.l BitFieldMasks, X : STA $00
 		PLX ; restore X again
 		LDA.w SprItemFlags, X : AND #$00FF : CMP #$0001 : BEQ +
-			TYX : LDA.l SpriteItemSRAM, X : BIT $00 : BEQ .notObtained
+			TYX : LDA.l SpritePotData, X : BIT $00 : BEQ .notObtained
 			BRA .obtained
-		+ TYX : LDA.l PotItemSRAM, X : BIT $00 : BEQ .notObtained
+		+ TYX : LDA.l RoomPotData, X : BIT $00 : BEQ .notObtained
 			.obtained
 			SEP #$30 : PLY : PLX : LDA #$01 : RTL ; already obtained
 	.notObtained
@@ -351,8 +346,8 @@ MarkSRAMForItem:
 		TAX : LDA.l BitFieldMasks, X : STA $00
 		TYX
 		LDA.w SpawnedItemFlag : CMP #$0001 : BEQ +
-			LDA SpriteItemSRAM, X : ORA $00 : STA SpriteItemSRAM, X : BRA .end
-		+ LDA PotItemSRAM, X : ORA $00 : STA PotItemSRAM, X
+			LDA SpritePotData, X : ORA $00 : STA SpritePotData, X : BRA .end
+		+ LDA RoomPotData, X : ORA $00 : STA RoomPotData, X
 	.end
 	SEP #$30 : PLY : PLX
 	LDA.w $0403
@@ -403,7 +398,7 @@ SpriteKeyDrawGFX:
     PLA : RTL
 
 KeyGet:
-    LDA $7EF36F ; what we wrote over
+    LDA CurrentSmallKeys ; what we wrote over
     PHA
     	LDA.l StandingItemsOn : BNE +
     		PLA : RTL
@@ -420,7 +415,7 @@ KeyGet:
     	PHX
 			LDA $040C : CMP #$FF : BNE +
 				LDA $00 : CMP.b #$AF : BNE .skip
-				LDA $7EF38B : INC : STA $7EF38B
+				LDA CurrentGenericKeys : INC : STA CurrentGenericKeys
 				LDA $00 : BRA .countIt
 			+ LSR : TAX
 			LDA $00 : CMP.l KeyTable, X : BNE +
