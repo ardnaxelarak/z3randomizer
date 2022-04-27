@@ -168,12 +168,18 @@ RevealPotItem:
 	STZ.w SpawnedItemIsMultiWorld
 	BIT.b $08
 	BVS LoadMultiWorldPotItem
-	BMI LoadMajorPotItem
+	BMI .major
+	BRA .normal_secret
+.major
+	JMP LoadMajorPotItem
 
 .normal_secret
 	STA $08
 
 	PHX : PHY
+		INY : INY
+		LDA.b [$00],Y : AND.w #$00FF
+		CMP #$0088 : BEQ .obtained ; skip this step for switches
 		; set bit and count if first time lifting this pot
 		LDA.b $A0 : ASL : TAY
 		TXA : ASL : TAX : LDA.l BitFieldMasks, X : STA $0A
