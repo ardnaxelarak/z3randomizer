@@ -165,6 +165,11 @@ org $A1A000 ; static mapping area. Referenced by front end. Do not move.
 incsrc invertedstatic.asm
 warnpc $A1A100
 
+org $A1B000
+incsrc failure.asm
+warnpc $A1FF00
+
+
 org $A1FF00 ; static mapping area
 incsrc init.asm
 
@@ -312,6 +317,11 @@ if !FEATURE_NEW_TEXT
     incbin newfont.bin
     NewFontInverted:
     incbin newfont_inverted.bin
+
+    org $0CD7DF
+    incbin text_unscramble1.bin
+    org $0CE4D5
+    incbin text_unscramble2.bin
 endif
 
 org $328000
