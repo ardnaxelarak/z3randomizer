@@ -168,25 +168,18 @@ RevealPotItem:
 	STZ.w SpawnedItemIsMultiWorld
 	BIT.b $08
 	BVS LoadMultiWorldPotItem
-	BMI .major
-	BRA .normal_secret
-.major
-	JMP LoadMajorPotItem
+	BMI LoadMajorPotItem
 
 .normal_secret
 	STA $08
 
 	PHX : PHY
-		INY : INY
-		LDA.b [$00],Y : AND.w #$00FF
-		CMP #$0088 : BEQ .obtained ; skip this step for switches
 		; set bit and count if first time lifting this pot
-		LDA.b $A0 : ASL : TAY
 		TXA : ASL : TAX : LDA.l BitFieldMasks, X : STA $0A
-		TYX : LDA.l RoomPotData, X : BIT $0A : BNE .obtained
+		LDA.b $A0 : ASL : TAX
+		JSR ShouldCountNormalPot : BCC .obtained
+		LDA.l RoomPotData, X : BIT $0A : BNE .obtained
 			ORA $0A : STA RoomPotData, X
-			PLY : PHY
-			JSR ShouldCountNormalPot : BCC .obtained
 			; increment dungeon counts
 			SEP #$30
 			LDA $040C : CMP #$FF : BEQ +
