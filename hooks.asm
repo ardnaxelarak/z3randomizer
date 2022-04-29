@@ -2936,6 +2936,22 @@ db $B2, $28, $B3, $28, $C2, $28, $C2, $68
 org $079CE6 ; Bank07.asm@4632 (LDA #$80 : TSB $3A)
 JSL CheckDetonateBomb
 ;--------------------------------------------------------------------------------
+org $1EDCF8 ; bank_1E.asm@16086 (LDX $0202 : ...)
+JSL SetBeeType
+BRA + : NOP #15 : +
+;--------------------------------------------------------------------------------
+org $1EB5E8 ; bank_1E.asm@9387 (LDA #$03 : STA $0D80, X)
+JSL ArrghusBoing
+;--------------------------------------------------------------------------------
+org $1EDFAF ; bank_1E.asm@16607 (.next_sprite)
+JSL BeeCheckTarget
+BCS .bee_valid_target
+BRA .bee_unsuitable_target
+NOP #48
+.bee_unsuitable_target
+skip 11
+.bee_valid_target
+;--------------------------------------------------------------------------------
 
 ;================================================================================
 ; Variable Ganon Vulnerability
@@ -2952,8 +2968,9 @@ org $0DD628 ; Bank0D.asm@1266 (LDA $0B6B, Y : AND #$02)
 JSL CheckBeeBoss
 NOP
 ;--------------------------------------------------------------------------------
-org $0DD677 ; Bank0D.asm@1303 (JSL Ancilla_CheckSpriteDamage.preset_class)
+org $0DD676 ; Bank0D.asm@1303 (TYX : JSL Ancilla_CheckSpriteDamage.preset_class)
 JSL Ganon_CheckBeeVulnerability
+NOP
 ;--------------------------------------------------------------------------------
 
 ;================================================================================
