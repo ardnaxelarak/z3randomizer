@@ -331,6 +331,7 @@ AllowBombingMoldorm:
 	                     CMP #$03 : BEQ .no_disable_projectiles
 	                     CMP #$04 : BEQ .no_disable_projectiles
 	                     CMP #$05 : BEQ .no_disable_projectiles
+	                     CMP #$06 : BEQ .no_disable_projectiles
 	INC $0BA0, X
 .no_disable_projectiles
 	JSL !SPRITE_INITIALIZED_SEGMENTED
@@ -432,6 +433,12 @@ StoreSwordDamage:
 	LDA #$05
 	RTL
 ;--------------------------------------------------------------------------------
+BeeDamageClass:
+	db $01
+	db $06, $00, $07, $08, $0A
+	db $0B, $0C, $0D, $0E, $0F
+	db $01, $03, $01, $01, $01
+	db $01, $01, $01, $01, $01
 CheckDetonateBomb:
 	LDA.l SpecialWeapons : CMP.b #$01 : BNE .not_bomb_mode
 .detonate_bombs
@@ -445,9 +452,33 @@ CheckDetonateBomb:
 .next_ancilla
 	DEX
 	BPL .check_ancilla
+	BRA .done
 .not_bomb_mode
+	LDA.l SpecialWeapons : CMP.b #$06 : BNE .done
+	JSL $1EDCC9
+	BMI .done 
+	PHX
+	LDX.w $0202
+	LDA.l BeeDamageClass, X
+	STA.w $0ED0, Y
+	PLX
+.done
 	; what we wrote over
 	LDA.b #$80
 	TSB.b $3A
 	RTL
 ;--------------------------------------------------------------------------------
+SetBeeType:
+	LDA.l SpecialWeapons : CMP.b #$06 : BNE .regular_bee
+	LDX.w $0202
+	LDA.l $7EF33F, X
+	TAX
+	LDA.l $7EF35B, X
+	CMP.b #$08
+	BNE .regular_bee
+	LDA.b #$01
+	STA.w $0EB0, Y
+.regular_bee
+	LDA.b #$01
+	STA.w $0ED0, Y
+	RTL
