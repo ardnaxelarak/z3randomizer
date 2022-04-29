@@ -128,17 +128,18 @@ LoadModifiedIceFloorValue_a01:
 ;================================================================================
 CheckTabletSword:
 	LDA.l AllowHammerTablets : BEQ +
-	LDA $7EF34B : BEQ + ; check for hammer
-		LDA.b #$02 : RTL
+	LDA $7EF34B : BNE .allow ; check for hammer
 	+
 	LDA.l SpecialWeapons : CMP #$01 : BEQ .check_special
 	                       CMP #$03 : BEQ .check_special
 	                       CMP #$04 : BEQ .check_special
 	                       CMP #$05 : BEQ .check_special
+	                       CMP #$06 : BEQ .allow
 	BRA .normal
-	.check_special
-	LDA !WEAPON_LEVEL : CMP #$02 : !BLT + ; check for master bombs
+	.allow
 		LDA.b #$02 : RTL
+	.check_special
+	LDA !WEAPON_LEVEL : CMP #$02 : !BGE .allow ; check for master bombs
 	.normal
 	LDA $7EF359 ; get actual sword value
 RTL

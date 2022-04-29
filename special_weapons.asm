@@ -10,6 +10,7 @@ DamageClassCalc:
 	JSL Ganon_CheckAncillaVulnerability
 	RTL
 +
+	LDA SpecialWeapons : CMP #$06 : BEQ .cane_immune ; only crystal switches in bee mode
 	PLA
 	CMP #$01 : BEQ .red_cane
 	CMP #$2C : BEQ .red_cane
@@ -279,9 +280,13 @@ Utility_CheckImpervious:
 	                     CMP #$03 : BEQ +
 	                     CMP #$04 : BEQ +
 	                     CMP #$05 : BEQ +
+	                     CMP #$06 : BEQ .check_sidenexx
 	BRA .normal
 +
 	LDA $0301 : AND.b #$0A : BNE .impervious ; impervious to hammer
+.check_sidenexx
+	LDA.w $0DD1 : ORA.w $0DD2 : BNE .impervious ; at least one sidenexx alive
+	LDA.w $0D80, X : CMP.b #$02 : BCS .impervious ; at least one sidenexx alive
 	BRA .not_impervious
 .normal
 	LDA $0E60, X : AND.b #$40 : BNE .impervious
@@ -331,6 +336,7 @@ AllowBombingMoldorm:
 	                     CMP #$03 : BEQ .no_disable_projectiles
 	                     CMP #$04 : BEQ .no_disable_projectiles
 	                     CMP #$05 : BEQ .no_disable_projectiles
+	                     CMP #$06 : BEQ .no_disable_projectiles
 	INC $0BA0, X
 .no_disable_projectiles
 	JSL !SPRITE_INITIALIZED_SEGMENTED
@@ -344,6 +350,7 @@ AllowBombingBarrier:
 	                     CMP #$03 : BEQ .no_disable_projectiles
 	                     CMP #$04 : BEQ .no_disable_projectiles
 	                     CMP #$05 : BEQ .no_disable_projectiles
+	                     CMP #$06 : BEQ .no_disable_projectiles
 .disable_projectiles
 	INC $0BA0, X
 .no_disable_projectiles
@@ -432,6 +439,12 @@ StoreSwordDamage:
 	LDA #$05
 	RTL
 ;--------------------------------------------------------------------------------
+BeeDamageClass:
+	db $FF
+	db $06, $00, $07, $08, $0A
+	db $0B, $0C, $0D, $0E, $0F
+	db $FF, $03, $FF, $FF, $FF
+	db $FF, $01, $01, $FF, $FF
 CheckDetonateBomb:
 	LDA.l SpecialWeapons : CMP.b #$01 : BNE .not_bomb_mode
 .detonate_bombs
@@ -445,9 +458,130 @@ CheckDetonateBomb:
 .next_ancilla
 	DEX
 	BPL .check_ancilla
+	BRA .done
 .not_bomb_mode
+	LDA.l SpecialWeapons : CMP.b #$06 : BNE .done
+	LDX.w $0202
+	LDA.l BeeDamageClass, X : CMP.b #$FF : BEQ .nope
+	JSL $1EDCC9
+	BMI .nope
+	LDX.w $0202
+	LDA.l BeeDamageClass, X
+	CMP.b #$06 : BNE .set_bee_class
+	LDA.l $7EF340 : CMP.b #$03 : !BGE .silver_arrows
+	LDA.b #$06
+	BRA .set_bee_class
+.silver_arrows
+	LDA.b #$09
+.set_bee_class
+	STA.w $0ED0, Y
+	BRA .done
+.nope
+	LDA.b #$3C
+	STA.w $0CF8
+	JSL $0DBB67
+	ORA.w $0CF8
+	STA.w $012E
+.done
 	; what we wrote over
 	LDA.b #$80
 	TSB.b $3A
 	RTL
 ;--------------------------------------------------------------------------------
+SetBeeType:
+	LDA.l SpecialWeapons : CMP.b #$06 : BEQ .bee_mode
+	LDX.w $0202
+.check_bee_type
+	LDA.l $7EF33F, X
+	TAX
+	LDA.l $7EF35B, X
+	CMP.b #$08
+	BNE .regular_bee
+	LDA.b #$01
+	STA.w $0EB0, Y
+.regular_bee
+	LDA.b #$01
+	STA.w $0ED0, Y
+	RTL
+.bee_mode
+	LDX.w $0202
+	CPX.b #$10 : BEQ .check_bee_type
+	BRA .regular_bee
+;--------------------------------------------------------------------------------
+ArrghusBoing:
+	LDA.l SpecialWeapons : CMP.b #$06 : BNE .done
+	LDA.w $0F60, X : AND.b #$BF : STA.w $0F60, X
+.done
+	; what we wrote over
+	LDA.b #$03
+	STA.w $0D80, X
+	RTL
+;--------------------------------------------------------------------------------
+BeeCheckTarget:
+CPY.w $0FA0
+BEQ .unsuitable_target
+
+LDA.w $0DD0,Y
+CMP.b #$09
+BCC .unsuitable_target
+
+LDA.w $0F00,Y
+BNE .unsuitable_target
+
+; in bee-mode skip targets that the bee can't hurt
+LDA.l SpecialWeapons : CMP.b #$06 : BNE +
+JSR BeeCheckDamage
+CMP.b #$00 : BEQ .unsuitable_target
++
+
+LDA.w $0E40,Y
+BMI .potential_target
+
+LDA.w $0F20,Y
+CMP.w $0F20,X
+BNE .unsuitable_target
+
+LDA.w $0F60,Y
+AND.b #$40
+BEQ +
+LDA.l SpecialWeapons : CMP.b #$06 : BNE .unsuitable_target
+; in bee mode, allow targetting anti-fairies, bunny beams, and keese
+LDA.w $0E20,Y
+CMP.b #$15 : BEQ + ; anti-fairy
+CMP.b #$6F : BEQ + ; keese
+CMP.b #$D1 : BEQ + ; bunny beam
+BRA .unsuitable_target
++
+
+LDA.w $0BA0,Y
+BEQ .valid_target
+BRA .unsuitable_target
+
+.potential_target
+LDA.w $0EB0,X
+BEQ .unsuitable_target
+
+LDA.w $0CD2,Y
+AND.b #$40
+BNE .valid_target
+
+.unsuitable_target
+CLC : RTL
+
+.valid_target
+SEC : RTL
+;--------------------------------------------------------------------------------
+BeeCheckDamage:
+PHX : PHP
+REP #$20
+LDA.w $0E20,Y : AND.w #$00FF
+ASL #4
+SEP #$20
+ORA.w $0ED0,X
+REP #$30
+TAX
+SEP #$20
+JSL LookupDamageLevel
+SEP #$10
+PLP : PLX
+RTS
