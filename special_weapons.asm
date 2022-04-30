@@ -10,6 +10,7 @@ DamageClassCalc:
 	JSL Ganon_CheckAncillaVulnerability
 	RTL
 +
+	LDA SpecialWeapons : CMP #$06 : BEQ .cane_immune ; only crystal switches in bee mode
 	PLA
 	CMP #$01 : BEQ .red_cane
 	CMP #$2C : BEQ .red_cane
@@ -345,6 +346,7 @@ AllowBombingBarrier:
 	                     CMP #$03 : BEQ .no_disable_projectiles
 	                     CMP #$04 : BEQ .no_disable_projectiles
 	                     CMP #$05 : BEQ .no_disable_projectiles
+	                     CMP #$06 : BEQ .no_disable_projectiles
 .disable_projectiles
 	INC $0BA0, X
 .no_disable_projectiles
@@ -434,11 +436,11 @@ StoreSwordDamage:
 	RTL
 ;--------------------------------------------------------------------------------
 BeeDamageClass:
-	db $01
+	db $FF
 	db $06, $00, $07, $08, $0A
 	db $0B, $0C, $0D, $0E, $0F
-	db $01, $03, $01, $01, $01
-	db $01, $01, $01, $01, $01
+	db $FF, $03, $FF, $FF, $FF
+	db $FF, $01, $01, $FF, $FF
 CheckDetonateBomb:
 	LDA.l SpecialWeapons : CMP.b #$01 : BNE .not_bomb_mode
 .detonate_bombs
@@ -455,13 +457,27 @@ CheckDetonateBomb:
 	BRA .done
 .not_bomb_mode
 	LDA.l SpecialWeapons : CMP.b #$06 : BNE .done
+	LDX.w $0202
+	LDA.l BeeDamageClass, X : CMP.b #$FF : BEQ .nope
 	JSL $1EDCC9
-	BMI .done 
-	PHX
+	BMI .nope
 	LDX.w $0202
 	LDA.l BeeDamageClass, X
+	CMP.b #$06 : BNE .set_bee_class
+	LDA.l $7EF340 : CMP.b #$03 : !BGE .silver_arrows
+	LDA.b #$06
+	BRA .set_bee_class
+.silver_arrows
+	LDA.b #$09
+.set_bee_class
 	STA.w $0ED0, Y
-	PLX
+	BRA .done
+.nope
+	LDA.b #$3C
+	STA.w $0CF8
+	JSL $0DBB67
+	ORA.w $0CF8
+	STA.w $012E
 .done
 	; what we wrote over
 	LDA.b #$80
