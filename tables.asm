@@ -1876,19 +1876,19 @@ org $30EFE0 ; PC 0x186FE0-0x186FEF
 CrystalPendantFlags_3:
     db $00 ; Sewers
 	db $00 ; Hyrule Castle
-	db $01 ; Eastern Palace
-	db $02 ; Desert Palace
+	db $08 ; Eastern Palace
+	db $09 ; Desert Palace
 	db $00 ; Agahnim's Tower
-	db $04 ; Swamp Palace
-	db $04 ; Palace of Darkness
-	db $03 ; Misery Mire
-    db $04 ; Skull Woods
-	db $03 ; Ice Palace
-	db $02 ; Tower of Hera
+	db $02 ; Swamp Palace
+	db $01 ; Palace of Darkness
+	db $06 ; Misery Mire
+    db $03 ; Skull Woods
+	db $05 ; Ice Palace
+	db $0A ; Tower of Hera
 	db $04 ; Thieves' Town
-	db $04 ; Turtle Rock
+	db $07 ; Turtle Rock
 	db $00 ; Ganons Tower
-; 00 - No Prize. 01 - Green Pendant. 02 - Other Pendant, 03 - Special Crystal, 04 - Other Crystal
+; 00 - No Prize. 01 - 07 Crystal Number 08 - Green Pendant 09 - Blue Pendant, 0A - Red Pendant
 org $30F000 ; PC 0x187000-0x18700F
 CompassTotalsROM:
 db $08, $08, $06, $06, $02, $0A, $0E, $08, $08, $08, $06, $08, $0C, $1B, $00, $00
