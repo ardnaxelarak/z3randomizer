@@ -498,3 +498,11 @@ SetBeeType:
 	LDA.b #$01
 	STA.w $0ED0, Y
 	RTL
+;--------------------------------------------------------------------------------
+ArrghusBoing:
+	LDA.l SpecialWeapons : CMP.b #$06 : BNE .done
+	LDA.w $0F60, X : AND.b #$BF : STA.w $0F60, X
+.done
+	; what we wrote over
+	LDA.b #$03
+	STA.w $0D80, X
