@@ -335,10 +335,9 @@ ShouldSpawnItem:
 	RTL
 
 MarkSRAMForItem:
-	LDA.l StandingItemsOn : BNE +
-		- LDA.w $0403 : ORA.w KeyRoomFlagMasks, Y : RTL
-	+ LDA $048E : CMP.b #$87 : BNE + ; check for hera basement cage
-		LDA $A8 : AND.b #$03 : CMP.b #$02 : BEQ -
+	LDA $048E : CMP.b #$87 : BNE + ; check for hera basement cage
+		LDA $A8 : AND.b #$03 : CMP.b #$02 : BNE +
+		LDA.w $0403 : ORA.w KeyRoomFlagMasks, Y : RTL
 	+ PHX : PHY : REP #$30
 		LDA.b $A0 : ASL : TAY
 		LDA.l SpawnedItemIndex : ASL
