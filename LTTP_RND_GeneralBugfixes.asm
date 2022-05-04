@@ -615,6 +615,9 @@ Link_ReceiveItem:
 org $07E68F
 Unknown_Method_0: ; In US version disassembly simply called "$3E6A6 IN ROM"
 
+org $07F413
+Link_CheckForEdgeScreenTransition:
+
 org $07F4AA
 Sprite_CheckIfPlayerPreoccupied:
 
@@ -659,6 +662,9 @@ AddAncillaLong:
 
 org $099D1A
 Ancilla_CheckIfAlreadyExistsLong:
+
+org $09AC57
+Ancilla_TerminateSelectInteractives:
 
 org $09AE64
 Sprite_SetSpawnedCoords:
