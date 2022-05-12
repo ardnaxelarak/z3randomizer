@@ -280,9 +280,13 @@ Utility_CheckImpervious:
 	                     CMP #$03 : BEQ +
 	                     CMP #$04 : BEQ +
 	                     CMP #$05 : BEQ +
+	                     CMP #$06 : BEQ .check_sidenexx
 	BRA .normal
 +
 	LDA $0301 : AND.b #$0A : BNE .impervious ; impervious to hammer
+.check_sidenexx
+	LDA.w $0DD1 : ORA.w $0DD2 : BNE .impervious ; at least one sidenexx alive
+	LDA.w $0D80, X : CMP.b #$02 : BCS .impervious ; at least one sidenexx alive
 	BRA .not_impervious
 .normal
 	LDA $0E60, X : AND.b #$40 : BNE .impervious
