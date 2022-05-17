@@ -444,7 +444,7 @@ CreditsLineBlank:
 
 %blankline()
 
-%bigcredits("CODEMANN8")
+%bigcredits("CODEMANN8            CATOBAT")
 
 %blankline()
 %blankline()
