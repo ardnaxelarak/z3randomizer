@@ -1171,7 +1171,7 @@ RTL
 ; Set a flag in SRAM if we pick up a compass in its own dungeon with HUD compass
 ; counts on
 MaybeFlagCompassTotalPickup:
-        LDA.l CompassMode : AND.w #$000F : BEQ .done
+        LDA.l CompassMode : AND.b #$0F : BEQ .done
         LDA $040C : CMP #$FF : BEQ .done
         LSR : STA $04 : LDA #$0F : !SUB $04 ; Compute flag "index"
         CPY #$25 : BEQ .setFlag             ; Set flag if it's a compass for this dungeon
