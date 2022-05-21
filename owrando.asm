@@ -226,7 +226,7 @@ OWPreserveMirrorSprite:
 OWMirrorSpriteMove:
 {
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq +
-        lda $1acf : eor #$80 : sta $1acf
+        lda $1acf : ora #$40 : sta $1acf
     + lda #$2c : jml.l $07A985 ; what we wrote over
 }
 OWMirrorSpriteRestore:
@@ -614,7 +614,7 @@ OWWorldUpdate: ; x = owid of destination screen
         cmp #0 : beq + : lda #1
         + cmp.l InvertedMode : bne +
             lda $1acf : and #$0f : sta $1acf : bra .playSfx ; bring portal back into position
-        + lda $1acf : eor #$80 : sta $1acf ; move portal off screen
+        + lda $1acf : ora #$40 : sta $1acf ; move portal off screen
         
         .playSfx
         lda #$38 : sta $012f ; play sfx - #$3b is an alternative
