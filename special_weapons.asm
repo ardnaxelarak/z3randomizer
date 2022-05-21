@@ -489,8 +489,9 @@ CheckDetonateBomb:
 	RTL
 ;--------------------------------------------------------------------------------
 SetBeeType:
-	LDA.l SpecialWeapons : CMP.b #$06 : BNE .regular_bee
+	LDA.l SpecialWeapons : CMP.b #$06 : BEQ .bee_mode
 	LDX.w $0202
+.check_bee_type
 	LDA.l $7EF33F, X
 	TAX
 	LDA.l $7EF35B, X
@@ -502,6 +503,10 @@ SetBeeType:
 	LDA.b #$01
 	STA.w $0ED0, Y
 	RTL
+.bee_mode
+	LDX.w $0202
+	CPX.b #$10 : BEQ .check_bee_type
+	BRA .regular_bee
 ;--------------------------------------------------------------------------------
 ArrghusBoing:
 	LDA.l SpecialWeapons : CMP.b #$06 : BNE .done
