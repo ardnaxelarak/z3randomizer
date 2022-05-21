@@ -196,6 +196,16 @@ OWWhirlpoolUpdate:
     rtl
 }
 
+OWMirrorSpriteOnMap:
+{
+    lda $1ac0,x : bit #$f0 : beq .continue
+        lda #$00 : rtl
+    .continue
+    ora $1ab0,x
+    ora $1ad0,x
+    ora $1ae0,x
+    rtl
+}
 OWPreserveMirrorSprite:
 {
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla ; if OW Crossed, skip world check and continue

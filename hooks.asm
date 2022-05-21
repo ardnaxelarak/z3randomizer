@@ -2386,6 +2386,8 @@ MirrorBonk_BranchGamma:
 JML.l OWMirrorSpriteMove
 org $02FBAB
 JSL.l OWMirrorSpriteRestore : NOP
+org $0ABFBF
+JSL.l OWMirrorSpriteOnMap : BRA + : NOP #6 : +
 ;================================================================================
 
 ;================================================================================
