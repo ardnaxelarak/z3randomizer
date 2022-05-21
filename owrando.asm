@@ -198,8 +198,9 @@ OWWhirlpoolUpdate:
 
 OWPreserveMirrorSprite:
 {
-    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla
-        rtl ; if OW Crossed, skip world check and continue
+    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla ; if OW Crossed, skip world check and continue
+        lda $10 : cmp #$0f : beq .vanilla ; if performing mirror superbunny
+            rtl
     
     .vanilla
     lda InvertedMode : beq +
