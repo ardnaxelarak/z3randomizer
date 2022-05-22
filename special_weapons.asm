@@ -515,3 +515,73 @@ ArrghusBoing:
 	; what we wrote over
 	LDA.b #$03
 	STA.w $0D80, X
+	RTL
+;--------------------------------------------------------------------------------
+BeeCheckTarget:
+CPY.w $0FA0
+BEQ .unsuitable_target
+
+LDA.w $0DD0,Y
+CMP.b #$09
+BCC .unsuitable_target
+
+LDA.w $0F00,Y
+BNE .unsuitable_target
+
+; in bee-mode skip targets that the bee can't hurt
+LDA.l SpecialWeapons : CMP.b #$06 : BNE +
+JSR BeeCheckDamage
+CMP.b #$00 : BEQ .unsuitable_target
++
+
+LDA.w $0E40,Y
+BMI .potential_target
+
+LDA.w $0F20,Y
+CMP.w $0F20,X
+BNE .unsuitable_target
+
+LDA.w $0F60,Y
+AND.b #$40
+BEQ +
+LDA.l SpecialWeapons : CMP.b #$06 : BNE .unsuitable_target
+; in bee mode, allow targetting anti-fairies, bunny beams, and keese
+LDA.w $0E20,Y
+CMP.b #$15 : BEQ + ; anti-fairy
+CMP.b #$6F : BEQ + ; keese
+CMP.b #$D1 : BEQ + ; bunny beam
+BRA .unsuitable_target
++
+
+LDA.w $0BA0,Y
+BEQ .valid_target
+BRA .unsuitable_target
+
+.potential_target
+LDA.w $0EB0,X
+BEQ .unsuitable_target
+
+LDA.w $0CD2,Y
+AND.b #$40
+BNE .valid_target
+
+.unsuitable_target
+CLC : RTL
+
+.valid_target
+SEC : RTL
+;--------------------------------------------------------------------------------
+BeeCheckDamage:
+PHX : PHP
+REP #$20
+LDA.w $0E20,Y : AND.w #$00FF
+ASL #4
+SEP #$20
+ORA.w $0ED0,X
+REP #$30
+TAX
+SEP #$20
+JSL LookupDamageLevel
+SEP #$10
+PLP : PLX
+RTS

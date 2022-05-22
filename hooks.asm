@@ -2836,6 +2836,15 @@ BRA + : NOP #15 : +
 org $1EB5E8 ; bank_1E.asm@9387 (LDA #$03 : STA $0D80, X)
 JSL ArrghusBoing
 ;--------------------------------------------------------------------------------
+org $1EDFAF ; bank_1E.asm@16607 (.next_sprite)
+JSL BeeCheckTarget
+BCS .bee_valid_target
+BRA .bee_unsuitable_target
+NOP #48
+.bee_unsuitable_target
+skip 11
+.bee_valid_target
+;--------------------------------------------------------------------------------
 
 ;================================================================================
 ; Variable Ganon Vulnerability
