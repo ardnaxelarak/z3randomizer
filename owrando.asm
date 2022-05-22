@@ -226,6 +226,11 @@ OWMirrorSpriteMove:
 {
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq +
         lda.w $1acf : ora.b #$40 : sta.w $1acf
+    + rts
+}
+OWMirrorSpriteBonk:
+{
+    jsr.w OWMirrorSpriteMove
     lda.b #$2c : jml SetGameModeLikeMirror ; what we wrote over
 }
 OWMirrorSpriteRestore:
