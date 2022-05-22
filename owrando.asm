@@ -220,14 +220,14 @@ OWPreserveMirrorSprite:
         rtl
 
     .deleteMirror
-    pla : lda #$de : pha ; in vanilla, if in dark world, jump to $05afdf
     rtl
+    + pla : pla : pla : jml Sprite_6C_MirrorPortal_missing_mirror
 }
 OWMirrorSpriteMove:
 {
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq +
         lda $1acf : ora #$40 : sta $1acf
-    + lda #$2c : jml.l $07A985 ; what we wrote over
+    lda.b #$2c : jml SetGameModeLikeMirror ; what we wrote over
 }
 OWMirrorSpriteRestore:
 {

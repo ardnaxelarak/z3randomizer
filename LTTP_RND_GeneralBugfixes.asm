@@ -557,6 +557,9 @@ Overworld_MemorizeMap16Change:
 org $05A51D
 Sprite_SpawnFallingItem:
 
+org $05AFF1
+Sprite_6C_MirrorPortal_dont_do_warp:
+
 org $05DF6C ; 02DF6C - Bank05.asm : 2445
 Sprite_DrawMultiple:
 
@@ -616,6 +619,9 @@ Player_HaltDashAttackLong:
 
 org $07999D
 Link_ReceiveItem:
+
+org $07A985
+SetGameModeLikeMirror:
 
 org $07E68F
 Unknown_Method_0: ; In US version disassembly simply called "$3E6A6 IN ROM"
