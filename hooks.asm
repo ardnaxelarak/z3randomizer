@@ -2383,10 +2383,6 @@ JML MirrorBonk
 MirrorBonk_NormalReturn:
 org $07A9D1 ; <- 3A9D1 - Bank07.asm:6649 (BRANCH_GAMMA:)
 MirrorBonk_BranchGamma:
-org $02FBAB
-JSL.l OWMirrorSpriteRestore : NOP
-org $0ABFBF
-JSL.l OWMirrorSpriteOnMap : BRA + : NOP #6 : +
 JML OWMirrorSpriteBonk
 ;================================================================================
 

@@ -39,8 +39,17 @@ org $04E8B4
 Overworld_LoadSpecialOverworld:
 
 
-org $05af75
+; mirror hooks
+org $02FBAB
+JSL OWMirrorSpriteRestore : NOP
+org $05AF75
+Sprite_6C_MirrorPortal:
 jsl OWPreserveMirrorSprite : nop #2 ; LDA $7EF3CA : BNE $05AFDF
+org $05AFDF
+Sprite_6C_MirrorPortal_missing_mirror:
+JML OWMirrorSpriteDelete : NOP ; STZ $0DD0,X : BRA $05AFF1
+org $0ABFBF
+JSL OWMirrorSpriteOnMap : BRA + : NOP #6 : +
 
 ; whirlpool shuffle cross world change
 org $02b3bd
@@ -220,6 +229,8 @@ OWPreserveMirrorSprite:
         rtl
 
     .deleteMirror
+    lda.b $10 : cmp.b #$0f : bne +
+        jsr.w OWMirrorSpriteMove ; if performing mirror superbunny
     + pla : pla : pla : jml Sprite_6C_MirrorPortal_missing_mirror
 }
 OWMirrorSpriteMove:
@@ -232,6 +243,12 @@ OWMirrorSpriteBonk:
 {
     jsr.w OWMirrorSpriteMove
     lda.b #$2c : jml SetGameModeLikeMirror ; what we wrote over
+}
+OWMirrorSpriteDelete:
+{
+    stz.w $0dd0,x ; what we wrote over
+    jsr.w OWMirrorSpriteMove
+    jml Sprite_6C_MirrorPortal_dont_do_warp
 }
 OWMirrorSpriteRestore:
 {
