@@ -220,7 +220,6 @@ OWPreserveMirrorSprite:
         rtl
 
     .deleteMirror
-    rtl
     + pla : pla : pla : jml Sprite_6C_MirrorPortal_missing_mirror
 }
 OWMirrorSpriteMove:
