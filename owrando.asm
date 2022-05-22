@@ -198,25 +198,25 @@ OWWhirlpoolUpdate:
 
 OWMirrorSpriteOnMap:
 {
-    lda $1ac0,x : bit #$f0 : beq .continue
-        lda #$00 : rtl
+    lda.w $1ac0,x : bit.b #$f0 : beq .continue
+        lda.b #$00 : rtl
     .continue
-    ora $1ab0,x
-    ora $1ad0,x
-    ora $1ae0,x
+    ora.w $1ab0,x
+    ora.w $1ad0,x
+    ora.w $1ae0,x
     rtl
 }
 OWPreserveMirrorSprite:
 {
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla ; if OW Crossed, skip world check and continue
-        lda $10 : cmp #$0f : beq .vanilla ; if performing mirror superbunny
+        lda.b $10 : cmp.b #$0f : beq .vanilla ; if performing mirror superbunny
             rtl
     
     .vanilla
-    lda InvertedMode : beq +
-        lda $7ef3ca : beq .deleteMirror
+    lda.l InvertedMode : beq +
+        lda.l $7ef3ca : beq .deleteMirror
         rtl
-    + lda $7ef3ca : bne .deleteMirror
+    + lda.l $7ef3ca : bne .deleteMirror
         rtl
 
     .deleteMirror
@@ -225,19 +225,19 @@ OWPreserveMirrorSprite:
 OWMirrorSpriteMove:
 {
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq +
-        lda $1acf : ora #$40 : sta $1acf
+        lda.w $1acf : ora.b #$40 : sta.w $1acf
     lda.b #$2c : jml SetGameModeLikeMirror ; what we wrote over
 }
 OWMirrorSpriteRestore:
 {
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .return
-        lda InvertedMode : beq +
-            lda $7ef3ca : beq .return
+        lda.l InvertedMode : beq +
+            lda.l $7ef3ca : beq .return
             bra .restorePortal
-        + lda $7ef3ca : bne .return
+        + lda.l $7ef3ca : bne .return
         
     .restorePortal
-    lda $1acf : and #$0f : sta $1acf
+    lda.w $1acf : and.b #$0f : sta.w $1acf
     
     .return
     rep #$30 : lda.w $04AC ; what we wrote over
