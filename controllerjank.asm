@@ -6,6 +6,61 @@
 ; Filtered Joypad 1 Register: [BYST | udlr] [AXLR | ????]
 !INVERT_DPAD = "$7F50CB"
 
+
+InvertDPad_DPadOnly:
+	LDA $4218 : STA $00
+	LDA $4219 
+		BIT.b #$0C : BEQ + : EOR.b #$0C : + ; swap up/down
+		BIT.b #$03 : BEQ + : EOR.b #$03 : + ; swap left/right
+	STA $01
+JML.l InvertDPadReturn
+
+InvertDPad_ButtonsOnly:
+	REP #$20 ; set 16-bit accumulator
+	LDA $4218
+		BIT.w #$8040 : BEQ + : EOR.w #$8040 : + ; swap X/B
+		BIT.w #$4080 : BEQ + : EOR.w #$4080 : + ; swap Y/A
+	STA $00
+	SEP #$20 ; set 8-bit accumulator
+JML.l InvertDPadReturn
+
+InvertDPad_Both:
+	REP #$20 ; set 16-bit accumulator
+	LDA $4218
+		BIT.w #$8040 : BEQ + : EOR.w #$8040 : + ; swap X/B
+		BIT.w #$4080 : BEQ + : EOR.w #$4080 : + ; swap Y/A
+		BIT.w #$0C00 : BEQ + : EOR.w #$0C00 : + ; swap up/down
+		BIT.w #$0300 : BEQ + : EOR.w #$0300 : + ; swap left/right
+	STA $00
+	SEP #$20 ; set 8-bit accumulator
+JML.l InvertDPadReturn
+
+InvertDPad_SwapSides:
+	REP #$20 ; set 16-bit accumulator
+	LDA $4218
+		BIT.w #$0840 : BEQ + : EOR.w #$0840 : + ; swap X/up
+		BIT.w #$0180 : BEQ + : EOR.w #$0180 : + ; swap A/right
+		BIT.w #$4200 : BEQ + : EOR.w #$4200 : + ; swap Y/left
+		BIT.w #$8400 : BEQ + : EOR.w #$8400 : + ; swap B/down
+	STA $00
+	SEP #$20 ; set 8-bit accumulator
+JML.l InvertDPadReturn
+
+InvertDPad_DPadLROnly:
+	LDA $4218 : STA $00
+	LDA $4219
+		BIT.b #$03 : BEQ + : EOR.b #$03 : + ; swap left/right
+	STA $01
+JML.l InvertDPadReturn
+
+InvertDPad_DPadUDOnly:
+	LDA $4218 : STA $00
+	LDA $4219
+		BIT.b #$0C : BEQ + : EOR.b #$0C : + ; swap up/down
+	STA $01
+JML.l InvertDPadReturn
+
+
 InvertDPad:
 	LDA.l OneMindPlayerCount : BEQ .crowd_control
 
@@ -29,44 +84,18 @@ InvertDPad:
 	LDA $4219 : STA $01
 	JML.l InvertDPadReturn
 
-+	DEC : BEQ .dpadOnly
-	DEC : BEQ .buttonsOnly
-	DEC : BEQ .invertBoth
-	.swapSides
-	REP #$20 ; set 16-bit accumulator
-	LDA $4218
-		BIT.w #$0840 : BEQ + : EOR.w #$0840 : + ; swap X/up
-		BIT.w #$0180 : BEQ + : EOR.w #$0180 : + ; swap A/right
-		BIT.w #$4200 : BEQ + : EOR.w #$4200 : + ; swap Y/left
-		BIT.w #$8400 : BEQ + : EOR.w #$8400 : + ; swap B/down
-	STA $00
-	SEP #$20 ; set 8-bit accumulator
-JML.l InvertDPadReturn
-	.invertBoth
-	REP #$20 ; set 16-bit accumulator
-	LDA $4218
-		BIT.w #$8040 : BEQ + : EOR.w #$8040 : + ; swap X/B
-		BIT.w #$4080 : BEQ + : EOR.w #$4080 : + ; swap Y/A
-		BIT.w #$0C00 : BEQ + : EOR.w #$0C00 : + ; swap up/down
-		BIT.w #$0300 : BEQ + : EOR.w #$0300 : + ; swap left/right
-	STA $00
-	SEP #$20 ; set 8-bit accumulator
-JML.l InvertDPadReturn
-	.buttonsOnly
-	REP #$20 ; set 16-bit accumulator
-	LDA $4218
-		BIT.w #$8040 : BEQ + : EOR.w #$8040 : + ; swap X/B
-		BIT.w #$4080 : BEQ + : EOR.w #$4080 : + ; swap Y/A
-	STA $00
-	SEP #$20 ; set 8-bit accumulator
-JML.l InvertDPadReturn
-	.dpadOnly
-	LDA $4218 : STA $00
-	LDA $4219 
-		BIT.b #$0C : BEQ + : EOR.b #$0C : + ; swap up/down
-		BIT.b #$03 : BEQ + : EOR.b #$03 : + ; swap left/right
-	STA $01
-JML.l InvertDPadReturn
+	+ DEC : BNE +
+		JMP.w InvertDPad_DPadOnly
+	+ DEC : BNE +
+		JMP.w InvertDPad_ButtonsOnly
+	+ DEC : BNE +
+		JMP.w InvertDPad_Both
+	+ DEC : BNE +
+		JMP.w InvertDPad_SwapSides
+	+ DEC : BNE +
+		JMP.w InvertDPad_DPadLROnly
+	+ JMP.w InvertDPad_DPadUDOnly
+
 
 .onemind_controller_offset
 	db 0 ; player 0 - $4218 - joy1d1
@@ -75,8 +104,6 @@ JML.l InvertDPadReturn
 	db 6 ; player 3 - $421E - joy2d2
 	db 2 ; player 4 - $421A - joy2d1
 	db 6 ; player 5 - $421E - joy2d2
-
-
 
 ;--------------------------------------------------------------------------------
 
