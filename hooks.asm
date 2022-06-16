@@ -2439,8 +2439,8 @@ NOP #6 ; remove check
 org $068841 ; <- 30841 - sprite_prep.asm:269 (LDA $0D00, X : ADD.b #$03 : STA $0D00, X)
 JSL.l Mantle_CorrectPosition : NOP #2
 ;--------------------------------------------------------------------------------
-org $02D6FC ; <- bank02 : Underworld_LoadEntrance.not_a_respawn (LDA.w $010E : AND.w #$00FF)
-JSL MirrorScrollSpawnZelda : NOP #2
+org $0297FD ; <- bank02 : Module07_19_MirrorFade (STZ.b $11 : STZ.b $14)
+JSL MirrorScrollSpawnZelda
 ;--------------------------------------------------------------------------------
 org $0DFA53 ; <- 6FA53 - hud check for lantern
 JSL.l LampCheck

@@ -12,16 +12,11 @@ Mantle_CorrectPosition:
 	LDA $0D00, X : !ADD.b #$03 ; thing we did originally
 RTL
 ;--------------------------------------------------------------------------------
-
 MirrorScrollSpawnZelda:
-	SEP #$20
-	LDA.l StartingEntrance : CMP.b #$02 : BNE +
-		LDA.l MirrorEquipment : CMP.b #$01 : BNE +
-		    REP #$20
-		    PLA ; remove JSL 16 bits
-			PEA.w Underworld_LoadSpawnEntrance-1
-			RTL
-	+ REP #$20
+	LDA.l MirrorEquipment : CMP.b #$01 : BNE +  ;mirror scroll
+	LDA.l StartingEntrance : CMP.b #$02 : BEQ ++ ; zelda's cell
+	CMP.b #$04 : BNE +
+		++ INC $04AA
 	; what we replaced
-	LDA.w $010E : AND.w #$00FF
+	+ STZ.b $11 : STZ.b $14
 RTL
