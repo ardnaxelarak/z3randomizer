@@ -210,7 +210,7 @@ dw $8AD9 ; address of Bank02.asm:2085
 ;.done
 
 ;Enable south facing bk graphic
-;org $4e24
+;org $00CE24
 ;dw $2ac8
 
 org $01b714 ; PC: b714
