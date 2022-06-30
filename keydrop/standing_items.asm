@@ -48,11 +48,8 @@ org $07B169
 org $07B17D
 	JSL PreventPotSpawn2
 
-org $068283
-	JSL SubstituteSpriteId : NOP
-
-org $0681F4
-	Sprite_SpawnSecret_pool_ID:
+org $068275
+	JSL SubstitionFlow
 
 org $00A9DC
 dw $1928, $1938, $5928, $5938 ; change weird ugly black diagonal pot to blue-ish pot
@@ -65,6 +62,12 @@ JSL CheckIfPotIsSpecial
 
 
 ; refs to other functions
+org $0681F4
+Sprite_SpawnSecret_pool_ID:
+org $068283
+Sprite_SpawnSecret_NotRandomBush:
+org $06828A
+Sprite_SpawnSecret_SpriteSpawnDynamically:
 org $06d23a
 Sprite_DrawAbsorbable:
 org $1eff81
@@ -270,28 +273,6 @@ IncrementCountsForSubstitute:
 	.obtained
 	SEP #$30 : PLX
 RTS
-
-SubstitionTable:
-	db $DB ; RED RUPEE - 0x16
-	db $E2 ; ARROW REFILL 10 - 0x17
-	db $DD ; BOMB REFILL 4 - 0x18
-    db $DE ; BOMB REFILL 8  - 0x19
-
-
-SubstituteSpriteId:
-	CPY.b #$16 : BCS +
-		STY.b $0D
-		LDA.w Sprite_SpawnSecret_pool_ID-1,Y
-		RTL
-	LDA.b #$01
-	+ CPY.b #$18 : BCC +
-		LDA.b #$05
-	+ STA.b $0D
-	JSR IncrementCountsForSubstitute
-	PHB : PHK : PLB
-		LDA.w SubstitionTable-$16, Y ; Do substitute
-	PLB
-RTL
 
 ClearSpriteData:
 	STZ.b $02 : STZ.b $03 ; what we overrode
@@ -518,7 +499,38 @@ LoadProperties_PreserveCertainProps:
     PLA : STA $0F50, X
     RTL
 
+SubstitionFlow:
+	CPY.b #$04 : BNE +
+		RTL ; let enemizer/vanilla take care of it
+	+ PLA : PLA ; remove JSL stuff
+	CPY.b #$16 : BCS +
+		PEA.w Sprite_SpawnSecret_NotRandomBush-1 : RTL ; jump to not_random_bush spot
+	; jump directly to new code
+	+ PEA.w Sprite_SpawnSecret_SpriteSpawnDynamically-1
+RTL
+
+SubstitionTable:
+	db $DB ; RED RUPEE - 0x16
+	db $E2 ; ARROW REFILL 10 - 0x17
+	db $DD ; BOMB REFILL 4 - 0x18
+    db $DE ; BOMB REFILL 8  - 0x19
+
+
+SubstituteSpriteId:
+	CPY.b #$16 : BCS +
+		RTS
+	+ LDA.b #$01
+	CPY.b #$18 : BCC +
+		LDA.b #$05
+	+ STA.b $0D
+	JSR IncrementCountsForSubstitute
+	PHB : PHK : PLB
+		LDA.w SubstitionTable-$16, Y ; Do substitute
+	PLB
+RTS
+
 CheckSprite_Spawn:
+	JSR SubstituteSpriteId
 	JSL Sprite_SpawnDynamically
 	BMI .check
 RTL
