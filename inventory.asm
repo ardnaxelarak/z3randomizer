@@ -275,7 +275,7 @@ AddInventory:
 	+
 	CPY.b #$3B : BNE + : JMP .dungeonCounts : + ; Silver Arrow Bow - Skip Shop/Fairy Check for Silver Arrow Bow
 
-	LDA $1B : BEQ ++ ; skip shop check if outdoors
+	LDA $1B : BNE + : JMP .dungeonCounts : + ; skip shop check if outdoors
 	LDA $02E9 : CMP.b #$01 : BEQ ++ ; skip shop check for chests
 		PHP : REP #$20 ; set 16-bit accumulator
 			LDA $048E
@@ -284,9 +284,12 @@ AddInventory:
 			CMP.w #272 : BNE + : JMP .shop : + ; red shield shop
 			CMP.w #284 : BNE + : JMP .shop : + ; bomb shop
 			CMP.w #265 : BNE + : JMP .shop : + ; potion shop - commented this out because it's easier to just block potion refills because this one interferes with the powder item being counted
-			CMP.w #287 : BNE + : JMP .shop : + ; kakariko shop
-			CMP.w #255 : BNE + : JMP .shop : + ; light world death mountain shop
-			CMP.w #276 : BNE + : JMP .shop : + ; waterfall fairy
+			CMP.w #287 : BNE + : LDA.b $A9 : CMP.w #$0201 : BNE + ; kakariko shop
+				JMP .shop : + LDA.b $A0
+			CMP.w #255 : BNE + : LDA.b $A9 : BNE + ; light world death mountain shop
+				JMP .shop : + LDA.b $A0
+			CMP.w #276 : BNE + : LDA.b $A9 : CMP.w #$0200 : BNE + ; waterfall fairy
+				JMP .shop : + LDA.b $A0
 			CMP.w #277 : BNE + : JMP .shop : + ; upgrade fairy (shop)
 			CMP.w #278 : BNE + : JMP .shop : + ; pyramid fairy
 		PLP : BRA ++

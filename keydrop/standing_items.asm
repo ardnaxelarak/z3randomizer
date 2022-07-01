@@ -48,6 +48,9 @@ org $07B169
 org $07B17D
 	JSL PreventPotSpawn2
 
+org $068275
+	JSL SubstitionFlow
+
 org $00A9DC
 dw $1928, $1938, $5928, $5938 ; change weird ugly black diagonal pot to blue-ish pot
 
@@ -59,6 +62,12 @@ JSL CheckIfPotIsSpecial
 
 
 ; refs to other functions
+org $0681F4
+Sprite_SpawnSecret_pool_ID:
+org $068283
+Sprite_SpawnSecret_NotRandomBush:
+org $06828A
+Sprite_SpawnSecret_SpriteSpawnDynamically:
 org $06d23a
 Sprite_DrawAbsorbable:
 org $1eff81
@@ -224,7 +233,16 @@ SaveMajorItemDrop:
 	STA.w SpawnedItemID
 	STX.w SpawnedItemIndex
 	INC.w SpawnedItemFlag
-	LDA.w #$0008 : STA $0B9C ; indicates we should use the key routines
+	TAY : LDA.w #$0008
+	CPY.w #$0036 : BNE +  ; Red Rupee
+		LDA.w #$0016 : BRA .done
+	+ CPY.w #$0044 : BNE + ; 10 pack arrows
+		LDA.w #$0017 : BRA .done
+	+ CPY.w #$0028 : BNE + ; 3 pack bombs
+		LDA.w #$0018 : BRA .done
+	+ CPY.w #$0031 : BNE .done ; 10 pack bombs
+		LDA.w #$0019
+	.done STA $0B9C ; indicates we should use the key routines or a substitute
 	RTL
 
 ShouldCountNormalPot:
@@ -236,6 +254,24 @@ ShouldCountNormalPot:
 RTS
 .clear
 	CLC
+RTS
+
+IncrementCountsForSubstitute:
+	PHX : REP #$30
+	LDA.w SpawnedItemIndex : ASL : TAX : LDA.l BitFieldMasks, X : STA $0A
+	LDA.b $A0 : ASL : TAX
+	LDA.l RoomPotData, X : BIT $0A : BNE .obtained
+		ORA $0A : STA RoomPotData, X
+		SEP #$30
+		LDA $040C : CMP #$FF : BEQ +
+			BNE ++
+				INC #2 ; treat sewers as HC
+			++ LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
+			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
+		+ REP #$30
+		LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
+	.obtained
+	SEP #$30 : PLX
 RTS
 
 ClearSpriteData:
@@ -463,7 +499,38 @@ LoadProperties_PreserveCertainProps:
     PLA : STA $0F50, X
     RTL
 
+SubstitionFlow:
+	CPY.b #$04 : BNE +
+		RTL ; let enemizer/vanilla take care of it
+	+ PLA : PLA ; remove JSL stuff
+	CPY.b #$16 : BCS +
+		PEA.w Sprite_SpawnSecret_NotRandomBush-1 : RTL ; jump to not_random_bush spot
+	; jump directly to new code
+	+ PEA.w Sprite_SpawnSecret_SpriteSpawnDynamically-1
+RTL
+
+SubstitionTable:
+	db $DB ; RED RUPEE - 0x16
+	db $E2 ; ARROW REFILL 10 - 0x17
+	db $DD ; BOMB REFILL 4 - 0x18
+    db $DE ; BOMB REFILL 8  - 0x19
+
+
+SubstituteSpriteId:
+	CPY.b #$16 : BCS +
+		RTS
+	+ LDA.b #$01
+	CPY.b #$18 : BCC +
+		LDA.b #$05
+	+ STA.b $0D
+	JSR IncrementCountsForSubstitute
+	PHB : PHK : PLB
+		LDA.w SubstitionTable-$16, Y ; Do substitute
+	PLB
+RTS
+
 CheckSprite_Spawn:
+	JSR SubstituteSpriteId
 	JSL Sprite_SpawnDynamically
 	BMI .check
 RTL
