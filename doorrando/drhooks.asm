@@ -198,20 +198,15 @@ Underworld_DoorDown_Call:
 org $02C3F3
 dw $8AD9 ; address of Bank02.asm:2085
 
-; These two, if enabled together, have implications for vanilla BK doors in IP/Hera/Mire
-; IPBJ is common enough to consider not doing this. Mire is not a concern for vanilla - maybe glitched modes
-; Hera BK door back can be seen with Pot clipping - likely useful for no logic seeds
+org $01aa90
+JSL BigKeyDoorCheck
 
-;Kill big key (1e) check for south doors
-;org $1aa90
-;DontCheck:
-;bra .done
-;nop #3
-;.done
+org $01AAA2
+RoomDraw_OneSidedShutters_South_onesided_shutter_or_big_key_door:
 
 ;Enable south facing bk graphic
-;org $00CE24
-;dw $2ac8
+org $00CE24
+dw $2ac8
 
 org $01b714 ; PC: b714
 OpenableDoors:
