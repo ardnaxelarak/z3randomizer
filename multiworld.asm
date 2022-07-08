@@ -37,7 +37,7 @@ PHX : PHY : PHP
 	++
 
 	SEP #$20
-	LDA #$01 : STA !NMI_AUX+1 : STA !NMI_AUX
+	LDA #$01 : STA !NMI_MW+1 : STA !NMI_MW
 	LDA !MULTIWORLD_HUD_DELAY
 	STA !MULTIWORLD_HUD_TIMER
 .textdone
@@ -113,7 +113,7 @@ GetMultiworldItem:
 				BRA -
 			++
 			PLP
-			LDA #$01 : STA !NMI_AUX+1 : STA !NMI_AUX
+			LDA #$01 : STA !NMI_MW+1 : STA !NMI_MW
 	.textend
 
 	LDA $5D

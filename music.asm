@@ -15,7 +15,7 @@ PreOverworld_LoadProperties_ChooseMusic:
     LDY.b #$5A ; Main overworld animated tileset
 
     ; if we are in the light world go ahead and set chosen selection
-    ;LDA $7EF3CA : BEQ .checkInverted+4
+    ;LDA CurrentWorld : BEQ .checkInverted+4
     + JSL Overworld_DetermineMusic
 
     .lastCheck
@@ -84,7 +84,7 @@ BirdTravel_LoadTargetAreaMusic:
 ;--------------------------------------------------------------------------------
 ;X to be set to music track to load
 Overworld_DetermineMusic:
-    LDA $7EF3C5 : CMP.b #$02 : !BGE +
+    LDA ProgressIndicator : CMP.b #$02 : !BGE +
         LDX.b #$03 ; If phase < 2, play the rain music
         BRA .done
     
@@ -94,19 +94,19 @@ Overworld_DetermineMusic:
 
     LDX.b #$02  ; hyrule field theme
 
-    LDA $7EF3CA : BEQ +
+    LDA CurrentWorld : BEQ +
         LDX.b #$09  ; default dark world theme
 
     ; Check if we're entering the village
     + LDA $8A : CMP.b #$18 : BNE +
         ; Check what phase we're in
-        ; LDA $7EF3C5 : CMP.b #$03 : !BGE .bunny
+        ; LDA ProgressIndicator : CMP.b #$03 : !BGE .bunny
             LDX.b #$07 ; Default village theme (phase <3)
             BRA .bunny
     
     ; Check if we're entering the lost woods
     + CMP.b #$00 : BNE +
-        LDA $7EF300 : AND.b #$40 : BNE .bunny
+        LDA OverworldEventDataWRAM+$80 : AND.b #$40 : BNE .bunny
             LDX.b #$05 ; lost woods theme
             BRA .bunny
     
@@ -119,8 +119,8 @@ Overworld_DetermineMusic:
 
 .bunny
     ; if not inverted and light world, or inverted and dark world, skip moon pearl check
-    LDA $7EF3CA : CLC : ROL #$03 : CMP InvertedMode : BEQ .done
-        LDA $7EF357 : BNE .done
+    LDA CurrentWorld : CLC : ROL #$03 : CMP InvertedMode : BEQ .done
+        LDA MoonPearlEquipment : BNE .done
             LDX #$04    ; bunny theme
 
 .done
@@ -130,7 +130,7 @@ Overworld_DetermineMusic:
 ;--------------------------------------------------------------------------------
 ;$012D to be set to any ambient SFX for the area
 Overworld_DetermineAmbientSFX:
-    LDA $7EF3C5 : CMP.b #$02 : !BGE +
+    LDA ProgressIndicator : CMP.b #$02 : !BGE +
         BRA .done ; rain state sfx handled elsewhere
     
     + LDA $8A : CMP.b #$43 : BEQ .darkMountain
@@ -142,7 +142,7 @@ Overworld_DetermineAmbientSFX:
     LDA.b #$05 : BRA .setSfx ; silence
 
 .mire
-    LDA $7EF2F0 : AND.b #$20 : BNE .done
+    LDA OverworldEventDataWRAM+$70 : AND.b #$20 : BNE .done
         LDA.b #$01 : BRA .setSfx ; Misery Mire rain SFX
 
 .darkMountain
@@ -179,7 +179,7 @@ Overworld_MosaicDarkWorldChecks:
     CMP.b #$51 : bne .doFade
 
 .checkCrystals
-    LDA $7EF37A : CMP.b #$7F : BEQ .done
+    LDA CrystalsField : CMP.b #$7F : BEQ .done
 
 .doFade
     LDA.b #$F1 : STA $012C  ; thing we wrote over, fade out music
@@ -194,7 +194,7 @@ Overworld_MosaicDarkWorldChecks:
 ; On entry, A=16bit XY=8bit, A & X safe to mod, Y unknown
 Underworld_DoorDown_Entry:
     LDX #$FF ; some junk value to be used later to determine if the below lines will change the track
-    LDA.l $7EF3C5 : AND.w #$00FF : CMP.w #2 : !BLT .vanilla
+    LDA.l ProgressIndicator : AND.w #$00FF : CMP.w #2 : !BLT .vanilla
     LDA.l DRMode : BNE .done
 
 .vanilla ; thing we wrote over
@@ -210,6 +210,6 @@ Underworld_DoorDown_Entry:
 ;
 ; A=16bit XY=8bit
 CheckHeraBossDefeated:
-LDA $7EF00F : AND.w #$00FF : BEQ +
+LDA RoomDataWRAM[$08].high : AND.w #$00FF : BEQ +
     SEC : RTL
 + CLC : RTL

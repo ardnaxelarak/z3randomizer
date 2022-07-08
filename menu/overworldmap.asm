@@ -1,8 +1,5 @@
 ; adding support for up to 13 markers
 !MC_FLAG = "$7F5420"
-!INVENTORY_MAP = "$7EF368"
-!INVENTORY_COMPASS = "$7EF364"
-!MAP_OVERLAY = "$7EF414" ; [2]
 
 ; tables
 org $0ABDF6
@@ -200,7 +197,7 @@ PHX
 	JSR OverworldMap_CheckForCompass
 	BCC +
 		LDA.l !MC_FLAG : ORA #$01 : STA.l !MC_FLAG
-		LDA $7EF3CA : AND #$40 : BNE ++ ; is the compass position on LW or DW?
+		LDA CurrentWorld : AND #$40 : BNE ++ ; is the compass position on LW or DW?
         	LDA.l WorldCompassMask, X : BEQ + : JMP .fail
         ++ LDA.l WorldCompassMask, X : BNE + : JMP .fail
 	+ JSR OverworldMap_CheckForMap
@@ -209,7 +206,7 @@ PHX
 	+
 	LDA.l !MC_FLAG : BEQ .fail
 	CMP #$02 : BNE .checkIfObtained
-		LDA $7EF3CA : AND #$40 : BNE +
+		LDA CurrentWorld : AND #$40 : BNE +
 			CPX #3 : BCS .fail : BRA .checkIfObtained
 		+ CPX #10 : BCS .fail
 		CPX #3 : BCC .fail
@@ -224,23 +221,23 @@ PHX
 	LDA.l CrystalPendantFlags_2, X : AND.b #$02 : BNE .checkAga2
 
 	; see if hyrule castle has been completely cleared
-	LDA.l CompassTotal, X : SEC : SBC $7EF4BF, X : BEQ .fail
+	LDA.l CompassTotalsWRAM, X : SEC : SBC DungeonLocationsChecked, X : BEQ .fail
 	CLC : BRA .done
 
 	.checkPendant
-	LDA $7EF374 : AND.l CrystalPendantFlags, X : BNE .fail
+	LDA PendantsField : AND.l CrystalPendantFlags, X : BNE .fail
 	CLC : BRA .done
 
 	.checkCrystal
-	LDA $7EF37A : AND.l CrystalPendantFlags, X : BNE .fail
+	LDA CrystalsField : AND.l CrystalPendantFlags, X : BNE .fail
 	CLC : BRA .done
 
 	.checkAga1
-	LDA $7EF3C5 : CMP #$03 : BEQ .fail
+	LDA ProgressIndicator : CMP #$03 : BEQ .fail
 	CLC : BRA .done
 
 	.checkAga2
-	LDA $7EF01B : AND #$80 : BNE .fail
+	LDA RoomDataWRAM[$0D].high : AND #$08 : BNE .fail
 	CLC : BRA .done
 
 	.fail
@@ -260,7 +257,7 @@ OverworldMap_CheckForCompass:
 	+ LDA.l CompassExists, X : BEQ .set ; compass doesn't exist
 	PHX
 		LDA.l MC_SRAM_Offsets, X : TAX ; put compass offset into X
-		LDA !INVENTORY_COMPASS, X : ORA !MAP_OVERLAY, X
+		LDA CompassField, X : ORA MapOverlay, X
 	PLX
 	AND.l MC_Masks, X : BNE .set ; is the compass obtained
 .unset
@@ -275,13 +272,13 @@ RTS
 ; SEC - yep should show exact prize
 OverworldMap_CheckForMap:
 	LDA.l MapMode : BEQ .set ; obtaining map doesn't change anything
-	LDA $7EF3CA : AND #$40 : BNE + ; not really sure on this check
-		LDA !INVENTORY_MAP : ORA !MAP_OVERLAY : AND.b #$01 : BNE .set : BRA .continue
-	+ LDA !INVENTORY_MAP : ORA !MAP_OVERLAY : AND.b #$02 : BNE .set
+	LDA CurrentWorld : AND #$40 : BNE + ; not really sure on this check
+		LDA MapField : ORA MapOverlay : AND.b #$01 : BNE .set : BRA .continue
+	+ LDA MapField : ORA MapOverlay : AND.b #$02 : BNE .set
 .continue
 	PHX
 		LDA.l MC_SRAM_Offsets, X : TAX ; put map offset into X
-		LDA !INVENTORY_MAP, X : ORA !MAP_OVERLAY, X
+		LDA MapField, X : ORA MapOverlay, X
 	PLX
 	AND.l MC_Masks, X : BNE .set ; is the map obtained?
 .unset

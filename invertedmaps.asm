@@ -261,7 +261,7 @@ LDA #$0150 : STA $292A : STA $29A8 : STA $2A26
 LDA #$014E : STA $299E : STA $29A0 : STA $29A2 : STA $29A4
 
 ; remove ladder
-LDA $7EF287 : CMP.w #$0010 : BNE .ladder
+LDA OverworldEventDataWRAM+$07 : CMP.w #$0010 : BNE .ladder
 RTS
 .ladder
 LDA #$0152 : STA $2A20 : STA $2A22
@@ -424,7 +424,7 @@ LDA #$0466 : STA $21A0
 LDA #$0101 : STA $2252 ; add sign for Goal at HC
 
 ; CHECK IF AGAHNIM 2 IS DEAD AND WE HAVE ALREADY LANDED
-LDA $7EF2DB : AND #$0020 : BEQ .agahnim2Alive
+LDA OverworldEventDataWRAM+$5B : AND #$0020 : BEQ .agahnim2Alive
 LDA #$0E3A : STA $24BC
 LDA #$0E3B : STA $24BE
 LDA #$0E3E : STA $253C
@@ -1167,7 +1167,7 @@ LDA #$0108 : STA $3C38
 + LDA.l OWTileMapAlt+$5B : AND #$0001 : BEQ +
 ;Warp Tile agah defeated
 LDA #$0034 : STA $3BBE ;Tile when no warp
-LDA $7EF3C5 : AND #$00FF : CMP #$0003 : BNE .agahnimAlive
+LDA ProgressIndicator : AND #$00FF : CMP #$0003 : BNE .agahnimAlive
 LDA #$0212 : STA $3BBE ;warp
 .agahnimAlive
 

@@ -84,7 +84,7 @@ IcePalaceBombosNE:
     RTL
 
 CastleEastEntrance: ; new solution (see Rain Prevention)
-	RTL
+    RTL
 
 CastleWestEntrance: ; new solution (see Rain Prevention)
     RTL

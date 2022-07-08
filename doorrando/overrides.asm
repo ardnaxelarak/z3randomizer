@@ -7,9 +7,9 @@ LampCheckOverride:
 	LDA $7F50C4 : CMP.b #$01 : BNE + : RTL : +
 				  CMP.b #$FF : BNE + : INC : RTL : +
 
-	LDA $7EF34A : BNE .done ; skip if we already have lantern
+	LDA LampEquipment : BNE .done ; skip if we already have lantern
 
-	LDA $7EF3CA : BNE +
+	LDA CurrentWorld : BNE +
 		.lightWorld
 		LDA $040C : CMP.b #$04 : !BGE ++ ; check if we're in HC
 			LDA LampConeSewers : BRA .done
@@ -36,13 +36,13 @@ rtl
 OnFileLoadOverride:
     jsl OnFileLoad ; what I wrote over
     + lda.l DRFlags : and #$02 : beq + ; Mirror Scroll
-        lda $7ef353 : bne +
-            lda #$01 : sta $7ef353
+        lda MirrorEquipment : bne +
+            lda #$01 : sta MirrorEquipment
 + rtl
 
 MirrorCheckOverride:
     lda.l DRFlags : and #$02 : beq ++
-        lda $7ef353 : cmp #$01 : beq +
+        lda MirrorEquipment : cmp #$01 : beq +
     ;++ lda $8A : and #$40 ; what I wrote over
     ++ phx : ldx $8A : lda.l OWTileWorldAssoc,x : plx : and.b #$ff
     rtl
@@ -55,13 +55,13 @@ EGFixOnMirror:
 	rtl
 
 BlockEraseFix:
-    lda $7ef353 : and #$02 : beq +
+    lda MirrorEquipment : and #$02 : beq +
         stz $05fc : stz $05fd
     + rtl
 
 FixShopCode:
     cpx #$300 : !bge +
-        sta $7ef000, x
+        sta RoomDataWRAM[$00].l, x
     + rtl
 
 VitreousKeyReset:
@@ -78,7 +78,7 @@ GuruguruFix:
 BlindAtticFix:
     lda.l DRMode : beq +
         lda #$01 : rtl
-    + lda $7EF3CC : cmp.b #$06
+    + lda FollowerIndicator : cmp.b #$06
     rtl
 
 SuctionOverworldFix:
@@ -119,27 +119,29 @@ RetrieveBunnyState:
 + RTL
 
 RainPrevention:
-	LDA $00 : XBA : AND #$00FF ; what we wrote over
+	LDA $00 : XBA : AND #$00FF : STA.b $0A ; what we wrote over
 	PHA
-		LDA $7EF3C5 : AND #$00FF : CMP #$0002 : !BGE .done ; only in rain states (0 or 1)
-		LDA.l $7EF3C6 : AND #$0004 : BNE .done ; zelda's been rescued
+		LDA ProgressIndicator : AND #$00FF : CMP #$0002 : !BGE .done ; only in rain states (0 or 1)
+		LDA.l ProgressFlags : AND #$0004 : BNE .done ; zelda's been rescued
 			LDA.l BlockSanctuaryDoorInRain : BEQ .done ;flagged
 			LDA $A0 : CMP #$0012 : BNE + ;we're in the sanctuary
-				LDA.l $7EF3CC : AND #$00FF : CMP #$0001 : BEQ .done ; zelda is following
+				LDA.l FollowerIndicator : AND #$00FF : CMP #$0001 : BEQ .done ; zelda is following
 					LDA $00 : AND #$00FF : CMP #$00A1 : BNE .done ; position is a1
 						PLA : LDA #$0008 : RTL
 			+ LDA.l BlockCastleDoorsInRain : AND #$00FF : BEQ .done ;flagged
 			LDX #$FFFE
 			- INX #2 : LDA.l RemoveRainDoorsRoom, X : CMP #$FFFF : BEQ .done
 			CMP $A0 : BNE -
-				LDA.l RainDoorMatch, X : CMP $00 : BNE -
-					PLA : LDA #$0008 : RTL
-	.done PLA : RTL
+				SEP #$20 : LDA.l RainDoorMatch, X : CMP $00 : BNE .continue
+					REP #$20 : PLA : SEC : RTL
+				.continue
+				REP #$20 : BRA -
+	.done PLA : CLC : RTL
 
 ; A should be how much dmg to do to Aga when leaving this function
 StandardAgaDmg:
 	LDX.b #$00 ; part of what we wrote over
-	LDA.l $7EF3C6 : AND #$04 : BEQ + ; zelda's not been rescued
+	LDA.l ProgressFlags : AND #$04 : BEQ + ; zelda's not been rescued
 		LDA.b #$10 ; hurt him!
 	+ RTL ; A is zero if the AND results in zero and then Agahnim's invincible!
 
@@ -147,7 +149,7 @@ StandardAgaDmg:
 BlindsAtticHint:
 	REP #$20
 	CMP.w #$0122 : BNE +
-	LDA $7EF0CA : AND.w #$0100 : BEQ +
+	LDA RoomDataWRAM[$65].low : AND.w #$0100 : BEQ +
 		SEP #$20 : RTL ; skip the dialog box if the hole is already open
 	+ SEP #$20 : JML Main_ShowTextMessage
 

@@ -8,6 +8,6 @@ check_blind_boss_room:
 	CMP #172 : BNE +                    ; Is is Thieve Town Boss Room
 	LDA $09DE81 : BEQ +        			; Blind maiden does not need rescuing
 
-	LDA $7EF3CC : JML Check_for_Blind_Fight
+	LDA FollowerIndicator : JML Check_for_Blind_Fight
 	+
 	JML Initialize_Blind_Fight
