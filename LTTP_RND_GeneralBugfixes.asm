@@ -233,6 +233,7 @@ incsrc menu/overworldmap.asm ; overwrites some code in bank 0A
 incsrc doorrando/doorrando.asm ; bank 27 likely A7 in the future
 ;bank 28/A8 for keydropshuffle / standing items
 incsrc keydrop/standing_items.asm
+incsrc owrando.asm ; bank AA
 incsrc enemizer/main.asm ; this is originally in bank 36, but is currently in migratory status in bank 37
 
 org $308000 ; bank #$30
