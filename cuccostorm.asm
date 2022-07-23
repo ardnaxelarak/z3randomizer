@@ -1,5 +1,4 @@
 ;================================================================================
-!CUCCO_STORM = "$7F50C5"
 !IS_INDOORS = "$7E001B"
 !ENEMY_STATE_TABLE = "$7E0DD0"
 !ENEMY_TYPE_TABLE = "$7E0E20"
@@ -22,9 +21,9 @@
 CuccoStorm:
 	
 	SEP #$30 ; set 8-bit accumulator index registers
-	LDA.l !CUCCO_STORM : BEQ + ; only if storm is on
+	LDA.l CuccoStormModifier : BEQ + ; only if storm is on
 	LDA.b $10 : CMP.b #$09 : BNE + ; only if outdoors
-	LDA.l !LOOP_FRAMES_LOW : AND.b #$7F : BNE + ; check every 128 frames
+	LDA.l LoopFrames : AND.b #$7F : BNE + ; check every 128 frames
 	
 	-
 		;==== Find a Cucco

@@ -10,7 +10,6 @@ org $1BEE1B
 JSL SpriteSwap_Palette_ArmorAndGloves_part_two
 RTL
 
-!SPRITE_SWAP = "$7F50CD"
 ;!STABLE_SCRATCH = "$7EC178"
 !BANK_BASE = "#$29"
 
@@ -18,7 +17,7 @@ org $BF8000
 SwapSpriteIfNecessary:
 	PHP
 		SEP #$20 ; set 8-bit accumulator
-		LDA !SPRITE_SWAP : BEQ + : !ADD !BANK_BASE : CMP $BC : BEQ +
+		LDA SpriteSwapper : BEQ + : !ADD !BANK_BASE : CMP $BC : BEQ +
 			STA $BC
 		    STZ $0710 ; Set Normal Sprite NMI
 			JSL.l SpriteSwap_Palette_ArmorAndGloves_part_two
@@ -29,17 +28,17 @@ RTL
 SpriteSwap_Palette_ArmorAndGloves:
 {
     ;DEDF9
-    LDA !SPRITE_SWAP : BNE .continue
+    LDA SpriteSwapper : BNE .continue
         LDA.b #$10 : STA $BC ; Load Original Sprite Location
         REP #$21
-        LDA $7EF35B
+        LDA ArmorEquipment
         JSL $1BEDFF ; Read Original Palette Code
     RTL
     .part_two
     SEP #$30
-    LDA !SPRITE_SWAP : BNE .continue
+    LDA SpriteSwapper : BNE .continue
         REP #$30
-        LDA $7EF354 
+        LDA GloveEquipment 
         JSL $1BEE21 ; Read Original Palette Code
     RTL
 
@@ -51,7 +50,7 @@ SpriteSwap_Palette_ArmorAndGloves:
     REP #$20 ; set 16-bit accumulator
     
     ; Check what Link's armor value is.
-    LDA $7EF35B : AND.w #$00FF : TAX
+    LDA ArmorEquipment : AND.w #$00FF : TAX
     
     ; (DEC06, X)
     

@@ -20,7 +20,7 @@
 ;JML.l Smithy_DoesntHaveSword
 ;================================================================================
 ;LoadSwordForDamage:
-;	LDA $7EF359 : CMP #$04 : BNE .done ; skip if not gold sword
+;	LDA SwordEquipment : CMP #$04 : BNE .done ; skip if not gold sword
 ;	LDA $1B : BEQ + ; skip if outdoors
 ;	LDA $A0 : CMP #41 : BNE + ; decimal 41 ; skip if not in the mothula room
 ;		LDA #$03 ; pretend we're using tempered
@@ -71,23 +71,21 @@ LookupDamageLevel:
 	.pseudo_table
 		%LookupDamageSubclass(Damage_Table_Pseudo) : RTL
 ;================================================================================
-; $7F50C0 - Sword Modifier
 LoadModifiedSwordLevel: ; returns short
-	LDA $7F50C0 : BEQ +
-		!ADD $7EF359 ; add normal sword value to modifier
+	LDA SwordModifier : BEQ +
+		!ADD SwordEquipment ; add normal sword value to modifier
 			BNE ++ : LDA.b #$01 : RTS : ++
 			CMP.b #$05 : !BLT ++ : LDA.b #$04 : RTS : ++
 		RTS
 	+
-	LDA $7EF359 ; load normal sword value
+	LDA SwordEquipment ; load normal sword value
 RTS
 ;================================================================================
-; $7EF35B - Armor Inventory
-; $7F50C2 - Armor Modifier
+; ArmorEquipment - Armor Inventory
 ; $7F5020 - Scratch Space (Caller Preserved)
 LoadModifiedArmorLevel:
 	PHA
-		LDA $7EF35B : !ADD $7F50C2
+		LDA ArmorEquipment : !ADD ArmorModifier
 		CMP.b #$FF : BNE + : LDA.b #$00 : +
 		CMP.b #$03 : !BLT + : LDA.b #$02 : +
 		STA $7F5020
@@ -95,30 +93,28 @@ LoadModifiedArmorLevel:
 	!ADD $7F5020
 RTL
 ;================================================================================
-; $7EF37B - Magic Inventory
-; $7F50C3 - Magic Modifier
+; MagicConsumption - Magic Inventory
 LoadModifiedMagicLevel:
-	LDA $7F50C3 : BEQ +
-		!ADD $7EF37B ; add normal magic value to modifier
+	LDA MagicModifier : BEQ +
+		!ADD MagicConsumption ; add normal magic value to modifier
 			CMP.b #$FF : BNE ++ : LDA.b #$00 : RTL : ++
 			CMP.b #$03 : !BLT ++ : LDA.b #$02 : ++
 		RTL
 	+
-	LDA $7EF37B ; load normal magic value
+	LDA MagicConsumption ; load normal magic value
 RTL
 ;================================================================================
 ; $7E0348 - Ice Value
-; $7F50C7 - Temporary Ice Modifier
-; $30802D - Permanent Ice Modifier ($01 bit)
+; ChallengeModes - Permanent Ice Modifier ($01 bit)
 LoadModifiedIceFloorValue:
 	LDA $A0 : CMP #$91 : BEQ + : CMP #$92 : BEQ + : CMP #$93 : BEQ + ; mire basement currently broken - not sure why
 	LDA $5D : CMP #$01 : BEQ + : CMP #$17 : BEQ + : CMP #$1C : BEQ +
 	LDA $5E : CMP #$02 : BEQ +
 	LDA $5B : BNE +
-	LDA.l $30802D : BIT #$01 : BEQ ++
+	LDA.l ChallengeModes : BIT #$01 : BEQ ++
 	LDA $A0 : CMP #$16 : BEQ ++ ; swamp supertile with current -- fine for temporary physics but impossible without boots for permanent
-	LDA.w $0348 : ORA $7F50C7 : ORA #$10 : RTS
-	++ : LDA.w $0348 : ORA $7F50C7 : RTS
+	LDA.w $0348 : ORA IcePhysicsModifier : ORA #$10 : RTS
+	++ : LDA.w $0348 : ORA IcePhysicsModifier : RTS
 	+ : LDA.w $0348
 RTS
 LoadModifiedIceFloorValue_a11:
@@ -128,7 +124,7 @@ LoadModifiedIceFloorValue_a01:
 ;================================================================================
 CheckTabletSword:
 	LDA.l AllowHammerTablets : BEQ +
-	LDA $7EF34B : BNE .allow ; check for hammer
+	LDA HammerEquipment : BNE .allow ; check for hammer
 	+
 	LDA.l SpecialWeapons : CMP #$01 : BEQ .check_special
 	                       CMP #$03 : BEQ .check_special
@@ -139,16 +135,16 @@ CheckTabletSword:
 	.allow
 		LDA.b #$02 : RTL
 	.check_special
-	LDA !WEAPON_LEVEL : CMP #$02 : !BGE .allow ; check for master bombs
+	LDA SpecialWeaponLevel : CMP #$02 : !BGE .allow ; check for master bombs
 	.normal
-	LDA $7EF359 ; get actual sword value
+	LDA SwordEquipment ; get actual sword value
 RTL
 ;================================================================================
 GetSwordLevelForEvilBarrier:
 	LDA.l AllowHammerEvilBarrierWithFighterSword : BEQ +
 	LDA #$FF : RTL
 	+
-	LDA $7EF359
+	LDA SwordEquipment
 RTL
 ;================================================================================
 CheckGanonHammerDamage:
@@ -159,14 +155,14 @@ RTL
 	LDA.l GanonVulnerabilityItem : CMP.b #$0C : BEQ +
 	LDA $0E20, X : CMP.b #$D6 ; original behavior
 RTL
-  +
+	+
 	LDA $0E20, X : CMP.b #$D8 : BCC +
 RTL
-  +
-  CMP.b #$D6 : BNE +
+	+
+	CMP.b #$D6 : BNE +
 RTL
-  +
-  CLC
+	+
+	CLC
 RTL
 ;================================================================================
 GetSmithSword:
@@ -175,7 +171,7 @@ GetSmithSword:
 		JML.l Smithy_DoesntHaveSword ; Classic Smithy
 	+
 
-	REP #$20 : LDA $7EF360 : CMP #$000A : SEP #$20 : !BGE .buy
+	REP #$20 : LDA CurrentRupees : CMP #$000A : SEP #$20 : !BGE .buy
 	.cant_afford
 		REP #$10
 		LDA.b #$7A
@@ -190,7 +186,7 @@ GetSmithSword:
 		STZ $02E9 ; Item from NPC
 		PHX : JSL Link_ReceiveItem : PLX
 
-		REP #$20 : LDA $7EF360 : !SUB.w #$000A : STA $7EF360 : SEP #$20 ; Take 10 rupees
+		REP #$20 : LDA CurrentRupees : !SUB.w #$000A : STA CurrentRupees : SEP #$20 ; Take 10 rupees
 		JSL ItemSet_SmithSword
 
 	.done
@@ -202,7 +198,7 @@ CheckMedallionSword:
 		LDA.b #$02 ; Pretend we have master sword
 		RTL
 	.check_sword
-		LDA $7EF359
+		LDA SwordEquipment
 		RTL
 	.check_pad
 		PHB : PHX : PHY
@@ -240,19 +236,19 @@ CheckMedallionSword:
 		.outdoors
 			LDA $8A : CMP.b #$70 : BNE +
 				LDA.l MireRequiredMedallion : TAX : LDA.l .medallion_type, X : CMP $0303 : BNE .done
-				LDA $7EF2F0 : AND.b #$20 : BNE .done
+				LDA OverworldEventDataWRAM+$70 : AND.b #$20 : BNE .done
 				LDA.b #$08 : PHA : PLB ; set data bank to $08
 				LDY.b #$02 : JSL.l Ancilla_CheckIfEntranceTriggered : BCS .permit ; misery mire
 				BRA .done
 			+ : CMP.b #$47 : BNE +
 				LDA.l TRockRequiredMedallion : TAX : LDA.l .medallion_type, X : CMP $0303 : BNE .done
-				LDA $7EF2C7 : AND.b #$20 : BNE .done
+				LDA OverworldEventDataWRAM+$47 : AND.b #$20 : BNE .done
 				LDA.b #$08 : PHA : PLB ; set data bank to $08
 				LDY.b #$03 : JSL.l Ancilla_CheckIfEntranceTriggered : BCS .permit ; turtle rock
 			+
 	.done
 		PLY : PLX : PLB
-		LDA $7EF359
+		LDA SwordEquipment
 		RTL
 	.permit
 		SEP #$20 ; set 8-bit accumulator

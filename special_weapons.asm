@@ -54,17 +54,17 @@ DamageClassCalc:
 .not_cane_or_beam
 	CMP #$07 : BNE .no_change
 	LDA SpecialWeapons : CMP #$01 : BNE .normal_bombs
-	LDA !WEAPON_LEVEL : BEQ .normal_bombs
+	LDA SpecialWeaponLevel : BEQ .normal_bombs
 	LDA $0E20, X : CMP.b #$D6 : BEQ .unstunned_ganon
 	CMP.b #$D7 : BEQ .stunned_ganon
 	CMP.b #$88 : BEQ .mothula
 	CMP.b #$91 : BEQ .stalfos_knight
 	CMP.b #$92 : BEQ .helmasaur_king
 .special_level
-	LDA !WEAPON_LEVEL
+	LDA SpecialWeaponLevel
 	BRA .done
 .mothula
-	LDA !WEAPON_LEVEL
+	LDA SpecialWeaponLevel
 	CMP #$04 : !BGE .fix_mothula
 	BRA .done
 .fix_mothula
@@ -96,7 +96,7 @@ DamageClassCalc:
 	LDA.l !ANCILLA_DAMAGE, X
 	PLX
 	CMP.b #$06 : BNE .done ; not arrows
-	LDA $7EF340 : CMP.b #$03 : !BGE .actual_silver_arrows
+	LDA BowEquipment : CMP.b #$03 : !BGE .actual_silver_arrows
 .normal_arrows
 	LDA #$06
 .done
@@ -359,7 +359,7 @@ AllowBombingBarrier:
 DrawBombInMenu:
 	JSL LoadBombCount16 : AND.w #$00FF : BEQ .noBombs
 	LDA SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BNE .vanillaBombs
-	LDA.l !WEAPON_LEVEL : AND.w #$00FF : BEQ .noBombs : STA $02
+	LDA.l SpecialWeaponLevel : AND.w #$00FF : BEQ .noBombs : STA $02
 	LDA.w #$FC81 : STA $04
 	BRA .done
 .vanillaBombs
@@ -377,7 +377,7 @@ DrawSwordInMenu:
 	                                    CMP.w #$0003 : BEQ .specialSword
 	                                    CMP.w #$0004 : BEQ .specialSword
 	                                    CMP.w #$0005 : BEQ .specialSword
-	LDA $7EF359 : AND.w #$00FF : CMP.w #$00FF : BEQ .noSword
+	LDA SwordEquipment : AND.w #$00FF : CMP.w #$00FF : BEQ .noSword
 .hasSword
 	STA $02
 	LDA.w #$F859 : STA $04
@@ -387,14 +387,14 @@ DrawSwordInMenu:
 	LDA.w #$F859 : STA $04
 	RTL
 .specialSword
-	LDA !WEAPON_LEVEL : AND.w #$00FF : STA $02
+	LDA SpecialWeaponLevel : AND.w #$00FF : STA $02
 	LDA.w #$FC51 : STA $04
 	RTL
 ;--------------------------------------------------------------------------------
 DrawBombInYBox:
 	CPX.w #$0004 : BNE .done
 	LDA SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BNE .vanilla
-	LDA !WEAPON_LEVEL : AND.w #$00FF : CLC : ADC.w #$00BD : BRA .done
+	LDA SpecialWeaponLevel : AND.w #$00FF : CLC : ADC.w #$00BD : BRA .done
 .vanilla
 	LDA.w #$0001
 .done
@@ -411,7 +411,7 @@ DrawBombOnHud:
 	PLB
 
 	LDA.l SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BNE .regularBombs
-	LDA.l !WEAPON_LEVEL : AND.w #$00FF : ASL #2 : TAX
+	LDA.l SpecialWeaponLevel : AND.w #$00FF : ASL #2 : TAX
 	LDA.l BombIcon, X : STA.l $7EC71A
 	LDA.l BombIcon+2, X : STA.l $7EC71C
 .regularBombs
@@ -422,7 +422,7 @@ BombSpriteColor:
 SetBombSpriteColor:
 	LDA.l SpecialWeapons : CMP.b #$01 : BNE .normal
 	PHX
-	LDA.l !WEAPON_LEVEL
+LDA.l SpecialWeaponLevel
 	TAX
 	LDA.l BombSpriteColor, X
 	STA $0B
@@ -468,7 +468,7 @@ CheckDetonateBomb:
 	LDX.w $0202
 	LDA.l BeeDamageClass, X
 	CMP.b #$06 : BNE .set_bee_class
-	LDA.l $7EF340 : CMP.b #$03 : !BGE .silver_arrows
+	LDA.l BowEquipment : CMP.b #$03 : !BGE .silver_arrows
 	LDA.b #$06
 	BRA .set_bee_class
 .silver_arrows
@@ -492,9 +492,9 @@ SetBeeType:
 	LDA.l SpecialWeapons : CMP.b #$06 : BEQ .bee_mode
 	LDX.w $0202
 .check_bee_type
-	LDA.l $7EF33F, X
+	LDA.l EquipmentWRAM-1, X
 	TAX
-	LDA.l $7EF35B, X
+	LDA.l BottleContents-1, X
 	CMP.b #$08
 	BNE .regular_bee
 	LDA.b #$01

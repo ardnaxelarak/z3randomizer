@@ -2,9 +2,6 @@
 ; Challenge Timer
 ;================================================================================
 !Temp = "$7F5020"
-!BaseTimer = "$7EF43E"
-!ChallengeTimer = "$7EF454"
-!TemporaryOHKO = "$7F50CC"
 ;--------------------------------------------------------------------------------
 !CLOCK_HOURS = "$7F5080" ; $7F5080 - $7F5083 - Clock Hours
 !CLOCK_MINUTES = "$7F5084" ; $7F5084 - $7F5087 - Clock Minutes
@@ -58,17 +55,17 @@ CalculateTimer:
 	STA.l !CLOCK_SECONDS+2
 
 	LDA.l TimerStyle : AND.w #$00FF : CMP.w #$0002 : BNE + ; Stopwatch Mode
-		%Sub32(!BaseTimer,!ChallengeTimer,!CLOCK_TEMPORARY)
+		%Sub32(NMIFrames,ChallengeTimer,!CLOCK_TEMPORARY)
 		BRA ++
 	+ CMP.w #$0001 : BNE ++ ; Countdown Mode
-		%Sub32(!ChallengeTimer,!BaseTimer,!CLOCK_TEMPORARY)
+		%Sub32(ChallengeTimer,NMIFrames,!CLOCK_TEMPORARY)
 	++
 
 	%Blt32(!CLOCK_TEMPORARY,.halfCycle) : !BLT +
 		LDA.l TimeoutBehavior : AND.w #$00FF : BNE ++ ; DNF
 			LDA.w #$0002 : STA.l !Status ; Set DNF Mode
-			LDA.l !BaseTimer : STA.l !ChallengeTimer
-			LDA.l !BaseTimer+2 : STA.l !ChallengeTimer+2
+			LDA.l NMIFrames : STA.l ChallengeTimer
+			LDA.l NMIFrames+2 : STA.l ChallengeTimer+2
 			RTS
 		++ CMP.w #$0001 : BNE ++ ; Negative Time
 			LDA.l !CLOCK_TEMPORARY : EOR.w #$FFFF : !ADD.w #$0001 : STA.l !CLOCK_TEMPORARY
@@ -77,8 +74,8 @@ CalculateTimer:
 			BRA .prepDigits
 		++ CMP.w #$0002 : BNE ++ ; OHKO
 			LDA.w #$0002 : STA.l !Status ; Set DNF Mode
-			LDA.l !BaseTimer : STA.l !ChallengeTimer
-			LDA.l !BaseTimer+2 : STA.l !ChallengeTimer+2
+			LDA.l NMIFrames : STA.l ChallengeTimer
+			LDA.l NMIFrames+2 : STA.l ChallengeTimer+2
 			RTS
 		++ ; End Game
 			SEP #$30
@@ -123,26 +120,25 @@ dw #$003C, #$0000
 .halfCycle
 dw #$FFFF, #$7FFF
 ;--------------------------------------------------------------------------------
-!TEMPORARY_OHKO = "$7F50CC"
 DrawChallengeTimer:
-	LDA !TEMPORARY_OHKO : AND.w #$00FF : BEQ +
-    	LDA.w #$2807 : STA $7EC790
+	LDA TemporaryOHKO : AND.w #$00FF : BEQ +
+		LDA.w #$2807 : STA $7EC790
 		LDA.w #$280A : STA $7EC792
 		LDA.w #$280B : STA $7EC794
 		LDA.w #$280C : STA $7EC796
 		RTL
 	+
-    	LDA.w #$247F : STA $7EC790
+		LDA.w #$247F : STA $7EC790
 					   STA $7EC792
 					   STA $7EC794
 					   STA $7EC796
 	++
 	
 	LDA.l TimerStyle : BNE + : RTL : + ; Hud Timer
-    	LDA.w #$2807 : STA $7EC792
-    	
-    	LDA.l !Status : AND.w #$0002 : BEQ + ; DNF / OKHO
-    	
+		LDA.w #$2807 : STA $7EC792
+
+		LDA.l !Status : AND.w #$0002 : BEQ + ; DNF / OKHO
+
 			LDA.l TimeoutBehavior : AND.w #$00FF : BNE ++ ; DNF
 				LDA.w #$2808 : STA $7EC794
 				LDA.w #$2809 : STA $7EC796
@@ -163,13 +159,13 @@ DrawChallengeTimer:
 			LDA.l TimerRestart : BNE +++ : RTL : +++
 			BRA ++
 		+ ; Show Timer
-	    	LDA.l !Status : AND.w #$0001 : !ADD.w #$2804 : STA $7EC794
+			LDA.l !Status : AND.w #$0001 : !ADD.w #$2804 : STA $7EC794
 			LDA !CLOCK_HOURS+2 : STA $7EC796
 			LDA !CLOCK_HOURS : STA $7EC798
-	    	LDA.w #$2806 : STA $7EC79A
+			LDA.w #$2806 : STA $7EC79A
 			LDA !CLOCK_MINUTES+2 : STA $7EC79C
 			LDA !CLOCK_MINUTES : STA $7EC79E
-	    	LDA.w #$2806 : STA $7EC7A0
+			LDA.w #$2806 : STA $7EC7A0
 			LDA !CLOCK_SECONDS+2 : STA $7EC7A2
 			LDA !CLOCK_SECONDS : STA $7EC7A4
 		++
@@ -178,12 +174,12 @@ DrawChallengeTimer:
 RTL
 ;--------------------------------------------------------------------------------
 OHKOTimer:
-	LDA !TemporaryOHKO : BNE .kill
+	LDA TemporaryOHKO : BNE .kill
 	LDA.l TimeoutBehavior : CMP #$02 : BNE +
 	LDA !Status : AND.b #$02 : BEQ +
 		.kill
-		LDA.b #$00 : STA $7EF36D ; kill link
+		LDA.b #$00 : STA CurrentHealth ; kill link
 	+
-	LDA $7EF36D
+	LDA CurrentHealth
 RTL
 ;--------------------------------------------------------------------------------

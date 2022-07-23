@@ -4,7 +4,6 @@
 ;--------------------------------------------------------------------------------
 ; Filtered Joypad 1 Register: [AXLR | ????]
 ; Filtered Joypad 1 Register: [BYST | udlr] [AXLR | ????]
-!INVERT_DPAD = "$7F50CB"
 
 InvertDPad:
 	LDA.l OneMindPlayerCount : BEQ .crowd_control
@@ -23,7 +22,7 @@ InvertDPad:
 	JML.l InvertDPadReturn
 
 .crowd_control
-	LDA !INVERT_DPAD : BNE +
+	LDA InvertDPadModifier : BNE +
 
 	LDA $4218 : STA $00
 	LDA $4219 : STA $01
