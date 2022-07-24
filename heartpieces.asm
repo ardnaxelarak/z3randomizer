@@ -741,12 +741,8 @@ HeartPieceGetPlayer:
 			LDA HauntedGroveItem_Player
 			BRL .done
 	+ CMP.w #$2B : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeData+(21*6)+4
-			BRL .done
-		++
-			LDA #$00
-			BRL .done
+		LDA.l OWBonkPrizeData+(21*6)+4
+		BRL .done
 	+ CMP.w #$2E : BNE +
 		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeData+(22*6)+4
