@@ -200,6 +200,7 @@ incsrc decryption.asm
 incsrc hashalphabet.asm
 incsrc inverted.asm
 incsrc invertedmaps.asm
+incsrc bonktreemaps.asm
 incsrc newhud.asm
 incsrc compasses.asm
 incsrc save.asm

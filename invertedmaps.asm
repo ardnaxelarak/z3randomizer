@@ -1,5 +1,7 @@
 Overworld_LoadNewTiles:
 {
+    JSL.l Overworld_LoadBonkTiles
+
     LDA $040A : AND #$00FF : CMP #$0005 : BNE +
         ; add sign to EDM for OWG people to read
         LDA #$0101 : STA $7E2E18 ; #$0101 is the sign tile16 id, $7E2D98 is the position of the tile16 on map
