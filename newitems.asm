@@ -435,7 +435,7 @@ AddReceivedItemExpandedGetItem:
 	+ CMP.b #$B4 : BNE + ; Big Magic
 		LDA.b #$80 : STA MagicFiller ; fill magic
 		BRA .done
-	+ CMP.b #$B3 : BNE + ; 5 Arrows
+	+ CMP.b #$B5 : BNE + ; 5 Arrows
 		LDA.b #$05 : STA ArrowsFiller ; add 5 arrows
 		BRA .done
 	+
