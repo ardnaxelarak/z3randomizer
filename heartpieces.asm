@@ -140,11 +140,16 @@ RTL
 RTL
 ;--------------------------------------------------------------------------------
 SaveHeartCollectedStatus:
-	LDA !SKIP_HEART_SAVE : BEQ .normal_behavior
+	LDA !SKIP_HEART_SAVE : BEQ .save_flag
 	
 	DEC : STA !SKIP_HEART_SAVE
 RTL
 	
+	.save_flag
+	LDA 4,S : TAY : LDA $0ED0,Y : BEQ .normal_behavior
+		PHA : LDA OverworldEventDataWRAM, X : ORA 1,S : STA OverworldEventDataWRAM, X
+		PLA : RTL
+
 	.normal_behavior
 	LDA OverworldEventDataWRAM, X : ORA.b #$40 : STA OverworldEventDataWRAM, X
 RTL
@@ -229,7 +234,7 @@ macro GetPossiblyEncryptedItem(ItemLabel,TableLabel)
 		LDA.w #<ItemLabel>-<TableLabel>
 		JSL RetrieveValueFromEncryptedTable
 
-		PLX : STX $02 : PLX : STX $01
+		PLX : STX $02 : PLX : STX $00
 	PLP : PLX
 	?done:
 endmacro
@@ -283,7 +288,10 @@ LoadOutdoorValue:
 	PHP
 	REP #$20 ; set 16-bit accumulator
 	LDA $8A
-	CMP.w #$03 : BNE +
+	CMP.w #$00 : BNE +
+		LDA.l OWBonkPrizeData+(0*6)+3
+		JMP .done
+	+ CMP.w #$03 : BNE +
 		LDA $22 : CMP.w #1890 : !BLT ++
 			%GetPossiblyEncryptedItem(HeartPiece_Spectacle, HeartPieceOutdoorValues)
 			JMP .done
@@ -291,20 +299,105 @@ LoadOutdoorValue:
 			%GetPossiblyEncryptedItem(EtherItem, SpriteItemValues)
 			JMP .done
 	+ CMP.w #$05 : BNE +
-		%GetPossiblyEncryptedItem(HeartPiece_Mountain_Warp, HeartPieceOutdoorValues)
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(1*6)+3
+			JMP .done
+		++
+			%GetPossiblyEncryptedItem(HeartPiece_Mountain_Warp, HeartPieceOutdoorValues)
+			JMP .done
+	+ CMP.w #$0A : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(2*6)+3
+			JMP .done
+		++
+			LDA.l OWBonkPrizeData+(3*6)+3
+			JMP .done
+	+ CMP.w #$10 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(4*6)+3
+			JMP .done
+		++
+			LDA.l OWBonkPrizeData+(5*6)+3
+			JMP .done
+	+ CMP.w #$11 : BNE +
+		LDA.l OWBonkPrizeData+(6*6)+3
+		JMP .done
+	+ CMP.w #$12 : BNE +
+		LDA.l OWBonkPrizeData+(7*6)+3
+		JMP .done
+	+ CMP.w #$13 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(8*6)+3
+			JMP .done
+		++
+			LDA.l OWBonkPrizeData+(9*6)+3
+			JMP .done
+	+ CMP.w #$15 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(10*6)+3
+			JMP .done
+		++
+			LDA.l OWBonkPrizeData+(11*6)+3
+			JMP .done
+	+ CMP.w #$18 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(12*6)+3
+			JMP .done
+		++
+			LDA.l OWBonkPrizeData+(13*6)+3
+			JMP .done
+	+ CMP.w #$1A : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(14*6)+3
+			JMP .done
+		++
+			LDA.l OWBonkPrizeData+(15*6)+3
+			JMP .done
+	+ CMP.w #$1B : BNE +
+		LDA.l OWBonkPrizeData+(16*6)+3
+		JMP .done
+	+ CMP.w #$1D : BNE +
+		LDA.l OWBonkPrizeData+(17*6)+3
+		JMP .done
+	+ CMP.w #$1E : BNE +
+		LDA.l OWBonkPrizeData+(18*6)+3
 		JMP .done
 	+ CMP.w #$28 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Maze, HeartPieceOutdoorValues)
 		JMP .done
 	+ CMP.w #$2A : BNE +
-		%GetPossiblyEncryptedItem(HauntedGroveItem, HeartPieceOutdoorValues)
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(19*6)+3
+			JMP .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeData+(20*6)+3
+			JMP .done
+		++
+			%GetPossiblyEncryptedItem(HauntedGroveItem, HeartPieceOutdoorValues)
+			JMP .done
+	+ CMP.w #$2B : BNE +
+		LDA.l OWBonkPrizeData+(21*6)+3
 		JMP .done
+	+ CMP.w #$2E : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(22*6)+3
+			JMP .done
+		++
+			LDA.l OWBonkPrizeData+(23*6)+3
+			JMP .done
 	+ CMP.w #$30 : BNE +
 		LDA $22 : CMP.w #512 : !BGE ++
 			%GetPossiblyEncryptedItem(HeartPiece_Desert, HeartPieceOutdoorValues)
 			JMP .done
 		++
 			%GetPossiblyEncryptedItem(BombosItem, SpriteItemValues)
+			JMP .done
+	+ CMP.w #$32 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(24*6)+3
+			JMP .done
+		++
+			LDA.l OWBonkPrizeData+(25*6)+3
 			JMP .done
 	+ CMP.w #$35 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Lake, HeartPieceOutdoorValues)
@@ -313,16 +406,67 @@ LoadOutdoorValue:
 		%GetPossiblyEncryptedItem(HeartPiece_Swamp, HeartPieceOutdoorValues)
 		JMP .done
 	+ CMP.w #$42 : BNE +
-		%GetPossiblyEncryptedItem(HeartPiece_Cliffside, HeartPieceOutdoorValues)
-		JMP .done
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(26*6)+3
+			JMP .done
+		++
+			%GetPossiblyEncryptedItem(HeartPiece_Cliffside, HeartPieceOutdoorValues)
+			JMP .done
 	+ CMP.w #$4A : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Cliffside, HeartPieceOutdoorValues)
 		JMP .done
+	+ CMP.w #$51 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(27*6)+3
+			JMP .done
+		++
+			LDA.l OWBonkPrizeData+(28*6)+3
+			JMP .done
+	+ CMP.w #$54 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(29*6)+3
+			JMP .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeData+(30*6)+3
+			JMP .done
+		++
+			LDA.l OWBonkPrizeData+(31*6)+3
+			JMP .done
+	+ CMP.w #$55 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(32*6)+3
+			JMP .done
+		++
+			LDA.l OWBonkPrizeData+(33*6)+3
+			JMP .done
+	+ CMP.w #$56 : BNE +
+		LDA.l OWBonkPrizeData+(34*6)+3
+		JMP .done
 	+ CMP.w #$5B : BNE +
-		%GetPossiblyEncryptedItem(HeartPiece_Pyramid, HeartPieceOutdoorValues)
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(35*6)+3
+			JMP .done
+		++
+			%GetPossiblyEncryptedItem(HeartPiece_Pyramid, HeartPieceOutdoorValues)
+			JMP .done
+	+ CMP.w #$5E : BNE +
+		LDA.l OWBonkPrizeData+(36*6)+3
 		JMP .done
 	+ CMP.w #$68 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Digging, HeartPieceOutdoorValues)
+		JMP .done
+	+ CMP.w #$6E : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(37*6)+3
+			JMP .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeData+(38*6)+3
+			JMP .done
+		++
+			LDA.l OWBonkPrizeData+(39*6)+3
+			JMP .done
+	+ CMP.w #$74 : BNE +
+		LDA.l OWBonkPrizeData+(40*6)+3
 		JMP .done
 	+ CMP.w #$81 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Zora, HeartPieceOutdoorValues)
@@ -502,7 +646,10 @@ HeartPieceGetPlayer:
 	PHP
 	REP #$20 ; set 16-bit accumulator
 	LDA $8A
-	CMP.w #$03 : BNE +
+	CMP.w #$00 : BNE +
+		LDA.l OWBonkPrizeData+(0*6)+4
+		BRL .done
+	+ CMP.w #$03 : BNE +
 		LDA $22 : CMP.w #1890 : !BLT ++
 			LDA HeartPiece_Spectacle_Player
 			BRL .done
@@ -510,20 +657,116 @@ HeartPieceGetPlayer:
 			LDA EtherItem_Player
 			BRL .done
 	+ CMP.w #$05 : BNE +
-		LDA HeartPiece_Mountain_Warp_Player
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(1*6)+4
+			BRL .done
+		++
+			LDA HeartPiece_Mountain_Warp_Player
+			BRL .done
+	+ CMP.w #$0A : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(2*6)+4
+			BRL .done
+		++
+			LDA.l OWBonkPrizeData+(3*6)+4
+			BRL .done
+	+ CMP.w #$10 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(4*6)+4
+			BRL .done
+		++
+			LDA.l OWBonkPrizeData+(5*6)+4
+			BRL .done
+	+ CMP.w #$11 : BNE +
+		LDA.l OWBonkPrizeData+(6*6)+4
+		BRL .done
+	+ CMP.w #$12 : BNE +
+		LDA.l OWBonkPrizeData+(7*6)+4
+		BRL .done
+	+ CMP.w #$13 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(8*6)+4
+			BRL .done
+		++
+			LDA.l OWBonkPrizeData+(9*6)+4
+			BRL .done
+	+ CMP.w #$15 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(10*6)+4
+			BRL .done
+		++
+			LDA.l OWBonkPrizeData+(11*6)+4
+			BRL .done
+	+ CMP.w #$18 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(12*6)+4
+			BRL .done
+		++
+			LDA.l OWBonkPrizeData+(13*6)+4
+			BRL .done
+	+ CMP.w #$1A : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(14*6)+4
+			BRL .done
+		++
+			LDA.l OWBonkPrizeData+(15*6)+4
+			BRL .done
+	+ CMP.w #$1B : BNE +
+		LDA.l OWBonkPrizeData+(16*6)+4
+		BRL .done
+	+ CMP.w #$1D : BNE +
+		LDA.l OWBonkPrizeData+(17*6)+4
+		BRL .done
+	+ CMP.w #$1E : BNE +
+		LDA.l OWBonkPrizeData+(18*6)+4
 		BRL .done
 	+ CMP.w #$28 : BNE +
-		LDA HeartPiece_Maze_Player
-		BRL .done
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(19*6)+4
+			BRL .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeData+(20*6)+4
+			BRL .done
+		++
+			LDA HeartPiece_Maze_Player
+			BRL .done
 	+ CMP.w #$2A : BNE +
-		LDA HauntedGroveItem_Player
-		BRL .done
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(19*6)+4
+			BRL .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeData+(20*6)+4
+			BRL .done
+		++
+			LDA HauntedGroveItem_Player
+			BRL .done
+	+ CMP.w #$2B : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(21*6)+4
+			BRL .done
+		++
+			LDA #$00
+			BRL .done
+	+ CMP.w #$2E : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(22*6)+4
+			BRL .done
+		++
+			LDA.l OWBonkPrizeData+(23*6)+4
+			BRL .done
 	+ CMP.w #$30 : BNE +
 		LDA $22 : CMP.w #512 : !BGE ++
 			LDA HeartPiece_Desert_Player
 			BRL .done
 		++
 			LDA BombosItem_Player
+			BRL .done
+	+ CMP.w #$32 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(24*6)+4
+			BRL .done
+		++
+			LDA.l OWBonkPrizeData+(25*6)+4
 			BRL .done
 	+ CMP.w #$35 : BNE +
 		LDA HeartPiece_Lake_Player
@@ -532,16 +775,67 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Swamp_Player
 		BRL .done
 	+ CMP.w #$42 : BNE +
-		LDA HeartPiece_Cliffside_Player
-		BRL .done
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(26*6)+4
+			BRL .done
+		++
+			LDA HeartPiece_Cliffside_Player
+			BRL .done
 	+ CMP.w #$4A : BNE +
 		LDA HeartPiece_Cliffside_Player
 		BRL .done
+	+ CMP.w #$51 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(27*6)+4
+			BRL .done
+		++
+			LDA.l OWBonkPrizeData+(28*6)+4
+			BRL .done
+	+ CMP.w #$54 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(29*6)+4
+			BRL .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeData+(30*6)+4
+			BRL .done
+		++
+			LDA.l OWBonkPrizeData+(31*6)+4
+			BRL .done
+	+ CMP.w #$55 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(32*6)+4
+			BRL .done
+		++
+			LDA.l OWBonkPrizeData+(33*6)+4
+			BRL .done
+	+ CMP.w #$56 : BNE +
+		LDA.l OWBonkPrizeData+(34*6)+4
+		BRL .done
 	+ CMP.w #$5B : BNE +
-		LDA HeartPiece_Pyramid_Player
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(35*6)+4
+			BRL .done
+		++
+			LDA HeartPiece_Pyramid_Player
+			BRL .done
+	+ CMP.w #$5E : BNE +
+		LDA.l OWBonkPrizeData+(36*6)+4
 		BRL .done
 	+ CMP.w #$68 : BNE +
 		LDA HeartPiece_Digging_Player
+		BRL .done
+	+ CMP.w #$6E : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeData+(37*6)+4
+			BRL .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeData+(38*6)+4
+			BRL .done
+		++
+			LDA.l OWBonkPrizeData+(39*6)+4
+			BRL .done
+	+ CMP.w #$74 : BNE +
+		LDA.l OWBonkPrizeData+(40*6)+4
 		BRL .done
 	+ CMP.w #$81 : BNE +
 		LDA HeartPiece_Zora_Player

@@ -581,6 +581,9 @@ Utility_CheckIfHitBoxesOverlapLong:
 org $06A7DB
 Chicken_SpawnAvengerChicken: ; returns short
 
+org $06AD58
+Sprite_TransmuteToBomb:
+
 org $06DC5C
 Sprite_DrawShadowLong:
 

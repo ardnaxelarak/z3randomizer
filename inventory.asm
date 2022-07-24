@@ -542,6 +542,9 @@ AddInventory:
 		JSR .incrementMap
 		JMP .done
 	+ CPY.b #$80 : !BLT + ; Items $80 - $8F - Free Compasses
+				; there was a bug for all loot ID's >$7F
+					LDA.w AddReceivedItemExpanded_item_target_addr+$100, X : STA.b $00
+					LDA.w AddReceivedItemExpanded_item_target_addr+$101, X : STA.b $01
 	  CPY.b #$90 : !BGE +
                 JSL MaybeFlagCompassTotalPickup
 		JSR .incrementCompass

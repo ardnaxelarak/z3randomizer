@@ -2679,8 +2679,8 @@ JSL NewElderCode
 ;--------------------------------------------------------------------------------
 ; Add him to Castle Map post-rain, and post aga1
 ;--------------------------------------------------------------------------------
-org $09D0AC
-db #$18, #$0F, #$43, #$FF;remove heart from tree adjancent map [LW1]
+org $09D0A9
+db #$18, #$0A, #$D8, #$18, #$0F, #$43, #$FF;remove heart from tree adjancent map [LW1]
 db #$12, #$19, #$16 ;add sahasrala in castle Y, X, Sprite ID
 org $09C937
 db #$B0, #$D0 ;change [LW1] map 01C pointers
