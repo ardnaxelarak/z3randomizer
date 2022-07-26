@@ -682,6 +682,13 @@ RTS
 map091: ;Pyramid
 {
 LDA.l OWTileMapAlt+$5B : AND #$0001 : BNE + : JMP .notInverted
+    ; Warp Tile Post-Aga Defeated
+    LDA ProgressIndicator : AND #$00FF : CMP #$0003 : BNE +
+        LDA #$0212 : BRA .write_warp
+    + LDA #$0034
+    .write_warp
+    STA $3BBE
+
     ; delete Goal sign
     + LDA #$09F1 : STA $27B6 ; remove sign
     LDA #$09F0 : STA $27B4 ; remove the added pyramid peg on the left of the sign
@@ -721,15 +728,8 @@ LDA.l OWTileMapAlt+$5B : AND #$0001 : BNE + : JMP .notInverted
     LDA #$0333 : STA $3B3A : STA $3B3C : STA $3B3E
     LDA #$0034 : STA $3BB6 : STA $3BBA : STA $3BBC
         STA $3C3A : STA $3C3C :  STA $3C3E
-
-    ; Warp Tile Post-Aga Defeated
-    LDA ProgressIndicator : AND #$00FF : CMP #$0003 : BNE +
-        LDA #$0212
-    + STA $3BBE ; warp tile
-
     LDA #$00F2 : STA $3BB8
     LDA #$0108 : STA $3C38
-
     LDA #$0324 : STA $39C0 : STA $39C2 : STA $39C4
     LDA #$0325 : STA $39C6
     LDA #$02D5 : STA $39C8 : STA $39D2
