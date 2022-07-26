@@ -683,13 +683,13 @@ map091: ;Pyramid
 {
 LDA.l OWTileMapAlt+$5B : AND #$0001 : BNE + : JMP .notInverted
     ; Warp Tile Post-Aga Defeated
-    LDA #$0034 : STA $3BBE
+    + LDA #$0034 : STA $3BBE
     LDA ProgressIndicator : AND #$00FF : CMP #$0003 : BNE +
         LDA #$0212 : STA $3BBE
     +
 
     ; delete Goal sign
-    + LDA #$09F1 : STA $27B6 ; remove sign
+    LDA #$09F1 : STA $27B6 ; remove sign
     LDA #$09F0 : STA $27B4 ; remove the added pyramid peg on the left of the sign
 
     LDA #$0A06 : STA $2E1C ; cover up entrance
