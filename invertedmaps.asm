@@ -683,11 +683,10 @@ map091: ;Pyramid
 {
 LDA.l OWTileMapAlt+$5B : AND #$0001 : BNE + : JMP .notInverted
     ; Warp Tile Post-Aga Defeated
+    LDA #$0034 : STA $3BBE
     LDA ProgressIndicator : AND #$00FF : CMP #$0003 : BNE +
-        LDA #$0212 : BRA .write_warp
-    + LDA #$0034
-    .write_warp
-    STA $3BBE
+        LDA #$0212 : STA $3BBE
+    +
 
     ; delete Goal sign
     + LDA #$09F1 : STA $27B6 ; remove sign
