@@ -67,12 +67,12 @@ CheckGanonVulnerability:
 .all_dungeons_no_agahnim
 	LDA.l PendantsField : AND.b #$07 : CMP.b #$07 : BNE .fail ; require all pendants
 	LDA.l CrystalsField : AND.b #$7F : CMP.b #$7F : BNE .fail ; require all crystals
-	LDA.l OverworldEventDataWRAM+$5B : AND.b #$20 : BEQ .fail ; require aga2 defeated (pyramid hole open)
+	LDA RoomDataWRAM[$0D].high : AND.b #$08 : BEQ .fail ; require aga2 defeated (pyramid hole open)
 	BRA .success
 
 ; 03 = crystals and aga 2
 .crystals_and_aga
-	LDA.l OverworldEventDataWRAM+$5B : AND.b #$20 : BEQ .fail ; check aga2 first then bleed in
+	LDA RoomDataWRAM[$0D].high : AND.b #$08 : BEQ .fail ; check aga2 first then bleed in
 
 ; 04 = crystals only
 .crystals
