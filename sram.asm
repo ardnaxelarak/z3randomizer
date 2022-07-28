@@ -53,11 +53,12 @@ endstruct align 2
 ; This label can be indexed with a plus symbol (e.g. The Hyrule Castle screen would
 ; be OverworldEventDataWRAM+$1B or OverworldEventDataWRAM+27)
 ;--------------------------------------------------------------------------------
-; - i o - - - b -
+; - i o t t t b -
 ;
 ; i = Free-standing item collected. Also used for sprites like the castle tower barrier
 ; o = Overlay active
 ; b = Bomb wall opened
+; t = Tree/Rock/Statue prize collected (Bonk Drop Shuffle)
 ;--------------------------------------------------------------------------------
 OverworldEventDataWRAM = $7EF280
 
