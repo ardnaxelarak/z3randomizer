@@ -635,6 +635,7 @@ RTS
 FontTable:
     incbin stats/fonttable.bin
 
+print "Stats Config address: ", pc
 CreditsStats:
 incsrc stats/statConfig.asm
 dw $FFFF
