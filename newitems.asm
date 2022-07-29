@@ -402,15 +402,15 @@ AddReceivedItemExpandedGetItem:
 			JMP .done
 	+ CMP.b #$B0 : BNE + ; Bee Trap
 		LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI ++ ; DashBeeHive_SpawnBee
-		LDA $22 : CLC : ADC.b #$07 : AND.b #$F0 : STA $0D10,Y
-			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 16
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
 		LDA $20 : STA $0D00, Y : LDA $21 : STA $0D20, Y
 		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
 		++ JMP .done
 	+ CMP.b #$B1 : BNE + ; Apples
 		LDA.b #$AC : JSL Sprite_SpawnDynamically : BMI ++
-		LDA $22 : CLC : ADC.b #$07 : AND.b #$F0 : STA $0D10,Y
-			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 16
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
 		LDA.b $20 : SEC : SBC.b #$10 : STA.w $0D00,Y
 			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 16 pixels
 		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
@@ -418,8 +418,8 @@ AddReceivedItemExpandedGetItem:
 		++ BRA .done
 	+ CMP.b #$B2 : BNE + ; Fairy
 		LDA.b #$E3 : JSL Sprite_SpawnDynamically : BMI .done
-		LDA $22 : CLC : ADC.b #$07 : AND.b #$F0 : STA $0D10,Y
-			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 16
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
 		LDA.b $20 : SEC : SBC.b #$10 : STA.w $0D00,Y
 			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 16 pixels
 		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
@@ -427,8 +427,8 @@ AddReceivedItemExpandedGetItem:
 		BRA .done
 	+ CMP.b #$B3 : BNE + ; Chicken
 		LDA.b #$0B : JSL Sprite_SpawnDynamically : BMI .done
-		LDA $22 : CLC : ADC.b #$07 : AND.b #$F0 : STA $0D10,Y
-			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 16
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
 		LDA.b $20 : SEC : SBC.b #$08 : STA.w $0D00,Y
 			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 8 pixels
 		BRA .done
