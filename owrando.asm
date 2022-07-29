@@ -385,7 +385,7 @@ OWBonkDrops:
     ; loop thru rando bonk table to find match
     PHB : PHK : PLB
     LDA.b $8A
-    LDX.b #(40*6) ; 40 bonk items, 6 bytes each
+    LDX.b #(41*6) ; 41 bonk items, 6 bytes each
     - CMP.w OWBonkPrizeData,X : BNE +
         INX
         LDA.w $0D10,Y : LSR A : LSR A : LSR A : LSR A
@@ -1312,7 +1312,7 @@ db 0, 0, 0, 0, 0, 0, 0, 0
 db 0, 0
 
 ;================================================================================
-; Bonk Prize Data ($AABB00 - $AABBF5)
+; Bonk Prize Data ($AABB00 - $AABBFB)
 ;--------------------------------------------------------------------------------
 ; This table stores data relating to bonk locations for Bonk Drop Shuffle
 ; 
@@ -1371,7 +1371,7 @@ db $18, $a8, $10, $b2, $00, $20
 db $18, $36, $08, $35, $00, $20
 db $1a, $8a, $10, $42, $00, $20
 db $1a, $1d, $08, $b2, $00, $20
-;db $1a, $77, $04, $35, $00, $20  ; pre aga ONLY ; hijacked murahdahla bonk tree
+db $ff, $77, $04, $35, $00, $20  ; pre aga ONLY ; hijacked murahdahla bonk tree
 db $1b, $46, $10, $b1, $00, $10
 db $1d, $6b, $10, $b1, $00, $20
 db $1e, $72, $10, $b2, $00, $20
