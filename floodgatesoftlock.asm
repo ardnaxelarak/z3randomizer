@@ -12,7 +12,7 @@ FloodGateReset:
 	+
 FloodGateResetInner:
 	    LDA.l Bugfix_SwampWaterLevel : BEQ .done
-	    LDA $279004 : BEQ .check_room_35; Only do the check for room 37 if on door rando
+	    LDA DRMode : BEQ .check_room_35; Only do the check for room 37 if on door rando
 	    LDA.l SwampDrain1HasItem : BEQ .flipper_check
 		LDA $7F666F : AND.b #$80 : BEQ .drain_room_37 ; Check if key in room 37 has been collected.
 		.flipper_check
