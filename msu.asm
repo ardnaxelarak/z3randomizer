@@ -248,26 +248,30 @@ CheckMusicLoadRequest:
 ;.boss
             LDA $040C : LSR : !ADD.b #45
             BRA .check_fallback-3
+.no_change
+            PLA : BRA .check_fallback-3
 .lightworld
             PHA
-                ;LDA OverworldEventDataWRAM+$80 : AND.b #$40 : BEQ + ; ped pull
-                LDA ProgressIndicator : CMP.b #03 : BNE + ; aga1 killed
-                    PLA
-                    LDA.b #60 : BRA .check_fallback-3
+                LDA InvertedMode : BNE +
+                    ;LDA OverworldEventDataWRAM+$80 : AND.b #$40 : BEQ + ; ped pull
+                    LDA ProgressIndicator : CMP.b #03 : BNE .no_change ; aga1 killed
+                        - PLA : LDA.b #60 : BRA .check_fallback-3
                 +
-            -- : PLA : BRA .check_fallback-3
+                    LDA CrystalsField : CMP.b #$7F : BNE .no_change
+                        BRA -
 .darkworld
             PHA
-                LDA CrystalsField : CMP.b #$7F : BNE --
-            - : PLA
-            LDA.b #61 : BRA .check_fallback-3 
+                LDA InvertedMode : BNE +
+                    LDA CrystalsField : CMP.b #$7F : BNE .no_change
+                        - PLA : LDA.b #61 : BRA .check_fallback-3
+                +
+                    LDA ProgressIndicator : CMP.b #03 : BNE .no_change ; aga1 killed
+                        BRA -
 .darkwoods
-            PHA
-                LDA CrystalsField : CMP.b #$7F : BEQ -
-                ;LDA CurrentWorld : BEQ --
-                LDA $8A : CMP #$40 : BNE --
-            PLA
-            LDA.b #15 : BRA .check_fallback-3
+            LDA.b #15 : PHA
+                LDX $8A : LDA.l OWTileWorldAssoc,X : BEQ +
+                    PLA : BRA .darkworld
+                + PLA : BRA .lightworld
 .castle
             LDA $040C
             CMP.b #$08 : BNE .check_fallback  ; Hyrule Castle 2
