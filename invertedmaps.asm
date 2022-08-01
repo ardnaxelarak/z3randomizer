@@ -850,7 +850,7 @@ RTS
 Overworld_InvertedTRPuzzle:
 {
     REP #$30
-    LDA.l OWTileMapAlt+07 : BNE .inverted
+    LDA.l OWTileMapAlt+07 : AND #$00FF : BNE .inverted
         LDA.w #$0212 : LDX.w #$0720 : STA.l $7E2000,X ; what we wrote over
         JSL.l Overworld_MemorizeMap16Change : JSL.l Overworld_DrawPersistentMap16+4 ; what we wrote over
         RTL
