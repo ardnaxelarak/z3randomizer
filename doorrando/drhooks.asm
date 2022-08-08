@@ -198,8 +198,8 @@ Underworld_DoorDown_Call:
 org $02C3F3
 dw $8AD9 ; address of Bank02.asm:2085
 
-org $01aa90
-JSL BigKeyDoorCheck
+org $01AA90
+JSL BigKeyDoorCheck : NOP
 
 org $01AAA2
 RoomDraw_OneSidedShutters_South_onesided_shutter_or_big_key_door:
