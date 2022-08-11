@@ -235,15 +235,30 @@ SaveMajorItemDrop:
 	INC.w SpawnedItemFlag
 	TAY : LDA.w #$0008
 	CPY.w #$0036 : BNE +  ; Red Rupee
-		LDA.w #$0016 : BRA .done
+		LDA.w #$0016 : BRA .substitute
 	+ CPY.w #$0044 : BNE + ; 10 pack arrows
-		LDA.w #$0017 : BRA .done
+		LDA.w #$0017 : BRA .substitute
 	+ CPY.w #$0028 : BNE + ; 3 pack bombs
-		LDA.w #$0018 : BRA .done
-	+ CPY.w #$0031 : BNE .done ; 10 pack bombs
-		LDA.w #$0019
-	.done STA $0B9C ; indicates we should use the key routines or a substitute
-	RTL
+		LDA.w #$0018 : BRA .substitute
+	+ CPY.w #$0031 : BNE + ; 10 pack bombs
+		LDA.w #$0019 : BRA .substitute
+	+ STA $0B9C ; indicates we should use the key routines or a substitute
+RTL
+	.substitute
+	PHA
+		TXA : ASL : STA.b $00
+		LDA.w #$001F : SBC $00
+		TAX : LDA.l BitFieldMasks, X : STA $00
+		LDA.b $A0 : ASL : TAX
+		LDA.l $7EF580, X
+		AND.b $00
+		BNE .exit
+		LDA.l $7EF580, X : ORA $00 : STA.l $7EF580, X
+	PLA : STA $0B9C
+RTL
+	.exit
+	PLA : STZ.w $0B9C
+RTL
 
 ShouldCountNormalPot:
 	INY : INY : LDA [$00], Y : AND #$00FF : CMP #$0080 : BCS .clear
