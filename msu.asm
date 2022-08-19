@@ -237,6 +237,7 @@ CheckMusicLoadRequest:
             LDA !REG_MUSIC_CONTROL_REQUEST
 
             CMP.b #02 : BEQ .lightworld
+            CMP.b #04 : BEQ .no_change+1  ; bunny
             CMP.b #09 : BEQ .darkworld
             CMP.b #13 : BEQ .darkwoods
             CMP.b #15 : BEQ .darkwoods
