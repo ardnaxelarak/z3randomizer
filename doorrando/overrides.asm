@@ -152,6 +152,13 @@ BlindsAtticHint:
 		SEP #$20 : RTL ; skip the dialog box if the hole is already open
 	+ SEP #$20 : JML Main_ShowTextMessage
 
+BlindZeldaDespawnFix:
+	CMP.b #06 : BEQ +
+	LDA.w $0D00,X : BEQ + ; don't despawn follower if maiden isn't "present"
+		PLA : PLA : PEA.w SpritePrep_BlindMaiden_despawn_follower-1 : RTL
+	+ PLA : PLA : PEA.w SpritePrep_BlindMaiden_kill_the_girl-1 : RTL
+
+
 BigKeyDoorCheck:
 	CPY.w #$001E : BNE + ; skip if it isn't a BK door
 	LDA.l DRFlags : AND #$0400 : BNE + ; skip if the flag is set - bk doors can be double-sided
