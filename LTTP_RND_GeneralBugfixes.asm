@@ -362,7 +362,8 @@ warnpc $B08000
 ;$27 DR Code Bank
 ;$28 Keydrop / Standing Items Code bank
 ;$29 External hooks (rest of bank not used)
-;$2A Room Data migration
+;$2A Reserved for OWR
+;$2B Room Data migration
 ;$2E Reserved for Tournament Use
 ;$2F Static RNG (rest is reserved for tournament use)
 ;$30 Main Configuration Table
