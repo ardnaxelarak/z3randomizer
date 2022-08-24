@@ -152,3 +152,10 @@ BlindsAtticHint:
 		SEP #$20 : RTL ; skip the dialog box if the hole is already open
 	+ SEP #$20 : JML Main_ShowTextMessage
 
+BlindZeldaDespawnFix:
+	CMP.b #06 : BEQ +
+	LDA.w $0D00,X : BEQ + ; don't despawn follower if maiden isn't "present"
+		PLA : PLA : PEA.w SpritePrep_BlindMaiden_despawn_follower-1 : RTL
+	+ PLA : PLA : PEA.w SpritePrep_BlindMaiden_kill_the_girl-1 : RTL
+
+
