@@ -415,7 +415,7 @@ AddReceivedItemExpandedGetItem:
 			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 16 pixels
 		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
 		LDA.b #$FF : STA.w $0B58,Y ; allows them to expire
-		++ BRA .done
+		++ JMP .done
 	+ CMP.b #$B2 : BNE + ; Fairy
 		LDA.b #$E3 : JSL Sprite_SpawnDynamically : BMI .done
 		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
@@ -431,6 +431,7 @@ AddReceivedItemExpandedGetItem:
 			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
 		LDA.b $20 : SEC : SBC.b #$08 : STA.w $0D00,Y
 			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 8 pixels
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
 		BRA .done
 	+ CMP.b #$B4 : BNE + ; Big Magic
 		LDA.b #$80 : STA MagicFiller ; fill magic
