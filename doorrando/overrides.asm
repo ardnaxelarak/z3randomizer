@@ -132,7 +132,7 @@ RainPrevention:
 			- INX #2 : LDA.l RemoveRainDoorsRoom, X : CMP #$FFFF : BEQ .done
 			CMP $A0 : BNE -
 				SEP #$20 : LDA.l RainDoorMatch, X : CMP $00 : BNE .continue
-					REP #$20 : PLA : SEC : RTL
+					INC.w $0460 : INC.w $0460 : REP #$20 : PLA : SEC : RTL
 				.continue
 				REP #$20 : BRA -
 	.done PLA : CLC : RTL
