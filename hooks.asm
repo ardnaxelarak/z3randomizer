@@ -1036,6 +1036,11 @@ NOP
 org $07B57D ; 3B57D - Bank07.asm:8527 (LDA Link_ReceiveItemAlternates, Y : STA $03)
 JSL.l Link_ReceiveItemAlternatesExpanded_loadAlternate
 NOP
+
+org $08C563
+JML ItemGetAlternateSFX : NOP
+org $0988A5
+JSL ItemGetOverworldAlternateSFX : NOP #5
 ;--------------------------------------------------------------------------------
 org $09892E ; 4892E - ancilla_init.asm:1307 (LDA BottleList, X)
 LDA.w BottleListExpanded, X
