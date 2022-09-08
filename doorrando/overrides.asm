@@ -133,7 +133,7 @@ RainPrevention:
 			- INX #2 : LDA.l RemoveRainDoorsRoom, X : CMP #$FFFF : BEQ .done
 			CMP $A0 : BNE -
 				SEP #$20 : LDA.l RainDoorMatch, X : CMP $00 : BNE .continue
-					REP #$20 : PLA : SEC : RTL
+					INC.w $0460 : INC.w $0460 : REP #$20 : PLA : SEC : RTL
 				.continue
 				REP #$20 : BRA -
 	.done PLA : CLC : RTL
@@ -152,4 +152,11 @@ BlindsAtticHint:
 	LDA RoomDataWRAM[$65].low : AND.w #$0100 : BEQ +
 		SEP #$20 : RTL ; skip the dialog box if the hole is already open
 	+ SEP #$20 : JML Main_ShowTextMessage
+
+BlindZeldaDespawnFix:
+	CMP.b #06 : BEQ +
+	LDA.w $0D00,X : BEQ + ; don't despawn follower if maiden isn't "present"
+		PLA : PLA : PEA.w SpritePrep_BlindMaiden_despawn_follower-1 : RTL
+	+ PLA : PLA : PEA.w SpritePrep_BlindMaiden_kill_the_girl-1 : RTL
+
 

@@ -2595,7 +2595,14 @@ JSL.l QuickSwap
 org $0689AB ; <- 309AB - sprite_prep.asm: 647 (LDA $7EF3CC : CMP.b #$06 : BEQ .killSprite)
 ; Note: In JP 1.0 we have: (CMP.b #$00 : BNE .killSprite) appling US bugfix
 ; Prevent followers from causing blind/maiden to despawn:
-CMP.b #$06 : db #$F0 ; BEQ
+; Door rando: let zelda despawn the maiden.
+JSL BlindZeldaDespawnFix
+
+org $0689AF
+SpritePrep_BlindMaiden_despawn_follower: ; this is the normal execution path
+
+org $0689C9
+SpritePrep_BlindMaiden_kill_the_girl: ; not the follower
 ;--------------------------------------------------------------------------------
 ; Fix old man purple chest issues using the same method as above
 org $1EE906 ; <- F6906 - sprite_old_mountain_man.asm : 31 (LDA $7EF3CC : CMP.b #$00 : BNE .already_have_tagalong)
