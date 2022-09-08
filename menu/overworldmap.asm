@@ -297,3 +297,4 @@ MC_Masks:
 ;   EP   TH   DP   PD   SK   TR   TT   MM
 db $20, $20, $10, $02, $80, $08, $10, $01, $40, $04, $04, $08, $40
 
+warnpc $0AC3B1 ; above code should not exceed the space of the code segment it is overwriting
