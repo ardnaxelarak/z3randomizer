@@ -40,18 +40,13 @@
 ; #$90 - Big Keys
 ; #$A0 - Small Keys
 ; #$B0 - reserved for bee traps
-; #$B1 - L-1 Bombs
-; #$B2 - L-2 Bombs
-; #$B3 - L-3 Bombs
-; #$B4 - L-4 Bombs
-; #$B5 - L-5 Bombs
-; #$B6 - Progressive Bombs
-; #$B7 - L-1 Cane
-; #$B8 - L-2 Cane
-; #$B9 - L-3 Cane
-; #$BA - L-4 Cane
-; #$BB - L-5 Cane
-; #$BC - Progressive Cane
+; #$B1 - reserved for bonk shuffle
+; #$B2 - reserved for bonk shuffle
+; #$B3 - reserved for bonk shuffle
+; #$B4 - reserved for bonk shuffle
+; #$B5 - reserved for bonk shuffle
+; #$B6 - Progressive Bomb
+; #$B7 - Progressive Cane
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
 ;--------------------------------------------------------------------------------
@@ -398,11 +393,10 @@ AddReceivedItemExpandedGetItem:
 				LDA CurrentSmallKeys : INC : STA CurrentSmallKeys
 			++
 			JMP .done
-	+ CMP.b #$B1 : !BLT + : CMP.b #$B7 : !BGE + ; Bomb Upgrades
-		LDA.l SpecialWeapons : CMP #$01 : BNE .done
-			LDA #$01 : STA InfiniteBombsModifier
-			JMP .done
-	+ : CMP.b #$B7 : !BLT + : CMP.b #$BD : !BGE + ; Cane Upgrades
+	+ CMP.b #$B6 : BNE + ; Bomb Upgrade
+		LDA #$01 : STA InfiniteBombsModifier
+		JMP .done
+	+ : CMP.b #$B7 : BNE + ; Cane Upgrade
 		LDA.l SpecialWeapons : CMP #$03 : BEQ .blue_cane
 		                       CMP #$04 : BEQ .red_cane
 			BRA .done
@@ -533,30 +527,6 @@ AddReceivedItemExpanded:
 			JSL.l GetRNGItemMulti : STA $02D8
 			LDA #$FF : STA !LOCK_IN ; clear lock-in
 			JMP .done
-		++ : CMP.b #$B6 : BNE ++ ; Progressive Bombs
-			LDA SpecialWeaponLevel
-			CMP.b #$00 : BNE + ; have no Bombs
-				LDA.b #$B1 : STA $02D8 : JMP .done
-			+ : CMP.b #$01 : BNE + ; have L-1 Bombs
-				LDA.b #$B2 : STA $02D8 : JMP .done
-			+ : CMP.b #$02 : BNE + ; have L-2 Bombs
-				LDA.b #$B3 : STA $02D8 : JMP .done
-			+ : CMP.b #$03 : BNE + ; have L-3 Bombs
-				LDA.b #$B4 : STA $02D8 : JMP .done
-			+ ; Everything Else
-				LDA.b #$B5 : STA $02D8 : JMP .done
-		++ : CMP.b #$BC : BNE ++ ; Progressive Cane
-			LDA SpecialWeaponLevel
-			CMP.b #$00 : BNE + ; have no Cane
-				LDA.b #$B7 : STA $02D8 : JMP .done
-			+ : CMP.b #$01 : BNE + ; have L-1 Cane
-				LDA.b #$B8 : STA $02D8 : JMP .done
-			+ : CMP.b #$02 : BNE + ; have L-2 Cane
-				LDA.b #$B9 : STA $02D8 : JMP .done
-			+ : CMP.b #$03 : BNE + ; have L-3 Cane
-				LDA.b #$BA : STA $02D8 : JMP .done
-			+ ; Everything Else
-				LDA.b #$BB : STA $02D8 : JMP .done
 		++
 		.done
 	PLX : PLA
@@ -602,9 +572,10 @@ AddReceivedItemExpanded:
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Free Big Key
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Free Small Key
 	db -4 ; reserved for bee traps
-	db -4, -4, -4, -4, -4, -4 ; Bomb Upgrades
-	db -4, -4, -4, -4, -4, -4 ; Cane Upgrades
-	db -4, -4, -4 ; Unused
+	db -4, -4, -4, -4, -4 ; reserved for bonk shuffle
+	db -4 ; Bomb Upgrade
+	db -4 ; Cane Upgrade
+	db -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
@@ -645,9 +616,10 @@ AddReceivedItemExpanded:
 	;db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; *EVENT*
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  0 ; reserved for bee traps
-	db  0, 0, 0, 0, 0, 0 ; Bomb Upgrades
-	db  4, 4, 4, 4, 4, 4 ; Cane Upgrades
-	db  0, 0, 0 ; Unused
+	db  0, 0, 0, 0, 0 ; reserved for bonk shuffle
+	db  0 ; Bomb Upgrade
+	db  4 ; Cane Upgrade
+	db  0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
@@ -692,9 +664,10 @@ AddReceivedItemExpanded:
 	;db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; *EVENT*
 	;db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; *EVENT*
 	db $49 ; reserved for bee traps
-	db $13, $13, $13, $13, $13, $13 ; Bomb Upgrades
-	db $07, $07, $07, $07, $07, $07 ; Cane Upgrades
-	db $49, $49, $49 ; Unused
+	db $49, $49, $49, $49, $49 ; reserved for bonk shuffle
+	db $13 ; Bomb Upgrade
+	db $07 ; Cane Upgrade
+	db $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -734,9 +707,10 @@ AddReceivedItemExpanded:
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Free Big Key
 	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 ; Free Small Key
 	db $02 ; reserved for bee traps
-	db $02, $02, $02, $02, $02, $02 ; Bomb Upgrades
-	db $00, $00, $00, $00, $00, $00 ; Cane Upgrades
-	db $02, $02, $02 ; Unused
+	db $02, $02, $02, $02, $02 ; reserved for bonk shuffle
+	db $02 ; Bomb Upgrade
+	db $00 ; Cane Upgrade
+	db $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
@@ -777,9 +751,10 @@ AddReceivedItemExpanded:
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Big Key
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  4 ; reserved for bee traps
-	db  4, 2, 1, 5, 5, 5 ; Bomb Upgrades
-	db  5, 5, 5, 5, 5, 5 ; Cane Upgrades
-	db  4, 4, 4 ; Unused
+	db  4, 4, 4, 4, 4 ; reserved for bonk shuffle
+	db  5 ; Bomb Upgrade
+	db  5 ; Cane Upgrade
+	db  4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
@@ -821,9 +796,10 @@ AddReceivedItemExpanded:
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Big Key
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Small Key
 	dw $F36A ; reserved for bee traps
-	dw $F38F, $F38F, $F38F, $F38F, $F38F, $F38F ; Bomb Upgrades
-	dw $F38F, $F38F, $F38F, $F38F, $F38F, $F38F ; Cane Upgrades
-	dw $F36A, $F36A, $F36A ; Unused
+	dw $F36A, $F36A, $F36A, $F36A, $F36A ; reserved for bonk shuffle
+	dw $F38F ; Bomb Upgrade
+	dw $F38F ; Cane Upgrade
+	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
@@ -867,9 +843,10 @@ AddReceivedItemExpanded:
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Free Big Key
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Free Small Key
 	db $FF ; reserved for bee traps
-	db $01, $02, $03, $04, $05, $FF ; Bomb Upgrades
-	db $01, $02, $03, $04, $05, $FF ; Cane Upgrades
-	db $FF, $FF, $FF ; Unused
+	db $FF, $FF, $FF, $FF, $FF ; reserved for bonk shuffle
+	db $FF ; Bomb Upgrade
+	db $FF ; Cane Upgrade
+	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
@@ -955,9 +932,10 @@ Link_ReceiveItemAlternatesExpanded:
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Free Big Key
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Free Small Key
 	db -1 ; reserved for bee traps
-	db -1, -1, -1, -1, -1, -1 ; Bomb Upgrades
-	db -1, -1, -1, -1, -1, -1 ; Cane Upgrades
-	db -1, -1, -1 ; Unused
+	db -1, -1, -1, -1, -1 ; reserved for bonk shuffle
+	db -1 ; Bomb Upgrade
+	db -1 ; Cane Upgrade
+	db -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
@@ -1249,3 +1227,17 @@ MaybeFlagCompassTotalEntrance:
 	.done
 RTL
 ;--------------------------------------------------------------------------------
+LoadReceivedItemExpandedProperties:
+CPX.b #$B6 : BEQ .bomb_upgrade
+	LDA.l AddReceivedItemExpanded_properties, X ; load from table
+	RTL
+.bomb_upgrade
+	LDA SpecialWeaponLevel
+	CMP.b #$01 : BNE + ; L1 Bombs
+		LDA.b #4 : RTL
+	+ : CMP.b #$02 : BNE + ; L2 Bombs
+		LDA.b #2 : RTL
+	+ : CMP.b #$03 : BNE + ; L3 Bombs
+		LDA.b #1 : RTL
+	+ ; Everything Else
+		LDA.b #5 : RTL

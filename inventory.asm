@@ -288,17 +288,17 @@ AddInventory:
 	SEP #$20 ; Set 8-bit Accumulator
 
 	LDA $040C ; get dungeon id
-        CMP.b #$FF : BEQ .fullItemCounts
+	CMP.b #$FF : BEQ .fullItemCounts
 
-        CMP.l BallNChainDungeon : BNE +
+	CMP.l BallNChainDungeon : BNE +
 		CPY.b #$32 : BNE +
                         JMP .done
 	+
-        CMP.b #$04 : BCS +
-                LDA SewersLocations : INC : STA SewersLocations
-                LDA HCLocations : INC : STA HCLocations
-                BRA .fullItemCounts
-        + LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
+	CMP.b #$04 : BCS +
+		LDA SewersLocations : INC : STA SewersLocations
+		LDA HCLocations : INC : STA HCLocations
+		BRA .fullItemCounts
+	+ LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
 	++ CPX.b #$0D : BNE +
 		LDA BigKeyField : AND #$04 : BNE ++
 			JSR .incrementGTowerPreBigKey
@@ -319,39 +319,39 @@ AddInventory:
 		LDA PreFluteLocations : INC : STA PreFluteLocations ; Increment Pre Mirror Counter
 	+
 
-        REP #$20
+	REP #$20
 	LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
-        SEP #$20
+	SEP #$20
 
 	.itemCounts
 
 	CPY.b #$00 : BNE + ; Fighter's Sword & Fighter's Shield
-                LDX #$01
+		LDX #$01
 		JSR .incrementSword
 		JSR .incrementShield
 		JMP .done
 	+ CPY.b #$01 : BNE + ; Master Sword
-                LDX #$02
+		LDX #$02
 		JSR .incrementSword
 		JMP .done
 	+ CPY.b #$02 : BNE + ; Tempered Sword
-                LDX #$03
+		LDX #$03
 		JSR .incrementSword
 		JMP .done
 	+ CPY.b #$03 : BNE + ; Golden Sword
-                LDX #$04
+		LDX #$04
 		JSR .incrementSword
 		JMP .done
 	+ CPY.b #$04 : BNE + ; Fighter's Shield
-                LDX #$01
+		LDX #$01
 		JSR .incrementShield
 		JMP .done
 	+ CPY.b #$05 : BNE + ; Red Shield
-                LDX #$02
+		LDX #$02
 		JSR .incrementShield
 		JMP .done
 	+ CPY.b #$06 : BNE + ; Mirror Shield
-                LDX #$03
+		LDX #$03
 		JSR .incrementShield
 		JMP .done
 	+ CPY.b #$07 : !BLT + ; Items $07 - $0D
@@ -386,22 +386,22 @@ AddInventory:
 		JMP .done
 	+ CPY.b #$20 : BNE + ; Crystal
 		JSR .incrementCrystal
-                JSR .setDungeonCompletion
+		JSR .setDungeonCompletion
 		JMP .done
 	+ CPY.b #$21 : BNE + ; Bug Net
 		JSR .incrementY
 		JMP .done
 	+ CPY.b #$22 : BNE + ; Blue Mail
-                LDX #$01
-                JSR .incrementMail
+		LDX #$01
+		JSR .incrementMail
 	+ CPY.b #$23 : BNE + ; Red Mail
-                LDX #$02
-                JSR .incrementMail
+		LDX #$02
+		JSR .incrementMail
 	+ CPY.b #$24 : BNE + ; Small Key
 		JSR .incrementKey
 		JMP .done
 	+ CPY.b #$25 : BNE + ; Compass
-                JSL MaybeFlagCompassTotalPickup
+		JSL MaybeFlagCompassTotalPickup
 		JSR .incrementCompass
 		JMP .done
 	+ CPY.b #$26 : BNE + ; Liar Heart (Container)
@@ -432,7 +432,7 @@ AddInventory:
 	+ CPY.b #$37 : !BLT + ; Items $37 - $39 - Pendants
 	  CPY.b #$3A : !BGE +
 		JSR .incrementPendant
-                JSR .setDungeonCompletion
+		JSR .setDungeonCompletion
 		JMP .done
 	+ CPY.b #$3A : !BLT + ; Items $3A - $3B - Bow & Silver Arrows
 	  CPY.b #$3C : !BGE +
@@ -452,7 +452,7 @@ AddInventory:
 		JSR .incrementY
 		JMP .done
 	+ CPY.b #$49 : BNE + ; Fighter's Sword
-                LDX #$01
+		LDX #$01
 		JSR .incrementSword
 		JMP .done
 	+ CPY.b #$4A : BNE + ; Flute (Active)
@@ -472,15 +472,15 @@ AddInventory:
 		JSR .incrementCapacity
 		JMP .done
 	+ CPY.b #$50 : BNE + ; Master Sword (Safe)
-                LDX #$02
+		LDX #$02
 		JSR .incrementSword
 		JMP .done
 	+ CPY.b #$51 : BNE + ; 5 Bomb Capacity Upgrade
-                LDX #$02
+		LDX #$02
 		JSR .maybeIncrementBombs
 		JMP .done
 	+ CPY.b #$52 : BNE + ; 10 Bomb Capacity Upgrade
-                LDX #$02
+		LDX #$02
 		JSR .maybeIncrementBombs
 		JMP .done
 	+ CPY.b #$51 : !BLT + ; Items $51 - $54 - Capacity Upgrades
@@ -491,15 +491,15 @@ AddInventory:
 		JSR .incrementBow
 		JMP .done
 	+ CPY.b #$5E : BNE + ; Progressive Sword
-                LDA SwordEquipment : INC : TAX
+		LDA SwordEquipment : INC : TAX
 		JSR .incrementSword
 		JMP .done
 	+ CPY.b #$5F : BNE + ; Progressive Shield
-                LDA ShieldEquipment : INC : TAX
+		LDA ShieldEquipment : INC : TAX
 		JSR .incrementShield
 		JMP .done
 	+ CPY.b #$60 : BNE + ; Progressive Armor
-                LDA ArmorEquipment : INC : TAX
+		LDA ArmorEquipment : INC : TAX
 		JSR .incrementMail
 		JMP .done
 	+ CPY.b #$61 : BNE + ; Progressive Lifting Glove
@@ -515,7 +515,7 @@ AddInventory:
 		JMP .done
 	+ CPY.b #$80 : !BLT + ; Items $80 - $8F - Free Compasses
 	  CPY.b #$90 : !BGE +
-                JSL MaybeFlagCompassTotalPickup
+		JSL MaybeFlagCompassTotalPickup
 		JSR .incrementCompass
 		JMP .done
 	+ CPY.b #$90 : !BLT + ; Items $90 - $9F - Free Big Keys
@@ -526,14 +526,18 @@ AddInventory:
 	  CPY.b #$B0 : !BGE +
 		JSR .incrementKey
 		JMP .done
-	+ CPY.b #$B1 : !BLT + ; Items $B1 - $B6 - Bomb Upgrades
-	  CPY.b #$B7 : !BGE +
-		JSR .incrementBombLevel
-		JMP .done
-	+ CPY.b #$B7 : !BLT + ; Items $B7 - $BC - Cane Upgrades
-	  CPY.b #$BD : !BGE +
-		JSR .incrementCaneLevel
-		JMP .done
+	+ CPY.b #$B6 : BNE + ; Item $B6 - Bomb Upgrade
+		JSR .stampSword ; update "first bomb" timestamp
+		LDA.l SpecialWeaponLevel ; get current bomb level
+		CMP #$05 : !BGE ++ ; check if already maxed
+		INC : STA.l SpecialWeaponLevel
+		++ JMP .done
+	+ CPY.b #$B7 : BNE + ; Item $B7 - Cane Upgrade
+		JSR .stampSword ; update "first cane" timestamp
+		LDA.l SpecialWeaponLevel ; get current cane level
+		CMP #$05 : !BGE ++ ; check if already maxed
+		INC : STA.l SpecialWeaponLevel
+		++ JMP .done
 	+
 	.done
 	PLP : PLX : PLA
@@ -583,29 +587,21 @@ RTS
 
 .incrementSword
 	JSR .stampSword
-        LDA HighestSword
-        INC : STA $04 : CPX $04 : !BLT + ; don't increment unless we're getting a better sword
-                TXA : STA HighestSword
-        +
-RTS
-
-.incrementBombLevel
-	JSR .stampSword ; update "first bomb" timestamp
-RTS
-
-.incrementCaneLevel
-	JSR .stampSword ; update "first cane" timestamp
+	LDA HighestSword
+	INC : STA $04 : CPX $04 : !BLT + ; don't increment unless we're getting a better sword
+		TXA : STA HighestSword
+	+
 RTS
 
 .incrementShield
-        LDA HighestShield
-        INC : STA $04 : CPX $04 : !BLT + ; don't increment unless we're getting a better shield
-                TXA : STA HighestShield
-        +
+	LDA HighestShield
+	INC : STA $04 : CPX $04 : !BLT + ; don't increment unless we're getting a better shield
+		TXA : STA HighestShield
+	+
 RTS
 
 .incrementBow
-        LDA BowEquipment : BNE .dontCount ; Don't increment Y item count for extra bows
+	LDA BowEquipment : BNE .dontCount ; Don't increment Y item count for extra bows
 .incrementY
 	LDA YAItemCounter : !ADD #$08 : STA YAItemCounter
 .dontCount
@@ -638,10 +634,10 @@ RTS
 RTS
 
 .incrementMail
-        LDA HighestMail
-        INC : STA $04 : CPX $04 : !BLT +   ; don't increment unless we're getting a better mail
-                TXA : STA HighestMail
-        +
+	LDA HighestMail
+	INC : STA $04 : CPX $04 : !BLT +   ; don't increment unless we're getting a better mail
+		TXA : STA HighestMail
+	+
 RTS
 
 .incrementKeyLong
@@ -649,7 +645,7 @@ RTS
 RTL
 
 .incrementKey
-        LDA SmallKeyCounter : INC : STA SmallKeyCounter
+	LDA SmallKeyCounter : INC : STA SmallKeyCounter
 RTS
 
 .incrementCompass
@@ -661,7 +657,7 @@ RTS
 RTS
 
 .incrementGTowerPreBigKey
-        LDA PreGTBKLocations : INC : STA PreGTBKLocations
+	LDA PreGTBKLocations : INC : STA PreGTBKLocations
 RTS
 
 .maybeIncrementBombs
@@ -688,8 +684,8 @@ RTL
 	+ : LDA SpecialWeaponLevel
 	++
 	BNE + : -
-                LDA SwordlessBossKills : INC : STA SwordlessBossKills
-                RTS
+		LDA SwordlessBossKills : INC : STA SwordlessBossKills
+		RTS
 	+ CMP #$FF : BEQ -
 	+ CMP #$01 : BNE +
 		%TopHalf(SwordBossKills) : RTS
@@ -1093,8 +1089,8 @@ RTL
 SpawnShovelItem:
 	LDA.b #$01 : STA !REDRAW
 
-    LDA $03FC : BEQ +
-    	JSL DiggingGameGuy_AttemptPrizeSpawn
+	LDA $03FC : BEQ +
+		JSL DiggingGameGuy_AttemptPrizeSpawn
 		JMP .skip
 	+
 

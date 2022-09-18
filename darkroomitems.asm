@@ -1,13 +1,13 @@
 CheckReceivedItemPropertiesBeforeLoad:
     LDA $A0 : BEQ .normalCode
     LDA $7EC005 : BNE .lightOff
-    .normalCode
-    LDA.l AddReceivedItemExpanded_properties, X ;Restore Rando Code
+.normalCode
+    JSL LoadReceivedItemExpandedProperties ; get palette
     RTL
 
 .lightOff
     PHX : PHY : PHB
-    LDA.l AddReceivedItemExpanded_properties, X ; get palette
+    JSL LoadReceivedItemExpandedProperties ; get palette
 
     REP #$30
     AND #$0007 ; mask out palette
