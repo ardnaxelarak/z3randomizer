@@ -441,9 +441,8 @@ AddReceivedItemExpandedGetItem:
 		LDA.b #$05 : STA ArrowsFiller ; add 5 arrows
 		BRA .done
 	+ CMP.b #$B6 : BNE + ; Bomb Upgrade
-		LDA.l SpecialWeapons : CMP #$01 : BNE .done
-			LDA #$01 : STA InfiniteBombsModifier ; infinite bombs
-			JMP .done
+		LDA #$01 : STA InfiniteBombsModifier ; infinite bombs
+		JMP .done
 	+ : CMP.b #$B7 : BNE + ; Cane Upgrade
 		LDA.l SpecialWeapons : CMP #$03 : BEQ .blue_cane
 		                       CMP #$04 : BEQ .red_cane
@@ -599,30 +598,6 @@ AddReceivedItemExpanded:
 			LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +++
 				LDA.b #$0E : STA $02D8 : JMP .done ; Bee in a bottle
 			+++
-		++ : CMP.b #$B6 : BNE ++ ; Progressive Bombs
-			LDA SpecialWeaponLevel
-			CMP.b #$00 : BNE + ; have no Bombs
-				LDA.b #$B1 : STA $02D8 : JMP .done
-			+ : CMP.b #$01 : BNE + ; have L-1 Bombs
-				LDA.b #$B2 : STA $02D8 : JMP .done
-			+ : CMP.b #$02 : BNE + ; have L-2 Bombs
-				LDA.b #$B3 : STA $02D8 : JMP .done
-			+ : CMP.b #$03 : BNE + ; have L-3 Bombs
-				LDA.b #$B4 : STA $02D8 : JMP .done
-			+ ; Everything Else
-				LDA.b #$B5 : STA $02D8 : JMP .done
-		++ : CMP.b #$BC : BNE ++ ; Progressive Cane
-			LDA SpecialWeaponLevel
-			CMP.b #$00 : BNE + ; have no Cane
-				LDA.b #$B7 : STA $02D8 : JMP .done
-			+ : CMP.b #$01 : BNE + ; have L-1 Cane
-				LDA.b #$B8 : STA $02D8 : JMP .done
-			+ : CMP.b #$02 : BNE + ; have L-2 Cane
-				LDA.b #$B9 : STA $02D8 : JMP .done
-			+ : CMP.b #$03 : BNE + ; have L-3 Cane
-				LDA.b #$BA : STA $02D8 : JMP .done
-			+ ; Everything Else
-				LDA.b #$BB : STA $02D8 : JMP .done
 		++
 		.done
 	PLX : PLA
@@ -1363,3 +1338,17 @@ MaybeFlagCompassTotalEntrance:
 	.done
 RTL
 ;--------------------------------------------------------------------------------
+LoadReceivedItemExpandedProperties:
+CPX.b #$B6 : BEQ .bomb_upgrade
+	LDA.l AddReceivedItemExpanded_properties, X ; load from table
+	RTL
+.bomb_upgrade
+	LDA SpecialWeaponLevel
+	CMP.b #$01 : BNE + ; L1 Bombs
+		LDA.b #4 : RTL
+	+ : CMP.b #$02 : BNE + ; L2 Bombs
+		LDA.b #2 : RTL
+	+ : CMP.b #$03 : BNE + ; L3 Bombs
+		LDA.b #1 : RTL
+	+ ; Everything Else
+		LDA.b #5 : RTL

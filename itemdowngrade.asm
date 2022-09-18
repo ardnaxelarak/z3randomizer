@@ -29,9 +29,6 @@ ItemDowngradeFixMain:
 	CPY.b #$13 : BEQ .isShovel ; Shovel
 	CPY.b #$29 : BEQ .isMushroom ; Mushroom
 
-	CPY.b #$B1 : !BLT + : CPY.b #$B6 : !BLT .isBombUpgrade : +
-	CPY.b #$B7 : !BLT + : CPY.b #$BC : !BLT .isCaneUpgrade : +
-
 	CPY.b #$00 : BEQ .isUncleSwordShield ; Fighter's Sword & Shield
 
 	.done
@@ -70,28 +67,6 @@ RTS
 		INC : CMP $04 : !BGE + ; skip if highest is lower (this is an upgrade)
 			LDA $04 : DEC ; convert to item id
 			TAY : PLA : LDA $04 ; put sword id into the thing to write
-			JMP .done
-		+
-	PLA
-JMP .done
-	.isBombUpgrade
-	PHA
-		TYA ; load bomb upgrade item
-		!SUB #$B0 ; convert to bomb level
-		CMP.l SpecialWeaponLevel : !BGE + ; skip if highest is lower (this is an upgrade)
-			LDA.l SpecialWeaponLevel : !ADD #$B0 ; convert to item id
-			TAY : PLA : LDA.l SpecialWeaponLevel ; put bomb level into the thing to write
-			JMP .done
-		+
-	PLA
-JMP .done
-	.isCaneUpgrade
-	PHA
-		TYA ; load cane upgrade item
-		!SUB #$B6 ; convert to cane level
-		CMP.l SpecialWeaponLevel : !BGE + ; skip if highest is lower (this is an upgrade)
-			LDA.l SpecialWeaponLevel : !ADD #$B6 ; convert to item id
-			TAY : PLA : LDA.l SpecialWeaponLevel ; put cane level into the thing to write
 			JMP .done
 		+
 	PLA

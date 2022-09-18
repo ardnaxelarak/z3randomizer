@@ -557,14 +557,18 @@ AddInventory:
 	  CPY.b #$B0 : !BGE +
 		JSR .incrementKey
 		JMP .done
-	+ CPY.b #$B1 : !BLT + ; Items $B1 - $B6 - Bomb Upgrades
-	  CPY.b #$B7 : !BGE +
-		JSR .incrementBombLevel
-		JMP .done
-	+ CPY.b #$B7 : !BLT + ; Items $B7 - $BC - Cane Upgrades
-	  CPY.b #$BD : !BGE +
-		JSR .incrementCaneLevel
-		JMP .done
+	+ CPY.b #$B6 : BNE + ; Item $B6 - Bomb Upgrade
+		JSR .stampSword ; update "first bomb" timestamp
+		LDA.l SpecialWeaponLevel ; get current bomb level
+		CMP #$05 : !BGE ++ ; check if already maxed
+		INC : STA.l SpecialWeaponLevel
+		++ JMP .done
+	+ CPY.b #$B7 : BNE + ; Item $B7 - Cane Upgrade
+		JSR .stampSword ; update "first cane" timestamp
+		LDA.l SpecialWeaponLevel ; get current cane level
+		CMP #$05 : !BGE ++ ; check if already maxed
+		INC : STA.l SpecialWeaponLevel
+		++ JMP .done
 	+
 	.done
 	PLP : PLX : PLA
@@ -620,14 +624,6 @@ RTS
 	+
 RTS
 
-.incrementBombLevel
-	JSR .stampSword ; update "first bomb" timestamp
-RTS
-
-.incrementCaneLevel
-	JSR .stampSword ; update "first cane" timestamp
-RTS
-
 .incrementShield
 	LDA HighestShield
 	INC : STA $04 : CPX $04 : !BLT + ; don't increment unless we're getting a better shield
@@ -669,7 +665,6 @@ RTS
 RTS
 
 .incrementMail
-
 	LDA HighestMail
 	INC : STA $04 : CPX $04 : !BLT +   ; don't increment unless we're getting a better mail
 		TXA : STA HighestMail
