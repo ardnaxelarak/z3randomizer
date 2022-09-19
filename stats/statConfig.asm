@@ -12,7 +12,7 @@
 %AddStat(DamageCounter, 0, 0, 16, 5, !DAMAGETAKEN_X, !DAMAGETAKEN_Y)
 %AddStat(MagicCounter, 0, 0, 16, 5, !MAGICUSED_X, !MAGICUSED_Y)
 %AddStat(BonkCounter, 0, 0, 08, 3, !BONKS_X, !BONKS_Y)
-%AddStat($7EF46E, 0, 0, 16, 4, !BOMBS_X, !BOMBS_Y)
+%AddStat(BombsPlaced, 0, 0, 16, 4, !BOMBS_X, !BOMBS_Y)
 %AddStat(SaveQuitCounter, 0, 0, 08, 2, !SAVE_AND_QUITS_X, !SAVE_AND_QUITS_Y)
 %AddStat(DeathCounter, 0, 0, 08, 2, !DEATHS_X, !DEATHS_Y)
 %AddStat(FaerieRevivalCounter, 0, 0, 08, 3, !FAERIE_REVIVALS_X, !FAERIE_REVIVALS_Y)

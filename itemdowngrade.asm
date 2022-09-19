@@ -78,9 +78,9 @@ JMP .done
 	PHA
 		TYA ; load bomb upgrade item
 		!SUB #$B0 ; convert to bomb level
-		CMP.l !WEAPON_LEVEL : !BGE + ; skip if highest is lower (this is an upgrade)
-			LDA.l !WEAPON_LEVEL : !ADD #$B0 ; convert to item id
-			TAY : PLA : LDA.l !WEAPON_LEVEL ; put bomb level into the thing to write
+		CMP.l SpecialWeaponLevel : !BGE + ; skip if highest is lower (this is an upgrade)
+			LDA.l SpecialWeaponLevel : !ADD #$B0 ; convert to item id
+			TAY : PLA : LDA.l SpecialWeaponLevel ; put bomb level into the thing to write
 			JMP .done
 		+
 	PLA
@@ -89,9 +89,9 @@ JMP .done
 	PHA
 		TYA ; load cane upgrade item
 		!SUB #$B6 ; convert to cane level
-		CMP.l !WEAPON_LEVEL : !BGE + ; skip if highest is lower (this is an upgrade)
-			LDA.l !WEAPON_LEVEL : !ADD #$B6 ; convert to item id
-			TAY : PLA : LDA.l !WEAPON_LEVEL ; put cane level into the thing to write
+		CMP.l SpecialWeaponLevel : !BGE + ; skip if highest is lower (this is an upgrade)
+			LDA.l SpecialWeaponLevel : !ADD #$B6 ; convert to item id
+			TAY : PLA : LDA.l SpecialWeaponLevel ; put cane level into the thing to write
 			JMP .done
 		+
 	PLA

@@ -1,6 +1,5 @@
-!INFINITE_BOMBS = "$7F50C9"
 IsItemAvailable:
-	LDA !INFINITE_BOMBS : BEQ .finite
+	LDA InfiniteBombsModifier : BEQ .finite
 	.infinite
 		CPX.b #$04 : BNE .finite
 		LDA.b #$01 : RTL
@@ -8,35 +7,34 @@ IsItemAvailable:
                 LDA EquipmentWRAM-1, X
 RTL
 LoadBombCount:
-	LDA !INFINITE_BOMBS : BNE .infinite
+	LDA InfiniteBombsModifier : BNE .infinite
 	.finite
 		LDA BombsEquipment
 	.infinite
 RTL
 LoadBombCount16:
-	LDA !INFINITE_BOMBS : AND.w #$00FF : BNE .infinite
+	LDA InfiniteBombsModifier : AND.w #$00FF : BNE .infinite
 	.finite
 		LDA BombsEquipment
 	.infinite
 RTL
 StoreBombCount:
 	JSL IncrementBombsPlacedCounter
-	PHA : LDA !INFINITE_BOMBS : BEQ .finite
+	PHA : LDA InfiniteBombsModifier : BEQ .finite
 	.infinite
 		PLA : LDA.b #$01 : RTL
 	.finite
 		PLA : STA BombsEquipment
 RTL
 SearchForEquippedItem:
-	LDA !INFINITE_BOMBS : BEQ +
+	LDA InfiniteBombsModifier : BEQ +
 		LDA.b #$01 : LDX.b #$00 : RTL
 	+
 	LDA BowEquipment ; thing we wrote over
 RTL
 
-!INFINITE_ARROWS = "$7F50C8"
 DecrementArrows:
-	LDA !INFINITE_ARROWS : BNE .infinite
+	LDA InfiniteArrowsModifier : BNE .infinite
 	LDA.l ArrowMode : BNE .rupees : BRA .normal
 	.infinite
 		LDA.b #$01 : RTL

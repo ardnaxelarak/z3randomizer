@@ -2,7 +2,6 @@
 ; Challenge Timer
 ;================================================================================
 !Temp = "$7F5020"
-!TemporaryOHKO = "$7F50CC"
 ;--------------------------------------------------------------------------------
 !CLOCK_HOURS = "$7F5080" ; $7F5080 - $7F5083 - Clock Hours
 !CLOCK_MINUTES = "$7F5084" ; $7F5084 - $7F5087 - Clock Minutes
@@ -176,7 +175,7 @@ DrawChallengeTimer:
 RTL
 ;--------------------------------------------------------------------------------
 OHKOTimer:
-	LDA !TemporaryOHKO : BNE .kill
+	LDA TemporaryOHKO : BNE .kill
 	LDA.l TimeoutBehavior : CMP #$02 : BNE +
 	LDA !Status : AND.b #$02 : BEQ +
 		.kill

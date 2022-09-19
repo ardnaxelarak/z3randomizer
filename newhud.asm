@@ -3,15 +3,14 @@ NewDrawHud:
 ;================================================================================
 ; Draw bomb count
 !BOMBCOUNT_DRAW_ADDRESS = "$7EC75A"
-!INFINITE_BOMBS = "$7F50C9"
 ;================================================================================
 
-	LDA !INFINITE_BOMBS : BNE .infinite_bombs
+	LDA InfiniteBombsModifier : BNE .infinite_bombs
 	.finite_bombs
 		LDA.l SpecialWeapons : CMP #$01 : BNE .normal
-		LDA.l !WEAPON_LEVEL : BEQ .no_bombs
+		LDA.l SpecialWeaponLevel : BEQ .no_bombs
 	.normal
-		LDA.l $7EF343 ; bombs
+		LDA.l BombsEquipment ; bombs
 		JSR HudHexToDec2Digit ;requires 8 bit registers!
 		REP #$20
 		LDX.b $06 : TXA : ORA.w #$2400 : STA !BOMBCOUNT_DRAW_ADDRESS ; Draw bombs 10 digit
@@ -43,14 +42,13 @@ NewDrawHud:
 ;================================================================================
 ; Draw arrow count
 !ARROWCOUNT_DRAW_ADDRESS = "$7EC760"
-!INFINITE_ARROWS = "$7F50C8"
 ;================================================================================
 
 	SEP #$20
 	LDA.l ArrowMode : BNE +
-		LDA !INFINITE_ARROWS : BNE .infinite_arrows
+		LDA InfiniteArrowsModifier : BNE .infinite_arrows
 		.finite_arrows
-			LDA.l $7EF377 ; arrows
+			LDA.l CurrentArrows ; arrows
 			JSR HudHexToDec2Digit
 			REP #$20
 			LDX.b $06 : TXA : ORA.w #$2400 : STA !ARROWCOUNT_DRAW_ADDRESS ; Draw arrows 10 digit
@@ -175,7 +173,6 @@ NewDrawHud:
 
 ;--------------------------------------------------------------------------------
 ; Draw Magic Meter
-!INFINITE_MAGIC = "$7F50CA"
 !DrawMagicMeter_mp_tilemap = "$0DFE0F" 
 ;--------------------------------------------------------------------------------
 	LDA CurrentMagic : AND #$00FF ; crap we wrote over when placing the hook for OnDrawHud
@@ -183,7 +180,7 @@ NewDrawHud:
 	AND #$FFF8
 	TAX						 ; end of crap
 	
-	LDA !INFINITE_MAGIC : AND.w #$00FF : BNE + : JMP .green : +
+	LDA InfiniteMagicModifier : AND.w #$00FF : BNE + : JMP .green : +
 	SEP #$20 : LDA.b #$80 : STA CurrentMagic : REP #$30 ; set magic to max
 	LDX.w #$0080 ; load full magic meter graphics
 	LDA $1A : AND.w #$000C : LSR #2

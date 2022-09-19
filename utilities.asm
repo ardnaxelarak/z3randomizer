@@ -247,7 +247,7 @@ RTL
 		+ ; Any Bow
 			LDA.b #$02 : RTL
 	++ : CMP.b #$F7 : BNE ++ ; Progressive Bombs
-		LDA !WEAPON_LEVEL
+		LDA SpecialWeaponLevel
 			CMP.b #$00 : BNE + ; No Bombs
 			LDA.b #$08 : RTL
 		+ : CMP.b #$01 : BNE + ; L1 Bombs

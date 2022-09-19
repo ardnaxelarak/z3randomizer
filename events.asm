@@ -59,9 +59,9 @@ RTL
 OnUncleItemGet:
 	PHA
 		LDA.l EscapeAssist
-		BIT.b #$04 : BEQ + : STA !INFINITE_MAGIC : +
-		BIT.b #$02 : BEQ + : STA !INFINITE_BOMBS : +
-		BIT.b #$01 : BEQ + : STA !INFINITE_ARROWS : +
+		BIT.b #$04 : BEQ + : STA InfiniteMagicModifier : +
+		BIT.b #$02 : BEQ + : STA InfiniteBombsModifier : +
+		BIT.b #$01 : BEQ + : STA InfiniteArrowsModifier : +
 
 		LDA UncleItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
 	PLA

@@ -189,7 +189,7 @@ IncrementBombsPlacedCounter:
 	PHA
 		LDA StatsLocked : BNE +
 			PHP : REP #$20
-			LDA !BOMBS_PLACED_COUNTER : INC : STA !BOMBS_PLACED_COUNTER
+			LDA BombsPlaced : INC : STA BombsPlaced
 			PLP
 		+
 	PLA

@@ -137,7 +137,7 @@ CheckTabletSword:
 	                       CMP #$05 : BEQ .check_special
 	BRA .normal
 	.check_special
-	LDA !WEAPON_LEVEL : CMP #$02 : !BLT + ; check for master bombs
+	LDA SpecialWeaponLevel : CMP #$02 : !BLT + ; check for master bombs
 		LDA.b #$02 : RTL
 	.normal
 	LDA SwordEquipment ; get actual sword value

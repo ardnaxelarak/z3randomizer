@@ -418,14 +418,14 @@ AddReceivedItemExpandedGetItem:
 		LDA.b #$FF : STA.w $0B58,Y ; allows them to expire
 		++ JMP .done
 	+ CMP.b #$B2 : BNE + ; Fairy
-		LDA.b #$E3 : JSL Sprite_SpawnDynamically : BMI .done
+		LDA.b #$E3 : JSL Sprite_SpawnDynamically : BMI ++
 		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
 			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
 		LDA.b $20 : SEC : SBC.b #$10 : STA.w $0D00,Y
 			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 16 pixels
 		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
 		LDA.b #$FF : STA.w $0B58,Y ; allows them to expire
-		BRA .done
+		++ JMP .done
 	+ CMP.b #$B3 : BNE + ; Chicken
 		LDA.b #$0B : JSL Sprite_SpawnDynamically : BMI .done
 		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
@@ -442,17 +442,17 @@ AddReceivedItemExpandedGetItem:
 		BRA .done
 	+ CMP.b #$B6 : BNE + ; Bomb Upgrade
 		LDA.l SpecialWeapons : CMP #$01 : BNE .done
-			LDA #$01 : STA $7F50C9 ; infinite bombs
+			LDA #$01 : STA InfiniteBombsModifier ; infinite bombs
 			JMP .done
 	+ : CMP.b #$B7 : BNE + ; Cane Upgrade
 		LDA.l SpecialWeapons : CMP #$03 : BEQ .blue_cane
 		                       CMP #$04 : BEQ .red_cane
 			BRA .done
 		.blue_cane
-			LDA #$01 : STA $7EF351
+			LDA #$01 : STA ByrnaEquipment
 			BRA .done
 		.red_cane
-			LDA #$01 : STA $7EF350
+			LDA #$01 : STA SomariaEquipment
 			BRA .done
 	+
 	.done
@@ -600,7 +600,7 @@ AddReceivedItemExpanded:
 				LDA.b #$0E : STA $02D8 : JMP .done ; Bee in a bottle
 			+++
 		++ : CMP.b #$B6 : BNE ++ ; Progressive Bombs
-			LDA !WEAPON_LEVEL
+			LDA SpecialWeaponLevel
 			CMP.b #$00 : BNE + ; have no Bombs
 				LDA.b #$B1 : STA $02D8 : JMP .done
 			+ : CMP.b #$01 : BNE + ; have L-1 Bombs
@@ -612,7 +612,7 @@ AddReceivedItemExpanded:
 			+ ; Everything Else
 				LDA.b #$B5 : STA $02D8 : JMP .done
 		++ : CMP.b #$BC : BNE ++ ; Progressive Cane
-			LDA !WEAPON_LEVEL
+			LDA SpecialWeaponLevel
 			CMP.b #$00 : BNE + ; have no Cane
 				LDA.b #$B7 : STA $02D8 : JMP .done
 			+ : CMP.b #$01 : BNE + ; have L-1 Cane
@@ -1299,6 +1299,23 @@ ChestPrep:
 	LDY $0C ; get item value
 	SEC
 RTL
+;--------------------------------------------------------------------------------
+UpdateInventoryLocationExpanded:
+{
+	REP #$30
+	TYA : AND #$00FF : ASL A : TAX
+
+	; Tells what inventory location to write to.
+	LDA.w AddReceivedItemExpanded_item_target_addr, X : STA $00
+
+	SEP #$30
+
+	LDA.b #$7E : STA $02
+
+	LDA.w AddReceivedItemExpanded_item_values, Y
+	JSL ItemDowngradeFix
+	RTL
+}
 ;--------------------------------------------------------------------------------
 ; Set a flag in SRAM if we pick up a compass in its own dungeon with HUD compass
 ; counts on

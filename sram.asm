@@ -173,11 +173,12 @@ InventoryTracking: skip 2       ; b r m p n s k f  - - - - - - o q (bitfield)
                                 ; p = Magic Powder     | n = Mushroom Past  | s = Shovel
                                 ; k = Inactive Flute   | f = Active Flute   | o = Any bomb acquired
                                 ; q = Quickswap locked
-BowTracking: skip 2             ; b s p - - - - -  - - - - - - - - (bitfield)
+BowTracking: skip 1             ; b s p - - - - -  (bitfield)
                                 ; b = Bow | s = Silver Arrows Upgrade | p = Second Progressive Bow
                                 ; The front end writes two distinct progressive bow items. p
                                 ; indicates whether the "second" has been found independent of
                                 ; the first
+SpecialWeaponLevel: skip 1      ; Keeps track of level of weapon in bomb-only and cane-only modes
 ItemLimitCounts: skip 16        ; Keeps track of limited non-progressive items such as lamp.
                                 ; See: ItemSubstitutionRules in tables.asm
                                 ; Right now this is only used for three items but extra space is
@@ -313,7 +314,8 @@ HeartPieceCounter: skip 1       ; Total Number of heartpieces collected (integer
 CrystalCounter: skip 1          ; Total Number of crystals collected (integer)
 DungeonsCompleted: skip 2       ; Bitfield indicating whether a dungeon's prize has been collected.
                                 ; This has the same shape as the dungeon item bitfields.
-skip 44                         ; Unused
+BombsPlaced: skip 2             ; Total Number of bombs placed (16-bit integer)
+skip 42                         ; Unused
 ServiceSequenceRx:              ; Service sequence receive
 ServiceSequenceTx:              ; Service sequence transmit
 ServiceSequence: skip 8         ; Service request block. See servicerequest.asm
@@ -370,6 +372,26 @@ skip 2                          ; Reserved for previous table
 FileMarker: skip 1              ; $FF = Active save file | $00 = Inactive save file
 skip 13                         ; Unused
 InverseChecksum: skip 2         ; Vanilla Inverse Checksum. Don't write unless computing checksum.
+
+;================================================================================
+; Temporary Effects ($7F50C0 - $7F50CF)
+;--------------------------------------------------------------------------------
+base $7F50C0
+SwordModifier: skip 1
+ShieldModifier: skip 1 ; (not implemented)
+ArmorModifier: skip 1
+MagicModifier: skip 1
+LightConeModifier: skip 1
+CuccoStormModifier: skip 1
+OldManDashModifier: skip 1
+IcePhysicsModifier: skip 1
+InfiniteArrowsModifier: skip 1
+InfiniteBombsModifier: skip 1
+InfiniteMagicModifier: skip 1
+InvertDPadModifier: skip 1
+TemporaryOHKO: skip 1
+SpriteSwapper: skip 1
+BootsModifier: skip 1 ; (0=Off, 1=Always, 2=Never)
 
 ;================================================================================
 ; Expanded SRAM ($7F6000 - $7F6FFF)
@@ -527,6 +549,7 @@ endmacro
 ;--------------------------------------------------------------------------------
 %assertSRAM(InventoryTracking, $7EF38C)
 %assertSRAM(BowTracking, $7EF38E)
+%assertSRAM(SpecialWeaponLevel, $7EF38F)
 %assertSRAM(ItemLimitCounts, $7EF390)
 ;--------------------------------------------------------------------------------
 %assertSRAM(GameCounter, $7EF3FF)
