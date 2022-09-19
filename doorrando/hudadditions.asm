@@ -62,7 +62,7 @@ HudAdditions:
             + lda #$207f
             .reminder sta $7ec702
             + lda.w DRFlags : and #$0004 : beq .restore
-            lda MapField : and.l $0098c0, x : beq .restore
+            ; lda MapField : and.l $0098c0, x : beq .restore
                 txa : lsr : tax
 
 				lda.l GenericKeys : and #$00ff : bne +
@@ -133,7 +133,7 @@ DrHudDungeonItemsAdditions:
         			jsr ConvertToDisplay2 : sta $1644, y
         		+ iny #2 : lda.w #$24f5 : sta $1644, y
         		phx : ldx $00
-        			lda MapField : and.l $0098c0, x : beq + ; must have map
+        			; lda MapField : and.l $0098c0, x : beq + ; must have map
         				plx : sep #$30 : lda.l ChestKeys, x : sta $02
         				lda.l GenericKeys : bne +++
         					lda $02 : !sub DungeonCollectedKeys, x : sta $02
