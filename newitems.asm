@@ -40,18 +40,13 @@
 ; #$90 - Big Keys
 ; #$A0 - Small Keys
 ; #$B0 - Bee Trap
-; #$B1 - L-1 Bombs
-; #$B2 - L-2 Bombs
-; #$B3 - L-3 Bombs
-; #$B4 - L-4 Bombs
-; #$B5 - L-5 Bombs
-; #$B6 - Progressive Bombs
-; #$B7 - L-1 Cane
-; #$B8 - L-2 Cane
-; #$B9 - L-3 Cane
-; #$BA - L-4 Cane
-; #$BB - L-5 Cane
-; #$BC - Progressive Cane
+; #$B1 - Apples
+; #$B2 - Fairy
+; #$B3 - Chicken
+; #$B4 - Big Magic
+; #$B5 - 5 Arrows
+; #$B6 - Progressive Bomb
+; #$B7 - Progressive Cane
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
 ;--------------------------------------------------------------------------------
@@ -155,10 +150,6 @@ macro ValueShift()
 	BRA ?start : ?end:
 endmacro
 ;--------------------------------------------------------------------------------
-!CHALLENGE_TIMER = "$7EF454"
-!GOAL_COUNTER = "$7EF418"
-!INVENTORY_SWAP_2 = "$7EF38E"
-;--------------------------------------------------------------------------------
 ;carry clear if pass
 ;carry set if caught
 ;incsrc eventdata.asm
@@ -172,24 +163,24 @@ ProcessEventItems:
 		LDA $02D8
 		CMP.b #$E0 : BNE +
 			REP #$30 ; set 16-bit accumulator & index registers
-			LDA $7EF450 : ASL : TAX
+			LDA RNGItem : ASL : TAX
 			LDA.l EventDataOffsets, X : !ADD #EventDataTable : STA $00
 
 			SEP #$20 ; set 8-bit accumulator
 			LDA.b #$AF : STA $02
 
 			JSL.l LoadDialogAddressIndirect
-			LDA $7EF450 : INC : STA $7EF450
+			LDA RNGItem : INC : STA RNGItem
 
 			SEP #$10 ; set 8-bit index registers
-
+			REP #$20 ; set 16-bit accumulator
 			LDA GoalItemRequirement : BEQ ++
-			LDA !GOAL_COUNTER : INC : STA !GOAL_COUNTER
+			LDA GoalCounter : INC : STA GoalCounter
 			CMP GoalItemRequirement : !BLT ++
-			LDA TurnInGoalItems : BNE ++
+			LDA TurnInGoalItems : AND.w #$00FF : BNE ++
 				JSL.l ActivateGoal
 			++
-
+			SEP #$20 ; set 8-bit accumulator
 			LDX.b #$01 : BRA .done
 		+
 		LDX.b #$00
@@ -204,13 +195,6 @@ RTS
 AddReceivedItemExpandedGetItem:
 	PHX
 
-	;JSR.w ProcessEventItems : CPX.b #$00 : BEQ ++
-	;	;JSL.l Main_ShowTextMessage_Alt
-	;	LDA !GOAL_COUNTER : INC : STA !GOAL_COUNTER
-	;	LDA.b #$01 : STA $7F50XX
-	;	JMP .done
-	;++
-	;STA $FFFFFF
 	LDA $02D8 ; check inventory
 	JSL.l FreeDungeonItemNotice
 
@@ -222,62 +206,62 @@ AddReceivedItemExpandedGetItem:
 	PLA
 
 	CMP.b #$0B : BNE + ; Bow
-		LDA !INVENTORY_SWAP_2 : AND.b #$40 : BEQ ++
+		LDA BowTracking : AND.b #$40 : BEQ ++
 		LDA.l SilverArrowsUseRestriction : BNE ++
-			LDA.b #03 : STA $7EF340 ; set bow to silver
+			LDA.b #03 : STA BowEquipment ; set bow to silver
 		++
 		JMP .done
 	+ CMP.b #$3B : BNE + ; Silver Bow
 		LDA.l SilverArrowsUseRestriction : BNE .noequip
 		LDA.l SilverArrowsAutoEquip : AND.b #$01 : BEQ .noequip
-		LDA $7EF376 : BNE ++ ; check arrows
+		LDA ArrowsFiller : BNE ++ ; check arrows
 			LDA.b #$03 : BRA +++ ; bow without arrow
 		++
 			LDA.b #$04 ; bow with arrow
 		+++
-		STA $7EF340
+		STA BowEquipment
 		.noequip
-		LDA !INVENTORY_SWAP_2 : ORA #$40 : STA !INVENTORY_SWAP_2 ; mark silver bow on y-toggle
+		LDA BowTracking : ORA #$40 : STA BowTracking ; mark silver bow on y-toggle
 		JMP .done
 	+ CMP.b #$4C : BNE + ; 50 bombs
-		;LDA.b #$07 : STA $7EF370 ; upgrade bombs
-		LDA.b #50 : !SUB.l StartingMaxBombs : STA $7EF370 ; upgrade bombs
-		LDA.b #50 : STA $7EF375 ; fill bombs
+		;LDA.b #$07 : STA BombCapacityUpgrades ; upgrade bombs
+		LDA.b #50 : !SUB.l StartingMaxBombs : STA BombCapacityUpgrades ; upgrade bombs
+		LDA.b #50 : STA BombsFiller ; fill bombs
 		JMP .done
 	+ CMP.b #$4D : BNE + ; 70 arrows
-		;LDA #$07 : STA $7EF371 ; upgrade arrows
-		LDA.b #70 : !SUB.l StartingMaxArrows : STA $7EF371 ; upgrade arrows
-		LDA.b #70 : STA $7EF376 ; fill arrows
+		;LDA #$07 : STA ArrowCapacityUpgrades ; upgrade arrows
+		LDA.b #70 : !SUB.l StartingMaxArrows : STA ArrowCapacityUpgrades ; upgrade arrows
+		LDA.b #70 : STA ArrowsFiller ; fill arrows
 		JMP .done
 	+ CMP.b #$4E : BNE + ; 1/2 magic
-		LDA $7EF37B : CMP #$02 : !BGE ++
-			INC : STA $7EF37B ; upgrade magic
+		LDA MagicConsumption : CMP #$02 : !BGE ++
+			INC : STA MagicConsumption ; upgrade magic
 		++
-		LDA.b #$80 : STA $7EF373 ; fill magic
+		LDA.b #$80 : STA MagicFiller ; fill magic
 		JMP .done
 	+ CMP.b #$4F : BNE + ; 1/4 magic
-		LDA.b #$02 : STA $7EF37B ; upgrade magic
-		LDA.b #$80 : STA $7EF373 ; fill magic
+		LDA.b #$02 : STA MagicConsumption ; upgrade magic
+		LDA.b #$80 : STA MagicFiller ; fill magic
 		JMP .done
 	+ CMP.b #$50 : BNE + ; Master Sword (Safe)
-		LDA $7EF359 : CMP.b #$02 : !BGE + ; skip if we have a better sword
-		LDA.b #$02 : STA $7EF359 ; set master sword
+		LDA SwordEquipment : CMP.b #$02 : !BGE + ; skip if we have a better sword
+		LDA.b #$02 : STA SwordEquipment ; set master sword
 		JMP .done
 	+ CMP.b #$51 : BNE + ; +5 Bombs
-		LDA $7EF370 : !ADD.b #$05 : STA $7EF370 ; upgrade bombs +5
-		LDA.l Upgrade5BombsRefill : STA $7EF375 ; fill bombs
+		LDA BombCapacityUpgrades : !ADD.b #$05 : STA BombCapacityUpgrades ; upgrade bombs +5
+		LDA.l Upgrade5BombsRefill : STA BombsFiller ; fill bombs
 		JMP .done
 	+ CMP.b #$52 : BNE + ; +10 Bombs
-		LDA $7EF370 : !ADD.b #$0A : STA $7EF370 ; upgrade bombs +10
-		LDA.l Upgrade10BombsRefill : STA $7EF375 ; fill bombs
+		LDA BombCapacityUpgrades : !ADD.b #$0A : STA BombCapacityUpgrades ; upgrade bombs +10
+		LDA.l Upgrade10BombsRefill : STA BombsFiller ; fill bombs
 		JMP .done
 	+ CMP.b #$53 : BNE + ; +5 Arrows
-		LDA $7EF371 : !ADD.b #$05 : STA $7EF371 ; upgrade arrows +5
-		LDA.l Upgrade5ArrowsRefill : STA $7EF376 ; fill arrows
+		LDA ArrowCapacityUpgrades : !ADD.b #$05 : STA ArrowCapacityUpgrades ; upgrade arrows +5
+		LDA.l Upgrade5ArrowsRefill : STA ArrowsFiller ; fill arrows
 		JMP .done
 	+ CMP.b #$54 : BNE + ; +10 Arrows
-		LDA $7EF371 : !ADD.b #$0A : STA $7EF371 ; upgrade arrows +10
-		LDA.l Upgrade10ArrowsRefill : STA $7EF376 ; fill arrows
+		LDA ArrowCapacityUpgrades : !ADD.b #$0A : STA ArrowCapacityUpgrades ; upgrade arrows +10
+		LDA.l Upgrade10ArrowsRefill : STA ArrowsFiller ; fill arrows
 		JMP .done
 	+ CMP.b #$55 : BNE + ; Programmable Object 1
 		%ProgrammableItemLogic(1)
@@ -291,34 +275,34 @@ AddReceivedItemExpandedGetItem:
 	+ CMP.b #$58 : BNE + ; Upgrade-Only Silver Arrows
 		LDA.l SilverArrowsUseRestriction : BNE +++
 		LDA.l SilverArrowsAutoEquip : AND.b #$01 : BEQ +++
-			LDA $7EF340 : BEQ ++ : CMP.b #$03 : !BGE ++
-				!ADD.b #$02 : STA $7EF340 ; switch to silver bow
+			LDA BowEquipment : BEQ ++ : CMP.b #$03 : !BGE ++
+				!ADD.b #$02 : STA BowEquipment ; switch to silver bow
 			++
 		+++
 		LDA.l ArrowMode : BEQ ++
-			LDA.b #$01 : STA $7EF376
+			LDA.b #$01 : STA ArrowsFiller
 		++
 	+ CMP.b #$59 : BNE + ; 1 Rupoor
-		REP #$20 : LDA $7EF360 : !SUB RupoorDeduction : STA $7EF360 : SEP #$20 ; Take 1 rupee
+		REP #$20 : LDA CurrentRupees : !SUB RupoorDeduction : STA CurrentRupees : SEP #$20 ; Take 1 rupee
 		JMP .done
 	+ CMP.b #$5A : BNE + ; Null Item
 		JMP .done
 	+ CMP.b #$5B : BNE + ; Red Clock
 		REP #$20 ; set 16-bit accumulator
-		LDA !CHALLENGE_TIMER : !ADD.l RedClockAmount : STA !CHALLENGE_TIMER
-		LDA !CHALLENGE_TIMER+2 : ADC.l RedClockAmount+2 : STA !CHALLENGE_TIMER+2
+		LDA ChallengeTimer : !ADD.l RedClockAmount : STA ChallengeTimer
+		LDA ChallengeTimer+2 : ADC.l RedClockAmount+2 : STA ChallengeTimer+2
 		SEP #$20 ; set 8-bit accumulator
 		JMP .done
 	+ CMP.b #$5C : BNE + ; Blue Clock
 		REP #$20 ; set 16-bit accumulator
-		LDA !CHALLENGE_TIMER : !ADD.l BlueClockAmount : STA !CHALLENGE_TIMER
-		LDA !CHALLENGE_TIMER+2 : ADC.l BlueClockAmount+2 : STA !CHALLENGE_TIMER+2
+		LDA ChallengeTimer : !ADD.l BlueClockAmount : STA ChallengeTimer
+		LDA ChallengeTimer+2 : ADC.l BlueClockAmount+2 : STA ChallengeTimer+2
 		SEP #$20 ; set 8-bit accumulator
 		JMP .done
 	+ CMP.b #$5D : BNE + ; Green Clock
 		REP #$20 ; set 16-bit accumulator
-		LDA !CHALLENGE_TIMER : !ADD.l GreenClockAmount : STA !CHALLENGE_TIMER
-		LDA !CHALLENGE_TIMER+2 : ADC.l GreenClockAmount+2 : STA !CHALLENGE_TIMER+2
+		LDA ChallengeTimer : !ADD.l GreenClockAmount : STA ChallengeTimer
+		LDA ChallengeTimer+2 : ADC.l GreenClockAmount+2 : STA ChallengeTimer+2
 		SEP #$20 ; set 8-bit accumulator
 		JMP .done
 	+ CMP.b #$5E : BNE + ; Progressive Sword
@@ -344,12 +328,14 @@ AddReceivedItemExpandedGetItem:
 		BRA .multi_collect
 	+ CMP.b #$6C : BNE + ; Goal Collectable (Multi/Power Star) Alternate Graphic
 		.multi_collect
-		LDA GoalItemRequirement : BEQ ++
-		LDA !GOAL_COUNTER : INC : STA !GOAL_COUNTER
-		CMP GoalItemRequirement : !BLT ++
-		LDA TurnInGoalItems : BNE ++
+		REP #$20 ; set 16-bit accumulator
+		LDA.l GoalItemRequirement : BEQ ++
+		LDA.l GoalCounter : INC : STA.l GoalCounter
+		CMP.w GoalItemRequirement : !BLT ++
+		LDA.l TurnInGoalItems : AND.w #$00FF : BNE ++
 				JSL.l ActivateGoal
 		++
+		SEP #$20 ; set 8-bit accumulator
 		JMP .done
 	+ CMP.b #$6D : BNE + ; Server Request F0
 		JSL.l ItemGetServiceRequest_F0
@@ -366,64 +352,99 @@ AddReceivedItemExpandedGetItem:
 	+ CMP.b #$70 : !BLT + : CMP.b #$80 : !BGE + ; Free Map
 		AND #$0F : CMP #$08 : !BGE ++
 			%ValueShift()
-			ORA $7EF368 : STA $7EF368 ; Map 1
+			ORA MapField : STA MapField ; Map 1
 			JMP .done
 		++
 			!SUB #$08
 			%ValueShift()
 			BIT.b #$C0 : BEQ +++ : LDA.b #$C0 : +++ ; Make Hyrule Castle / Sewers Count for Both
-			ORA $7EF369 : STA $7EF369 ; Map 2
+			ORA MapField+1 : STA MapField+1 ; Map 2
 		JMP .done
 	+ CMP.b #$80 : !BLT + : CMP.b #$90 : !BGE + ; Free Compass
 		AND #$0F : CMP #$08 : !BGE ++
 			%ValueShift()
-			ORA $7EF364 : STA $7EF364 ; Compass 1
+			ORA CompassField : STA CompassField ; Compass 1
 			JMP .done
 		++
 			!SUB #$08
 			%ValueShift()
 			BIT.b #$C0 : BEQ +++ : LDA.b #$C0 : +++ ; Make Hyrule Castle / Sewers Count for Both
-			ORA $7EF365 : STA $7EF365 ; Compass 2
+			ORA CompassField+1 : STA CompassField+1 ; Compass 2
 		JMP .done
 	+ CMP.b #$90 : !BLT + : CMP.b #$A0 : !BGE + ; Free Big Key
 		AND #$0F : CMP #$08 : !BGE ++
 			%ValueShift()
-			ORA $7EF366 : STA $7EF366 ; Big Key 1
+			ORA BigKeyField : STA BigKeyField ; Big Key 1
 			JMP .done
 		++
 			!SUB #$08
 			%ValueShift()
 			BIT.b #$C0 : BEQ +++ : LDA.b #$C0 : +++ ; Make Hyrule Castle / Sewers Count for Both
-			ORA $7EF367 : STA $7EF367 ; Big Key 2
+			ORA BigKeyField+1 : STA BigKeyField+1 ; Big Key 2
 		JMP .done
 	+ CMP.b #$A0 : !BLT + : CMP.b #$B0 : !BGE + ; Free Small Key
 		AND #$0F : TAX
-		LDA $7EF37C, X : INC : STA $7EF37C, X ; Increment Key Count
+		LDA DungeonKeys, X : INC : STA DungeonKeys, X ; Increment Key Count
 
 		CPX.b #$00 : BNE ++
-			STA $7EF37D ; copy HC to sewers
+			STA HyruleCastleKeys ; copy HC to sewers
 		++ : CPX.b #$01 : BNE ++
-			STA $7EF37C ; copy sewers to HC
+			STA SewerKeys ; copy sewers to HC
 		++
 
 		LDA.l GenericKeys : BEQ +
 		.generic
-			LDA $7EF36F : INC : STA $7EF36F
+			LDA CurrentSmallKeys : INC : STA CurrentSmallKeys
 			JMP .done
 		.normal
 			TXA : ASL : CMP $040C : BNE ++
-				LDA $7EF36F : INC : STA $7EF36F
+				LDA CurrentSmallKeys : INC : STA CurrentSmallKeys
 			++
 			JMP .done
 	+ CMP.b #$B0 : BNE + ; Bee Trap
-		LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI + ; DashBeeHive_SpawnBee
-		LDA $22 : STA $0D10, Y : LDA $23 : STA $0D30, Y ; from enemizer's Spawn_Bees
+		LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI ++ ; DashBeeHive_SpawnBee
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
 		LDA $20 : STA $0D00, Y : LDA $21 : STA $0D20, Y
-	+ CMP.b #$B1 : !BLT + : CMP.b #$B7 : !BGE + ; Bomb Upgrades
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
+		++ JMP .done
+	+ CMP.b #$B1 : BNE + ; Apples
+		LDA.b #$AC : JSL Sprite_SpawnDynamically : BMI ++
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
+		LDA.b $20 : SEC : SBC.b #$10 : STA.w $0D00,Y
+			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 16 pixels
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
+		LDA.b #$FF : STA.w $0B58,Y ; allows them to expire
+		++ JMP .done
+	+ CMP.b #$B2 : BNE + ; Fairy
+		LDA.b #$E3 : JSL Sprite_SpawnDynamically : BMI .done
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
+		LDA.b $20 : SEC : SBC.b #$10 : STA.w $0D00,Y
+			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 16 pixels
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
+		LDA.b #$FF : STA.w $0B58,Y ; allows them to expire
+		BRA .done
+	+ CMP.b #$B3 : BNE + ; Chicken
+		LDA.b #$0B : JSL Sprite_SpawnDynamically : BMI .done
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
+		LDA.b $20 : SEC : SBC.b #$08 : STA.w $0D00,Y
+			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 8 pixels
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
+		BRA .done
+	+ CMP.b #$B4 : BNE + ; Big Magic
+		LDA.b #$80 : STA MagicFiller ; fill magic
+		BRA .done
+	+ CMP.b #$B5 : BNE + ; 5 Arrows
+		LDA.b #$05 : STA ArrowsFiller ; add 5 arrows
+		BRA .done
+	+ CMP.b #$B6 : BNE + ; Bomb Upgrade
 		LDA.l SpecialWeapons : CMP #$01 : BNE .done
 			LDA #$01 : STA $7F50C9 ; infinite bombs
 			JMP .done
-	+ : CMP.b #$B7 : !BLT + : CMP.b #$BD : !BGE + ; Cane Upgrades
+	+ : CMP.b #$B7 : BNE + ; Cane Upgrade
 		LDA.l SpecialWeapons : CMP #$03 : BEQ .blue_cane
 		                       CMP #$04 : BEQ .red_cane
 			BRA .done
@@ -433,7 +454,6 @@ AddReceivedItemExpandedGetItem:
 		.red_cane
 			LDA #$01 : STA $7EF350
 			BRA .done
-		BRA .done
 	+
 	.done
 	PLX
@@ -445,8 +465,6 @@ RTL
 ; #$90 - Big Keys
 ; #$A0 - Small Keys
 ;--------------------------------------------------------------------------------
-!PROGRESSIVE_SHIELD = "$7EF416" ; ss-- ----
-!RNG_ITEM = "$7EF450"
 !SCRATCH_AREA = "$7F5020"
 !SINGLE_INDEX_TEMP = "$7F5020"
 !SINGLE_INDEX_OFFSET_TEMP = "$7F5021"
@@ -501,15 +519,15 @@ AddReceivedItemExpanded:
 				+++ : JMP .done
 			.notBottle
 		++ : CMP.b #$4E : BNE ++ ; Progressive Magic
-			LDA $7EF37B : BEQ +++
+			LDA MagicConsumption : BEQ +++
 				LDA.b #$4F : STA $02D8
 			+++ : JMP .done
 		++ : CMP.b #$5E : BNE ++ ; Progressive Sword
 			LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +
-			LDA $7EF359 : CMP.l ProgressiveSwordLimit : !BLT +
+			LDA HighestSword : CMP.l ProgressiveSwordLimit : !BLT +
 				LDA.l ProgressiveSwordReplacement : STA $02D8 : JMP .done
 			+
-			LDA $7EF359 : CMP.b #$FF : BNE + ; Swordless
+			LDA SwordEquipment : CMP.b #$FF : BNE + ; Swordless
 				LDA.b #$49 : STA $02D8 : JMP .done
 			+ : CMP.b #$00 : BNE + ; No Sword
 				LDA.b #$49 : STA $02D8 : JMP .done
@@ -521,49 +539,49 @@ AddReceivedItemExpanded:
 				LDA.b #$03 : STA $02D8 : JMP .done
 		++ : CMP.b #$5F : BNE ++ ; Progressive Shield
 			LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
-				LDA !PROGRESSIVE_SHIELD : AND.b #$C0 : BNE +++ ; No Shield
+				LDA ShieldEquipment : BNE +++ ; No Shield
 					LDA.b #$04 : STA $02D8 : JMP .done
 				+++ : CMP.b #$40 : BNE +++ ; Fighter Shield
 					LDA.b #$05 : STA $02D8 : JMP .done
 				+++ ; Everything Else
 					LDA.b #$06 : STA $02D8 : JMP .done
 			+
-			LDA !PROGRESSIVE_SHIELD : LSR #6 : CMP.l ProgressiveShieldLimit : !BLT +
+			LDA HighestShield : CMP.l ProgressiveShieldLimit : !BLT +
 				LDA.l ProgressiveShieldReplacement : STA $02D8 : JMP .done
 			+
-			LDA !PROGRESSIVE_SHIELD : AND.b #$C0 : BNE + ; No Shield
+			LDA HighestShield : BNE + ; No Shield
 				LDA.b #$04 : BRA .shielddone
-			+ : CMP.b #$40 : BNE + ; Fighter Shield
+			+ : CMP.b #$01 : BNE + ; Fighter Shield
 				LDA.b #$05 : BRA .shielddone
 			+ ; Everything Else
 				LDA.b #$06
 			.shielddone : STA $02D8
-			LDA !PROGRESSIVE_SHIELD : !ADD.b #$40 : STA !PROGRESSIVE_SHIELD : JMP .done
+			JMP .done
 		++ : CMP.b #$60 : BNE ++ ; Progressive Armor
 			LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +
-			LDA $7EF35B : CMP.l ProgressiveArmorLimit : !BLT +
+			LDA HighestMail : CMP.l ProgressiveArmorLimit : !BLT +
 				LDA.l ProgressiveArmorReplacement : STA $02D8 : JMP .done
 			+
-			LDA $7EF35B : CMP.b #$00 : BNE + ; No Armor
+			LDA ArmorEquipment : CMP.b #$00 : BNE + ; No Armor
 				LDA.b #$22 : STA $02D8 : JMP .done
 			+ ; Everything Else
 				LDA.b #$23 : STA $02D8 : JMP .done
 		++ : CMP.b #$61 : BNE ++ ; Progressive Lifting Glove
-			LDA $7EF354 : BNE + ; No Lift
+			LDA GloveEquipment : BNE + ; No Lift
 				LDA.b #$1B : STA $02D8 : JMP .done
 			+ ; Everything Else
 				LDA.b #$1C : STA $02D8 : JMP .done
 		++ : CMP.b #$64 : BNE ++ : -- ; Progressive Bow
 			LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +
-			LDA $7EF340 : INC : LSR : CMP.l ProgressiveBowLimit : !BLT +
+			LDA BowEquipment : INC : LSR : CMP.l ProgressiveBowLimit : !BLT +
 				LDA.l ProgressiveBowReplacement : STA $02D8 : JMP .done
-			+ LDA $7EF340 : INC : LSR : CMP.b #$00 : BNE + ; No Bow
+			+ LDA BowEquipment : INC : LSR : CMP.b #$00 : BNE + ; No Bow
 				LDA.b #$3A : STA $02D8 : JMP .done
 			+ ; Any Bow
 				LDA.b #$3B : STA $02D8 : JMP .done
 		++ : CMP.b #$65 : BNE ++ ; Progressive Bow 2
 			LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +++
-				LDA.l !INVENTORY_SWAP_2 : ORA #$20 : STA.l !INVENTORY_SWAP_2
+				LDA.l BowTracking : ORA #$20 : STA.l BowTracking
 			+++ : BRA --
 		; ++ : CMP.b #$FE : BNE ++ ; Server Request (Null Chest)
 		;	JSL ChestItemServiceRequest
@@ -650,9 +668,14 @@ AddReceivedItemExpanded:
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Free Big Key
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Free Small Key
 	db -4 ; Bee Trap
-	db -4, -4, -4, -4, -4, -4 ; Bomb Upgrades
-	db -4, -4, -4, -4, -4, -4 ; Cane Upgrades
-	db -4, -4, -4 ; Unused
+	db -4 ; Apples
+	db -4 ; Fairy
+	db -4 ; Chicken
+	db -4 ; Big Magic
+	db -4 ; 5 Arrows
+	db -4 ; Bomb Upgrade
+	db -4 ; Cane Upgrade
+	db -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
@@ -693,9 +716,14 @@ AddReceivedItemExpanded:
 	;db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; *EVENT*
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  0 ; Bee Trap
-	db  0, 0, 0, 0, 0, 0 ; Bomb Upgrades
-	db  4, 4, 4, 4, 4, 4 ; Cane Upgrades
-	db  0, 0, 0 ; Unused
+	db  0 ; Apples
+	db  0 ; Fairy
+	db  0 ; Chicken
+	db  4 ; Big Magic
+	db  0 ; 5 Arrows
+	db  0 ; Bomb Upgrade
+	db  4 ; Cane Upgrade
+	db  0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
@@ -741,9 +769,14 @@ AddReceivedItemExpanded:
 	;db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; *EVENT*
 
 	db $47 ; Bee Trap
-	db $13, $13, $13, $13, $13, $13 ; Bomb Upgrades
-	db $07, $07, $07, $07, $07, $07 ; Cane Upgrades
-	db $49, $49, $49 ; Unused
+	db $47 ; Apples
+	db $47 ; Fairy
+	db $47 ; Chicken
+	db $3B ; Big Magic
+	db $02 ; 5 Arrows
+	db $13 ; Bomb Upgrade
+	db $07 ; Cane Upgrade
+	db $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -783,9 +816,14 @@ AddReceivedItemExpanded:
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Free Big Key
 	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 ; Free Small Key
 	db $02 ; Bee Trap
-	db $02, $02, $02, $02, $02, $02 ; Bomb Upgrades
-	db $00, $00, $00, $00, $00, $00 ; Cane Upgrades
-	db $02, $02, $02 ; Unused
+	db $02 ; Apples
+	db $02 ; Fairy
+	db $02 ; Chicken
+	db $00 ; Big Magic
+	db $02 ; 5 Arrows
+	db $02 ; Bomb Upgrade
+	db $00 ; Cane Upgrade
+	db $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
@@ -826,9 +864,14 @@ AddReceivedItemExpanded:
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Big Key
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  1 ; Bee Trap
-	db  4, 2, 1, 5, 5, 5 ; Bomb Upgrades
-	db  5, 5, 5, 5, 5, 5 ; Cane Upgrades
-	db  4, 4, 4 ; Unused
+	db  1 ; Apples
+	db  1 ; Fairy
+	db  1 ; Chicken
+	db  4 ; Big Magic
+	db  2 ; 5 Arrows
+	db  5 ; Bomb Upgrade
+	db  5 ; Cane Upgrade
+	db  4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
@@ -870,9 +913,14 @@ AddReceivedItemExpanded:
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Big Key
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Small Key
 	dw $F36A ; Bee Trap
-	dw $F38F, $F38F, $F38F, $F38F, $F38F, $F38F ; Bomb Upgrades
-	dw $F38F, $F38F, $F38F, $F38F, $F38F, $F38F ; Cane Upgrades
-	dw $F36A, $F36A, $F36A ; Unused
+	dw $F36A ; Apples
+	dw $F36A ; Fairy
+	dw $F36A ; Chicken
+	dw $F373 ; Big Magic
+	dw $F376 ; 5 Arrows
+	dw $F38F ; Bomb Upgrade
+	dw $F38F ; Cane Upgrade
+	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
@@ -916,9 +964,14 @@ AddReceivedItemExpanded:
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Free Big Key
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Free Small Key
 	db $FF ; Bee Trap
-	db $01, $02, $03, $04, $05, $FF ; Bomb Upgrades
-	db $01, $02, $03, $04, $05, $FF ; Cane Upgrades
-	db $FF, $FF, $FF ; Unused
+	db $FF ; Apples
+	db $FF ; Fairy
+	db $FF ; Chicken
+	db $80 ; Big Magic
+	db $05 ; 5 Arrows
+	db $FF ; Bomb Upgrade
+	db $FF ; Cane Upgrade
+	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
@@ -940,27 +993,26 @@ AddReceivedItemExpanded:
 	;0x1A - Ganon's Tower
 
 .item_masks ; these are dungeon correlations to $7EF364 - $7EF369 so it knows where to store compasses, etc
-    ; sewers and castle get 2 bits active so that they can share their items elegantly
+	; sewers and castle get 2 bits active so that they can share their items elegantly
 	dw $C000, $C000, $2000, $1000, $0800, $0400, $0200, $0100
-	dw $0080, $0040, $0020, $0010, $0008, $0004, $0000, $0000
+	dw $0080, $0040, $0020, $0010, $0008, $0004, $4B8B, $20AB ; last two can be re-used
 
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	dw $0000, $0000, $0000, $0000, $0000, $0000, $0000
-	db $00
-	dw $0000 ; Caves
+	; caves
+	dw $9CCE, $0390, $2F82, $AD03, $02E9, $01C9, $06D0, $72A5
+	dw $A548, $4873, $01A0, $D8AD, $C902, $D020, $A002, $9802
+	dw $E48D, $DA02, $D8AC, $D002, $A215, $BD08, $84E2, $0085
+	dw $E3BD, $8584, $A901, $857E, $B902, $857A, $0087, $0A98
+	dw $BDAA, $84E2, $0085, $E3BD, $8584, $A901, $857E, $B902
+	dw $857A, $0230, $0087, $1FC0, $02D0, $5664, $04A9, $4BC0
+	dw $06F0, $1EC0, $0AD0, $02A9, $790F, $7EF3, $798F, $7EF3
+	dw $1BC0, $04F0, $1CC0, $07D0, $1B22, $1BEE, $0182, $A201
+	dw $C004, $F037, $A20C, $C001, $F038, $A206, $C002, $D039
+	dw $8A14, $0007, $0087, $00EE, $2902, $C907, $D007, $A906
+	dw $8F04, $F3C7, $C07E, $D022, $A70A, $D000, $A904, $8701
+	dw $8000, $C0C9, $F025, $C008, $F032, $C004, $D033, $AE11
+	dw $040C, $20C2, $C6BD, $0785, $8700, $E200, $8220, $00B0
+	dw $3EC0, $0AD0, $082C, $1003, $A905, $8D02, $0309, $20C0
+	dw $44D0
 }
 ;--------------------------------------------------------------------------------
 BottleListExpanded:
@@ -1005,9 +1057,14 @@ Link_ReceiveItemAlternatesExpanded:
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Free Big Key
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Free Small Key
 	db -1 ; Bee Trap
-	db -1, -1, -1, -1, -1, -1 ; Bomb Upgrades
-	db -1, -1, -1, -1, -1, -1 ; Cane Upgrades
-	db -1, -1, -1 ; Unused
+	db -1 ; Apples
+	db -1 ; Fairy
+	db -1 ; Chicken
+	db -1 ; Big Magic
+	db -1 ; 5 Arrows
+	db -1 ; Bomb Upgrade
+	db -1 ; Cane Upgrade
+	db -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
@@ -1031,8 +1088,8 @@ Link_ReceiveItemAlternatesExpanded:
 RTL
 ;--------------------------------------------------------------------------------
 ;DrawHUDSilverArrows:
-;	LDA $7EF340 : AND.w #$00FF : BNE +
-;		LDA !INVENTORY_SWAP_2 : AND.w #$0040 : BEQ +
+;	LDA BowEquipment : AND.w #$00FF : BNE +
+;		LDA BowTracking : AND.w #$0040 : BEQ +
 ;			LDA.w #$2810 : STA $11C8
 ;			LDA.w #$2811 : STA $11CA
 ;			LDA.w #$2820 : STA $1208
@@ -1041,19 +1098,19 @@ RTL
 ;	LDA.w #$11CE : STA $00 ; thing we wrote over
 ;RTL
 ;--------------------------------------------------------------------------------
-;Return $7EF340 but also draw silver arrows if you have the upgrade even if you don't have the bow
+;Return BowEquipment but also draw silver arrows if you have the upgrade even if you don't have the bow
 CheckHUDSilverArrows:
 	LDA.l ArrowMode : BEQ .normal
 	.rupee_arrows
 		JSL.l DrawHUDArrows
-		LDA $7EF340
+		LDA BowEquipment
 		RTL
 	.normal
-	LDA $7EF340 : BNE +
-		LDA !INVENTORY_SWAP_2 : AND.b #$40 : BEQ ++
+	LDA BowEquipment : BNE +
+		LDA BowTracking : AND.b #$40 : BEQ ++
 			JSL.l DrawHUDArrows
 		++
-		LDA $7EF340
+		LDA BowEquipment
 	+
 RTL
 ;--------------------------------------------------------------------------------
@@ -1061,9 +1118,9 @@ DrawHUDArrows:
 LDA.l ArrowMode : BEQ .normal
 	.rupee_arrows
 
-	LDA $7EF377 : BEQ .none ; assuming silvers will increment this. if we go with something else, reorder these checks
-	LDA $7EF340 : BNE +
-	LDA !INVENTORY_SWAP_2 : AND.b #$40 : BNE .silver
+	LDA CurrentArrows : BEQ .none ; assuming silvers will increment this. if we go with something else, reorder these checks
+	LDA BowEquipment : BNE +
+	LDA BowTracking : AND.b #$40 : BNE .silver
 	BRA .wooden
 	+ CMP.b #03 : !BGE .silver
 
@@ -1087,7 +1144,6 @@ RTL
 	LDA.b #$24 : STA $7EC723
 RTL
 ;--------------------------------------------------------------------------------
-!RNG_ITEM = "$7EF450"
 !SCRATCH_AREA = "$7F5020"
 !SINGLE_INDEX_TEMP = "$7F5020"
 !SINGLE_INDEX_OFFSET_TEMP = "$7F5021"
@@ -1125,7 +1181,7 @@ RTL
 ;--------------------------------------------------------------------------------
 CheckSingleItem:
 	LSR #3 : TAX
-	LDA.l !RNG_ITEM, X : STA !SINGLE_INDEX_BITMASK_TEMP ; load value to temporary
+	LDA.l RNGItem, X : STA !SINGLE_INDEX_BITMASK_TEMP ; load value to temporary
 	PHX
 		LDA !SINGLE_INDEX_TEMP : AND #$07 : TAX ; load 0-7 part into X
 		LDA !SINGLE_INDEX_BITMASK_TEMP
@@ -1143,7 +1199,7 @@ MarkRNGItemSingle:
 	;STA !SINGLE_INDEX_TEMP
 
 	LSR #3 : STA !SINGLE_INDEX_OFFSET_TEMP : TAX
-	LDA.l !RNG_ITEM, X
+	LDA.l RNGItem, X
 	STA.l !SINGLE_INDEX_BITMASK_TEMP
 	LDA.l !SINGLE_INDEX_TEMP : AND #$07 : TAX ; load 0-7 part into X
 	LDA.b #01
@@ -1158,7 +1214,7 @@ MarkRNGItemSingle:
 		LDA.l !SINGLE_INDEX_OFFSET_TEMP : TAX
 	PLA
 	ORA.l !SINGLE_INDEX_BITMASK_TEMP
-	STA.l !RNG_ITEM, X
+	STA.l RNGItem, X
 RTS
 ;--------------------------------------------------------------------------------
 GetRNGItemMulti:
@@ -1183,7 +1239,7 @@ IncrementItemCounters:
 				.match
 					PHX
 						TXA : LSR #2 : TAX
-						LDA !ITEM_LIMIT_COUNTS, X : INC : STA !ITEM_LIMIT_COUNTS, X
+						LDA ItemLimitCounts, X : INC : STA ItemLimitCounts, X
 					PLX
 					BEQ .exit
 				.noMatch
@@ -1203,7 +1259,7 @@ AttemptItemSubstitution:
 			.match
 				PHX
 					TXA : LSR #2 : TAX
-					LDA !ITEM_LIMIT_COUNTS, X
+					LDA ItemLimitCounts, X
 				PLX
 				CMP.l ItemSubstitutionRules+1, X : !BLT +
 					LDA.l ItemSubstitutionRules+2, X : STA 1,s
@@ -1219,10 +1275,10 @@ RTS
 CountBottles:
 	PHX
 		LDX.b #$00
-		LDA $7EF35C : BEQ ++ : INX
-		++ : LDA $7EF35D : BEQ ++ : INX
-		++ : LDA $7EF35E : BEQ ++ : INX
-		++ : LDA $7EF35F : BEQ ++ : INX
+		LDA BottleContentsOne : BEQ ++ : INX
+		++ : LDA BottleContentsTwo : BEQ ++ : INX
+		++ : LDA BottleContentsThree : BEQ ++ : INX
+		++ : LDA BottleContentsFour : BEQ ++ : INX
 		++
 		TXA
 	PLX
@@ -1235,6 +1291,7 @@ JML.l StatsFinalPrep
 ;--------------------------------------------------------------------------------
 ChestPrep:
 	LDA.b #$01 : STA $02E9
+	JSL.l IncrementChestCounter
 	LDA.l ServerRequestMode : BEQ +
 		JSL.l ChestItemServiceRequest
 		RTL
@@ -1243,19 +1300,49 @@ ChestPrep:
 	SEC
 RTL
 ;--------------------------------------------------------------------------------
-UpdateInventoryLocationExpanded:
-{
-	REP #$30
-	TYA : AND #$00FF : ASL A : TAX
-
-	; Tells what inventory location to write to.
-	LDA.w AddReceivedItemExpanded_item_target_addr, X : STA $00
-
-	SEP #$30
-
-	LDA.b #$7E : STA $02
-
-	LDA.w AddReceivedItemExpanded_item_values, Y
-	JSL ItemDowngradeFix
-	RTL
-}
+; Set a flag in SRAM if we pick up a compass in its own dungeon with HUD compass
+; counts on
+MaybeFlagCompassTotalPickup:
+	LDA.l CompassMode : AND.b #$0F : BEQ .done
+	LDA $040C : CMP #$FF : BEQ .done
+	LSR : STA $04 : LDA #$0F : !SUB $04 ; Compute flag "index"
+	CPY #$25 : BEQ .setFlag             ; Set flag if it's a compass for this dungeon
+		STA $04
+		TYA : AND #$0F : CMP $04 : BNE .done ; Check if compass is for this dungeon
+			.setFlag
+			CMP #$08 : !BGE ++
+				%ValueShift()
+				ORA CompassCountDisplay : STA CompassCountDisplay
+				BRA .done
+			++
+				!SUB #$08
+				%ValueShift()
+				BIT.b #$C0 : BEQ + : LDA.b #$C0 : + ; Make Hyrule Castle / Sewers Count for Both
+				ORA CompassCountDisplay+1 : STA CompassCountDisplay+1
+	.done
+RTL
+;--------------------------------------------------------------------------------
+; Set the compass count display flag if we're entering a dungeon and alerady have
+; that compass
+MaybeFlagCompassTotalEntrance:
+	LDX $040C : CPX #$FF : BEQ .done ; Skip if we're not entering dungeon
+	LDA.l CompassMode : AND.w #$000F : BEQ .done ; Skip if we're not showing compass counts
+	CMP.w #$0002 : BEQ .countShown
+		LDA CompassField : AND.l DungeonItemMasks, X : BEQ .done ; skip if we don't have compass
+		.countShown
+		SEP #$20
+		TXA : LSR : STA.b $04 : LDA.b #$0F : !SUB $04 ; Compute flag "index"
+		CMP #$08 : !BGE ++
+			%ValueShift()
+			ORA CompassCountDisplay : STA CompassCountDisplay
+			REP #$20
+			BRA .done
+		++
+			!SUB #$08
+			%ValueShift()
+			BIT.b #$C0 : BEQ + : LDA.b #$C0 : + ; Make Hyrule Castle / Sewers Count for Both
+			ORA CompassCountDisplay+1 : STA CompassCountDisplay+1
+			REP #$20
+	.done
+RTL
+;--------------------------------------------------------------------------------

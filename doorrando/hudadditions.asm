@@ -7,28 +7,43 @@ DrHudOverride:
 
 HudAdditions:
 {
-    lda.l DRFlags : and #$0008 : beq ++
-;		LDA.w #$28A4 : STA !GOAL_DRAW_ADDRESS
-		lda $7EF423
-        jsr HudHexToDec4DigitCopy
-		LDX.b $05 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+2 ; draw 100's digit
-		LDX.b $06 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+4 ; draw 10's digit
-		LDX.b $07 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+6 ; draw 1's digit
+    SEP #$10
+    LDA.l DRFlags : AND #$0008 : BNE + : JMP .end_item_count : +
+		LDA.l TotalItemCounter : PHA : CMP #1000 : !BLT +
+			JSL HexToDec4Digit_fast
+			LDX.b $04 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS ; draw 1000's digit
+			BRA .skip
+        + JSL HexToDec_fast
+        .skip
+        LDA #$207F : STA !GOAL_DRAW_ADDRESS+2 : STA !GOAL_DRAW_ADDRESS+4
+		PLA : PHA : CMP.w #100 : !BLT +
+			LDX.b $05 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+2 ; draw 100's digit
+		+ PLA : CMP.w #10 : !BLT +
+		 	LDX.b $06 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+4 ; draw 10's digit
+		+ LDX.b $07 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+6 ; draw 1's digit
 		LDA.w #$2830 : STA !GOAL_DRAW_ADDRESS+8 ; draw slash
 		LDA.l DRFlags : AND #$0100 : BNE +
-        	lda $7EF33E
-			jsr HudHexToDec4DigitCopy
-			LDX.b $05 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+10 ; draw 100's digit
-			LDX.b $06 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+12 ; draw 10's digit
-			LDX.b $07 : TXA : ORA.w #$2400 : STA !GOAL_DRAW_ADDRESS+14 ; draw 1's digit
-			BRA ++
-		+ LDA.w #$2405 : STA !GOAL_DRAW_ADDRESS+10 : STA !GOAL_DRAW_ADDRESS+12 : STA !GOAL_DRAW_ADDRESS+14
-    ++
+        	LDA.l MultiClientFlagsWRAM+1 : CMP #1000 : !BLT .three_digit_goal
+				JSL HexToDec4Digit_fast
+				LDX.b $04 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+10 ; draw 1000's digit
+				LDX.b $05 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+12 ; draw 100's digit
+				LDX.b $06 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+14 ; draw 10's digit
+				LDX.b $07 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+16 ; draw 1's digit
+				BRA .end_item_count
+			.three_digit_goal
+			JSL HexToDec_fast
+			LDX.b $05 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+10 ; draw 100's digit
+			LDX.b $06 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+12 ; draw 10's digit
+			LDX.b $07 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+14 ; draw 1's digit
+			BRA .end_item_count
+		+ LDA.w #$2405 : STA !GOAL_DRAW_ADDRESS+10 : STA !GOAL_DRAW_ADDRESS+12
+		                 STA !GOAL_DRAW_ADDRESS+14 : STA !GOAL_DRAW_ADDRESS+16
+    .end_item_count
 
 	LDX $1B : BNE + ; if outdoors
         lda.l OWMode : and.w #((!FLAG_OW_CROSSED+!FLAG_OW_MIXED)<<8)+$ff : bne ++ : rts ; Skip if vanilla ow rando
-        ++ lda $7ef36d : and #$00ff : beq ++
-            lda $7ef3ca : and #$00ff : beq +++
+        ++ lda CurrentHealth : and #$00ff : beq ++
+            lda CurrentWorld : and #$00ff : beq +++
                 lda #$2d60 : bra .owdisplay
             +++ lda #$2d68 : bra .owdisplay
         ++ lda #$207f
@@ -36,22 +51,22 @@ HudAdditions:
 	+ ldx $040c : cpx #$ff : bne + : rts : + ; Skip if not in dungeon
 	lda.l DRMode : bne + : rts : + ; Skip if not door rando
         phb : phk : plb
-        lda $7ef364 : and.l $0098c0, x : beq +
+        lda CompassField : and.l $0098c0, x : beq +
             lda.w CompassBossIndicator, x : and #$00ff : cmp $a0 : bne +
                 lda $1a : and #$0010 : beq +
                     lda #$345e : sta $7ec790 : bra .next
         + lda #$207f : sta $7ec790
     .next lda.w DRMode : and #$0002 : bne + : plb : rts : +
-            lda $7ef36d : and #$00ff : beq +
+            lda CurrentHealth : and #$00ff : beq +
                 lda.w DungeonReminderTable, x : bra .reminder
             + lda #$207f
             .reminder sta $7ec702
             + lda.w DRFlags : and #$0004 : beq .restore
-            lda $7ef368 : and.l $0098c0, x : beq .restore
+            lda MapField : and.l $0098c0, x : beq .restore
                 txa : lsr : tax
 
 				lda.l GenericKeys : and #$00ff : bne +
-                	lda $7ef4e0, x : jsr ConvertToDisplay : sta $7ec7a2
+                	lda DungeonCollectedKeys, x : jsr ConvertToDisplay : sta $7ec7a2
                 	lda #$2830 : sta $7ec7a4
                 +
                 lda.w ChestKeys, x : jsr ConvertToDisplay : sta $7ec7a6
@@ -89,7 +104,7 @@ DrHudDungeonItemsAdditions:
     - sta $1704, x : sta $170e, x : sta $1718, x
     inx #2 : cpx #$0008 : !blt -
 
-    lda !HUD_FLAG : and.w #$0020 : beq + : JMP ++ : +
+    lda HudFlag : and.w #$0020 : beq + : JMP ++ : +
     lda HUDDungeonItems : and.w #$0007 : bne + : JMP ++ : +
     	; bk symbols
 		lda.w #$2811 : sta $1606 : sta $1610 : sta $161a : sta $1624
@@ -102,9 +117,9 @@ DrHudDungeonItemsAdditions:
         	- lda #$0000 : !addl RowOffsets,x : !addl ColumnOffsets, x : tay
         	lda.l DungeonReminderTable, x : sta $1644, y : iny #2
         	lda.w #$24f5 : sta $1644, y
-        	lda $7ef368 : and.l $0098c0, x : beq + ; must have map
+        	lda MapField : and.l $0098c0, x : beq + ; must have map
         		jsr BkStatus : sta $1644, y : bra .smallKey ; big key status
-        	+ lda $7ef366 : and.l $0098c0, x : beq .smallKey
+        	+ lda BigKeyField : and.l $0098c0, x : beq .smallKey
         		lda.w #$2826 : sta $1644, y
         	.smallKey
         	+ iny #2
@@ -114,14 +129,14 @@ DrHudDungeonItemsAdditions:
         		txa : lsr : tax
         		lda.w #$24f5 : sta $1644, y
         		lda.l GenericKeys : and #$00FF : bne +
-        		lda.l $7ef37c, x : and #$00FF : beq +
+        		lda.l DungeonKeys, x : and #$00FF : beq +
         			jsr ConvertToDisplay2 : sta $1644, y
         		+ iny #2 : lda.w #$24f5 : sta $1644, y
         		phx : ldx $00
-        			lda $7ef368 : and.l $0098c0, x : beq + ; must have map
+        			lda MapField : and.l $0098c0, x : beq + ; must have map
         				plx : sep #$30 : lda.l ChestKeys, x : sta $02
         				lda.l GenericKeys : bne +++
-        					lda $02 : !sub $7ef4e0, x : sta $02
+        					lda $02 : !sub DungeonCollectedKeys, x : sta $02
         				+++ lda $02
         				rep #$30
         				jsr ConvertToDisplay2 : sta $1644, y ; small key totals
@@ -134,7 +149,7 @@ DrHudDungeonItemsAdditions:
         	ldx $00
             + inx #2 : cpx #$001b : bcs ++ : JMP -
     ++
-    lda !HUD_FLAG : and.w #$0020 : bne + : JMP ++ : +
+    lda HudFlag : and.w #$0020 : bne + : JMP ++ : +
     lda HUDDungeonItems : and.w #$000c : bne + : JMP ++ : +
         ; map symbols (do I want these) ; note compass symbol is 2c20
         lda.w #$2821 : sta $1606 : sta $1610 : sta $161a : sta $1624
@@ -147,16 +162,16 @@ DrHudDungeonItemsAdditions:
         	lda.l DungeonReminderTable, x : sta $1644, y
         	iny #2
         	lda.w #$24f5 : sta $1644, y ; blank out map spot
-        	lda $7ef368 : and.l $0098c0, x : beq + ; must have map
-				lda #$2826 : sta $1644, y ; check mark
+        	lda MapField : and.l $0098c0, x : beq + ; must have map
+        		JSR MapIndicatorShort : STA $1644, Y
 			+ iny #2
             cpx #$001a : bne +
 				tya : !add #$003c : tay
-			+ lda $7ef364 : and.l $0098c0, x : beq + ; must have compass
+			+ lda CompassField : and.l $0098c0, x : beq + ; must have compass
                 phx ; total chest counts
                     txa : lsr : tax
                     sep #$30
-                    lda.l TotalLocations, x : !sub $7EF4BF, x : JSR HudHexToDec2DigitCopy
+                    lda.l TotalLocations, x : !sub DungeonLocationsChecked, x : JSR HudHexToDec2DigitCopy
                     rep #$30
                     lda $06 : jsr ConvertToDisplay2 : sta $1644, y : iny #2
                     lda $07 : jsr ConvertToDisplay2 : sta $1644, y
@@ -171,8 +186,36 @@ DrHudDungeonItemsAdditions:
     plp : ply : plx : rtl
 }
 
+MapIndicatorLong:
+	PHX
+		LDA.l OldHudToNewHudTable, X : TAX
+		JSR MapIndicator
+	PLX
+RTL
+
+MapIndicatorShort:
+	PHX
+		TXA : LSR : TAX
+		JSR MapIndicator
+	PLX
+RTS
+
+OldHudToNewHudTable:
+	dw 1, 2, 3, 10, 4, 6, 5, 8, 11, 9, 7, 12, 13
+
+IndicatorCharacters:
+	;  check      1      2      3      4      5      6      7      G      B      R
+	dw $2426, $2817, $2818, $2819, $281A, $281B, $281C, $281D, $2590, $258B, $259B
+
+MapIndicator:
+	LDA.l CrystalPendantFlags_3, X : AND #$00FF
+	PHX
+		ASL : TAX : LDA.l IndicatorCharacters, X
+	PLX
+RTS
+
 BkStatus:
-    lda $7ef366 : and.l $0098c0, x : bne +++ ; has the bk already
+    lda BigKeyField : and.l $0098c0, x : bne +++ ; has the bk already
          lda.l BigKeyStatus, x : bne ++
             lda #$2827 : rts ; 0/O for no BK
          ++ cmp #$0002 : bne +
@@ -188,7 +231,7 @@ ConvertToDisplay:
 ConvertToDisplay2:
     and.w #$00ff : beq ++
         cmp #$000a : !blt +
-            !add #$2553 : rts
+            !add #$2553 : rts ; 2580 with 258A as "A" for non transparent digits
         + !add #$2816 : rts
     ++ lda #$2827 : rts ; 0/O for 0 or placeholder digit ;2483
 
@@ -196,7 +239,7 @@ CountAbsorbedKeys:
     jsl IncrementSmallKeysNoPrimary : phx
     lda $040c : cmp #$ff : beq +
         lsr : tax
-        lda $7ef4b0, x : inc : sta $7ef4b0, x
+        lda DungeonAbsorbedKeys, x : inc : sta DungeonAbsorbedKeys, x
     + plx : rtl
 
 ;================================================================================

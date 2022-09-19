@@ -1,8 +1,6 @@
 ;================================================================================
 ; Utility Functions
 ;================================================================================
-!PROGRESSIVE_SHIELD = "$7EF416" ; ss-- ----
-;--------------------------------------------------------------------------------
 ; GetSpriteTile
 ; in:	A - Loot ID
 ; out:	A - Sprite GFX ID
@@ -46,7 +44,7 @@ GetSpriteID:
 RTL
 	.specialHandling
 	CMP.b #$F9 : BNE ++ ; Progressive Magic
-		LDA.l $7EF37B : BNE +++
+		LDA.l MagicConsumption : BNE +++
 			LDA.b #$3B : RTL ; Half Magic
 		+++
 			LDA.b #$3C : RTL ; Quarter Magic
@@ -56,18 +54,18 @@ RTL
 		JSL.l GetRNGItemMulti : JMP GetSpriteID
 	++ CMP.b #$FD : BNE ++ ; Progressive Armor
 		LDA !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE +
-		LDA $7EF35B : CMP.l ProgressiveArmorLimit : !BLT + ; Progressive Armor Limit
+		LDA ArmorEquipment : CMP.l ProgressiveArmorLimit : !BLT + ; Progressive Armor Limit
 			LDA.l ProgressiveArmorReplacement
 			JMP GetSpriteID
 		+
 		LDA.b #$04 : RTL
 	++ CMP.b #$FE : BNE ++ ; Progressive Sword
 		LDA !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .skipswordlimit
-		LDA $7EF359
+		LDA HighestSword
 		CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
 			LDA.l ProgressiveSwordReplacement
 			JMP GetSpriteID
-		.skipswordlimit : LDA $7EF359
+		.skipswordlimit : LDA SwordEquipment
 		+ : CMP.b #$FF : BNE + ; Swordless
 			LDA.b #$43 : RTL
 		+ : CMP.b #$00 : BNE + ; No Sword
@@ -81,11 +79,11 @@ RTL
 		+
 	++ : CMP.b #$FF : BNE ++ ; Progressive Shield
 		LDA !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .skipshieldlimit
-		LDA !PROGRESSIVE_SHIELD : AND #$C0 : LSR #6
+		LDA HighestShield
 		CMP.l ProgressiveShieldLimit : !BLT + ; Progressive Shield Limit
 			LDA.l ProgressiveShieldReplacement
 			JMP GetSpriteID
-		.skipshieldlimit : LDA !PROGRESSIVE_SHIELD : AND #$C0 : LSR #6
+		.skipshieldlimit : LDA.l HighestShield
 		+ : CMP.b #$00 : BNE + ; No Shield
 			LDA.b #$2D : RTL
 		+ : CMP.b #$01 : BNE + ; Fighter Shield
@@ -94,11 +92,11 @@ RTL
 			LDA.b #$2E : RTL
 	++ : CMP.b #$F8 : BNE ++ ; Progressive Bow
 		LDA !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .skipbowlimit
-		LDA $7EF340 : INC : LSR
+		LDA BowEquipment : INC : LSR
 		CMP.l ProgressiveBowLimit : !BLT +
 			LDA.l ProgressiveBowReplacement
 			JMP GetSpriteID
-		.skipbowlimit : LDA $7EF340 : INC : LSR
+		.skipbowlimit : LDA BowEquipment : INC : LSR
 		+ : CMP.b #$00 : BNE + ; No Bow
 			LDA.b #$29 : RTL
 		+ ; Any Bow
@@ -157,10 +155,14 @@ RTL
 
 	;Bx
 	db $2C ; Bee Trap
-	db $13, $13, $13, $13, $13, $13 ; Bomb Upgrades
-
-	db $07, $07, $07, $07, $07, $07 ; Cane Upgrades
-	db $49, $49, $49 ; Unused
+	db $4A ; Apples
+	db $4A ; Fairy
+	db $4A ; Chicken
+	db $3B ; Big Magic
+	db $02 ; 5 Arrows
+	db $13 ; Bomb Upgrade
+	db $07 ; Cane Upgrade
+	db $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -198,7 +200,7 @@ GetSpritePalette:
 RTL
 	.specialHandling
 	CMP.b #$FD : BNE ++ ; Progressive Sword
-		LDA $7EF359
+		LDA HighestSword
 		CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
 			LDA.l ProgressiveSwordReplacement
 			JMP GetSpritePalette
@@ -211,7 +213,7 @@ RTL
 		+ ; Everything Else
 			LDA.b #$08 : RTL
 	++ : CMP.b #$FE : BNE ++ ; Progressive Shield
-		LDA !PROGRESSIVE_SHIELD : AND #$C0 : LSR #6
+		LDA HighestShield
 		CMP.l ProgressiveShieldLimit : !BLT + ; Progressive Shield Limit
 			LDA.l ProgressiveShieldReplacement
 			JMP GetSpritePalette
@@ -222,7 +224,8 @@ RTL
 		+ ; Everything Else
 			LDA.b #$08 : RTL
 	++ : CMP.b #$FF : BNE ++ ; Progressive Armor
-		LDA $7EF35B : CMP.l ProgressiveArmorLimit : !BLT + ; Progressive Armor Limit
+		LDA HighestMail
+                CMP.l ProgressiveArmorLimit : !BLT + ; Progressive Armor Limit
 			LDA.l ProgressiveArmorReplacement
 			JMP GetSpritePalette
 		+ : CMP.b #$00 : BNE + ; Green Tunic
@@ -230,12 +233,12 @@ RTL
 		+ ; Everything Else
 			LDA.b #$02 : RTL
 	++ : CMP.b #$FC : BNE ++ ; Progressive Gloves
-		LDA $7EF354 : BNE + ; No Gloves
+		LDA GloveEquipment : BNE + ; No Gloves
 			LDA.b #$02 : RTL
 		+ ; Everything Else
 			LDA.b #$08 : RTL
 	++ : CMP.b #$F8 : BNE ++ ; Progressive Bow
-		LDA $7EF340 : INC : LSR
+		LDA BowEquipment : INC : LSR
 		CMP.l ProgressiveBowLimit : !BLT +
 			LDA.l ProgressiveBowReplacement
 			JMP GetSpritePalette
@@ -299,9 +302,14 @@ RTL
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Big Key
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Small Key
 	db $04 ; Bee Trap
-	db $08, $04, $02, $0A, $0A, $F7 ; Bomb Upgrades
-	db $0A, $0A, $0A, $0A, $0A, $0A ; Cane Upgrades
-	db $08, $08, $08 ; Unused
+	db $08 ; Apples
+	db $08 ; Fairy
+	db $08 ; Chicken
+	db $08 ; Big Magic
+	db $04 ; 5 Arrows
+	db $F7 ; Bomb Upgrade
+	db $0A ; Cane Upgrade
+	db $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
@@ -335,19 +343,19 @@ IsNarrowSprite:
 			+ : JMP .continue
 		.notBottle
 	CMP.b #$5E : BNE ++ ; Progressive Sword
-		LDA $7EF359 : CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
+		LDA HighestSword : CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
 			LDA.l ProgressiveSwordReplacement
 			JSL.l IsNarrowSprite
 			JMP .done
 		+ : JMP .continue
 	++ CMP.b #$5F : BNE ++ ; Progressive Shield
-		LDA !PROGRESSIVE_SHIELD : AND #$C0 : BNE + : SEC : JMP .done ; No Shield
-		+ : LSR #6 : CMP.l ProgressiveShieldLimit : !BLT .continue
+		LDA HighestShield : BNE + : JMP .done ; No Shield
+		+ : CMP.l ProgressiveShieldLimit : !BLT .continue
 			LDA.l ProgressiveShieldReplacement
 			JSL.l IsNarrowSprite
 			JMP .done
 	++ CMP.b #$60 : BNE ++ ; Progressive Armor
-		LDA $7EF35B : CMP.l ProgressiveArmorLimit : !BLT .continue
+		LDA HighestMail : CMP.l ProgressiveArmorLimit : !BLT .continue
 			LDA.l ProgressiveArmorReplacement
 			JSL.l IsNarrowSprite
 			JMP .done
@@ -358,7 +366,7 @@ IsNarrowSprite:
 		JSL.l GetRNGItemMulti
 	++ CMP.b #$64 : BEQ +               ; Progressive Bow
 	   CMP.b #$65 : BNE .continue       ; Progressive Bow (alt)
-		+ : LDA $7EF340 : INC : LSR
+		+ : LDA BowEquipment : INC : LSR
 		CMP.l ProgressiveBowLimit : !BLT +
 			LDA.l ProgressiveBowReplacement
 			JSL.l IsNarrowSprite
@@ -392,8 +400,7 @@ RTL
 	db $15, $18, $24, $2A, $34, $35, $36, $42
 	db $43, $45, $59, $A0, $A1, $A2, $A3, $A4
 	db $A5, $A6, $A7, $A8, $A9, $AA, $AB, $AC
-	db $AD, $AE, $AF, $B7, $B8, $B9, $BA, $BB
-	db $BC, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+	db $AD, $AE, $AF, $B4, $B7, $FF, $FF, $FF
 }
 ;--------------------------------------------------------------------------------
 
@@ -699,19 +706,19 @@ RTL
 ; out: A(b) - sum of bits
 ; caller is responsible for setting 8-bit mode and preserving X and Y
 ;--------------------------------------------------------------------------------
-CountBits:
-	PHX
-	TAX                      ; Save a copy of value
-	LSR #4                   ; Shift down hi nybble, Leave <3> in C
-	PHA                      ; And save <7:4> in Stack
-	TXA                      ; Recover value
-	AND.b #$07               ; Put out <2:0> in X
-	TAX                      ; And save in X
-	LDA.l NybbleBitCounts, X ; Fetch count for <2:0>
-	PLX                      ; get <7:4>
-	ADC.l NybbleBitCounts, X ; Add count for S & C
-	PLX
-RTL
+;CountBits:
+;	PHX
+;	TAX                      ; Save a copy of value
+;	LSR #4                   ; Shift down hi nybble, Leave <3> in C
+;	PHA                      ; And save <7:4> in Stack
+;	TXA                      ; Recover value
+;	AND.b #$07               ; Put out <2:0> in X
+;	TAX                      ; And save in X
+;	LDA.l NybbleBitCounts, X ; Fetch count for <2:0>
+;	PLX                      ; get <7:4>
+;	ADC.l NybbleBitCounts, X ; Add count for S & C
+;	PLX
+;RTL
 
 ; Look up table of bit counts in the values $00-$0F
 NybbleBitCounts:

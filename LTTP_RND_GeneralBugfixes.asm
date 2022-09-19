@@ -9,7 +9,6 @@ lorom
 ;db #$23, $4E
 
 org $00FFD5 ; <- 7FD5 - Bank00.asm : 9175 (db $20   ; rom layout)
-;db #$35 ; set fast exhirom
 db #$30 ; set fast lorom
 
 ;org $00FFD6 ; <- 7FD6 - Bank00.asm : 9176 (db $02   ; cartridge type)
@@ -29,7 +28,7 @@ db #$20, #$19, #$08, #$31 ; year/month/day
 
 ;================================================================================
 !ROM_VERSION_LOW ?= 1  ; ROM version (two 16-bit integers)
-!ROM_VERSION_HIGH ?= 1 ;
+!ROM_VERSION_HIGH ?= 2 ;
 
 org $00FFE0 ; Unused hardware vector
 RomVersion:
@@ -43,40 +42,7 @@ dw !ROM_VERSION_HIGH
 !BLT = "BCC"
 !BGE = "BCS"
 
-; Rando Specific SRAM assignments
-!SHOP_PURCHASE_COUNTS = "$7EF302" ;$7EF302 - $7EF33F (temporary home)
-!INVENTORY_SWAP = "$7EF38C"
-!INVENTORY_SWAP_2 = "$7EF38E"
-!WEAPON_LEVEL = "$7EF38F"
-!ITEM_LIMIT_COUNTS = "$7EF390" ; $7EF390 - ????
-!NPC_FLAGS   = "$7EF410"
-!NPC_FLAGS_2 = "$7EF411"
-!MAP_OVERLAY = "$7EF414" ; [w]
-!PROGRESSIVE_SHIELD = "$7EF416" ; ss-- ----
-!HUD_FLAG = "$7EF416" ; --h- ----
-!FORCE_PYRAMID = "$7EF416" ; ---- p---
-!IGNORE_FAIRIES = "$7EF416" ; ---- -i--
-!SHAME_CHEST = "$7EF416" ; ---s ----
-!HAS_GROVE_ITEM = "$7EF416" ; ---- ---g general flags, don't waste these
-!HIGHEST_SWORD_LEVEL = "$7EF417" ; --- -sss
-;$7EF41A[w] - Programmable Item #1
-;$7EF41C[w] - Programmable Item #2
-;$7EF41E[w] - Programmable Item #3
-!SRAM_SINK = "$7EF41E" ; <- change this (conflicts with Programmable item 3)
-;$7EF418 - Goal Item Counter
-;$7EF419 - Service Sequence
-;$7EF420 - $7EF46F - Stat Tracking Bank 1 (overlaps with RNG Item Flags)
-;$7EF450 - $7EF45F - RNG Item (Single) Flags
-;$7EF4A0 - $7EF4A7 - Service Request Block
-;$7EF4AA - $7EF4AD = Stat Tracking Bank 2
-!FRESH_FILE_MARKER = "$7EF4F0" ; zero if fresh file
-;$700500 - $70050F - Extended File Name
-;$701000 - $70100F - Password (incorporate into log header)
-;$702000 - $702014 - Rom title copy (incorporate into log header)
-
-
 !MS_GOT = "$7F5031"
-!DARK_WORLD = "$7EF3CA"
 
 !REDRAW = "$7F5000"
 !GANON_WARP_CHAIN = "$7F5032";
@@ -137,6 +103,8 @@ incsrc treekid.asm
 incsrc spriteswap.asm
 incsrc hashalphabethooks.asm
 incsrc sharedplayerpalettefix.asm
+incsrc ram.asm
+incsrc sram.asm
 
 ;org $208000 ; bank #$20
 org $A08000 ; bank #$A0
@@ -150,7 +118,6 @@ incsrc heartpieces.asm
 incsrc npcitems.asm
 incsrc utilities.asm
 incsrc flipperkill.asm
-incsrc previewdatacopy.asm
 incsrc pendantcrystalhud.asm
 incsrc potions.asm
 incsrc shopkeeper.asm
@@ -201,6 +168,11 @@ org $A1A000 ; static mapping area. Referenced by front end. Do not move.
 incsrc invertedstatic.asm
 warnpc $A1A100
 
+org $A1B000
+incsrc failure.asm
+warnpc $A1FF00
+
+
 org $A1FF00 ; static mapping area
 incsrc init.asm
 
@@ -214,7 +186,6 @@ incsrc firebarlayer.asm
 incsrc glitched.asm
 incsrc hardmode.asm
 incsrc goalitem.asm
-incsrc openmode.asm
 incsrc quickswap.asm
 incsrc endingsequence.asm
 incsrc cuccostorm.asm
@@ -229,6 +200,7 @@ incsrc decryption.asm
 incsrc hashalphabet.asm
 incsrc inverted.asm
 incsrc invertedmaps.asm
+incsrc bonktreemaps.asm
 incsrc newhud.asm
 incsrc compasses.asm
 incsrc save.asm
@@ -255,12 +227,16 @@ warnpc $A58000
 ;org $228000 ; contrib area
 org $A28000 ; contrib area
 incsrc contrib.asm
+warnpc $A38000
 
 org $A38000
 incsrc stats/main.asm
 
-incsrc doorrando.asm ; bank 27 likely A7 in the future
-;bank 28/A8 for keydropshuffle
+incsrc menu/overworldmap.asm ; overwrites some code in bank 0A
+incsrc doorrando/doorrando.asm ; bank 27 likely A7 in the future
+;bank 28/A8 for keydropshuffle / standing items
+incsrc keydrop/standing_items.asm
+incsrc owrando.asm ; bank AA
 incsrc enemizer/main.asm ; this is originally in bank 36, but is currently in migratory status in bank 37
 
 org $308000 ; bank #$30
@@ -371,7 +347,7 @@ if !FEATURE_NEW_TEXT
     incsrc itemtext_lower.asm
 else
     incsrc itemtext.asm
-endif  
+endif
 warnpc $32E000
 
 org $32DFD0	; PC 0x195FD0
@@ -401,8 +377,10 @@ warnpc $B08000
 ;$23 Stats & Credits
 ;$24 Code Bank
 ;$27 DR Code Bank
-;$28 Keydrop Code bank
+;$28 Keydrop / Standing Items Code bank
 ;$29 External hooks (rest of bank not used)
+;$2A Reserved for OWR
+;$2B Room Data migration
 ;$2E Reserved for Tournament Use
 ;$2F Static RNG (rest is reserved for tournament use)
 ;$30 Main Configuration Table
@@ -418,20 +396,21 @@ warnpc $B08000
 ;$7E021B[0x1]: Used by race game instead of $0ABF to avoid witch item conflict
 ;$7EC900[0x1F00]: BIGRAM buffer
 ;$7EF000[0x500]: SRAM mirror First 0x500 bytes of SRAM
+;   See sram.asm for labels and assignments
 ;$7F5000[0x800]: Rando's main free ram region
 ;   See tables.asm for specific assignments
-;$7F6000[0x500]: Free RAM (reclaimed from damage table) Not allocated yet
-;$7F6500[0xB00]: SRAM mirror for last 0xB00 bytes of SRAM (extended sram)
+;$7F6000[0x1000]: SRAM buffer mapped to vanilla save slots 1 and 2
+;   See sram.asm for labels and assignments
 ;$7F7667[0x6719] - free ram
 ;================================================================================
 ;SRAM Map
-;$70:0000 ( 4K) Game state
-;  0000-04FF Vanilla Slot 1 (mirrored at 0x7EF000)
-;    See earlier in this file for rando specific assignments
-;  0500-0FFF Ext Slot 1 (not yet mirrored)
-;    See earlier in this file for rando specific assignments
-;$70:1000 (20K) Log entries
-;$70:6000 ( 8K) Scratch buffers
+;See sram.asm for rando-specific assignments
+;$70:0000 (5K) Game state
+;  0000-04FF Vanilla Slot 1 (mirrored at $7EF000)
+;  0500-14FF Ext Slot 1 (mirrored at $7F6000)
+;$70:2000 (0x25) ROM Name and version number
+;$70:3000 (0x16) Password
+;$70:6000 (8K) Scratch buffers
 ;================================================================================
 ;org $0080DC ; <- 0xDC - Bank00.asm:179 - Kill Music
 ;db #$A9, #$00, #$EA
@@ -511,6 +490,8 @@ org $00891D
 org $00893D
 EnableForceBlank:
 
+DungeonMask = $0098C0
+
 org $00D308
 DecompSwordGfx:
 
@@ -552,8 +533,17 @@ Dungeon_SaveRoomData:
 org $02A0BE
 Dungeon_SaveRoomData_justKeys:
 
+org $02A4E3
+Overworld_ActualScreenID:
+
 org $02B861
 Dungeon_SaveRoomQuadrantData:
+
+org $02C176
+Overworld_FinalizeEntryOntoScreen_Data:
+
+org $02E99D
+FluteMenu_LoadTransport:
 
 org $02FD8A ; 17D8A - Bank0E.asm: 3732 Note: Different bank
 LoadGearPalettes_bunny:
@@ -567,8 +557,14 @@ Filter_Majorly_Whiten_Color:
 org $04E780
 Overworld_MemorizeMap16Change:
 
+org $04E879
+Overworld_CheckForSpecialOverworldTrigger_Direction:
+
 org $05A51D
 Sprite_SpawnFallingItem:
+
+org $05AFF1
+Sprite_6C_MirrorPortal_dont_do_warp:
 
 org $05DF6C ; 02DF6C - Bank05.asm : 2445
 Sprite_DrawMultiple:
@@ -600,6 +596,9 @@ Utility_CheckIfHitBoxesOverlapLong:
 org $06A7DB
 Chicken_SpawnAvengerChicken: ; returns short
 
+org $06AD58
+Sprite_TransmuteToBomb:
+
 org $06DC5C
 Sprite_DrawShadowLong:
 
@@ -630,8 +629,14 @@ Player_HaltDashAttackLong:
 org $07999D
 Link_ReceiveItem:
 
+org $07A985
+SetGameModeLikeMirror:
+
 org $07E68F
 Unknown_Method_0: ; In US version disassembly simply called "$3E6A6 IN ROM"
+
+org $07F413
+Link_CheckForEdgeScreenTransition:
 
 org $07F4AA
 Sprite_CheckIfPlayerPreoccupied:
@@ -678,11 +683,17 @@ AddAncillaLong:
 org $099D1A
 Ancilla_CheckIfAlreadyExistsLong:
 
+org $09AC57
+Ancilla_TerminateSelectInteractives:
+
 org $09AE64
 Sprite_SetSpawnedCoords:
 
 org $09AD58
 GiveRupeeGift:
+
+org $0AB7BD
+FluteMenu_HandleSelection_NoSelection:
 
 org $0ABA4F
 OverworldMap_InitGfx:
@@ -692,6 +703,13 @@ OverworldMap_DarkWorldTilemap:
 
 org $0ABAB9
 OverworldMap_LoadSprGfx:
+
+org $0CD7D1
+NameFile_MakeScreenVisible:
+org $0CDB3E
+InitializeSaveFile:
+org $0CDBC0
+InitializeSaveFile_build_checksum:
 
 org $0DBA71
 GetRandomInt:

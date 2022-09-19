@@ -122,9 +122,7 @@ org $308031 ; PC 0x180031
 EnableEasterEggs:
 db #$00 ; #$00 = Off (default) - #$01 = On
 ;--------------------------------------------------------------------------------
-org $308032 ; PC 0x180032
-OpenMode:
-db #$01 ; #$00 = Normal (default) - #$01 = Open
+; 0x180032 (unused)
 ;--------------------------------------------------------------------------------
 org $308033 ; PC 0x180033
 HeartBeep:
@@ -153,6 +151,9 @@ MapMode:
 db #$00 ; #$00 = Always On (default) - #$01 = Require Map Item
 CompassMode:
 db #$00 ; #$00 = Off (default) - #$01 = Display Dungeon Count w/Compass - #$02 = Display Dungeon Count Always
+        ; #$8x = Moves prize indicator to a special position if bit on
+        ; #$4x = Compasses or Maps are shuffled and must be obtained to show position if bit on
+        ; #$2x = Use Compass for position if bit on, otherwise use Map
 ;--------------------------------------------------------------------------------
 org $30803D ; PC 0x18003D
 PersistentFloodgate:
@@ -175,9 +176,7 @@ org $30803F ; PC 0x18003F
 HammerableGanon:
 db #$00 ; #$00 = Off (default) - #$01 = On
 ;--------------------------------------------------------------------------------
-org $308040 ; PC 0x180040
-PreopenCurtains:
-db #$00 ; #$00 = Off (default) - #$01 = On
+; 0x180040 - (unused)
 ;--------------------------------------------------------------------------------
 org $308041 ; PC 0x180041
 AllowSwordlessMedallionUse:
@@ -187,9 +186,7 @@ org $308042 ; PC 0x180042
 PermitSQFromBosses:
 db #$00 ; #$00 = Off (default) - #$01 = On
 ;--------------------------------------------------------------------------------
-org $308043 ; PC 0x180043
-StartingSword:
-db #$00 ; #$00 = No Sword (default) - #$FF = Non-Sword
+; 0x180043 (unused)
 ;--------------------------------------------------------------------------------
 org $308044 ; PC 0x180044
 AllowHammerTablets:
@@ -204,9 +201,7 @@ HUDDungeonItems:
  ; display ---edcba a: Small Keys, b: Big Key, c: Map, d: Compass, e: Bosses
 db #$00
 ;--------------------------------------------------------------------------------
-org $308046 ; PC 0x180046 Link's starting equipment
-LinkStartingRupees:
-dw #$0000
+; 0x180046 (unused)
 ;--------------------------------------------------------------------------------
 org $308048 ; PC 0x180048
 MenuSpeed:
@@ -257,13 +252,13 @@ org $30804F ; PC 0x18004F
 ByrnaInvulnerability:
 db #$01 ; #$00 = Off - #$01 = On (default)
 ;--------------------------------------------------------------------------------
-org $308050 ; PC 0x180050 - 0x18005C
+org $308050 ; PC 0x180050 - 0x18005D
 CrystalPendantFlags_2:
-	db $00 ; Sewers
-	db $00 ; Hyrule Castle
+	db $02 ; Ganons Tower - because 5D is not available right now - sewers doesn't get one
+	db $04 ; Hyrule Castle
 	db $00 ; Eastern Palace
 	db $00 ; Desert Palace
-	db $00 ; Agahnim's Tower
+	db $01 ; Agahnim's Tower
 	db $40 ; Swamp Palace
 	db $40 ; Palace of Darkness
 	db $40 ; Misery Mire
@@ -275,6 +270,9 @@ CrystalPendantFlags_2:
 	db $40 ; Turtle Rock
 ;Pendant: $00
 ;Crystal: $40
+;Aga1:    $01
+;Aga2:    $02
+;HC special check $04
 ;--------------------------------------------------------------------------------
 org $30805D ; PC 0x18005D
 SmithDeleteOnSave:
@@ -309,20 +307,20 @@ dl #$000000
 ;--------------------------------------------------------------------------------
 org $308070 ; PC 0x180070 - 0x18007F
 CrystalNumberTable:
-db $00 ;
+db $69 ; Eastern
+db $69 ; Hera
+db $69 ; Desert
+db $7F ; Darkness
+db $6C ; Skull
+db $7C ; TRock
+db $6D ; Thieves
+db $6F ; Mire
+db $6E ; Ice
 db $79 ; Swamp
 db $00 ;
-db $6E ; Ice
 db $00 ;
-db $6F ; Mire
 db $00 ;
-db $6D ; Thieves
-db $69 ; Desert
-db $7C ; TRock
-db $69 ; Hera
-db $6C ; Skull
-db $69 ; Eastern
-db $7F ; Darkness
+db $00 ;
 db $00 ;
 db $00 ;
 
@@ -397,17 +395,7 @@ org $30808A ; PC 0x18008A
 BlockCastleDoorsInRain:
 db #$00 ; #$00 - Normal, $01 - Block them (Used by Entrance Rando in Standard Mode)
 ;--------------------------------------------------------------------------------
-org $30808B ; PC 0x18008B
-PreopenPyramid:
-db $00 ; #$00 = Off (default) - #$01 = On
-;--------------------------------------------------------------------------------
-org $30808C ; PC 0x18008C
-PreopenGanonsTower:
-db $00 ; #$00 = Off (default) - #$01 = On
-;--------------------------------------------------------------------------------
-org $30808D ; PC 0x18008D
-InstantPostAgaWorldState:
-db $00 ; #$00 = Off (default) - #$01 = On
+; 0x18008B-0x18008D (unused)
 ;--------------------------------------------------------------------------------
 org $30808E ; PC 0x18008E
 FakeBoots:
@@ -854,13 +842,9 @@ org $308165 ; PC 0x180165
 GoalItemIcon:
 dw #$280E ; #$280D = Star - #$280E = Triforce Piece (default)
 ;================================================================================
-org $308167 ; PC 0x180167
+org $308167 ; PC 0x180167-0x180167
 GoalItemRequirement:
-db #$00 ; #$00 = Off (default) - #$XX = Require $XX Goal Items - #$FF = Counter-Only
-;================================================================================
-org $308168 ; PC 0x180168
-ByrnaCaveSpikeDamage:
-db #$08 ; #$08 = 1 Heart (default) - #$02 = 1/4 Heart
+dw $0000 ; #$0000 = Off (default) - #$XXXX = Require $XX Goal Items - #$FFFF = Counter-Only
 ;================================================================================
 org $308169 ; PC 0x180169
 AgahnimDoorStyle:
@@ -983,17 +967,22 @@ org $308194 ; PC 0x180194
 TurnInGoalItems:
 db #$01 ; #$00 = Instant win if last goal item collected. $01 = (Default) must turn in goal items
 ;--------------------------------------------------------------------------------
-; 0x180195 - 0x1801FF (unused)
+org $308195 ; PC 0x180195
+ByrnaCaveSpikeDamage:
+db #$08 ; #$08 = 1 Heart (default) - #$02 = 1/4 Heart
+;--------------------------------------------------------------------------------
+; 0x180196 - 0x1801FF (unused)
 ;================================================================================
-org $308200 ; PC 0x180200 - 0x18020F
+org $308200 ; PC 0x180200 - 0x18020B
 RedClockAmount:
 dw #$4650, #$0000 ; $00004650 = +5 minutes
 BlueClockAmount:
 dw #$B9B0, #$FFFF ; $FFFFB9B0 = -5 minutes
 GreenClockAmount:
 dw #$0000, #$0000
-StartingTime:
-dw #$0000, #$0000 ; #$A5E0, #$0001 = 30 minutes
+;--------------------------------------------------------------------------------
+; 0x18020C-0x18020F (unused)
+;--------------------------------------------------------------------------------
 ;================================================================================
 org $09E3BB ; PC 0x4E3BB
 db $E4 ; Hera Basement Key (Set to programmable HP $EB) (set to $E4 for original hookable/boomable key behavior)
@@ -1434,18 +1423,14 @@ db $04
 ;AE - Reserved
 ;AF - Generic Small Key
 
-;B0 - reserved for bee traps
-;B1 - L-1 Bombs
-;B2 - L-2 Bombs
-;B3 - L-3 Bombs
-;B4 - L-4 Bombs
-;B5 - L-5 Bombs
-;B6 - Progressive Bombs
-;B7 - L-1 Cane
-;B8 - L-2 Cane
-;B9 - L-3 Cane
-;BA - L-4 Cane
-;BB - L-5 Cane
+;B0 - Bee Trap
+;B1 - Apples
+;B2 - Fairy
+;B3 - Chicken
+;B4 - Big Magic
+;B5 - 5 Arrows
+;B6 - Progressive Bomb
+;B7 - Progressive Cane
 ;================================================================================
 ;;Residual Portal
 ;org $0283E0 ; PC 0x103E0 (Bank02.asm:816) (BNE)
@@ -1546,7 +1531,8 @@ dw #9999 ; Rupee Limit
 ; $7F5042 - Tile Upload Offset Override (Low)
 ; $7F5043 - Tile Upload Offset Override (High)
 ; $7F5044 - $7F5046 - NMI Auxiliary Function
-; $7F5047 - $7F504E - Unused
+; $7F5047 - $7F5048 - Multiworld NMI Flags
+; $7F5049 - $7F504E - Unused
 ; $7F504F - $7F506F - Shop Block
 ; $7F5070 - Reserved for OneMind
 ; $7F5071 - Reserved for OneMind
@@ -1601,7 +1587,9 @@ dw #9999 ; Rupee Limit
 ; $7F5300 - $7F53FF - Multiworld Block
 ; $7F5400 - $7F540F - MSU Block
 
-; $7F5410 - $7F56FF - Unused
+; $7F5410 - $7F545F - Dungeon Tracking Block
+; $7F5460 - MapCompass flag - used during Overworld Map processing
+; $7F5470 - $7F56FF - Unused
 
 ; $7F5700 - $7F57FF - Dialog Buffer
 ;
@@ -1651,41 +1639,26 @@ dw $0000
 ;--------------------------------------------------------------------------------
 ; 0x182305 - 182FFF (unused)
 ;================================================================================
-org $30B000 ; PC 0x183000 - 0x1832FF
-StartingRoomData:
-; reserved for Room Data
+org $30B000 ; PC 0x183000 - 0x1834FF
+incsrc initsramtable.asm
 
-org $30B280 ; PC 0x183280 - 0x1832FF
-StartingOverworldEvents:
-db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-
-org $30B340 ; PC 0x183340 - 0x183393
-StartingEquipment:
-dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-dw $0000, $0000, $0000, $0000, $0000, $0000, $1818, $FF00
-dw $0000, $0000, $0000, $0000, $F800, $0000, $0000, $0000
-dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-dw $0000, $0000
 ;--------------------------------------------------------------------------------
-; 0x183394 - 183FFF (unused)
+; 0x183500 - 183FFF (unused)
 ;================================================================================
-org $30C000 ; PC 0x184000 - 0x184007
+org $30C000 ; PC 0x184000 - 0x184040
 ItemSubstitutionRules:
 ;db [item][quantity][substitution][pad] - CURRENT LIMIT 16 ENTRIES
 db $12, $01, $35, $FF
 db $51, $06, $52, $FF
 db $53, $06, $54, $FF
 db $FF, $FF, $FF, $FF
+
+org $30C041 ; PC 0x184041
+ForceFileName:
+db $00 ; $00 = Player picks name (default) - $01 = Use StaticFileName (initsramtable.asm)
+
 ;--------------------------------------------------------------------------------
-; 0x184008 - 0x1847FF (unused)
+; 0x18405B - 0x1847FF (unused)
 ;================================================================================
 ;shop_config - tdav --qq
 ; t - 0=Shop - 1=TakeAny
@@ -1709,11 +1682,6 @@ ShopContentsTable:
 db $01, $51, $64, $00, $07, $FF, $00, $00, $00
 db $01, $53, $64, $00, $07, $FF, $00, $00, $00
 db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
-
-; Fix spawning with more hearts than capacity when less than 3 heart containers
-LowHeartFix:
-	org $09F4AC ; <- module_death.asm:331
-	db $08, $08, $10
 
 ;--------------------------------------------------------------------------------
 ; 0x185060 - 1850FF (unused)
@@ -1927,7 +1895,7 @@ db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00,
 
 org $30E37D ; PC 0x18637D
 Enable_TerrorPin_AI_Fix:
-db #$01
+db #$00
 
 ;Shop slot count as check
 org $30E560 ; PC 0x186560
@@ -1938,13 +1906,33 @@ db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00,
 db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
 
 ;--------------------------------------------------------------------------------
-; 0x186380 - 187FFF (unused)
+; 0x186C00 - 186FFE (unused)
 ;--------------------------------------------------------------------------------
-
 org $30EFFF ; PC 0x186FFF
 BallNChainDungeon:
 db #$02
 
+org $30EFE0 ; PC 0x186FE0-0x186FEF
+CrystalPendantFlags_3:
+    db $00 ; Sewers
+	db $00 ; Hyrule Castle
+	db $08 ; Eastern Palace
+	db $09 ; Desert Palace
+	db $00 ; Agahnim's Tower
+	db $02 ; Swamp Palace
+	db $01 ; Palace of Darkness
+	db $06 ; Misery Mire
+    db $03 ; Skull Woods
+	db $05 ; Ice Palace
+	db $0A ; Tower of Hera
+	db $04 ; Thieves' Town
+	db $07 ; Turtle Rock
+	db $00 ; Ganons Tower
+; 00 - No Prize. 01 - 07 Crystal Number 08 - Green Pendant 09 - Blue Pendant, 0A - Red Pendant
 org $30F000 ; PC 0x187000-0x18700F
-CompassTotal:
+CompassTotalsROM:
 db $08, $08, $06, $06, $02, $0A, $0E, $08, $08, $08, $06, $08, $0C, $1B, $00, $00
+
+;--------------------------------------------------------------------------------
+; 0x187010 - 187FFF (unused)
+;--------------------------------------------------------------------------------

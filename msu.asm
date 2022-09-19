@@ -237,6 +237,7 @@ CheckMusicLoadRequest:
             LDA !REG_MUSIC_CONTROL_REQUEST
 
             CMP.b #02 : BEQ .lightworld
+            CMP.b #04 : BEQ .no_change+1  ; bunny
             CMP.b #09 : BEQ .darkworld
             CMP.b #13 : BEQ .darkwoods
             CMP.b #15 : BEQ .darkwoods
@@ -248,26 +249,30 @@ CheckMusicLoadRequest:
 ;.boss
             LDA $040C : LSR : !ADD.b #45
             BRA .check_fallback-3
+.no_change
+            PLA : BRA .check_fallback-3
 .lightworld
             PHA
-                ;LDA $7EF300 : AND.b #$40 : BEQ + ; ped pull
-                LDA $7EF3C5 : CMP.b #03 : BNE + ; aga1 killed
-                    PLA
-                    LDA.b #60 : BRA .check_fallback-3
+                LDA InvertedMode : BNE +
+                    ;LDA OverworldEventDataWRAM+$80 : AND.b #$40 : BEQ + ; ped pull
+                    LDA ProgressIndicator : CMP.b #03 : BNE .no_change ; aga1 killed
+                        - PLA : LDA.b #60 : BRA .check_fallback-3
                 +
-            -- : PLA : BRA .check_fallback-3
+                    LDA CrystalsField : CMP.b #$7F : BNE .no_change
+                        BRA -
 .darkworld
             PHA
-                LDA $7EF37A : CMP.b #$7F : BNE --
-            - : PLA
-            LDA.b #61 : BRA .check_fallback-3 
+                LDA InvertedMode : BNE +
+                    LDA CrystalsField : CMP.b #$7F : BNE .no_change
+                        - PLA : LDA.b #61 : BRA .check_fallback-3
+                +
+                    LDA ProgressIndicator : CMP.b #03 : BNE .no_change ; aga1 killed
+                        BRA -
 .darkwoods
-            PHA
-                LDA $7EF37A : CMP.b #$7F : BEQ -
-                ;LDA $7EF3CA : BEQ --
-                LDA $8A : CMP #$40 : BNE --
-            PLA
-            LDA.b #15 : BRA .check_fallback-3
+            LDA.b #15 : PHA
+                LDX $8A : LDA.l OWTileWorldAssoc,X : BEQ +
+                    PLA : BRA .darkworld
+                + PLA : BRA .lightworld
 .castle
             LDA $040C
             CMP.b #$08 : BNE .check_fallback  ; Hyrule Castle 2
@@ -345,10 +350,10 @@ CheckMusicLoadRequest:
             +
 
             CMP.b #$70 : BNE +    ; Misery Mire
-                LDA $7EF2F0 : AND.b #$20 : BEQ .rain
+                LDA OverworldEventDataWRAM+$70 : AND.b #$20 : BEQ .rain
             +
 
-            LDA $7EF3C5 : CMP.b #$02 : BCS +
+            LDA ProgressIndicator : CMP.b #$02 : BCS +
 .rain
                 LDX.b #$01
             +
@@ -387,7 +392,7 @@ SpiralStairsPreCheck:
         LDA !REG_MSU_ID_45 : CMP !VAL_MSU_ID_45 : BNE .done
     +
 
-    LDA $7EF366 : AND.w #$0004 : BEQ .done                      ; Check that we have the GT big key
+    LDA BigKeyField : AND.w #$0004 : BEQ .done                  ; Check that we have the GT big key
     LDA !REG_MSU_FALLBACK_TABLE+7 : AND.w #$0004 : BEQ .done    ; Check that we have the extended track
 
 .fade
@@ -520,16 +525,16 @@ PHA : XBA : PHA
         ; dont save if we already saved recently
         REP #$20
         LDA !MSU_RESUME_TRACK : AND #$00FF : BEQ ++
-            LDA !NMI_COUNTER : !SUB !MSU_RESUME_TIME : PHA
-            LDA !NMI_COUNTER+2 : SBC !MSU_RESUME_TIME+2 : BNE +++
+            LDA NMIFrames : !SUB !MSU_RESUME_TIME : PHA
+            LDA NMIFrames+2 : SBC !MSU_RESUME_TIME+2 : BNE +++
                 PLA : CMP MSUResumeTimer : !BLT .too_early
                 BRA ++
             +++
             PLA
         ++
         ; saving
-        LDA !NMI_COUNTER : STA !MSU_RESUME_TIME
-        LDA !NMI_COUNTER+2 : STA !MSU_RESUME_TIME+2
+        LDA NMIFrames : STA !MSU_RESUME_TIME
+        LDA NMIFrames+2 : STA !MSU_RESUME_TIME+2
         SEP #$20
 
         LDA !MSU_LOADED_TRACK : STA !MSU_RESUME_TRACK
@@ -686,8 +691,8 @@ MSUMain:
     PLX
     TXA : CMP !MSU_RESUME_TRACK : BNE + ; dont resume if too late
         REP #$20
-            LDA !NMI_COUNTER : !SUB !MSU_RESUME_TIME : PHA
-            LDA !NMI_COUNTER+2 : SBC !MSU_RESUME_TIME+2 : BNE ++
+            LDA NMIFrames : !SUB !MSU_RESUME_TIME : PHA
+            LDA NMIFrames+2 : SBC !MSU_RESUME_TIME+2 : BNE ++
                 PLA : CMP MSUResumeTimer : !BGE +++
                 SEP #$20
                 LDA !FLAG_RESUME_FADEIN : BRA .done_resume

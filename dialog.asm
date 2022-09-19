@@ -267,8 +267,8 @@ RTL
 ;--------------------------------------------------------------------------------
 DialogFairyThrow:
 	LDA.l Restrict_Ponds : BEQ .normal
-	LDA $7EF35C : ORA $7EF35D : ORA $7EF35E : ORA $7EF35F : BNE .normal
-
+	LDA BottleContentsOne
+		ORA BottleContentsTwo : ORA BottleContentsThree : ORA BottleContentsFour : BNE .normal
 	.noInventory
 	LDA $0D80, X : !ADD #$08 : STA $0D80, X
 	LDA.b #$51
@@ -294,7 +294,7 @@ RTL
 ; #$0193 - no silvers alternate
 ; #$0194 - no silvers
 ; #$0195 - silvers
-; $7EF38E - bsp-- ---
+; BowTracking - bsp-- ---
 ; b = bow
 ; s = silver arrow bow
 ; p = 2nd progressive bow
@@ -309,7 +309,7 @@ DialogGanon2:
 		LDA.l SpecialWeapons : AND.w #$00FF
 		CMP.w #$0001 : BEQ .bombs ; bombs if special bomb mode
 	.silver_arrows
-		LDA.l $7EF38E
+		LDA.l $BowTracking
 
 		BIT.w #$0080 : BNE + ; branch if bow
 		LDA.w #$0192 : JMP .done
@@ -398,7 +398,7 @@ DialogBombosTablet:
 RTL
 ;--------------------------------------------------------------------------------
 DialogSahasrahla:
-	LDA.l $7EF374 : AND #$04 : BEQ + ;Check if player has green pendant
+	LDA.l PendantsField : AND #$04 : BEQ + ;Check if player has green pendant
 		LDA.b #$2F
 		LDY.b #$00
 		JML Sprite_ShowMessageUnconditional
@@ -407,7 +407,7 @@ RTL
 ;--------------------------------------------------------------------------------
 DialogBombShopGuy:
 	LDY.b #$15
-	LDA.l $7EF37A : AND #$05 : CMP #$05 : BNE + ;Check if player has crystals 5 & 6
+	LDA.l CrystalsField : AND #$05 : CMP #$05 : BNE + ;Check if player has crystals 5 & 6
 		INY ; from 15 to 16
 	+
 	TYA
@@ -420,7 +420,7 @@ AgahnimAsksAboutPed:
 	LDA.l InvincibleGanon
 	CMP.b #$06 : BNE .vanilla
 
-	LDA.l $7EF300 ; check ped flag
+	LDA.l OverworldEventDataWRAM+$80 ; check ped flag
 	AND.b #$40
 	BNE .vanilla
 

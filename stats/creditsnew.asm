@@ -482,7 +482,7 @@ CreditsLineBlank:
 
 %blankline()
 
-%bigcredits("CODEMANN8")
+%bigcredits("CODEMANN8            CATOBAT")
 
 %blankline()
 %blankline()
@@ -525,6 +525,8 @@ CreditsLineBlank:
 %blankline()
 
 %smallcredits("YOUR SPRITE BY", "green")
+
+%blankline()
 
 %addarbline(YourSpriteCreditsHi)
 %addarbline(YourSpriteCreditsLo)
@@ -605,8 +607,6 @@ CreditsLineBlank:
 %blankline()
 
 %bigcredits("HTTPS://ALTTPR.COM/DISCORD")
-
-%blankline()
 
 %emptyline()
 %emptyline()

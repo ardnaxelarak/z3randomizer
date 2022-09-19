@@ -10,24 +10,24 @@ DoWorldFix:
 	LDA InvertedMode : BEQ +
 		JMP DoWorldFix_Inverted
 	+
-	LDA $7EF3CC : CMP #$04 : BEQ .aga1Alive ; if old man following, skip mirror/aga check
+	LDA FollowerIndicator : CMP #$04 : BEQ .aga1Alive ; if old man following, skip mirror/aga check
 	LDA.l Bugfix_MirrorlessSQToLW : BEQ .skip_mirror_check
-		LDA $7EF353 : AND #$02 : BEQ .noMirror ; check if we have the mirror
+		LDA MirrorEquipment : AND #$02 : BEQ .noMirror ; check if we have the mirror
 	.skip_mirror_check ; alt entrance point
-	LDA $7EF3C5 : CMP.b #$03 : BCS .done ; check if agahnim 1 is alive
+	LDA ProgressIndicator : CMP.b #$03 : BCS .done ; check if agahnim 1 is alive
 	.aga1Alive
 	LDA #$00
 	.noMirror
-	STA $7EF3CA ; set flag to light world
+	STA CurrentWorld ; set flag to light world
 	LDA.l SmithDeleteOnSave : BEQ .transform
-		LDA $7EF3CC
+		LDA FollowerIndicator
 		CMP #$07 : BEQ .clear ; clear frog
 		CMP #$08 : BEQ .clear ; clear dwarf - consider flute implications
 		BRA .done
 		.clear
-		LDA.b #$00 : STA $7EF3CC : BRA .done ; clear follower
+		LDA.b #$00 : STA FollowerIndicator : BRA .done ; clear follower
 	.transform
-	LDA $7EF3CC : CMP #$07 : BNE .done : INC : STA $7EF3CC ; convert frog to dwarf
+	LDA FollowerIndicator : CMP #$07 : BNE .done : INC : STA FollowerIndicator ; convert frog to dwarf
 	.done
 RTL
 ;--------------------------------------------------------------------------------
@@ -48,29 +48,29 @@ JMP DoWorldFix
 JMP DoWorldFix_skip_mirror_check
 
 	.pyramid
-	LDA #$40 : STA $7EF3CA ; set flag to dark world
-	LDA $7EF3CC : CMP #$08 : BNE .done : DEC : STA $7EF3CC : + ; convert dwarf to frog
+	LDA #$40 : STA CurrentWorld ; set flag to dark world
+	LDA FollowerIndicator : CMP #$08 : BNE .done : DEC : STA FollowerIndicator : + ; convert dwarf to frog
 	.done
 RTL
 ;================================================================================
 DoWorldFix_Inverted:
-	LDA $7EF3CC : CMP #$04 : BEQ .aga1Alive ; if old man following, skip mirror/aga check
+	LDA FollowerIndicator : CMP #$04 : BEQ .aga1Alive ; if old man following, skip mirror/aga check
 	LDA.l Bugfix_MirrorlessSQToLW : BEQ .skip_mirror_check
-		LDA $7EF353 : AND #$02  : BEQ .noMirror ; check if we have the mirror
+            LDA.l MirrorEquipment : AND #$02 : BEQ .noMirror ; check if we have the mirror
 	.skip_mirror_check ; alt entrance point
-	LDA $7EF3C5 : CMP.b #$03 : BCS .done ; check if agahnim 1 is alive
+	LDA ProgressIndicator : CMP.b #$03 : BCS .done ; check if agahnim 1 is alive
 	.noMirror
 	.aga1Alive
-	LDA #$40 : STA $7EF3CA ; set flag to dark world
+	LDA #$40 : STA CurrentWorld ; set flag to dark world
 	LDA.l SmithDeleteOnSave : BEQ .transform
-		LDA $7EF3CC
+		LDA FollowerIndicator
 		CMP #$07 : BEQ .clear ; clear frog
 		CMP #$08 : BEQ .clear ; clear dwarf - consider flute implications
 		BRA .done
 		.clear
-		LDA.b #$00 : STA $7EF3CC : BRA .done ; clear follower
+		LDA.b #$00 : STA FollowerIndicator : BRA .done ; clear follower
 	.transform
-	LDA $7EF3CC : CMP #$07 : BNE .done : INC : STA $7EF3CC ; convert frog to dwarf
+	LDA FollowerIndicator : CMP #$07 : BNE .done : INC : STA FollowerIndicator ; convert frog to dwarf
 	.done
 RTL
 ;--------------------------------------------------------------------------------
@@ -88,8 +88,8 @@ JMP DoWorldFix_Inverted
 JMP DoWorldFix_Inverted_skip_mirror_check
 
 	.castle
-	LDA #$00 : STA $7EF3CA ; set flag to light world
-	LDA $7EF3CC : CMP #$07 : BNE + : LDA.b #$08 : STA $7EF3CC : + ; convert frog to dwarf
+	LDA #$00 : STA CurrentWorld ; set flag to dark world
+	LDA FollowerIndicator : CMP #$07 : BNE + : LDA.b #$08 : STA FollowerIndicator : + ; convert frog to dwarf
 	.done
 RTL
 ;================================================================================
@@ -99,20 +99,20 @@ RTL
 FakeWorldFix:
 	LDA FixFakeWorld : BEQ +
 		PHX
-			LDX $8A : LDA.l OWTileWorldAssoc, X : STA $7EF3CA
+			LDX $8A : LDA.l OWTileWorldAssoc, X : STA CurrentWorld
 		PLX
 	+
 RTL
 ;--------------------------------------------------------------------------------
 MasterSwordFollowerClear:
-	LDA $7EF3CC
+	LDA FollowerIndicator
 	CMP #$0E : BNE .exit ; clear master sword follower
-	LDA.b #$00 : STA $7EF3CC ; clear follower
+	LDA.b #$00 : STA FollowerIndicator ; clear follower
 .exit
 	RTL
 ;--------------------------------------------------------------------------------
 FixAgahnimFollowers:
-	LDA.b #$00 : STA $7EF3CC ; clear follower
+	LDA.b #$00 : STA FollowerIndicator ; clear follower
 	JML PrepDungeonExit ; thing we wrote over
 
 ;--------------------------------------------------------------------------------
@@ -122,24 +122,24 @@ macro SetMinimum(base,filler,compare)
 	?done:
 endmacro
 RefreshRainAmmo:
-	LDA $7EF3C5 : CMP.b #$01 : BEQ .rain ; check if we're in rain state
+	LDA ProgressIndicator : CMP.b #$01 : BEQ .rain ; check if we're in rain state
 	RTL
 	.rain
-		LDA $7EF3C8
+		LDA StartingEntrance
 		+ CMP.b #$03 : BNE + ; Uncle
-			%SetMinimum($7EF36E,$7EF373,RainDeathRefillMagic_Uncle)
-			%SetMinimum($7EF343,$7EF375,RainDeathRefillBombs_Uncle)
-			%SetMinimum($7EF377,$7EF376,RainDeathRefillArrows_Uncle)
+			%SetMinimum(CurrentMagic,MagicFiller,RainDeathRefillMagic_Uncle)
+			%SetMinimum(BombsEquipment,BombsFiller,RainDeathRefillBombs_Uncle)
+			%SetMinimum(CurrentArrows,ArrowsFiller,RainDeathRefillArrows_Uncle)
 			BRA .done
 		+ CMP.b #$02 : BNE + ; Cell
-			%SetMinimum($7EF36E,$7EF373,RainDeathRefillMagic_Cell)
-			%SetMinimum($7EF343,$7EF375,RainDeathRefillBombs_Cell)
-			%SetMinimum($7EF377,$7EF376,RainDeathRefillArrows_Cell)
+			%SetMinimum(CurrentMagic,MagicFiller,RainDeathRefillMagic_Cell)
+			%SetMinimum(BombsEquipment,BombsFiller,RainDeathRefillBombs_Cell)
+			%SetMinimum(CurrentArrows,ArrowsFiller,RainDeathRefillArrows_Cell)
 			BRA .done
 		+ CMP.b #$04 : BNE + ; Mantle
-			%SetMinimum($7EF36E,$7EF373,RainDeathRefillMagic_Mantle)
-			%SetMinimum($7EF343,$7EF375,RainDeathRefillBombs_Mantle)
-			%SetMinimum($7EF377,$7EF376,RainDeathRefillArrows_Mantle)
+			%SetMinimum(CurrentMagic,MagicFiller,RainDeathRefillMagic_Mantle)
+			%SetMinimum(BombsEquipment,BombsFiller,RainDeathRefillBombs_Mantle)
+			%SetMinimum(CurrentArrows,ArrowsFiller,RainDeathRefillArrows_Mantle)
 		+
 	.done
 RTL
@@ -148,7 +148,7 @@ RTL
 !INFINITE_BOMBS = "$7F50C9"
 !INFINITE_MAGIC = "$7F50CA"
 SetEscapeAssist:
-	LDA $7EF3C5 : CMP.b #$01 : BNE .no_train ; check if we're in rain state
+	LDA ProgressIndicator : CMP.b #$01 : BNE .no_train ; check if we're in rain state
 	.rain
 		LDA.l EscapeAssist
 		BIT.b #$04 : BEQ + : STA !INFINITE_MAGIC : +
@@ -170,8 +170,8 @@ RTL
 ;--------------------------------------------------------------------------------
 SetSilverBowMode:
 	LDA SilverArrowsUseRestriction : BEQ + ; fix bow type for restricted arrow mode
-		LDA $7EF340 : CMP.b #$3 : BCC +
-		SBC.b #$02 : STA $7EF340
+		LDA BowEquipment : CMP.b #$3 : BCC +
+		SBC.b #$02 : STA BowEquipment
 	+
 RTL
 ;================================================================================

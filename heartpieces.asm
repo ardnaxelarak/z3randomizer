@@ -18,7 +18,7 @@ HeartPieceGet:
 
 	CPY.b #$26 : BNE .notHeart ; don't add a 1/4 heart if it's not a heart piece
 	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE .notHeart
-	LDA $7EF36B : INC A : AND.b #$03 : STA $7EF36B : BNE .unfinished_heart ; add up heart quarters
+	LDA HeartPieceQuarter : INC A : AND.b #$03 : STA HeartPieceQuarter : BNE .unfinished_heart ; add up heart quarters
 	BRA .giveItem
 
 	.notHeart
@@ -136,17 +136,22 @@ HeartUpgradeSpawnDecision: ; this should return #$00 to make the hp spawn
 RTL
 	
 	.normal_behavior
-	LDA $7EF280, X
+	LDA OverworldEventDataWRAM, X
 RTL
 ;--------------------------------------------------------------------------------
 SaveHeartCollectedStatus:
-	LDA !SKIP_HEART_SAVE : BEQ .normal_behavior
+	LDA !SKIP_HEART_SAVE : BEQ .save_flag
 	
 	DEC : STA !SKIP_HEART_SAVE
 RTL
 	
+	.save_flag
+	LDA 4,S : TAY : LDA $0ED0,Y : BEQ .normal_behavior
+		PHA : LDA OverworldEventDataWRAM, X : ORA 1,S : STA OverworldEventDataWRAM, X
+		PLA : RTL
+
 	.normal_behavior
-	LDA $7EF280, X : ORA.b #$40 : STA $7EF280, X
+	LDA OverworldEventDataWRAM, X : ORA.b #$40 : STA OverworldEventDataWRAM, X
 RTL
 ;--------------------------------------------------------------------------------
 !REDRAW = "$7F5000"
@@ -210,7 +215,7 @@ MaybeMarkDigSpotCollected:
 		REP #$20 ; set 16-bit accumulator
 		LDA $8A
 		CMP.w #$2A : BNE +
-			LDA !HAS_GROVE_ITEM : ORA.w #$0001 : STA !HAS_GROVE_ITEM
+			LDA HasGroveItem : ORA.w #$0001 : STA HasGroveItem
 		+
 	PLP : PLA
 RTL
@@ -229,7 +234,7 @@ macro GetPossiblyEncryptedItem(ItemLabel,TableLabel)
 		LDA.w #<ItemLabel>-<TableLabel>
 		JSL RetrieveValueFromEncryptedTable
 
-		PLX : STX $02 : PLX : STX $01
+		PLX : STX $02 : PLX : STX $00
 	PLP : PLX
 	?done:
 endmacro
@@ -283,7 +288,10 @@ LoadOutdoorValue:
 	PHP
 	REP #$20 ; set 16-bit accumulator
 	LDA $8A
-	CMP.w #$03 : BNE +
+	CMP.w #$00 : BNE +
+		LDA.l OWBonkPrizeTable[$00].loot
+		JMP .done
+	+ CMP.w #$03 : BNE +
 		LDA $22 : CMP.w #1890 : !BLT ++
 			%GetPossiblyEncryptedItem(HeartPiece_Spectacle, HeartPieceOutdoorValues)
 			JMP .done
@@ -291,20 +299,105 @@ LoadOutdoorValue:
 			%GetPossiblyEncryptedItem(EtherItem, SpriteItemValues)
 			JMP .done
 	+ CMP.w #$05 : BNE +
-		%GetPossiblyEncryptedItem(HeartPiece_Mountain_Warp, HeartPieceOutdoorValues)
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$01].loot
+			JMP .done
+		++
+			%GetPossiblyEncryptedItem(HeartPiece_Mountain_Warp, HeartPieceOutdoorValues)
+			JMP .done
+	+ CMP.w #$0A : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$02].loot
+			JMP .done
+		++
+			LDA.l OWBonkPrizeTable[$03].loot
+			JMP .done
+	+ CMP.w #$10 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$04].loot
+			JMP .done
+		++
+			LDA.l OWBonkPrizeTable[$05].loot
+			JMP .done
+	+ CMP.w #$11 : BNE +
+		LDA.l OWBonkPrizeTable[$06].loot
+		JMP .done
+	+ CMP.w #$12 : BNE +
+		LDA.l OWBonkPrizeTable[$07].loot
+		JMP .done
+	+ CMP.w #$13 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$08].loot
+			JMP .done
+		++
+			LDA.l OWBonkPrizeTable[$09].loot
+			JMP .done
+	+ CMP.w #$15 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$0A].loot
+			JMP .done
+		++
+			LDA.l OWBonkPrizeTable[$0B].loot
+			JMP .done
+	+ CMP.w #$18 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$0C].loot
+			JMP .done
+		++
+			LDA.l OWBonkPrizeTable[$0D].loot
+			JMP .done
+	+ CMP.w #$1A : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$0E].loot
+			JMP .done
+		++
+			LDA.l OWBonkPrizeTable[$0F].loot
+			JMP .done
+	+ CMP.w #$1B : BNE +
+		LDA.l OWBonkPrizeTable[$11].loot
+		JMP .done
+	+ CMP.w #$1D : BNE +
+		LDA.l OWBonkPrizeTable[$12].loot
+		JMP .done
+	+ CMP.w #$1E : BNE +
+		LDA.l OWBonkPrizeTable[$13].loot
 		JMP .done
 	+ CMP.w #$28 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Maze, HeartPieceOutdoorValues)
 		JMP .done
 	+ CMP.w #$2A : BNE +
-		%GetPossiblyEncryptedItem(HauntedGroveItem, HeartPieceOutdoorValues)
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$14].loot
+			JMP .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeTable[$15].loot
+			JMP .done
+		++
+			%GetPossiblyEncryptedItem(HauntedGroveItem, HeartPieceOutdoorValues)
+			JMP .done
+	+ CMP.w #$2B : BNE +
+		LDA.l OWBonkPrizeTable[$16].loot
 		JMP .done
+	+ CMP.w #$2E : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$17].loot
+			JMP .done
+		++
+			LDA.l OWBonkPrizeTable[$18].loot
+			JMP .done
 	+ CMP.w #$30 : BNE +
 		LDA $22 : CMP.w #512 : !BGE ++
 			%GetPossiblyEncryptedItem(HeartPiece_Desert, HeartPieceOutdoorValues)
 			JMP .done
 		++
 			%GetPossiblyEncryptedItem(BombosItem, SpriteItemValues)
+			JMP .done
+	+ CMP.w #$32 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$19].loot
+			JMP .done
+		++
+			LDA.l OWBonkPrizeTable[$1A].loot
 			JMP .done
 	+ CMP.w #$35 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Lake, HeartPieceOutdoorValues)
@@ -313,16 +406,67 @@ LoadOutdoorValue:
 		%GetPossiblyEncryptedItem(HeartPiece_Swamp, HeartPieceOutdoorValues)
 		JMP .done
 	+ CMP.w #$42 : BNE +
-		%GetPossiblyEncryptedItem(HeartPiece_Cliffside, HeartPieceOutdoorValues)
-		JMP .done
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$1B].loot
+			JMP .done
+		++
+			%GetPossiblyEncryptedItem(HeartPiece_Cliffside, HeartPieceOutdoorValues)
+			JMP .done
 	+ CMP.w #$4A : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Cliffside, HeartPieceOutdoorValues)
 		JMP .done
+	+ CMP.w #$51 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$1C].loot
+			JMP .done
+		++
+			LDA.l OWBonkPrizeTable[$1D].loot
+			JMP .done
+	+ CMP.w #$54 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$1E].loot
+			JMP .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeTable[$1F].loot
+			JMP .done
+		++
+			LDA.l OWBonkPrizeTable[$20].loot
+			JMP .done
+	+ CMP.w #$55 : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$21].loot
+			JMP .done
+		++
+			LDA.l OWBonkPrizeTable[$22].loot
+			JMP .done
+	+ CMP.w #$56 : BNE +
+		LDA.l OWBonkPrizeTable[$23].loot
+		JMP .done
 	+ CMP.w #$5B : BNE +
-		%GetPossiblyEncryptedItem(HeartPiece_Pyramid, HeartPieceOutdoorValues)
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$24].loot
+			JMP .done
+		++
+			%GetPossiblyEncryptedItem(HeartPiece_Pyramid, HeartPieceOutdoorValues)
+			JMP .done
+	+ CMP.w #$5E : BNE +
+		LDA.l OWBonkPrizeTable[$25].loot
 		JMP .done
 	+ CMP.w #$68 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Digging, HeartPieceOutdoorValues)
+		JMP .done
+	+ CMP.w #$6E : BNE +
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$26].loot
+			JMP .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeTable[$27].loot
+			JMP .done
+		++
+			LDA.l OWBonkPrizeTable[$28].loot
+			JMP .done
+	+ CMP.w #$74 : BNE +
+		LDA.l OWBonkPrizeTable[$29].loot
 		JMP .done
 	+ CMP.w #$81 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Zora, HeartPieceOutdoorValues)
@@ -502,7 +646,10 @@ HeartPieceGetPlayer:
 	PHP
 	REP #$20 ; set 16-bit accumulator
 	LDA $8A
-	CMP.w #$03 : BNE +
+	CMP.w #$00 : BNE +
+		LDA.l OWBonkPrizeTable[$00].mw_player
+		BRL .done
+	+ CMP.w #$03 : BNE +
 		LDA $22 : CMP.w #1890 : !BLT ++
 			LDA HeartPiece_Spectacle_Player
 			BRL .done
@@ -510,20 +657,105 @@ HeartPieceGetPlayer:
 			LDA EtherItem_Player
 			BRL .done
 	+ CMP.w #$05 : BNE +
-		LDA HeartPiece_Mountain_Warp_Player
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$01].mw_player
+			BRL .done
+		++
+			LDA HeartPiece_Mountain_Warp_Player
+			BRL .done
+	+ CMP.w #$0A : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$02].mw_player
+			BRL .done
+		++
+			LDA.l OWBonkPrizeTable[$03].mw_player
+			BRL .done
+	+ CMP.w #$10 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$04].mw_player
+			BRL .done
+		++
+			LDA.l OWBonkPrizeTable[$05].mw_player
+			BRL .done
+	+ CMP.w #$11 : BNE +
+		LDA.l OWBonkPrizeTable[$06].mw_player
+		BRL .done
+	+ CMP.w #$12 : BNE +
+		LDA.l OWBonkPrizeTable[$07].mw_player
+		BRL .done
+	+ CMP.w #$13 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$08].mw_player
+			BRL .done
+		++
+			LDA.l OWBonkPrizeTable[$09].mw_player
+			BRL .done
+	+ CMP.w #$15 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$0A].mw_player
+			BRL .done
+		++
+			LDA.l OWBonkPrizeTable[$0B].mw_player
+			BRL .done
+	+ CMP.w #$18 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$0C].mw_player
+			BRL .done
+		++
+			LDA.l OWBonkPrizeTable[$0D].mw_player
+			BRL .done
+	+ CMP.w #$1A : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$0E].mw_player
+			BRL .done
+		++
+			LDA.l OWBonkPrizeTable[$0F].mw_player
+			BRL .done
+	+ CMP.w #$1B : BNE +
+		LDA.l OWBonkPrizeTable[$11].mw_player
+		BRL .done
+	+ CMP.w #$1D : BNE +
+		LDA.l OWBonkPrizeTable[$12].mw_player
+		BRL .done
+	+ CMP.w #$1E : BNE +
+		LDA.l OWBonkPrizeTable[$13].mw_player
 		BRL .done
 	+ CMP.w #$28 : BNE +
 		LDA HeartPiece_Maze_Player
 		BRL .done
 	+ CMP.w #$2A : BNE +
-		LDA HauntedGroveItem_Player
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$14].mw_player
+			BRL .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeTable[$15].mw_player
+			BRL .done
+		++
+			LDA HauntedGroveItem_Player
+			BRL .done
+	+ CMP.w #$2B : BNE +
+		LDA.l OWBonkPrizeTable[$16].mw_player
 		BRL .done
+	+ CMP.w #$2E : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$17].mw_player
+			BRL .done
+		++
+			LDA.l OWBonkPrizeTable[$18].mw_player
+			BRL .done
 	+ CMP.w #$30 : BNE +
 		LDA $22 : CMP.w #512 : !BGE ++
 			LDA HeartPiece_Desert_Player
 			BRL .done
 		++
 			LDA BombosItem_Player
+			BRL .done
+	+ CMP.w #$32 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$19].mw_player
+			BRL .done
+		++
+			LDA.l OWBonkPrizeTable[$1A].mw_player
 			BRL .done
 	+ CMP.w #$35 : BNE +
 		LDA HeartPiece_Lake_Player
@@ -532,16 +764,67 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Swamp_Player
 		BRL .done
 	+ CMP.w #$42 : BNE +
-		LDA HeartPiece_Cliffside_Player
-		BRL .done
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$1B].mw_player
+			BRL .done
+		++
+			LDA HeartPiece_Cliffside_Player
+			BRL .done
 	+ CMP.w #$4A : BNE +
 		LDA HeartPiece_Cliffside_Player
 		BRL .done
+	+ CMP.w #$51 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$1C].mw_player
+			BRL .done
+		++
+			LDA.l OWBonkPrizeTable[$1D].mw_player
+			BRL .done
+	+ CMP.w #$54 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$1E].mw_player
+			BRL .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeTable[$1F].mw_player
+			BRL .done
+		++
+			LDA.l OWBonkPrizeTable[$20].mw_player
+			BRL .done
+	+ CMP.w #$55 : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$21].mw_player
+			BRL .done
+		++
+			LDA.l OWBonkPrizeTable[$22].mw_player
+			BRL .done
+	+ CMP.w #$56 : BNE +
+		LDA.l OWBonkPrizeTable[$23].mw_player
+		BRL .done
 	+ CMP.w #$5B : BNE +
-		LDA HeartPiece_Pyramid_Player
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$24].mw_player
+			BRL .done
+		++
+			LDA HeartPiece_Pyramid_Player
+			BRL .done
+	+ CMP.w #$5E : BNE +
+		LDA.l OWBonkPrizeTable[$25].mw_player
 		BRL .done
 	+ CMP.w #$68 : BNE +
 		LDA HeartPiece_Digging_Player
+		BRL .done
+	+ CMP.w #$6E : BNE +
+		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+			LDA.l OWBonkPrizeTable[$26].mw_player
+			BRL .done
+		++ CMP.w #$0008 : BNE ++
+			LDA.l OWBonkPrizeTable[$27].mw_player
+			BRL .done
+		++
+			LDA.l OWBonkPrizeTable[$28].mw_player
+			BRL .done
+	+ CMP.w #$74 : BNE +
+		LDA.l OWBonkPrizeTable[$29].mw_player
 		BRL .done
 	+ CMP.w #$81 : BNE +
 		LDA HeartPiece_Zora_Player
