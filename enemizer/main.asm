@@ -17,7 +17,8 @@ lorom
 !RANDOM_SPRITE_FLAG = "$368103"
 !AGAHNIM_FUN_BALLS = "$368104"
 !ENABLE_MIMIC_OVERRIDE = "$368105"
-!ENABLE_TERRORPIN_AI_FIX = "$368106"
+;!ENABLE_TERRORPIN_AI_FIX = "$368106" # moved to baserom already
+!CENTER_BOSS_DROP_FLAG = "$368107"
 
 ; Enemizer reserved memory
 ; $7F50B0 - $7F50BF - Downstream Reserved (Enemizer)
@@ -26,10 +27,43 @@ lorom
 ;================================================================================
 
 incsrc hooks.asm
+incsrc DMA.asm
 
-org $B78000 ; the original org is 368000, but I'm putting this here for migration purposes, and I think B6 is the same bank but fastrom
+org $B68000 ; the original org is 368000 and B6 is the same bank but fastrom
 EnemizerTablesStart:
-;none migrated yet
+incsrc enemizer_info_table.asm
+incsrc enemizerflags.asm
+incsrc bushes_table.asm
+; todo: room header table
 
 EnemizerCodeStart:
+incsrc bushes.asm
+incsrc NMI.asm
+incsrc special_action.asm
+incsrc bosses_moved.asm
+incsrc damage.asm
+incsrc bossdrop.asm
+incsrc moldorm.asm
+incsrc kodongo_fixes.asm
+incsrc mimic_fixes.asm
+; todo: vitreous key fix for boss shuffle
+
+incsrc overworld_sprites.asm
+
 incsrc blindboss.asm
+warnpc $B6FFFF ;if we hit this we need to split stuff by bank
+
+org $0684BD
+Sprite_Get16BitCoords_long:
+
+org $0DBA71
+GetRandomInt:
+
+org $0DBB67
+Sound_SetSfxPanWithPlayerCoords:
+
+org $0DBB8A
+Sound_SetSfx3PanLong:
+
+org $1EC6FA ;F46FA
+SpritePrep_Eyegore:
