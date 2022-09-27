@@ -92,35 +92,20 @@ SprItemIndex = $7E0750
 SprItemMWPlayer = $7E0760 ; 0x16
 SprItemFlags = $7E0770 ; 0x16 (used for both pots and drops) (combine with SprDropsItem?)
 
-; todo: move sprites
-;org $09D62E
-;UWSpritesPointers ; 0x250 bytes for 0x128 rooms' 16-bit pointers
+org $09D62E
+UWSpritesPointers: ; 0x250 bytes for 0x128 rooms' 16-bit pointers
 
-;org $09D87E
-;UWPotsPointers ; 0x250 bytes for 0x128 rooms' 16-bit pointers
-
-;org $09DACE
-;UWPotsData ; variable number of bytes (max 0x11D1) for all pots data
-
-;org $A88000
-;UWSpritesData ; variable number of bytes (max 0x2800) for all sprites and sprite drop data
-; First $2800 bytes of this bank (28) is reserved for the sprite tables
-
-;org $09C297
-;LDA.w UWSpritesPointers,Y
-;org $01E6BF  ; not sure this code is reachable anymore
-;LDA.l UWPotsPointers,X
-;STA.b $00
-;LDA.w #UWPotsPointers>>16
-
-; $2800 bytes reserved for sprites
-
-; temporary pot table until sprites get moved:
-org $A88000
+org $09D87E
 UWPotsPointers: ; 0x250 bytes for 0x128 rooms' 16-bit pointers
 
-org $A88250
-UWPotsData:
+org $09DACE
+UWPotsData: ; variable number of bytes (max 0x11D1) for all pots data
+
+org $A88000
+UWSpritesData: ; variable number of bytes (max 0x2800) for all sprites and sprite drop data
+; First $2800 bytes of this bank (28) is reserved for the sprite tables
+
+; $2800 bytes reserved for sprites
 
 org $A8A800
 ;tables:
@@ -290,7 +275,7 @@ IncrementCountsForSubstitute:
 RTS
 
 ClearSpriteData:
-	STZ.b $02 : STZ.b $03 ; what we overrode
+	STZ.b $03 ; what we overrode  # we no longer need STZ $02 see underworld_sprite_hooks
 	PHX
 		LDA #$00 : LDX #$00
 		.loop
@@ -303,20 +288,20 @@ ClearSpriteData:
 ; Runs during sprite load of the room
 LoadSpriteData:
 	INY : INY
-	LDA.b ($00), Y
+	LDA.b [$00], Y
 	CMP #$F3 : BCC .normal
 		PHA
-			DEC.b $02 ; standing items shouldn't consume a sprite slot
-			LDX.b $02
+			DEC.b $03 ; standing items shouldn't consume a sprite slot
+			LDX.b $03 ; these were changed to $03, for moved sprites
 			CMP #$F9 : BNE .not_multiworld
-				DEY : LDA.b ($00), Y : STA.l SprItemMWPlayer, X
+				DEY : LDA.b [$00], Y : STA.l SprItemMWPlayer, X
 				LDA.b #$02 : STA.l SprDropsItem, X : BRA .common
 			.not_multiworld
 			LDA.b #$00 : STA.l SprItemMWPlayer, X
 			LDA.b #$01 : STA.l SprDropsItem, X
 			DEY
 			.common
-			DEY : LDA.b ($00), Y : STA.l SprItemReceipt, X
+			DEY : LDA.b [$00], Y : STA.l SprItemReceipt, X
 		INY : INY
 		PLA
 		PLA : PLA ; remove the JSL return lower 16 bits

@@ -1,5 +1,5 @@
 ;-------------
-NMIHookAction:
+NMIHookActionEnemizer:
 {
     ;-----------------------------------------
     ; do our shell stuff
@@ -33,7 +33,7 @@ NMIHookAction:
     ; Sets DP to $0000
     LDA.w #$0000 : TCD
 
-JML.l NMIHookReturn
+JML.l NMIHookReturnEnemizer
 }
 
 DMAKholdstare:

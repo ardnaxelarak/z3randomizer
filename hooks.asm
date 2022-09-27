@@ -2917,3 +2917,9 @@ NOP
 
 org $02D7D2 ; BEQ .face_up
 NOP #2 ; this fixes Link's direction after mirroring and falling after entering through back of tavern
+
+;--------------------------------------------------------------------------------
+; Enable new room header table
+;--------------------------------------------------------------------------------
+org $01B5E6
+LDA.b #$30

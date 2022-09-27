@@ -18,4 +18,6 @@ incsrc hooks/damage_hooks.asm
 
 incsrc hooks/overworld_sprite_hooks.asm
 
+incsrc hooks/underworld_sprite_hooks.asm
+
 incsrc hooks/blindboss_hooks.asm

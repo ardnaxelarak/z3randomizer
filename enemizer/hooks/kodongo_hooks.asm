@@ -1,3 +1,3 @@
 org $1EC147
-JSL newKodongoCollision
+JSL NewKodongoCollision
 NOP #$05

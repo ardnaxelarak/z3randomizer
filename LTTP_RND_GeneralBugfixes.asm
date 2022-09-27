@@ -359,11 +359,12 @@ warnpc $B08000
 ;$22 Contrib Code
 ;$23 Stats & Credits
 ;$24 Code Bank
+;$26 Multiworld data
 ;$27 DR Code Bank
 ;$28 Keydrop / Standing Items Code bank
 ;$29 External hooks (rest of bank not used)
 ;$2A Reserved for OWR
-;$2B Room Data migration
+;$2B Reserved for "outlet data" ~5.8k
 ;$2E Reserved for Tournament Use
 ;$2F Static RNG (rest is reserved for tournament use)
 ;$30 Main Configuration Table
@@ -371,6 +372,7 @@ warnpc $B08000
 ;$32 Text Bank
 ;$33 Graphics Bank
 ;$36 reserved for Enemizer
+;$37 Room data if needed for DR/Pottery/Enemizer
 ;$3A reserved for downstream use
 ;$3B reserved for downstream use
 ;$3F reserved for internal debugging

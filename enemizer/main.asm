@@ -49,21 +49,15 @@ incsrc mimic_fixes.asm
 ; todo: vitreous key fix for boss shuffle
 
 incsrc overworld_sprites.asm
+incsrc underworld_sprites.asm
 
 incsrc blindboss.asm
+
+incsrc shell_gfx.asm
 warnpc $B6FFFF ;if we hit this we need to split stuff by bank
 
 org $0684BD
 Sprite_Get16BitCoords_long:
-
-org $0DBA71
-GetRandomInt:
-
-org $0DBB67
-Sound_SetSfxPanWithPlayerCoords:
-
-org $0DBB8A
-Sound_SetSfx3PanLong:
 
 org $1EC6FA ;F46FA
 SpritePrep_Eyegore:

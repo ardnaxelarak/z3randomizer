@@ -1,4 +1,4 @@
-newKodongoCollision:
+NewKodongoCollision:
 {
     LDA $0DE0, X : INC A : AND.b #$03 : STA $0DE0, X
     ;If they collide more than 32time then kill them !
