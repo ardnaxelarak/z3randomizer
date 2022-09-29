@@ -543,60 +543,117 @@ DrawPendantCrystalDiagram:
 		LDA PendantsField
 
 		  LSR : BCC + ; pendant of wisdom (red)
-			LDX.w #$252B
+			LDX.w #$247D
 			STX.w $13B6
 			INX : STX.w $13B8
-			INX : STX.w $13F6
-			INX : STX.w $13F8
+			LDX.w #$E47E
+			STX.w $13F6
+			DEX : STX.w $13F8
+			; LDX.w #$252B
+			; STX.w $13B6
+			; INX : STX.w $13B8
+			; INX : STX.w $13F6
+			; INX : STX.w $13F8
 
 		+ LSR : BCC + ; pendant of power (blue)
-			LDX.w #$2D2B
+			LDX.w #$2C7D
 			STX.w $13AE
 			INX : STX.w $13B0
-			INX : STX.w $13EE
-			INX : STX.w $13F0
+			LDX.w #$EC7E
+			STX.w $13EE
+			DEX : STX.w $13F0
+			; LDX.w #$2D2B
+			; STX.w $13AE
+			; INX : STX.w $13B0
+			; INX : STX.w $13EE
+			; INX : STX.w $13F0
 
 		+ LSR : BCC + ; pendant of courage (green)
-			LDX.w #$3D2B
+			LDX.w #$3C7D
 			STX.w $1332
 			INX : STX.w $1334
-			INX : STX.w $1372
-			INX : STX.w $1374
+			LDX.w #$FC7E
+			STX.w $1372
+			DEX : STX.w $1374
+			; LDX.w #$3D2B
+			; STX.w $1332
+			; INX : STX.w $1334
+			; INX : STX.w $1372
+			; INX : STX.w $1374
 		+
 
 
 
+		; ; crystals
+		; LDA CrystalsField
+		; LDX.w #$2D44
+		; LDY.w #$2D45
+
+		;   BIT.w #$0002 : BEQ + ; crystal 1
+		; 	STX.w $14AC
+		; 	STY.w $14AE
+		; + BIT.w #$0010 : BEQ + ; crystal 2
+		; 	STX.w $146E
+		; 	STY.w $1470
+		; + BIT.w #$0040 : BEQ + ; crystal 3
+		; 	STX.w $14B0
+		; 	STY.w $14B2
+		; + BIT.w #$0020 : BEQ + ; crystal 4
+		; 	STX.w $1472
+		; 	STY.w $1474
+		; + BIT.w #$0008 : BEQ + ; crystal 7
+		; 	STX.w $14B8
+		; 	STY.w $14BA
+		; + 
+
+		; LDX.w #$2544
+		; LDY.w #$2545
+
+		;   BIT.w #$0004 : BEQ + ; crystal 5
+		; 	STX.w $14B4
+		; 	STY.w $14B6
+		; + BIT.w #$0001 : BEQ + ; crystal 6
+		; 	STX.w $1476
+		; 	STY.w $1478
+		; +
+
 		; crystals
 		LDA CrystalsField
-		LDX.w #$2D44
-		LDY.w #$2D45
-
 		  BIT.w #$0002 : BEQ + ; crystal 1
-			STX.w $14AC
-			STY.w $14AE
+		  	LDX.w #$287D
+			STX.w $1432
+			LDX.w #$287E
+			STX.w $1434
 		+ BIT.w #$0010 : BEQ + ; crystal 2
+		  	LDX.w #$287D
 			STX.w $146E
-			STY.w $1470
+			LDX.w #$E87E
+			STX.w $14AE
 		+ BIT.w #$0040 : BEQ + ; crystal 3
+		  	LDX.w #$287E
+			STX.w $1470
+			LDX.w #$E87D
 			STX.w $14B0
-			STY.w $14B2
 		+ BIT.w #$0020 : BEQ + ; crystal 4
+		  	LDX.w #$287D
 			STX.w $1472
-			STY.w $1474
-		+ BIT.w #$0008 : BEQ + ; crystal 7
-			STX.w $14B8
-			STY.w $14BA
-		+ 
-
-		LDX.w #$2544
-		LDY.w #$2545
-
-		  BIT.w #$0004 : BEQ + ; crystal 5
+			LDX.w #$E87E
+			STX.w $14B2
+		+ BIT.w #$0004 : BEQ + ; crystal 5
+		  	LDX.w #$247E
+			STX.w $1474
+			LDX.w #$E47D
 			STX.w $14B4
-			STY.w $14B6
 		+ BIT.w #$0001 : BEQ + ; crystal 6
+		  	LDX.w #$247D
 			STX.w $1476
-			STY.w $1478
+			LDX.w #$E47E
+			STX.w $14B6
+		+ BIT.w #$0008 : BEQ + ; crystal 7
+		  	LDX.w #$287E
+			STX.w $1478
+			LDX.w #$E87D
+			STX.w $14B8
 		+
 
 	PLB : PLP

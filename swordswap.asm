@@ -65,7 +65,7 @@ LookupDamageLevel:
 	                     CMP #$03 : BEQ .bomb_table
 	                     CMP #$04 : BEQ .bomb_table
 	                     CMP #$05 : BEQ .bomb_table
-		%LookupDamageSubclass(Damage_Table) : RTL
+		%LookupDamageSubclass(Damage_Table_Bombos) : RTL
 	.bomb_table
 		%LookupDamageSubclass(Damage_Table_Bombs) : RTL
 	.pseudo_table

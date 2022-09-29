@@ -35,6 +35,20 @@ macro fs_draw16x16(screenrow,screencol)
 	%fs_draw16x8(<screenrow>+1,<screencol>)
 endmacro
 
+macro fs_draw_bombos_top(screenrow,screencol,color)
+	LDA.w #$0207|<color>
+	%fs_draw8x8(<screenrow>,<screencol>)
+	LDA.w #$0217|<color>|!FS_HFLIP|!FS_VFLIP
+	%fs_draw8x8(<screenrow>,<screencol>+1)
+endmacro
+
+macro fs_draw_bombos_right(screenrow,screencol,color)
+	LDA.w #$0217|<color>|!FS_HFLIP|!FS_VFLIP
+	%fs_draw8x8(<screenrow>,<screencol>)
+	LDA.w #$0207|<color>|!FS_HFLIP|!FS_VFLIP
+	%fs_draw8x8(<screenrow>+1,<screencol>)
+endmacro
+
 macro fs_LDY_screenpos(screenrow,screencol)
 	LDY.w #<screenrow>*$20+<screencol>*2+$1004
 endmacro
@@ -83,28 +97,28 @@ JMP DrawItemGray
 
 DrawBottle:
 	AND.w #$00FF : BNE +
-		LDX #FileSelectItems_empty_bottle
+		LDX #FileSelectItems_bombos
 		JMP DrawItemGray
 	+ : DEC #2 : BNE +
-		LDX #FileSelectItems_empty_bottle
+		LDX #FileSelectItems_bombos
 		JMP DrawItem
 	+ : DEC : BNE +
-		LDX #FileSelectItems_red_potion
+		LDX #FileSelectItems_bombos
 		JMP DrawItem
 	+ : DEC : BNE +
-		LDX #FileSelectItems_green_potion
+		LDX #FileSelectItems_bombos
 		JMP DrawItem
 	+ : DEC : BNE +
-		LDX #FileSelectItems_blue_potion
+		LDX #FileSelectItems_bombos
 		JMP DrawItem
 	+ : DEC : BNE +
-		LDX #FileSelectItems_fairy_bottle
+		LDX #FileSelectItems_bombos
 		JMP DrawItem
 	+ : DEC : BNE +
-		LDX #FileSelectItems_bee_bottle
+		LDX #FileSelectItems_bombos
 		JMP DrawItem
 	+
-	LDX #FileSelectItems_good_bee_bottle
+	LDX #FileSelectItems_bombos
 JMP DrawItem
 
 
@@ -155,111 +169,111 @@ DrawPlayerFileShared:
 	; Bow
 	LDA.l BowTrackingSRAM : AND.w #$0040 : BEQ +
 		LDA EquipmentSRAM+$00 : AND.w #$00FF : BEQ ++
-			%fs_drawItem(3,12,FileSelectItems_silver_bow)
+			%fs_drawItem(3,12,FileSelectItems_bombos)
 			BRA .bow_end
 		++
-		%fs_drawItem(3,12,FileSelectItems_silver_arrow)
+		%fs_drawItem(3,12,FileSelectItems_bombos)
 		BRA .bow_end
 	+
 	LDA.l EquipmentSRAM : AND.w #$00FF : BEQ +
-		%fs_drawItem(3,12,FileSelectItems_bow)
+		%fs_drawItem(3,12,FileSelectItems_bombos)
 		BRA .bow_end
 	+
-	%fs_drawItemGray(3,12,FileSelectItems_bow)
+	%fs_drawItemGray(3,12,FileSelectItems_bombos)
 	.bow_end
 
 	; Boomerang
 	LDA.l InventoryTrackingSRAM : AND.w #$00C0 : CMP.w #$00C0 : BNE +
-		%fs_drawItem(3,14,FileSelectItems_both_boomerang)
+		%fs_drawItem(3,14,FileSelectItems_bombos)
 		BRA .boomerang_end
 	+
 	LDA.l InventoryTrackingSRAM : AND.w #$0040 : BEQ +
-		%fs_drawItem(3,14,FileSelectItems_red_boomerang)
+		%fs_drawItem(3,14,FileSelectItems_bombos)
 		BRA .boomerang_end
 	+
 	LDA.l InventoryTrackingSRAM : AND.w #$0080 : BEQ +
-		%fs_drawItem(3,14,FileSelectItems_blue_boomerang)
+		%fs_drawItem(3,14,FileSelectItems_bombos)
 		BRA .boomerang_end
 	+
-	%fs_drawItemGray(3,14,FileSelectItems_blue_boomerang)
+	%fs_drawItemGray(3,14,FileSelectItems_bombos)
 	.boomerang_end
 
 	; Hookshot
-	%fs_drawItemBasic(EquipmentSRAM+$02,3,16,FileSelectItems_hookshot)
+	%fs_drawItemBasic(EquipmentSRAM+$02,3,16,FileSelectItems_bombos)
 
 	; Bombs
-	; %fs_drawItemBasic(EquipmentSRAM+$03,3,18,FileSelectItems_bombs)
+	; %fs_drawItemBasic(EquipmentSRAM+$03,3,18,FileSelectItems_bombos)
 
 	; Powder
 	LDA.l InventoryTrackingSRAM : AND.w #$0010 : BEQ +
-		%fs_drawItem(3,20,FileSelectItems_powder)
+		%fs_drawItem(3,20,FileSelectItems_bombos)
 		BRA ++
 	+
-		%fs_drawItemGray(3,20,FileSelectItems_powder)
+		%fs_drawItemGray(3,20,FileSelectItems_bombos)
 	++
 
 	; Mushroom
 	LDA.l InventoryTrackingSRAM : AND.w #$0008 : BEQ +
-		%fs_drawItem(3,18,FileSelectItems_mushroom)
+		%fs_drawItem(3,18,FileSelectItems_bombos)
 		BRA ++
 	+
-		%fs_drawItemGray(3,18,FileSelectItems_mushroom)
+		%fs_drawItemGray(3,18,FileSelectItems_bombos)
 	++
 
 	; Flute
 	LDA.l InventoryTrackingSRAM : AND.w #$0003 : BEQ +
-		%fs_drawItem(7,16,FileSelectItems_flute)
+		%fs_drawItem(7,16,FileSelectItems_bombos)
 		BRA ++
 	+
-		%fs_drawItemGray(7,16,FileSelectItems_flute)
+		%fs_drawItemGray(7,16,FileSelectItems_bombos)
 	++
 
 	; Shovel
 	LDA.l InventoryTrackingSRAM : AND.w #$0004 : BEQ +
-		%fs_drawItem(9,12,FileSelectItems_shovel)
+		%fs_drawItem(9,12,FileSelectItems_bombos)
 		BRA ++
 	+
-		%fs_drawItemGray(9,12,FileSelectItems_shovel)
+		%fs_drawItemGray(9,12,FileSelectItems_bombos)
 	++
 
 	; Fire Rod
-	%fs_drawItemBasic(EquipmentSRAM+$05,5,12,FileSelectItems_fire_rod)
+	%fs_drawItemBasic(EquipmentSRAM+$05,5,12,FileSelectItems_bombos)
 
 	; Ice Rod
-	%fs_drawItemBasic(EquipmentSRAM+$06,5,14,FileSelectItems_ice_rod)
+	%fs_drawItemBasic(EquipmentSRAM+$06,5,14,FileSelectItems_bombos)
 
 	; Bombos Medallion
 	%fs_drawItemBasic(EquipmentSRAM+$07,5,16,FileSelectItems_bombos)
 
 	; Ether Medallion
-	%fs_drawItemBasic(EquipmentSRAM+$08,5,18,FileSelectItems_ether)
+	%fs_drawItemBasic(EquipmentSRAM+$08,5,18,FileSelectItems_bombos)
 
 	; Quake Medallion
-	%fs_drawItemBasic(EquipmentSRAM+$09,5,20,FileSelectItems_quake)
+	%fs_drawItemBasic(EquipmentSRAM+$09,5,20,FileSelectItems_bombos)
 
 	; Lamp
-	%fs_drawItemBasic(EquipmentSRAM+$0A,7,12,FileSelectItems_lamp)
+	%fs_drawItemBasic(EquipmentSRAM+$0A,7,12,FileSelectItems_bombos)
 
 	; Hammer
-	%fs_drawItemBasic(EquipmentSRAM+$0B,7,14,FileSelectItems_hammer)
+	%fs_drawItemBasic(EquipmentSRAM+$0B,7,14,FileSelectItems_bombos)
 
 	; Bug Net
-	%fs_drawItemBasic(EquipmentSRAM+$0D,7,18,FileSelectItems_bugnet)
+	%fs_drawItemBasic(EquipmentSRAM+$0D,7,18,FileSelectItems_bombos)
 
 	; Book of Mudora
-	%fs_drawItemBasic(EquipmentSRAM+$0E,7,20,FileSelectItems_book)
+	%fs_drawItemBasic(EquipmentSRAM+$0E,7,20,FileSelectItems_bombos)
 
 	; Red Cane
-	%fs_drawItemBasic(EquipmentSRAM+$10,9,14,FileSelectItems_redcane)
+	%fs_drawItemBasic(EquipmentSRAM+$10,9,14,FileSelectItems_bombos)
 
 	; Blue Cane
-	%fs_drawItemBasic(EquipmentSRAM+$11,9,16,FileSelectItems_bluecane)
+	%fs_drawItemBasic(EquipmentSRAM+$11,9,16,FileSelectItems_bombos)
 
 	; Cape
-	%fs_drawItemBasic(EquipmentSRAM+$12,9,18,FileSelectItems_cape)
+	%fs_drawItemBasic(EquipmentSRAM+$12,9,18,FileSelectItems_bombos)
 
 	; Mirror
-	%fs_drawItemBasic(EquipmentSRAM+$13,9,20,FileSelectItems_mirror)
+	%fs_drawItemBasic(EquipmentSRAM+$13,9,20,FileSelectItems_bombos)
 
 	; Bottles
 	%fs_drawBottle(EquipmentSRAM+$1C,3,23)
@@ -270,70 +284,70 @@ DrawPlayerFileShared:
 	; Sword
 	LDA.l SpecialWeapons : AND.w #$00FF : CMP #$0001 : BEQ .bombSword
 	LDA.l EquipmentSRAM+$19 : AND.w #$00FF : BNE +
-		%fs_drawItemGray(3,26,FileSelectItems_fighters_sword)
+		%fs_drawItemGray(3,26,FileSelectItems_bombos)
 		JMP ++
 	+ : DEC : BNE +
-		%fs_drawItem(3,26,FileSelectItems_fighters_sword)
+		%fs_drawItem(3,26,FileSelectItems_bombos)
 		JMP ++
 	+ : DEC : BNE +
-		%fs_drawItem(3,26,FileSelectItems_master_sword)
+		%fs_drawItem(3,26,FileSelectItems_bombos)
 		JMP ++
 	+ : DEC : BNE +
-		%fs_drawItem(3,26,FileSelectItems_tempered_sword)
+		%fs_drawItem(3,26,FileSelectItems_bombos)
 		BRA ++
 	+ : DEC : BNE +
-		%fs_drawItem(3,26,FileSelectItems_gold_sword)
+		%fs_drawItem(3,26,FileSelectItems_bombos)
 		BRA ++
 	+
 		; a sword value above 4 is either corrupted or 0xFF (a.k.a. swordless)
-		%fs_drawItemGray(3,26,FileSelectItems_fighters_sword)
+		%fs_drawItemGray(3,26,FileSelectItems_bombos)
 	.bombSword
 	LDA.l $70038F : AND.w #$00FF : BNE +
-		%fs_drawItemGray(3,26,FileSelectItems_fighters_bombs)
+		%fs_drawItemGray(3,26,FileSelectItems_bombos)
 		BRA ++
 	+ : DEC : BNE +
-		%fs_drawItem(3,26,FileSelectItems_fighters_bombs)
+		%fs_drawItem(3,26,FileSelectItems_bombos)
 		BRA ++
 	+ : DEC : BNE +
-		%fs_drawItem(3,26,FileSelectItems_master_bombs)
+		%fs_drawItem(3,26,FileSelectItems_bombos)
 		BRA ++
 	+ : DEC : BNE +
-		%fs_drawItem(3,26,FileSelectItems_tempered_bombs)
+		%fs_drawItem(3,26,FileSelectItems_bombos)
 		BRA ++
 	+ : DEC : BNE +
-		%fs_drawItem(3,26,FileSelectItems_gold_bombs)
+		%fs_drawItem(3,26,FileSelectItems_bombos)
 		BRA ++
 	+ : DEC : BNE +
-		%fs_drawItem(3,26,FileSelectItems_extra_gold_bombs)
+		%fs_drawItem(3,26,FileSelectItems_bombos)
 		BRA ++
 	+
 		; a bomb value above 5 is... who knows, let's just pretend it's 5
-		%fs_drawItem(3,26,FileSelectItems_extra_gold_bombs)
+		%fs_drawItem(3,26,FileSelectItems_bombos)
 	++
 
 	; Shield
 	LDA.l EquipmentSRAM+$1A : AND.w #$00FF : BNE +
-		%fs_drawItemGray(5,26,FileSelectItems_fighters_shield)
+		%fs_drawItemGray(5,26,FileSelectItems_bombos)
 		BRA ++
 	+ : DEC : BNE +
-		%fs_drawItem(5,26,FileSelectItems_fighters_shield)
+		%fs_drawItem(5,26,FileSelectItems_bombos)
 		BRA ++
 	+ : DEC : BNE +
-		%fs_drawItem(5,26,FileSelectItems_fire_shield)
+		%fs_drawItem(5,26,FileSelectItems_bombos)
 		BRA ++
 	+
-		%fs_drawItem(5,26,FileSelectItems_mirror_shield)
+		%fs_drawItem(5,26,FileSelectItems_bombos)
 	++
 
 	; Mail
 	LDA.l EquipmentSRAM+$1B : AND.w #$00FF : BNE +
-		%fs_drawItem(7,26,FileSelectItems_green_mail)
+		%fs_drawItem(7,26,FileSelectItems_bombos)
 		BRA ++
 	+ : DEC : BNE +
-		%fs_drawItem(7,26,FileSelectItems_blue_mail)
+		%fs_drawItem(7,26,FileSelectItems_bombos)
 		BRA ++
 	+
-		%fs_drawItem(7,26,FileSelectItems_red_mail)
+		%fs_drawItem(7,26,FileSelectItems_bombos)
 	++
 
 	; Heart Pieces
@@ -356,24 +370,24 @@ DrawPlayerFileShared:
 	LDA $7F5007 : AND.w #$00FF : !ADD.w #$210+!FS_COLOR_BW : %fs_draw8x8(11,27)
 
 	; Boots
-	%fs_drawItemBasic(EquipmentSRAM+$15,3,28,FileSelectItems_boots)
+	%fs_drawItemBasic(EquipmentSRAM+$15,3,28,FileSelectItems_bombos)
 
 	; Gloves
 	LDA.l EquipmentSRAM+$14 : AND.w #$00FF : BNE +
-		%fs_drawItemGray(5,28,FileSelectItems_gloves)
+		%fs_drawItemGray(5,28,FileSelectItems_bombos)
 		BRA ++
 	+ : DEC : BNE +
-		%fs_drawItem(5,28,FileSelectItems_gloves)
+		%fs_drawItem(5,28,FileSelectItems_bombos)
 		BRA ++
 	+
-		%fs_drawItem(5,28,FileSelectItems_mitts)
+		%fs_drawItem(5,28,FileSelectItems_bombos)
 	++
 
 	; Flippers
-	%fs_drawItemBasic(EquipmentSRAM+$16,7,28,FileSelectItems_flippers)
+	%fs_drawItemBasic(EquipmentSRAM+$16,7,28,FileSelectItems_bombos)
 
 	; Moon Pearl
-	%fs_drawItemBasic(EquipmentSRAM+$17,9,28,FileSelectItems_pearl)
+	%fs_drawItemBasic(EquipmentSRAM+$17,9,28,FileSelectItems_bombos)
 
 	; Pendants
 	LDA EquipmentSRAM+$34 : AND.w #$0004 : BEQ +
@@ -399,53 +413,53 @@ DrawPlayerFileShared:
 
 	; Crystals
 	LDA EquipmentSRAM+$3A : AND.w #$0002 : BEQ +
-		LDA.w #$0297|!FS_COLOR_BLUE
+		%fs_draw_bombos_top(12,21,!FS_COLOR_YELLOW)
 		BRA ++
 	+
-		LDA.w #$0287|!FS_COLOR_GRAY
-	++ : %fs_draw16x8(13,18)
+		%fs_draw_bombos_top(12,21,!FS_COLOR_GRAY)
+	++
 
 	LDA EquipmentSRAM+$3A : AND.w #$0010 : BEQ +
-		LDA.w #$0297|!FS_COLOR_BLUE
+		LDA.w #$0207|!FS_COLOR_YELLOW
 		BRA ++
 	+
-		LDA.w #$0287|!FS_COLOR_GRAY
-	++ : %fs_draw16x8(12,19)
+		LDA.w #$0207|!FS_COLOR_GRAY
+	++ : %fs_draw8x16(13,19)
 
 	LDA EquipmentSRAM+$3A : AND.w #$0040 : BEQ +
-		LDA.w #$0297|!FS_COLOR_BLUE
+		%fs_draw_bombos_right(13,20,!FS_COLOR_YELLOW)
 		BRA ++
 	+
-		LDA.w #$0287|!FS_COLOR_GRAY
-	++ : %fs_draw16x8(13,20)
+		%fs_draw_bombos_right(13,20,!FS_COLOR_GRAY)
+	++
 
 	LDA EquipmentSRAM+$3A : AND.w #$0020 : BEQ +
-		LDA.w #$0297|!FS_COLOR_BLUE
+		LDA.w #$0207|!FS_COLOR_YELLOW
 		BRA ++
 	+
-		LDA.w #$0287|!FS_COLOR_GRAY
-	++ : %fs_draw16x8(12,21)
+		LDA.w #$0207|!FS_COLOR_GRAY
+	++ : %fs_draw8x16(13,21)
 
 	LDA EquipmentSRAM+$3A : AND.w #$0004 : BEQ +
-		LDA.w #$0297|!FS_COLOR_RED
+		%fs_draw_bombos_right(13,22,!FS_COLOR_RED)
 		BRA ++
 	+
-		LDA.w #$0287|!FS_COLOR_GRAY
-	++ : %fs_draw16x8(13,22)
+		%fs_draw_bombos_right(13,22,!FS_COLOR_GRAY)
+	++
 
 	LDA EquipmentSRAM+$3A : AND.w #$0001 : BEQ +
-		LDA.w #$0297|!FS_COLOR_RED
+		LDA.w #$0207|!FS_COLOR_RED
 		BRA ++
 	+
-		LDA.w #$0287|!FS_COLOR_GRAY
-	++ : %fs_draw16x8(12,23)
+		LDA.w #$0207|!FS_COLOR_GRAY
+	++ : %fs_draw8x16(13,23)
 
 	LDA EquipmentSRAM+$3A : AND.w #$0008 : BEQ +
-		LDA.w #$0297|!FS_COLOR_BLUE
+		%fs_draw_bombos_right(13,24,!FS_COLOR_YELLOW)
 		BRA ++
 	+
-		LDA.w #$0287|!FS_COLOR_GRAY
-	++ : %fs_draw16x8(13,24)
+		%fs_draw_bombos_right(13,24,!FS_COLOR_GRAY)
+	++
 
 
 	PLB : PLY : PLX
@@ -514,13 +528,13 @@ FileSelectItems:
 	dw #$0264|!FS_COLOR_RED, #$0265|!FS_COLOR_RED, #$0274|!FS_COLOR_RED, #$0275|!FS_COLOR_RED
 
 	.no_pendant
-	dw #$0285|!FS_COLOR_GRAY, #$0286|!FS_COLOR_GRAY, #$02B2|!FS_COLOR_GRAY, #$0296|!FS_COLOR_GRAY
+	dw #$0207|!FS_COLOR_GRAY, #$0217|!FS_COLOR_GRAY|!FS_HFLIP|!FS_VFLIP, #$0217|!FS_COLOR_GRAY, #$0207|!FS_COLOR_GRAY|!FS_HFLIP|!FS_VFLIP
 	.green_pendant
-	dw #$0285|!FS_COLOR_GREEN, #$0286|!FS_COLOR_GREEN, #$0295|!FS_COLOR_GREEN, #$0296|!FS_COLOR_GREEN
+	dw #$0207|!FS_COLOR_GREEN, #$0217|!FS_COLOR_GREEN|!FS_HFLIP|!FS_VFLIP, #$0217|!FS_COLOR_GREEN, #$0207|!FS_COLOR_GREEN|!FS_HFLIP|!FS_VFLIP
 	.blue_pendant
-	dw #$0285|!FS_COLOR_BLUE, #$0286|!FS_COLOR_BLUE, #$0295|!FS_COLOR_BLUE, #$0296|!FS_COLOR_BLUE
+	dw #$0207|!FS_COLOR_BLUE, #$0217|!FS_COLOR_BLUE|!FS_HFLIP|!FS_VFLIP, #$0217|!FS_COLOR_BLUE, #$0207|!FS_COLOR_BLUE|!FS_HFLIP|!FS_VFLIP
 	.red_pendant
-	dw #$0285|!FS_COLOR_RED, #$0286|!FS_COLOR_RED, #$0295|!FS_COLOR_RED, #$0296|!FS_COLOR_RED
+	dw #$0207|!FS_COLOR_RED, #$0217|!FS_COLOR_RED|!FS_HFLIP|!FS_VFLIP, #$0217|!FS_COLOR_RED, #$0207|!FS_COLOR_RED|!FS_HFLIP|!FS_VFLIP
 
 	.gloves
 	dw #$024E|!FS_COLOR_BROWN, #$024F|!FS_COLOR_BROWN, #$025E|!FS_COLOR_BROWN, #$025F|!FS_COLOR_BROWN
@@ -556,13 +570,13 @@ FileSelectItems:
 	dw #$026F|!FS_COLOR_RED, #$026F|!FS_COLOR_RED|!FS_HFLIP, #$027F|!FS_COLOR_RED, #$02B5|!FS_COLOR_RED
 
 	.heart_piece_0_of_4
-	dw #$0280|!FS_COLOR_RED, #$0280|!FS_COLOR_RED|!FS_HFLIP, #$0290|!FS_COLOR_RED, #$0290|!FS_COLOR_RED|!FS_HFLIP
+	dw #$0207|!FS_COLOR_GRAY, #$0217|!FS_COLOR_GRAY|!FS_HFLIP|!FS_VFLIP, #$0217|!FS_COLOR_GRAY, #$0207|!FS_COLOR_GRAY|!FS_HFLIP|!FS_VFLIP
 	.heart_piece_1_of_4
-	dw #$0281|!FS_COLOR_RED, #$0280|!FS_COLOR_RED|!FS_HFLIP, #$0290|!FS_COLOR_RED, #$0290|!FS_COLOR_RED|!FS_HFLIP
+	dw #$0207|!FS_COLOR_YELLOW, #$0217|!FS_COLOR_GRAY|!FS_HFLIP|!FS_VFLIP, #$0217|!FS_COLOR_GRAY, #$0207|!FS_COLOR_GRAY|!FS_HFLIP|!FS_VFLIP
 	.heart_piece_2_of_4
-	dw #$0281|!FS_COLOR_RED, #$0280|!FS_COLOR_RED|!FS_HFLIP, #$0291|!FS_COLOR_RED, #$0290|!FS_COLOR_RED|!FS_HFLIP
+	dw #$0207|!FS_COLOR_YELLOW, #$0217|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP, #$0217|!FS_COLOR_GRAY, #$0207|!FS_COLOR_GRAY|!FS_HFLIP|!FS_VFLIP
 	.heart_piece_3_of_4
-	dw #$0281|!FS_COLOR_RED, #$0281|!FS_COLOR_RED|!FS_HFLIP, #$0291|!FS_COLOR_RED, #$0290|!FS_COLOR_RED|!FS_HFLIP
+	dw #$0207|!FS_COLOR_YELLOW, #$0217|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP, #$0217|!FS_COLOR_YELLOW, #$0207|!FS_COLOR_GRAY|!FS_HFLIP|!FS_VFLIP
 
 	.empty_bottle
 	dw #$0240|!FS_COLOR_BW, #$0241|!FS_COLOR_BW, #$0250|!FS_COLOR_BW, #$0251|!FS_COLOR_BW

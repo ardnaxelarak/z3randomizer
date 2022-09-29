@@ -40,8 +40,8 @@ TryOpenTRock:
 RTL
 ;--------------------------------------------------------------------------------
 MedallionTrigger_Bombos:
-    STZ $50 ; stuff we wrote over
-    STZ $0FC1
+	STZ $50 ; stuff we wrote over
+	STZ $0FC1
 	
 	PHA
 	LDA.l MireRequiredMedallion : BNE +

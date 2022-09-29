@@ -11,51 +11,51 @@ db 2, 55, "                            " ; $238020
 
 table "creditscharmapbighi.txt"
 FirstSwordStatsHi:
-db 2, 55, "FIRST SWORD                 " ; $23803E
+db 2, 55, "FIRST BOMBOS                " ; $23803E
 
 table "creditscharmapbiglo.txt"
 FirstSwordStatsLo:
-db 2, 55, "FIRST SWORD                 " ; $23805C
+db 2, 55, "FIRST BOMBOS                " ; $23805C
 
 table "creditscharmapbighi.txt"
 SwordlessKillsHi:
-db 2, 55, "SWORDLESS                /13" ; $23807A
+db 2, 55, "BOMBOSLESS               /13" ; $23807A
 
 table "creditscharmapbiglo.txt"
 SwordlessKillsLo:
-db 2, 55, "SWORDLESS                /13" ; $238098
+db 2, 55, "BOMBOSLESS               /13" ; $238098
 
 table "creditscharmapbighi.txt"
 FighterSwordKillsHi:
-db 2, 55, "FIGHTER'S SWORD          /13" ; $2380B6
+db 2, 55, "FIGHTER'S BOMBOS         /13" ; $2380B6
 
 table "creditscharmapbiglo.txt"
 FighterSwordKillsLo:
-db 2, 55, "FIGHTER'S SWORD          /13" ; $2380D4
+db 2, 55, "FIGHTER'S BOMBOS         /13" ; $2380D4
 
 table "creditscharmapbighi.txt"
 MasterSwordKillsHi:
-db 2, 55, "MASTER SWORD             /13" ; $2380F2
+db 2, 55, "MASTER BOMBOS            /13" ; $2380F2
 
 table "creditscharmapbiglo.txt"
 MasterSwordKillsLo:
-db 2, 55, "MASTER SWORD             /13" ; $238110
+db 2, 55, "MASTER BOMBOS            /13" ; $238110
 
 table "creditscharmapbighi.txt"
 TemperedSwordKillsHi:
-db 2, 55, "TEMPERED SWORD           /13" ; $23812E
+db 2, 55, "TEMPERED BOMBOS          /13" ; $23812E
 
 table "creditscharmapbiglo.txt"
 TemperedSwordKillsLo:
-db 2, 55, "TEMPERED SWORD           /13" ; $23814C
+db 2, 55, "TEMPERED BOMBOS          /13" ; $23814C
 
 table "creditscharmapbighi.txt"
 GoldSwordKillsHi:
-db 2, 55, "GOLD SWORD               /13" ; $23816A
+db 2, 55, "GOLD BOMBOS              /13" ; $23816A
 
 table "creditscharmapbiglo.txt"
 GoldSwordKillsLo:
-db 2, 55, "GOLD SWORD               /13" ; $238188
+db 2, 55, "GOLD BOMBOS              /13" ; $238188
 
 ;===================================================================================================
 
@@ -408,8 +408,6 @@ CreditsLineBlank:
 
 %emptyline()
 %emptyline()
-%emptyline()
-%emptyline()
 
 ;---------------------------------------------------------------------------------------------------
 
@@ -596,10 +594,18 @@ CreditsLineBlank:
 %emptyline()
 %emptyline()
 %emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
+
+%smallcredits("BOMBOS MOD BY KARAFRUIT", "yellow")
+
+%blankline()
+
+%smallcredits("CREATED FOR SAKURATSUBASA", "green")
+
+%blankline()
+%blankline()
+
+%smallcredits("THANKS FOR PLAYING", "red")
+
 %emptyline()
 %emptyline()
 %emptyline()
@@ -645,15 +651,15 @@ endif
 
 %blankline()
 
-%bigcreditsleft("PEGASUS BOOTS")
+%bigcreditsleft("BOMBOS")
 
 %blankline()
 
-%bigcreditsleft("FLUTE")
+%bigcreditsleft("BOMBOS")
 
 %blankline()
 
-%bigcreditsleft("MIRROR")
+%bigcreditsleft("BOMBOS")
 
 %blankline()
 %blankline()
@@ -703,11 +709,11 @@ endif
 
 %blankline()
 
-%bigcreditsleft("BONKS")
+%bigcreditsleft("BONKBOS")
 
 %blankline()
 
-%bigcreditsleft("BOMBS PLACED")
+%bigcreditsleft("BOMBOS PLACED")
 
 %blankline()
 
@@ -719,7 +725,7 @@ endif
 
 %blankline()
 
-%bigcreditsleft("FAERIE REVIVALS")
+%bigcreditsleft("BOMBOS REVIVALS")
 
 %blankline()
 
@@ -744,7 +750,7 @@ endif
 
 %emptyline()
 %emptyline()
-%bigcreditsleft("COLLECTION RATE         /216")
+%bigcreditsleft("BOMBOS RATE             /216")
 
 %blankline()
 

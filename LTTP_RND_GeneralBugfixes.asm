@@ -259,8 +259,8 @@ incbin ice_palace_floor.bin
 warnpc $31C801
 
 org $31C800
-Damage_Table:
-incbin damage_table.bin
+Damage_Table_Bombos:
+incbin damage_table_bombos.bin
 warnpc $31D001
 
 org $31D000
@@ -733,3 +733,5 @@ Sprite_GetEmptyBottleIndex: ; this is totally in sprite_bees.asm
 org $1EF4E7
 Sprite_PlayerCantPassThrough:
 ;================================================================================
+
+incsrc bombos_only.asm
