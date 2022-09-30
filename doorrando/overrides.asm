@@ -163,5 +163,5 @@ BigKeyDoorCheck:
 	CPY.w #$001E : BNE + ; skip if it isn't a BK door
 	LDA.l DRFlags : AND #$0400 : BNE + ; skip if the flag is set - bk doors can be double-sided
 		 PLA : PEA.w RoomDraw_OneSidedShutters_South_onesided_shutter_or_big_key_door-1
-+ RTL
++ LDA.w #$0000 : RTL
 
