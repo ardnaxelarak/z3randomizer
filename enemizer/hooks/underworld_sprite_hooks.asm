@@ -30,7 +30,7 @@ org $09C35A
 DEC.b $03
 
 org $09C36E
-LDA.b $03
+JSL GetSpriteSlot16Bit ; depended on high bit being zero, which it isn't anymore
 
 org $09C383
 LDX.b $03

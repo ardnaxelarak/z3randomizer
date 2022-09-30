@@ -318,10 +318,21 @@ RevealSpriteDrop:
 		LDA.l SprItemReceipt, X : STA SpawnedItemID
 		LDA.l SprItemMWPlayer, X : STA SpawnedItemMWPlayer
 		LDY.b #$01 ; trigger the small key routines
-		LDA SpawnedItemID : CMP #$32 : BNE +
+		LDA.w SpawnedItemID : STA.b $00 : CMP #$32 : BNE +
 		LDA.l StandingItemsOn : BNE +
 			INY ; big key routine
-		+ RTL ; unstun if stunned
+		+
+		PHX : LDX.b #$00
+		- CPX.b #$1A : BCS .done
+			LDA.l MinorForcedDrops, X
+			CMP.b $00 : BNE +
+				INX : LDA.l MinorForcedDrops, X : STA.b $00
+				PLX : PLA : PLA : PEA.w $06F9D7-1 ; change call stack for PrepareEnemyDrop
+				JSR IncrementCountForMinor
+				LDA.b $00 : RTL
+			+ INX #2 : BRA -
+		.done PLX
+		 RTL ; unstun if stunned
 	.normal
 	LDY.w $0CBA, X : BEQ .no_forced_drop
 		RTL
@@ -341,6 +352,41 @@ RevealSpriteDrop2:
 	PEA.w $06E3CE-1 ; change return address to .no_forced_drop of (Sprite_DoTheDeath)
 	RTL
 
+MinorForcedDrops:
+; Item ID -> Sprite ID
+db $27, $DC ; BOMB REFILL 1
+db $28, $DD ; BOMB REFILL 4
+db $31, $DE ; BOMB REFILL 8
+db $34, $D9 ; GREEN RUPEE  ($34)
+db $35, $DA ; BLUE RUPEE  ($35)
+db $36, $DB ; RED RUPEE ($36)
+db $42, $D8 ; HEART ($42)
+db $44, $E2 ; ARROW REFILL 10 ($44)
+db $45, $DF ; SMALL MAGIC DECANTER ($45)
+db $B2, $E3 ; FAERIE ($B2)
+db $B3, $0B ; CUCCO ($B3)
+db $B4, $E0 ; LARGE MAGIC DECANTER ($B4)
+db $B5, $E1 ; ARROW REFILL 5  (x??)
+
+
+IncrementCountForMinor:
+	PHX : REP #$30
+	LDA.w SpawnedItemIndex : ASL : TAX : LDA.l BitFieldMasks, X : STA $0A
+	LDA.b $A0 : ASL : TAX
+	LDA.l SpritePotData, X : BIT $0A : BNE .obtained
+		ORA $0A : STA SpritePotData, X
+		SEP #$30
+		LDA $040C : CMP #$FF : BEQ +
+			BNE ++
+				INC #2 ; treat sewers as HC
+			++ LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
+			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
+		+ REP #$30
+		LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
+	.obtained
+	SEP #$30 : PLX
+RTS
+
 BitFieldMasks:
 dw $8000, $4000, $2000, $1000, $0800, $0400, $0200, $0100
 dw $0080, $0040, $0020, $0010, $0008, $0004, $0002, $0001
@@ -348,6 +394,7 @@ dw $0080, $0040, $0020, $0010, $0008, $0004, $0002, $0001
 ; Runs during Sprite_E4_SmallKey and duning Sprite_E5_BigKey spawns
 ShouldSpawnItem:
 	LDA $048E : CMP.b #$87 : BNE + ; check for hera basement cage
+	CPX #$0A : BNE +  ; the hera basement key is always sprite 0x0A
 	LDA $A8 : AND.b #$03 : CMP.b #$02 : BNE + ; we're not in that quadrant
 			LDA.w $0403 : AND.w KeyRoomFlagMasks,Y : RTL
 	+
@@ -372,8 +419,9 @@ ShouldSpawnItem:
 
 MarkSRAMForItem:
 	LDA $048E : CMP.b #$87 : BNE + ; check for hera basement cage
-		LDA $A8 : AND.b #$03 : CMP.b #$02 : BNE +
-		LDA.w $0403 : ORA.w KeyRoomFlagMasks, Y : RTL
+		CPX #$0A : BNE +  ; the hera basement key is always sprite 0x0A
+			LDA $A8 : AND.b #$03 : CMP.b #$02 : BNE +
+				LDA.w $0403 : ORA.w KeyRoomFlagMasks, Y : RTL
 	+ PHX : PHY : REP #$30
 		LDA.b $A0 : ASL : TAY
 		LDA.l SpawnedItemIndex : ASL
@@ -391,10 +439,11 @@ SpriteKeyPrep:
 	LDA.w $0B9B : STA.w $0CBA, X ; what we wrote over
 	PHA
 		LDA $A0 : CMP #$87 : BNE .continue
-			LDA $A9 : ORA $AA : AND #$03 : CMP #$02 : BNE .continue
-				LDA #$00 : STA.w SpawnedItemFlag : STA SprItemFlags, X
-				LDA #$24 : STA $0E80, X
-				BRA +
+			CPX #$0A : BNE .continue  ; the hera basement key is always sprite 0x0A
+				LDA $A9 : ORA $AA : AND #$03 : CMP #$02 : BNE .continue
+					LDA #$00 : STA.w SpawnedItemFlag : STA SprItemFlags, X
+					LDA #$24 : STA $0E80, X
+					BRA +
 		.continue
 		LDA.w SpawnedItemIndex : STA SprItemIndex, X
 		LDA.w SpawnedItemMWPlayer : STA SprItemMWPlayer, X

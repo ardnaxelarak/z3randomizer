@@ -40,6 +40,9 @@
 ; #$90 - Big Keys
 ; #$A0 - Small Keys
 ; #$B0 - Bee Trap
+; #$B2 - Fairy
+; #$B3 - Chicken
+; #$B4 - Big Magic
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
 ;--------------------------------------------------------------------------------
@@ -395,10 +398,13 @@ AddReceivedItemExpandedGetItem:
 			++
 			JMP .done
 	+ CMP.b #$B0 : BNE + ; Bee Trap
-		LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI + ; DashBeeHive_SpawnBee
-		LDA $22 : STA $0D10, Y : LDA $23 : STA $0D30, Y ; from enemizer's Spawn_Bees
+		LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI ++ ; DashBeeHive_SpawnBee
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
 		LDA $20 : STA $0D00, Y : LDA $21 : STA $0D20, Y
-	+
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
+		++ JMP .done
+	+ JSR NewItemsChecks
 	.done
 	PLX
 	LDA $02E9 : CMP.b #$01 ; thing we wrote over
@@ -553,6 +559,7 @@ AddReceivedItemExpanded:
 ;DATA AddReceivedItemExpanded
 {
 ; This is a temporary measure for Fish to have consistent addresses
+warnpc $A08800
 org $A08800
 
 .y_offsets
@@ -590,7 +597,12 @@ org $A08800
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Free Big Key
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Free Small Key
 	db -4 ; Bee Trap
-	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
+	db -4 ; Apples
+	db -4 ; Fairy
+	db -4 ; Chicken
+	db -4 ; Big Magic
+	db -4 ; 5 Arrows
+	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
@@ -631,7 +643,12 @@ org $A08800
 	;db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; *EVENT*
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  0 ; Bee Trap
-	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
+	db  0 ; Apples
+	db  0 ; Fairy
+	db  0 ; Chicken
+	db  4 ; Big Magic
+	db  0 ; 5 Arrows
+	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
@@ -677,7 +694,12 @@ org $A08800
 	;db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; *EVENT*
 
 	db $47 ; Bee Trap
-	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
+	db $47 ; Apples
+	db $47 ; Fairy
+	db $47 ; Chicken
+	db $3B ; Big Magic
+	db $02 ; 5 Arrows
+	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -717,8 +739,12 @@ org $A08800
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Free Big Key
 	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 ; Free Small Key
 	db $02 ; Bee Trap
-
-	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
+	db $02 ; Apples
+	db $02 ; Fairy
+	db $02 ; Chicken
+	db $00 ; Big Magic
+	db $02 ; 5 Arrows
+	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
@@ -759,7 +785,12 @@ org $A08800
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Big Key
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  1 ; Bee Trap
-	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
+	db  1 ; Apples
+	db  1 ; Fairy
+	db  1 ; Chicken
+	db  4 ; Big Magic
+	db  2 ; 5 Arrows
+	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
@@ -801,7 +832,12 @@ org $A08800
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Big Key
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Free Small Key
 	dw $F36A ; Bee Trap
-	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
+	dw $F36A ; Apples
+	dw $F36A ; Fairy
+	dw $F36A ; Chicken
+	dw $F373 ; Big Magic
+	dw $F376 ; 5 Arrows
+	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
@@ -845,7 +881,12 @@ org $A08800
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Free Big Key
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Free Small Key
 	db $FF ; Bee Trap
-	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
+	db $FF ; Apples
+	db $FF ; Fairy
+	db $FF ; Chicken
+	db $80 ; Big Magic
+	db $05 ; 5 Arrows
+	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
@@ -930,8 +971,12 @@ Link_ReceiveItemAlternatesExpanded:
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Free Compass
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Free Big Key
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Free Small Key
-	db -1 ; Bee Trap
-	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
+	db -1 ; Apples
+	db -1 ; Fairy
+	db -1 ; Chicken
+	db -1 ; Big Magic
+	db -1 ; 5 Arrows
+	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
@@ -1213,3 +1258,28 @@ MaybeFlagCompassTotalEntrance:
         .done
 RTL
 ;--------------------------------------------------------------------------------
+
+NewItemsChecks:
+	CMP.b #$B2 : BNE + ; Fairy
+		LDA.b #$E3 : JSL Sprite_SpawnDynamically : BMI .done
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
+		LDA.b $20 : SEC : SBC.b #$10 : STA.w $0D00,Y
+			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 16 pixels
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
+		LDA.b #$FF : STA.w $0B58,Y ; allows them to expire
+		BRA .done
+	+ CMP.b #$B3 : BNE + ; Chicken
+		LDA.b #$0B : JSL Sprite_SpawnDynamically : BMI .done
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
+		LDA.b $20 : SEC : SBC.b #$08 : STA.w $0D00,Y
+			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 8 pixels
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
+		BRA .done
+	+ CMP.b #$B4 : BNE .done ; Big Magic
+		LDA.b #$80 : STA MagicFiller ; fill magic
+	.done
+RTS
+
+
