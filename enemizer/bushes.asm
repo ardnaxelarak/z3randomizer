@@ -38,10 +38,6 @@ sprite_bush_spawn:
     LDA.w sprite_bush_spawn_table_random_sprites, Y 
     BRL .return
 
-    .item_table
-    db #$00, #$D9, #$3E, #$79, #$D9, #$DC, #$D8, #$DA, #$E4, #$E1, #$DC
-    db #$D8, #$DF, #$E0, #$0B, #$42, #$D3, #$41, #$D4, #$D9, #$E3, #$D8
-
     .not_random
 
     CPY.b #$0F : BEQ .newSpriteSpawn
@@ -49,7 +45,7 @@ sprite_bush_spawn:
     CPY.b #$10 : BEQ .newSpriteSpawn
     ;CPY.b #$0E : BEQ .newSpriteSpawn
 
-    LDA .item_table, Y
+    LDA.w item_drop_table_override, Y
     BRA .return
 
     .newSpriteSpawn

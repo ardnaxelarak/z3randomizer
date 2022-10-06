@@ -27,12 +27,13 @@ DoDungeonMapBossIcon:
 
 	; get sprite pointer for room
 	LDA.l $89D62E,X
-	INC ; to skip the "sort"
-	TAX
+	STA.b $00                ; pointer in $00
+	LDA.w #$0028 : STA.b $02 ; set the bank to 28 for now
+	LDY.w #$0001 ; to skip the "sort"
 
 	; get first byte to make sure it isn't an empty room
 	SEP #$20
-	LDA.l $890000,X
+	LDA.b [$00], Y
 	CMP.b #$FF
 	BNE ++
 
@@ -40,7 +41,8 @@ DoDungeonMapBossIcon:
 	BRA .cave
 
 	; check first sprite
-++	LDA.l $890002,X
+++	INY #2
+	LDA.b [$00], Y
 	SEP #$10
 
 	; match boss id

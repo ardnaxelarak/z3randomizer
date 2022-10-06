@@ -17,7 +17,6 @@ db #$00 ;408106 : 200106 ; toggle to turn on terrorpin ai "fix"
 .center_boss_drops
 db #$00 ;368107
 
-db #$00 ;408107 : 200107
 db #$00 ;408108 : 200108
 db #$00 ;408109 : 200109
 db #$00 ;40810A : 20010A

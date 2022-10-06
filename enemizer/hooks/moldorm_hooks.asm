@@ -11,10 +11,10 @@ org $1DD88E
 }
 
 ; set number of eyes
-org $1DDBB2 ;$0EDBB2
-{
+;org $1DDBB2 ;$0EDBB2
+;{
     ; LDX.b #$01
 	; number of eyes (-1)
     ;0EDBB2 0EDBB3
-    LDX.b #$07
-}
+;    LDX.b #$01
+;}

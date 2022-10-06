@@ -34,7 +34,6 @@ EnemizerTablesStart:
 incsrc enemizer_info_table.asm
 incsrc enemizerflags.asm
 incsrc bushes_table.asm
-; todo: room header table
 
 EnemizerCodeStart:
 incsrc bushes.asm
