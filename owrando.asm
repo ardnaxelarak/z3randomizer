@@ -1,3 +1,10 @@
+; Free RAM notes
+; $06F8-$06F9: Used to store edge table addresses
+; $06FA-$06FB: Used to store target edge IDs
+; $06FC-$06FD: Used for custom walk destination after transitions
+; $0703: Used to flag forced transitions
+; $0704-$0705: Used to store terrain type at the start of a transition
+
 org $aa8000 ;150000
 db $4f, $52 ;OR
 OWMode:
