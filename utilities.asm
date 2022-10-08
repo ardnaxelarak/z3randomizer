@@ -58,7 +58,7 @@ RTL
 		+
 		LDA.b #$04 : RTL
 	++ CMP.b #$FE : BNE ++ ; Progressive Sword
-		LDA HighestSword
+		LDA ProgressiveSwords
 		CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
 			LDA.l ProgressiveSwordReplacement
 			JMP GetSpriteID
@@ -72,7 +72,7 @@ RTL
 			LDA.b #$46 : RTL
 		+
 	++ : CMP.b #$FF : BNE ++ ; Progressive Shield
-		LDA HighestShield
+		LDA ProgressiveShields
 		CMP.l ProgressiveShieldLimit : !BLT + ; Progressive Shield Limit
 			LDA.l ProgressiveShieldReplacement
 			JMP GetSpriteID
@@ -186,7 +186,7 @@ GetSpritePalette:
 RTL
 	.specialHandling
 	CMP.b #$FD : BNE ++ ; Progressive Sword
-		LDA HighestSword
+		LDA ProgressiveSwords
 		CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
 			LDA.l ProgressiveSwordReplacement
 			JMP GetSpritePalette
@@ -199,7 +199,7 @@ RTL
 		+ ; Everything Else
 			LDA.b #$08 : RTL
 	++ : CMP.b #$FE : BNE ++ ; Progressive Shield
-		LDA HighestShield
+		LDA ProgressiveShields
 		CMP.l ProgressiveShieldLimit : !BLT + ; Progressive Shield Limit
 			LDA.l ProgressiveShieldReplacement
 			JMP GetSpritePalette
@@ -325,13 +325,13 @@ IsNarrowSprite:
 			+ : JMP .continue
 		.notBottle
 	CMP.b #$5E : BNE ++ ; Progressive Sword
-		LDA HighestSword : CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
+		LDA ProgressiveSwords : CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
 			LDA.l ProgressiveSwordReplacement
 			JSL.l IsNarrowSprite
 			JMP .done
 		+ : JMP .continue
 	++ CMP.b #$5F : BNE ++ ; Progressive Shield
-		LDA HighestShield : BNE + : JMP .done ; No Shield
+		LDA ProgressiveShields : BNE + : JMP .done ; No Shield
 		+ : CMP.l ProgressiveShieldLimit : !BLT .continue
 			LDA.l ProgressiveShieldReplacement
 			JSL.l IsNarrowSprite
