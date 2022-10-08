@@ -523,7 +523,7 @@ AddReceivedItemExpanded:
 			+++ : JMP .done
 		++ : CMP.b #$5E : BNE ++ ; Progressive Sword
 			LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +
-			LDA HighestSword : CMP.l ProgressiveSwordLimit : !BLT +
+			LDA ProgressiveSwords : CMP.l ProgressiveSwordLimit : !BLT +
 				LDA.l ProgressiveSwordReplacement : STA $02D8 : JMP .done
 			+
 			LDA SwordEquipment : CMP.b #$FF : BNE + ; Swordless
@@ -545,10 +545,10 @@ AddReceivedItemExpanded:
 				+++ ; Everything Else
 					LDA.b #$06 : STA $02D8 : JMP .done
 			+
-			LDA HighestShield : CMP.l ProgressiveShieldLimit : !BLT +
+			LDA ProgressiveShields : CMP.l ProgressiveShieldLimit : !BLT +
 				LDA.l ProgressiveShieldReplacement : STA $02D8 : JMP .done
 			+
-			LDA HighestShield : BNE + ; No Shield
+			LDA ProgressiveShields : BNE + ; No Shield
 				LDA.b #$04 : BRA .shielddone
 			+ : CMP.b #$01 : BNE + ; Fighter Shield
 				LDA.b #$05 : BRA .shielddone

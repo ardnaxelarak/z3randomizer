@@ -256,7 +256,7 @@ IgnoreFaeries:                  ;
 HasGroveItem:                   ;
 GeneralFlags: skip 1            ; - - h - - i - g (bitfield)
                                 ; h = HUD Flag       | i = ignore faeries | g = has diggable grove item
-HighestSword: skip 1            ; Highest sword level (integer)
+ProgressiveSwords: skip 1       ; Number of Progressive Swords obatined (integer)
 GoalCounter: skip 2             ; Goal items collected (16-bit integer)
 ProgrammableItemOne: skip 2     ; \  Reserved for programmable items
 ProgrammableItemTwo: skip 2     ;  |
@@ -264,7 +264,7 @@ ProgrammableItemThree: skip 2   ; /
 BonkCounter: skip 1             ; Number of times the player has bonked (integer)
 YAItemCounter: skip 1           ; y y y y y a a a (packed integers)
                                 ; Number of Y and A items collected represented as packed integers
-HighestShield: skip 1           ; Highest Shield level
+ProgressiveShields: skip 1      ; Number of Progressive Shields obtained
 TotalItemCounter: skip 2        ; Total items collected (integer)
 SwordBossKills: skip 2          ; t t t t g g g g  f f f f m m m m (packed integers)
                                 ; t = Tempered Sword boss kills | g = Gold Sword boss kills
@@ -562,14 +562,14 @@ endmacro
 %assertSRAM(IgnoreFaeries, $7EF416)
 %assertSRAM(HasGroveItem, $7EF416)
 %assertSRAM(GeneralFlags, $7EF416)
-%assertSRAM(HighestSword, $7EF417)
+%assertSRAM(ProgressiveSwords, $7EF417)
 %assertSRAM(GoalCounter, $7EF418)
 %assertSRAM(ProgrammableItemOne, $7EF41A)
 %assertSRAM(ProgrammableItemTwo, $7EF41C)
 %assertSRAM(ProgrammableItemThree, $7EF41E)
 %assertSRAM(BonkCounter, $7EF420)
 %assertSRAM(YAItemCounter, $7EF421)
-%assertSRAM(HighestShield, $7EF422)
+%assertSRAM(ProgressiveShields, $7EF422)
 %assertSRAM(TotalItemCounter, $7EF423)
 %assertSRAM(SwordBossKills, $7EF425)
 %assertSRAM(BigKeysBigChests, $7EF427)
