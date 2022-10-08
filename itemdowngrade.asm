@@ -60,7 +60,7 @@ RTS
 RTS
 	.isSword
 	PHA
-                LDA HighestSword : STA $04
+                LDA SwordEquipment : STA $04
 		TYA ; load sword item
 		CMP.b #$49 : BNE + : LDA.b #$00 : + ; convert extra fighter's sword to normal one
 		CMP.b #$50 : BNE + : LDA.b #$01 : + ; convert extra master sword to normal one
@@ -73,9 +73,11 @@ RTS
 JMP .done
         .isUncleSwordShield
 	PHA
-                LDA HighestSword : STA [$00] ; already set to 1 if we had no sword, always keep highest
+                ; set sword to 1 if current sword is 0
+                LDA [$00] : BNE + : LDA.b #$01 : STA [$00] : +
                 INC $00
-                LDA HighestShield : STA [$00]
+                ; set shield to 1 if current shield is 0
+                LDA [$00] : BNE + : LDA.b #$01 : STA [$00] : +
 	PLA
 RTS
 ;================================================================================

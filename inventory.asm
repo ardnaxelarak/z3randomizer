@@ -326,33 +326,16 @@ AddInventory:
 	.itemCounts
 
 	CPY.b #$00 : BNE + ; Fighter's Sword & Fighter's Shield
-                LDX #$01
-		JSR .incrementSword
-		JSR .incrementShield
+		JSR .stampSword
 		JMP .done
 	+ CPY.b #$01 : BNE + ; Master Sword
-                LDX #$02
-		JSR .incrementSword
+		JSR .stampSword
 		JMP .done
 	+ CPY.b #$02 : BNE + ; Tempered Sword
-                LDX #$03
-		JSR .incrementSword
+		JSR .stampSword
 		JMP .done
 	+ CPY.b #$03 : BNE + ; Golden Sword
-                LDX #$04
-		JSR .incrementSword
-		JMP .done
-	+ CPY.b #$04 : BNE + ; Fighter's Shield
-                LDX #$01
-		JSR .incrementShield
-		JMP .done
-	+ CPY.b #$05 : BNE + ; Red Shield
-                LDX #$02
-		JSR .incrementShield
-		JMP .done
-	+ CPY.b #$06 : BNE + ; Mirror Shield
-                LDX #$03
-		JSR .incrementShield
+		JSR .stampSword
 		JMP .done
 	+ CPY.b #$07 : !BLT + ; Items $07 - $0D
 	  CPY.b #$0E : !BGE +
@@ -452,8 +435,7 @@ AddInventory:
 		JSR .incrementY
 		JMP .done
 	+ CPY.b #$49 : BNE + ; Fighter's Sword
-                LDX #$01
-		JSR .incrementSword
+		JSR .stampSword
 		JMP .done
 	+ CPY.b #$4A : BNE + ; Flute (Active)
 		JSR .stampFlute
@@ -472,8 +454,7 @@ AddInventory:
 		JSR .incrementCapacity
 		JMP .done
 	+ CPY.b #$50 : BNE + ; Master Sword (Safe)
-                LDX #$02
-		JSR .incrementSword
+		JSR .stampSword
 		JMP .done
 	+ CPY.b #$51 : BNE + ; 5 Bomb Capacity Upgrade
                 LDX #$02
@@ -491,12 +472,11 @@ AddInventory:
 		JSR .incrementBow
 		JMP .done
 	+ CPY.b #$5E : BNE + ; Progressive Sword
-                LDA SwordEquipment : INC : TAX
-		JSR .incrementSword
+		JSR .stampSword
+		LDA.l ProgressiveSwords : INC : STA.l ProgressiveSwords
 		JMP .done
 	+ CPY.b #$5F : BNE + ; Progressive Shield
-                LDA ShieldEquipment : INC : TAX
-		JSR .incrementShield
+		LDA.l ProgressiveShields : INC : STA.l ProgressiveShields
 		JMP .done
 	+ CPY.b #$60 : BNE + ; Progressive Armor
                 LDA ArmorEquipment : INC : TAX
@@ -571,21 +551,6 @@ RTS
 		LDA NMIFrames+2 : STA MirrorTime+2
 	+
 	SEP #$20 ; set 8-bit accumulator
-RTS
-
-.incrementSword
-	JSR .stampSword
-        LDA HighestSword
-        INC : STA $04 : CPX $04 : !BLT + ; don't increment unless we're getting a better sword
-                TXA : STA HighestSword
-        +
-RTS
-
-.incrementShield
-        LDA HighestShield
-        INC : STA $04 : CPX $04 : !BLT + ; don't increment unless we're getting a better shield
-                TXA : STA HighestShield
-        +
 RTS
 
 .incrementBow
