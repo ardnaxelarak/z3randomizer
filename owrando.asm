@@ -835,9 +835,9 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
         ; toggle bunny mode
         lda MoonPearlEquipment : bne .nobunny
         lda.l InvertedMode : bne .inverted
-            lda CurrentWorld : and.b #$40 : bra +
-            .inverted lda CurrentWorld : and.b #$40 : eor #$40
-        + cmp #$40 : bne .nobunny
+            lda CurrentWorld : bra +
+            .inverted lda CurrentWorld : eor #$40
+        + and #$40 : beq .nobunny
 
             LDA.w $0703 : BEQ + ; check if forced transition
                 CPY.b #$03 : BEQ .end_forced_whirlpool
@@ -865,8 +865,9 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
                 .whirlpool
                     PLX : RTS
             .to_bunny_reset_swim
-            JSL Link_ResetSwimmingState
-            STZ.w $0345
+            LDA.b $5D : CMP.b #$04 : BNE .to_bunny ; check if swimming
+                JSL Link_ResetSwimmingState
+                STZ.w $0345
             .to_bunny
             LDA.b #$17 : STA.b $5D
             .to_pseudo_bunny
@@ -897,14 +898,14 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
         RTS
     .not_forced
     CPY.b #$02 : BNE + ; check if going from water to land
-        JSL Link_ResetSwimmingState
-        STZ.w $0345
-        LDA.b $5D : CMP.b #$04 : BNE + ; check if swimming
+        LDA.b $5D : CMP.b #$04 : BNE .return ; check if swimming
+            JSL Link_ResetSwimmingState
+            STZ.w $0345
             STZ.b $5D
     +
     CPY.b #$01 : BNE .return ; check if going from land to water
-    LDA.b #$01 : STA.w $0345
     LDA.b $5D : CMP.b #$04 : BEQ .return ; check if swimming
+        LDA.b #$01 : STA.w $0345
         LDA.l FlippersEquipment : BEQ .no_flippers ; check if flippers obtained
         LDA.b $5D : CMP.b #$17 : BEQ .no_flippers ; check if bunny
             LDA.b #$04 : STA.b $5D : RTS
