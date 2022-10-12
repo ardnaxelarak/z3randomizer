@@ -887,7 +887,7 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
         .end_forced_whirlpool
         STZ.w $0703
         CMP.b #$02 : BNE +
-            DEC : STA.w $0345
+            DEC : STA.w $0345 : STZ.w $0340
             LDA.b #$04 : BRA .set_state
         +
         CMP.b #$03 : BNE ++
@@ -908,7 +908,7 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
         LDA.b #$01 : STA.w $0345
         LDA.l FlippersEquipment : BEQ .no_flippers ; check if flippers obtained
         LDA.b $5D : CMP.b #$17 : BEQ .no_flippers ; check if bunny
-            LDA.b #$04 : STA.b $5D : RTS
+            LDA.b #$04 : STA.b $5D : STZ.w $0340 : RTS
         .no_flippers
             PHX
             INC : STA.w $0703
