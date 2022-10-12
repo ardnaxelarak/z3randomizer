@@ -61,7 +61,7 @@ RTL
 		LDA.b #$04 : RTL
 	++ CMP.b #$FE : BNE ++ ; Progressive Sword
 		LDA !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .skipswordlimit
-		LDA ProgressiveSwords
+		LDA HighestSword
 		CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
 			LDA.l ProgressiveSwordReplacement
 			JMP GetSpriteID
@@ -79,11 +79,11 @@ RTL
 		+
 	++ : CMP.b #$FF : BNE ++ ; Progressive Shield
 		LDA !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .skipshieldlimit
-		LDA ProgressiveShields
+		LDA HighestShield
 		CMP.l ProgressiveShieldLimit : !BLT + ; Progressive Shield Limit
 			LDA.l ProgressiveShieldReplacement
 			JMP GetSpriteID
-		.skipshieldlimit : LDA.l ProgressiveShields
+		.skipshieldlimit : LDA.l HighestShield
 		+ : CMP.b #$00 : BNE + ; No Shield
 			LDA.b #$2D : RTL
 		+ : CMP.b #$01 : BNE + ; Fighter Shield
@@ -200,7 +200,7 @@ GetSpritePalette:
 RTL
 	.specialHandling
 	CMP.b #$FD : BNE ++ ; Progressive Sword
-		LDA ProgressiveSwords
+		LDA HighestSword
 		CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
 			LDA.l ProgressiveSwordReplacement
 			JMP GetSpritePalette
@@ -213,7 +213,7 @@ RTL
 		+ ; Everything Else
 			LDA.b #$08 : RTL
 	++ : CMP.b #$FE : BNE ++ ; Progressive Shield
-		LDA ProgressiveShields
+		LDA HighestShield
 		CMP.l ProgressiveShieldLimit : !BLT + ; Progressive Shield Limit
 			LDA.l ProgressiveShieldReplacement
 			JMP GetSpritePalette
@@ -343,13 +343,13 @@ IsNarrowSprite:
 			+ : JMP .continue
 		.notBottle
 	CMP.b #$5E : BNE ++ ; Progressive Sword
-		LDA ProgressiveSwords : CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
+		LDA HighestSword : CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
 			LDA.l ProgressiveSwordReplacement
 			JSL.l IsNarrowSprite
 			JMP .done
 		+ : JMP .continue
 	++ CMP.b #$5F : BNE ++ ; Progressive Shield
-		LDA ProgressiveShields : BNE + : JMP .done ; No Shield
+		LDA HighestShield : BNE + : JMP .done ; No Shield
 		+ : CMP.l ProgressiveShieldLimit : !BLT .continue
 			LDA.l ProgressiveShieldReplacement
 			JSL.l IsNarrowSprite
