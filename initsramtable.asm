@@ -150,13 +150,13 @@ org $30B414 ; PC 0x183414-0x183416
 InitMapOverlay: dw $0000
 
 org $30B417 ; PC 0x183417
-InitProgressiveSwords: db $00
+InitHighestSword: db $00
 
 org $30B414 ; PC 0x183418-0x183419
 InitGoalCounter: dw $0000
 
 org $30B422 ; PC 0x183422
-InitProgressiveShields: db $00
+InitHighestShield: db $00
 
 org $30B428 ; PC 0x183428
 InitMapsCompasses: db $00
