@@ -107,7 +107,7 @@ org $0ABA99
 WorldMap_LoadDarkWorldMap:
 LDA.b $10 : CMP.b #$14 ; attract module
 BEQ .vanilla_light
-    LDA.l OWMode+1 : AND.b #$04 : BNE .mixed
+    LDA.l OWMode+1 : AND.b #!FLAG_OW_MIXED : BNE .mixed
         LDA.b $8A : AND.b #$40
         BEQ .vanilla_light
     .mixed
@@ -343,7 +343,7 @@ OWOldManSpeed:
 
 LoadMapDarkOrMixed:
 {
-    CMP.b #$04 : REP #$30 : BEQ .mixed
+    CMP.b #!FLAG_OW_MIXED : REP #$30 : BEQ .mixed
         LDX.w #$03FE ; draw vanilla Dark World (what we wrote over)
         .copy_next
             LDA.w $D739,X : STA.w $1000,X ; DB is $0A
@@ -400,7 +400,7 @@ OWBonkDrops:
 {
     CMP.b #$D8 : BEQ +
         RTL
-    + LDA.l OWFlags+1 : AND.b #$02 : BNE +
+    + LDA.l OWFlags+1 : AND.b #!FLAG_OW_CROSSED : BNE +
         JSL.l Sprite_TransmuteToBomb : RTL
     +
 
@@ -529,10 +529,10 @@ org $aa9000
 OWDetectEdgeTransition:
 {
     STZ.w $06FC
-    LDA.l OWMode : ORA.l OWMode+1 : BEQ .normal
+    LDA.l OWMode : ORA.l OWMode+1 : BEQ .vanilla
         JSR OWShuffle
         LDA.w $06FA : BMI .special
-    .normal
+    .vanilla
     REP #$31 : LDX.b $02 : LDA.b $84 ; what we wrote over
     RTL
     .special
@@ -586,9 +586,9 @@ OWDetectSpecialTransition:
 }
 OWEdgeTransition:
 {
-    LDA.l OWMode : ORA.l OWMode+1 : BEQ .normal
+    LDA.l OWMode : ORA.l OWMode+1 : BEQ .vanilla
     LDY.w $06FA : CPY.b #$7F
-    BEQ .normal
+    BEQ .vanilla
         REP #$10
         LDX.w $06F8
         PHB : PHK : PLB
@@ -596,7 +596,7 @@ OWEdgeTransition:
         PLB
         SEP #$30
         RTL
-    .normal
+    .vanilla
     LDA.l Overworld_ActualScreenID,X : ORA.l CurrentWorld ; what we wrote over
     RTL
 }
