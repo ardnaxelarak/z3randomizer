@@ -1,7 +1,7 @@
 ; ;Enemizer Flags
 EnemizerFlags:
 .randomize_bushes
-db #$00 ;408100 : 200100 ; Enable random enemy under bushes
+db #$00 ;368100 ; Enable random enemy under bushes
 .close_blind_door
 db #$00 ;408101 : 200101 ; Enable blind's door closing for other bosses
 .moldorm_eye_count
@@ -16,8 +16,9 @@ db #$00 ;408105 : 200105 ; toggle mimic code between new and old
 db #$00 ;408106 : 200106 ; toggle to turn on terrorpin ai "fix"
 .center_boss_drops
 db #$00 ;368107
+.killable_theives_id  ; must be set to C4 to make thieves killable...
+db #$B8 ;368108
 
-db #$00 ;408108 : 200108
 db #$00 ;408109 : 200109
 db #$00 ;40810A : 20010A
 db #$00 ;40810B : 20010B

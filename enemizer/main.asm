@@ -19,6 +19,7 @@ lorom
 !ENABLE_MIMIC_OVERRIDE = "$368105"
 ;!ENABLE_TERRORPIN_AI_FIX = "$368106" # moved to baserom already
 !CENTER_BOSS_DROP_FLAG = "$368107"
+!KILLABLE_THIEVES_ID = "$368108"
 
 ; Enemizer reserved memory
 ; $7F50B0 - $7F50BF - Downstream Reserved (Enemizer)
