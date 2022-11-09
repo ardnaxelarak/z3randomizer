@@ -2306,6 +2306,12 @@ AddReceivedItem_doneWithSoundEffects:
 org $05F030 ; <- 2F030 - display item
 JSL.l DrawHeartPieceGFX
 ;--------------------------------------------------------------------------------
+; moving LinkBusy check to later time to avoid a delay in HP movement
+org $05F037 ; (JSL CheckIfLinkIsBusy : BCS .exit)
+BRA + : NOP #4 : +  
+org $05F083
+JSL.l HeartPieceSpawnDelayFix
+;--------------------------------------------------------------------------------
 org $05F08A ; <- 2F08A - sprite_heart_upgrades.asm : 324 - (LDA $7EF36B : INC A : AND.b #$03 : STA $7EF36B : BNE .got_4_piecese) item determination
 JSL.l HeartPieceGet
 BCS $18 ; reinsert the near branch that appears midway through what we overrode
