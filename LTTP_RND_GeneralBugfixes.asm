@@ -563,6 +563,9 @@ Player_HaltDashAttackLong:
 org $07999D
 Link_ReceiveItem:
 
+org $079F82
+Link_UseHammer:
+
 org $07E68F
 Unknown_Method_0: ; In US version disassembly simply called "$3E6A6 IN ROM"
 
@@ -733,3 +736,7 @@ Sprite_GetEmptyBottleIndex: ; this is totally in sprite_bees.asm
 org $1EF4E7
 Sprite_PlayerCantPassThrough:
 ;================================================================================
+
+org $07FFF4
+Link_UseHammerLong:
+JSR Link_UseHammer : RTL

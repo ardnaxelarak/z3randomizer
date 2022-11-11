@@ -120,6 +120,7 @@ db #$00
 ; $04 = Somaria-Only mode
 ; $05 = Canes-Only mode
 ; $06 = Bee mode
+; $07 = Hammer on B (for use with swordless)
 ;--------------------------------------------------------------------------------
 org $308030 ; PC 0x180030
 EnableSRAMTrace:
