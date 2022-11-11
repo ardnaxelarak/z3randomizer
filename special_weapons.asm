@@ -445,6 +445,7 @@ BeeDamageClass:
 	db $0B, $0C, $0D, $0E, $0F
 	db $FF, $03, $FF, $FF, $FF
 	db $FF, $01, $01, $FF, $FF
+;--------------------------------------------------------------------------------
 CheckDetonateBomb:
 	LDA.l SpecialWeapons : CMP.b #$01 : BNE .not_bomb_mode
 .detonate_bombs
@@ -460,7 +461,14 @@ CheckDetonateBomb:
 	BPL .check_ancilla
 	BRA .done
 .not_bomb_mode
-	LDA.l SpecialWeapons : CMP.b #$06 : BNE .done
+	LDA.l SpecialWeapons : CMP.b #$06 : BEQ .release_bee
+	                       CMP.b #$07 : BNE .done
+	LDA.l HammerEquipment : BEQ .done
+	LDA.b $3A : ORA.b #$40 : STA.b $3A
+	LDA.b #$04 : STA.w $0304
+	JSL Link_UseHammerLong
+	BRA .done
+.release_bee
 	LDX.w $0202
 	LDA.l BeeDamageClass, X : CMP.b #$FF : BEQ .nope
 	JSL $1EDCC9
@@ -585,3 +593,13 @@ JSL LookupDamageLevel
 SEP #$10
 PLP : PLX
 RTS
+;--------------------------------------------------------------------------------
+NoSwingHammerB:
+LDA.l SpecialWeapons : CMP.b #$07 : BNE .normal
+LDA.l HammerEquipment : BEQ .normal
+SEC : RTL
+.normal ; what we wrote over
+INC.b $3C
+LDA.b $3C
+CMP.b #$09
+RTL
