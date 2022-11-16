@@ -216,13 +216,11 @@ AddReceivedItemExpandedGetItem:
 		LDA BowTracking : ORA #$40 : STA BowTracking ; mark silver bow on y-toggle
 		JMP .done
 	+ CMP.b #$4C : BNE + ; 50 bombs
-		;LDA.b #$07 : STA BombCapacityUpgrades ; upgrade bombs
-		LDA.b #50 : !SUB.l StartingMaxBombs : STA BombCapacityUpgrades ; upgrade bombs
+		LDA.b #50 : STA BombCapacity ; upgrade bombs
 		LDA.b #50 : STA BombsFiller ; fill bombs
 		JMP .done
 	+ CMP.b #$4D : BNE + ; 70 arrows
-		;LDA #$07 : STA ArrowCapacityUpgrades ; upgrade arrows
-		LDA.b #70 : !SUB.l StartingMaxArrows : STA ArrowCapacityUpgrades ; upgrade arrows
+		LDA.b #70 : STA ArrowCapacity ; upgrade arrows
 		LDA.b #70 : STA ArrowsFiller ; fill arrows
 		JMP .done
 	+ CMP.b #$4E : BNE + ; 1/2 magic
@@ -240,19 +238,19 @@ AddReceivedItemExpandedGetItem:
 		LDA.b #$02 : STA SwordEquipment ; set master sword
 		JMP .done
 	+ CMP.b #$51 : BNE + ; +5 Bombs
-		LDA BombCapacityUpgrades : !ADD.b #$05 : STA BombCapacityUpgrades ; upgrade bombs +5
+		LDA BombCapacity : !ADD.b #$05 : STA BombCapacity ; upgrade bombs +5
 		LDA.l Upgrade5BombsRefill : STA BombsFiller ; fill bombs
 		JMP .done
 	+ CMP.b #$52 : BNE + ; +10 Bombs
-		LDA BombCapacityUpgrades : !ADD.b #$0A : STA BombCapacityUpgrades ; upgrade bombs +10
+		LDA BombCapacity : !ADD.b #$0A : STA BombCapacity ; upgrade bombs +10
 		LDA.l Upgrade10BombsRefill : STA BombsFiller ; fill bombs
 		JMP .done
 	+ CMP.b #$53 : BNE + ; +5 Arrows
-		LDA ArrowCapacityUpgrades : !ADD.b #$05 : STA ArrowCapacityUpgrades ; upgrade arrows +5
+		LDA ArrowCapacity : !ADD.b #$05 : STA ArrowCapacity ; upgrade arrows +5
 		LDA.l Upgrade5ArrowsRefill : STA ArrowsFiller ; fill arrows
 		JMP .done
 	+ CMP.b #$54 : BNE + ; +10 Arrows
-		LDA ArrowCapacityUpgrades : !ADD.b #$0A : STA ArrowCapacityUpgrades ; upgrade arrows +10
+		LDA ArrowCapacity : !ADD.b #$0A : STA ArrowCapacity ; upgrade arrows +10
 		LDA.l Upgrade10ArrowsRefill : STA ArrowsFiller ; fill arrows
 		JMP .done
 	+ CMP.b #$55 : BNE + ; Programmable Object 1
@@ -474,7 +472,7 @@ AddReceivedItemExpanded:
 				LDA.b #$4F : STA $02D8
 			+++ : JMP .done
 		++ : CMP.b #$5E : BNE ++ ; Progressive Sword
-			LDA SwordEquipment : CMP.l ProgressiveSwordLimit : !BLT +
+			LDA HighestSword : CMP.l ProgressiveSwordLimit : !BLT +
 				LDA.l ProgressiveSwordReplacement : STA $02D8 : JMP .done
 			+ : CMP.b #$00 : BNE + ; No Sword
 				LDA.b #$49 : STA $02D8 : JMP .done
@@ -485,7 +483,7 @@ AddReceivedItemExpanded:
 			+ ; Everything Else
 				LDA.b #$03 : STA $02D8 : JMP .done
 		++ : CMP.b #$5F : BNE ++ ; Progressive Shield
-			LDA ShieldEquipment : CMP.l ProgressiveShieldLimit : !BLT +
+			LDA HighestShield : CMP.l ProgressiveShieldLimit : !BLT +
 				LDA.l ProgressiveShieldReplacement : STA $02D8 : JMP .done
 			+ : CMP.b #$00 : BNE + ; No Shield
 				LDA.b #$04 : STA $02D8 : JMP .done
@@ -494,7 +492,7 @@ AddReceivedItemExpanded:
 			+ ; Everything Else
 				LDA.b #$06 : STA $02D8 : JMP .done
 		++ : CMP.b #$60 : BNE ++ ; Progressive Armor
-			LDA ArmorEquipment : CMP.l ProgressiveArmorLimit : !BLT +
+			LDA HighestMail : CMP.l ProgressiveArmorLimit : !BLT +
 				LDA.l ProgressiveArmorReplacement : STA $02D8 : JMP .done
 			+ : CMP.b #$00 : BNE + ; No Armor
 				LDA.b #$22 : STA $02D8 : JMP .done

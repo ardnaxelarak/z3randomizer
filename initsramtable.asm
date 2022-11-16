@@ -15,6 +15,7 @@ fillword $0000 ; Zero out the table
 fill $500      ;
 
 org $30B000 ; PC 0x183000
+InitSRAMTable:
 InitRoomDataWRAM:
 org $30B060 ; PC 0x183060
 InitATAltarRoom: dw $0000 ; aga curtains
@@ -81,8 +82,8 @@ StartingHealth: db $18                  ; PC 0x18336C
 StartingMaximumHealth: db $18           ; PC 0x18336D
 StartingMagic: skip 1                   ; PC 0x18336E
 StartingSmallKeys: db $FF               ; PC 0x18336F
-StartingBombCapacityUpgrade: skip 1     ; PC 0x183370
-StartingArrowCapacityUpgrade: skip 1    ; PC 0x183371
+StartingBombCapacity: db $0A            ; PC 0x183370
+StartingArrowCapacity: db $1E           ; PC 0x183371
 InitHeartsFiller: skip 1                ; PC 0x183372
 InitMagicFiller: skip 1                 ; PC 0x183373
 StartingPendants: skip 1                ; PC 0x183374

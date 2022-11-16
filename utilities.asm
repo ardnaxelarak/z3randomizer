@@ -180,7 +180,7 @@ GetSpritePalette:
 	PHX
 	PHB : PHK : PLB
 	;--------
-	TAX : LDA.l .gfxPalettes, X ; look up item gfx
+	TAX : LDA.l GfxPalettes, X ; look up item gfx
 	PLB : PLX
 	CMP.b #$F6 : !BGE .specialHandling
 RTL
@@ -251,7 +251,7 @@ RTL
 
 ;DATA - Loot Identifier to Sprite Palette
 {
-	.gfxPalettes
+GfxPalettes:
 	db $00, $04, $02, $08, $04, $02, $08, $02
 	db $04, $02, $02, $02, $04, $04, $04, $08
 
