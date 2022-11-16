@@ -287,6 +287,7 @@ DrawPlayerFileShared:
 	+
 		; a sword value above 4 is either corrupted or 0xFF (a.k.a. swordless)
 		%fs_drawItemGray(3,26,FileSelectItems_fighters_sword)
+		BRA ++
 	.bombSword
 	LDA.l $70038F : AND.w #$00FF : BNE +
 		%fs_drawItemGray(3,26,FileSelectItems_fighters_bombs)
