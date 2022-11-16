@@ -220,6 +220,12 @@ MaybeMarkDigSpotCollected:
 	PLP : PLA
 RTL
 ;--------------------------------------------------------------------------------
+HeartPieceSpawnDelayFix:
+	; Fix the delay when spawning a HeartPiece sprite
+	JSL.l Sprite_CheckIfPlayerPreoccupied : BCS + ; what we moved from $05F037
+	JSL.l Sprite_CheckDamageToPlayerSameLayerLong : RTL ; what we wrote over
+	+ CLC : RTL
+;--------------------------------------------------------------------------------
 macro GetPossiblyEncryptedItem(ItemLabel,TableLabel)
 	LDA IsEncrypted : BNE ?encrypted
 		LDA.l <ItemLabel>
