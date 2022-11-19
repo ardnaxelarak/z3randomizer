@@ -2870,6 +2870,11 @@ NOP #48
 skip 11
 .bee_valid_target
 ;--------------------------------------------------------------------------------
+org $07F88C ; free rom from F877 - F88F; the starting part of this is used in quadrant glitch fix in overworld fork, however.
+Link_UseHammerLong:
+JSR Link_UseHammer : RTL
+warnpc $07F890
+;--------------------------------------------------------------------------------
 
 ;================================================================================
 ; Variable Ganon Vulnerability

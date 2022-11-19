@@ -736,7 +736,3 @@ Sprite_GetEmptyBottleIndex: ; this is totally in sprite_bees.asm
 org $1EF4E7
 Sprite_PlayerCantPassThrough:
 ;================================================================================
-
-org $07FFF4
-Link_UseHammerLong:
-JSR Link_UseHammer : RTL
