@@ -4,7 +4,7 @@
 %AddStat(BootsTime, 1, 0, 32, 4, !PEGASUS_BOOTS_X, !PEGASUS_BOOTS_Y)
 %AddStat(FluteTime, 1, 0, 32, 4, !FLUTE_X, !FLUTE_Y)
 %AddStat(MirrorTime, 1, 0, 32, 4, !MIRROR_X, !MIRROR_Y)
-%AddStat(SwordlessBossKills, 0, 4, 04, 2, !SWORDLESS_X, !SWORDLESS_Y)
+%AddStat(SwordlessBossKills, 0, 0, 04, 2, !SWORDLESS_X, !SWORDLESS_Y)
 %AddStat(SwordBossKills, 0, 4, 04, 2, !FIGHTERS_SWORD_X, !FIGHTERS_SWORD_Y)
 %AddStat(SwordBossKills, 0, 0, 04, 2, !MASTER_SWORD_X, !MASTER_SWORD_Y)
 %AddStat(SwordBossKills+1, 0, 4, 04, 2, !TEMPERED_SWORD_X, !TEMPERED_SWORD_Y)
