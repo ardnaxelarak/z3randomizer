@@ -1188,12 +1188,12 @@ RTL
 ;--------------------------------------------------------------------------------
 ; A = item id being collected
 ItemGetAlternateSFX:
-PEA $C567 ; SNES to RTS to in bank 08
-LDA.w $0C5E,X : CMP #$4A : BNE +
+PEA.w $C567 ; SNES to RTS to in bank 08
+LDA.w $0C5E,X : CMP.b #$4A : BNE +
 	; collecting pre-activated flute
-	LDA #$13 : JML $088007
+	LDA.b #$13 : JML $088007
 + ; normal itemget sfx
-LDA #$0F : JML $08800E ; what we wrote over
+LDA.b #$0F : JML $08800E ; what we wrote over
 
 ; A = item id being collected
 ItemGetOverworldAlternateSFX:

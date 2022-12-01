@@ -529,6 +529,9 @@ Dungeon_SaveRoomQuadrantData:
 org $02C176
 Overworld_FinalizeEntryOntoScreen_Data:
 
+org $02D9B9
+Underworld_LoadSpawnEntrance:
+
 org $02E99D
 FluteMenu_LoadTransport:
 

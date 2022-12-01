@@ -3,6 +3,9 @@ org $01E6B0
 	JSL RevealPotItem
 	RTS
 
+org $029C25
+	JSL SetTheSceneFix
+
 org $09C2BB
 	JSL ClearSpriteData
 
@@ -76,6 +79,10 @@ org $0db818
 Sprite_LoadProperties:
 org $06D038
 KeyRoomFlagMasks:
+org $00FDEE
+InitializeMirrorHDMA:
+org $00E3C4
+LoadCommonSprites_long:
 
 ; defines
 ; Ram usage
@@ -591,6 +598,10 @@ CheckIfPotIsSpecial:
 	.specialpot ; zero flag already set, so gtg
 RTL
 
+SetTheSceneFix:
+	JSL InitializeMirrorHDMA
+	JSL LoadCommonSprites_long
+RTL
 
 incsrc dynamic_si_vram.asm
 
