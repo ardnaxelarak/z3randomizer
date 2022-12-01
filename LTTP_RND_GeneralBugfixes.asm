@@ -519,6 +519,9 @@ Dungeon_SaveRoomData_justKeys:
 org $02B861
 Dungeon_SaveRoomQuadrantData:
 
+org $02D9B9
+Underworld_LoadSpawnEntrance:
+
 org $02FD8A ; 17D8A - Bank0E.asm: 3732 Note: Different bank
 LoadGearPalettes_bunny:
 

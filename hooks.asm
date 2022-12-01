@@ -1036,6 +1036,11 @@ NOP
 org $07B57D ; 3B57D - Bank07.asm:8527 (LDA Link_ReceiveItemAlternates, Y : STA $03)
 JSL.l Link_ReceiveItemAlternatesExpanded_loadAlternate
 NOP
+
+org $08C563
+JML ItemGetAlternateSFX : NOP
+org $0988A5
+JSL ItemGetOverworldAlternateSFX : NOP #5
 ;--------------------------------------------------------------------------------
 org $09892E ; 4892E - ancilla_init.asm:1307 (LDA BottleList, X)
 LDA.w BottleListExpanded, X
@@ -2439,6 +2444,9 @@ NOP #6 ; remove check
 org $068841 ; <- 30841 - sprite_prep.asm:269 (LDA $0D00, X : ADD.b #$03 : STA $0D00, X)
 JSL.l Mantle_CorrectPosition : NOP #2
 ;--------------------------------------------------------------------------------
+org $0297FD ; <- bank02 : Module07_19_MirrorFade (STZ.b $11 : STZ.b $14)
+JSL MirrorScrollSpawnZelda
+;--------------------------------------------------------------------------------
 org $0DFA53 ; <- 6FA53 - hud check for lantern
 JSL.l LampCheck
 ;--------------------------------------------------------------------------------
@@ -2894,3 +2902,18 @@ if !FEATURE_NEW_TEXT
     org $0EF285
         JSL RenderCharSetColorExtended_close : NOP
 endif
+;--------------------------------------------------------------------------------
+; Back of tavern fixes
+;--------------------------------------------------------------------------------
+org $028177 ; JSL Underworld_LoadCustomTileAttributes
+JSL TurnAroundOnUnderworld
+
+org $02ABC1 ; JSL Link_HandleMovingAnimation_FullLongEntry
+JSL TurnUpOnOverworld
+
+org $02E297 ; LDA.w #$0002 : STA.b $2F
+JSL WalkUpOnOverworld
+NOP
+
+org $02D7D2 ; BEQ .face_up
+NOP #2 ; this fixes Link's direction after mirroring and falling after entering through back of tavern

@@ -1183,3 +1183,21 @@ RTL
 
 }
 ;--------------------------------------------------------------------------------
+; A = item id being collected
+ItemGetAlternateSFX:
+PEA.w $C567 ; SNES to RTS to in bank 08
+LDA.w $0C5E,X : CMP.b #$4A : BNE +
+	; collecting pre-activated flute
+	LDA.b #$13 : JML $088007
++ ; normal itemget sfx
+LDA.b #$0F : JML $08800E ; what we wrote over
+
+; A = item id being collected
+ItemGetOverworldAlternateSFX:
+CMP.b #$4A : BNE +
+	JSL Sound_SetSfxPanWithPlayerCoords : ORA.b #$13 : STA.w $012E
+	RTL
++ ; normal itemget sfx
+JSL Sound_SetSfxPanWithPlayerCoords : ORA.b #$0F : STA.w $012F ; what we wrote over
+RTL
+;--------------------------------------------------------------------------------
