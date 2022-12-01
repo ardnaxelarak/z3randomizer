@@ -165,3 +165,7 @@ BigKeyDoorCheck:
 		 PLA : PEA.w RoomDraw_OneSidedShutters_South_onesided_shutter_or_big_key_door-1
 + LDA.w #$0000 : RTL
 
+ClearDoorState:
+	STZ.b $6C
+	LDA.b #$82 : STA.b $99 ; what was wrote over
+RTL
