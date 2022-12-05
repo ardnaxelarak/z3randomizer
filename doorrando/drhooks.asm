@@ -214,6 +214,3 @@ jsl CheckIfDoorsOpen
 bcs .normal
 rts
 .normal
-
-org $0282D1 ; Module08_00_LoadProperties
-JSL ClearDoorState

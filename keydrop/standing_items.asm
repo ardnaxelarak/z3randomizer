@@ -599,6 +599,7 @@ CheckIfPotIsSpecial:
 RTL
 
 SetTheSceneFix:
+	STZ.b $6C
 	JSL InitializeMirrorHDMA
 	JSL LoadCommonSprites_long
 RTL
