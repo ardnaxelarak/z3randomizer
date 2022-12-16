@@ -123,7 +123,7 @@ RainPrevention:
 	PHA
 		LDA ProgressIndicator : AND #$00FF : CMP #$0002 : !BGE .done ; only in rain states (0 or 1)
 		LDA.l ProgressFlags : AND #$0004 : BNE .done ; zelda's been rescued
-			LDA.l BlockSanctuaryDoorInRain : BEQ .done ;flagged
+			LDA.l BlockSanctuaryDoorInRain : BEQ + ;flagged
 			LDA $A0 : CMP #$0012 : BNE + ;we're in the sanctuary
 				LDA.l FollowerIndicator : AND #$00FF : CMP #$0001 : BEQ .done ; zelda is following
 					LDA $00 : AND #$00FF : CMP #$00A1 : BNE .done ; position is a1
@@ -165,4 +165,3 @@ BigKeyDoorCheck:
 	LDA.l DRFlags : AND #$0400 : BNE + ; skip if the flag is set - bk doors can be double-sided
 		 PLA : PEA.w RoomDraw_OneSidedShutters_South_onesided_shutter_or_big_key_door-1
 + LDA.w #$0000 : RTL
-
