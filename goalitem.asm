@@ -100,6 +100,7 @@ CheckGanonVulnerability:
 .bosses_only
 	JMP CheckForCrystalBossesDefeated
 
+; 0a = Check Item counter
 .completionist
 		REP #$20
 	LDA.l TotalItemCounter : CMP.l MaxItemCounter
