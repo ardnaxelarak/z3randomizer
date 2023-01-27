@@ -1,27 +1,3 @@
-;================================================================================
-; Lamp Mantle & Light Cone Fix
-;--------------------------------------------------------------------------------
-; Output: 0 for darkness, 1 for lamp cone
-;--------------------------------------------------------------------------------
-LampCheckOverride:
-	LDA $7F50C4 : CMP.b #$01 : BNE + : RTL : +
-				  CMP.b #$FF : BNE + : INC : RTL : +
-
-	LDA LampEquipment : BNE .done ; skip if we already have lantern
-
-	LDA CurrentWorld : BNE +
-		.lightWorld
-		LDA $040C : CMP.b #$04 : !BGE ++ ; check if we're in HC
-			LDA LampConeSewers : BRA .done
-		++
-			LDA LampConeLightWorld : BRA .done
-	+
-		.darkWorld
-		LDA LampConeDarkWorld
-	.done
-	;BNE + : STZ $1D : + ; remember to turn cone off after a torch
-RTL
-
 GtBossHeartCheckOverride:
     lda $a0 : cmp #$1c : beq ++
     cmp #$6c : beq ++

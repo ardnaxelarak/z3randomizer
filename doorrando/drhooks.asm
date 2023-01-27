@@ -110,8 +110,6 @@ org $9bece4
 Palette_SpriteAux1:
 
 
-org $8DFA53
-jsl LampCheckOverride
 org $828046 ; <- 10046 - Bank02.asm : 217 (JSL EnableForceBlank) (Start of Module_LoadFile)
 jsl OnFileLoadOverride
 org $87A93F  ; < 3A93F - Bank07.asm 6548 (LDA $8A : AND.b #$40 - Mirror checks)
