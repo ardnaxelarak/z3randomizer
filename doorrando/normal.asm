@@ -296,6 +296,7 @@ StraightStairsAdj:
             stz $046d
         .noScroll
         jsr GetTileAttribute : tax
+        jsl HandleIncomingDoorState
         lda $11 : cmp #$12 : beq .goingNorth
             lda $a2 : cmp #$51 : bne ++
                 rep #$20 : lda #$0018 : !add $20 : sta $20 : sep #$20 ; special fix for throne room
@@ -324,7 +325,7 @@ GetTileAttribute:
 {
     phk : pea.w .jslrtsreturn-1
     pea.w $02802c
-    jml $02c11d ; mucks with x/y sets a to Tile Attribute, I think
+    jml CalculateTransitionLanding ; mucks with x/y sets a to Tile Attribute, I think
     .jslrtsreturn
     rts
 }
@@ -416,4 +417,25 @@ InroomStairsTrapDoor:
     pla : pla : pla
     jsl StraightStairsTrapDoor_reset
     jml $028b15 ; just some RTS in bank 02
+}
+
+HandleSpecialDoorLanding: {
+    LDA.l $7F2000,X ; what we wrote over
+    SEP #$30
+    CMP #$34 : bne + ; inroom stairs
+        PHA : LDA #$26 : STA $045E : PLA
+    +
+}
+
+; Y = tiletype, also written to $4E
+HandleIncomingDoorState:
+{
+    PHA
+    LDA.l DRMode : BEQ .noDoor
+    CPY.b #$01 : !bge .noDoor
+        LDA.w $0418 : AND.b #$02 : BNE + : INC
+        + STA.b $6C
+    .noDoor
+    STY.b $4E : TYA ; what we wrote over
+    PLY : RTL
 }

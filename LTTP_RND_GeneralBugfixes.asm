@@ -526,6 +526,9 @@ Overworld_ActualScreenID:
 org $02B861
 Dungeon_SaveRoomQuadrantData:
 
+org $02C11D
+CalculateTransitionLanding:
+
 org $02C176
 Overworld_FinalizeEntryOntoScreen_Data:
 
@@ -693,6 +696,9 @@ OverworldMap_DarkWorldTilemap:
 
 org $0ABAB9
 OverworldMap_LoadSprGfx:
+
+org $8AE817
+DungeonMapBossRooms:
 
 org $0CD7D1
 NameFile_MakeScreenVisible:
