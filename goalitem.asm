@@ -46,6 +46,7 @@ CheckGanonVulnerability:
 	dw .crystals_and_bosses
 	dw .bosses_only
 	dw .all_dungeons_no_agahnim
+	dw .completionist
 
 ; 00 = always vulnerable
 .vulnerable
@@ -98,6 +99,15 @@ CheckGanonVulnerability:
 ; 08 = Crystal bosses but no crystals
 .bosses_only
 	JMP CheckForCrystalBossesDefeated
+
+; 0a = Check Item counter
+.completionist
+		REP #$20
+	LDA.l TotalItemCounter : CMP.l MaxItemCounter
+		SEP #$20
+	BCC .fail
+BRA .all_dungeons
+
 
 ;--------------------------------------------------------------------------------
 GetRequiredCrystalsForTower:

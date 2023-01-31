@@ -995,6 +995,11 @@ dw #$0000, #$0000
 org $09E3BB ; PC 0x4E3BB
 db $E4 ; Hera Basement Key (Set to programmable HP $EB) (set to $E4 for original hookable/boomable key behavior)
 ;================================================================================
+org $02D7D0 ; PC 0x157D0
+EntranceTavernBack:
+dw $0043 ; Overworld door that leads to back of tavern (update this when this entrance is shuffled)
+; Note: If shuffled, the overworld door on the north side of the tavern is expected to have a Y coordinate of $091B in the exit data (table at $02DDB5)
+;================================================================================
 org $308210 ; PC 0x180210
 RandomizerSeedType:
 db #$00 ; #$00 = Casual (default) - #$01 = Glitched - #$02 = Speedrunner - #$A0 = Super Metroid Combo - #$FF = Not Randomizer
@@ -1944,3 +1949,7 @@ db $08, $08, $06, $06, $02, $0A, $0E, $08, $08, $08, $06, $08, $0C, $1B, $00, $0
 ;--------------------------------------------------------------------------------
 ; 0x187010 - 187FFF (unused)
 ;--------------------------------------------------------------------------------
+org $30F010
+MaxItemCounter:
+dw $00D8  ; 216 default
+

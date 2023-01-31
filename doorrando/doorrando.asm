@@ -17,10 +17,24 @@
 incsrc drhooks.asm
 
 ;Main Code
-org $278000 ;138000
+org $A78000 ;138000
 db $44, $52 ;DR
 DRMode:
 dw 0
+; xxpg rmse
+; xxxx xBDM
+; x - unused
+
+; p - use the original palette for the dungeon rooms instead of the DR table
+; g - fix the EG glitch in more places (should be off for no logic)
+; r - The collection rate flag
+; m - Whether to display keys Map Info
+; s - Start with Mirror Scroll
+; e - GT minibosses marked as defeated instead of spawning heart container in all dungeons
+
+; B - Big Key doors can displayed and be opened on the "south" side in addition
+; D - Enabled spawning as a bunny in the Dark World underworld
+; M - hides the total number in the collection rate
 DRFlags:
 dw 0
 DRScroll:
@@ -38,7 +52,7 @@ incsrc edges.asm
 incsrc math.asm
 incsrc hudadditions.asm
 incsrc dr_lobby.asm
-warnpc $279C00
+warnpc $A79C00
 
 incsrc doortables.asm
-warnpc $288000
+warnpc $A88000

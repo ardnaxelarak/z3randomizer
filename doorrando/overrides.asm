@@ -1,27 +1,3 @@
-;================================================================================
-; Lamp Mantle & Light Cone Fix
-;--------------------------------------------------------------------------------
-; Output: 0 for darkness, 1 for lamp cone
-;--------------------------------------------------------------------------------
-LampCheckOverride:
-	LDA $7F50C4 : CMP.b #$01 : BNE + : RTL : +
-				  CMP.b #$FF : BNE + : INC : RTL : +
-
-	LDA LampEquipment : BNE .done ; skip if we already have lantern
-
-	LDA CurrentWorld : BNE +
-		.lightWorld
-		LDA $040C : CMP.b #$04 : !BGE ++ ; check if we're in HC
-			LDA LampConeSewers : BRA .done
-		++
-			LDA LampConeLightWorld : BRA .done
-	+
-		.darkWorld
-		LDA LampConeDarkWorld
-	.done
-	;BNE + : STZ $1D : + ; remember to turn cone off after a torch
-RTL
-
 GtBossHeartCheckOverride:
     lda $a0 : cmp #$1c : beq ++
     cmp #$6c : beq ++
@@ -123,7 +99,7 @@ RainPrevention:
 	PHA
 		LDA ProgressIndicator : AND #$00FF : CMP #$0002 : !BGE .done ; only in rain states (0 or 1)
 		LDA.l ProgressFlags : AND #$0004 : BNE .done ; zelda's been rescued
-			LDA.l BlockSanctuaryDoorInRain : BEQ .done ;flagged
+			LDA.l BlockSanctuaryDoorInRain : BEQ + ;flagged
 			LDA $A0 : CMP #$0012 : BNE + ;we're in the sanctuary
 				LDA.l FollowerIndicator : AND #$00FF : CMP #$0001 : BEQ .done ; zelda is following
 					LDA $00 : AND #$00FF : CMP #$00A1 : BNE .done ; position is a1
@@ -160,3 +136,8 @@ BlindZeldaDespawnFix:
 	+ PLA : PLA : PEA.w SpritePrep_BlindMaiden_kill_the_girl-1 : RTL
 
 
+BigKeyDoorCheck:
+	CPY.w #$001E : BNE + ; skip if it isn't a BK door
+	LDA.l DRFlags : AND #$0400 : BNE + ; skip if the flag is set - bk doors can be double-sided
+		 PLA : PEA.w RoomDraw_OneSidedShutters_South_onesided_shutter_or_big_key_door-1
++ LDA.w #$0000 : RTL

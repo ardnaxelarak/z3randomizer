@@ -1,81 +1,88 @@
 ; hooks
-org $01E6B0
+org $81E6B0
 	JSL RevealPotItem
 	RTS
 
-org $09C2BB
+org $829C25
+	JSL SetTheSceneFix
+
+org $89C2BB
 	JSL ClearSpriteData
 
-org $09C327
+org $89C327
 	JSL LoadSpriteData
 
-org $06F976
+org $86F976
 	JSL RevealSpriteDrop : NOP
 
-org $06E3C4
+org $86E3C4
 	JSL RevealSpriteDrop2 : NOP
 
-org $06926e ; <- 3126e - sprite_prep.asm : 2664 (LDA $0B9B : STA $0CBA, X)
+org $86926e ; <- 3126e - sprite_prep.asm : 2664 (LDA $0B9B : STA $0CBA, X)
 	JSL SpriteKeyPrep : NOP #2
 
-org $06d049 ; <- 35049 sprite_absorbable : 31-32 (JSL Sprite_DrawRippleIfInWater : JSR Sprite_DrawAbsorbable)
+org $86d049 ; <- 35049 sprite_absorbable : 31-32 (JSL Sprite_DrawRippleIfInWater : JSR Sprite_DrawAbsorbable)
 	JSL SpriteKeyDrawGFX : BRA + : NOP : +
 
-org $06d03d
+org $86d03d
 	JSL ShouldSpawnItem : NOP #2
 
-org $06D19F
+org $86D19F
 	JSL MarkSRAMForItem : NOP #2
 
-org $06d180
+org $86d180
 	JSL BigKeyGet : BCS $07 : NOP #5
 
-org $06d18d ; <- 3518D - sprite_absorbable.asm : 274 (LDA $7EF36F : INC A : STA $7EF36F)
+org $86d18d ; <- 3518D - sprite_absorbable.asm : 274 (LDA $7EF36F : INC A : STA $7EF36F)
 	JSL KeyGet
 
-org $06f9f3 ; bank06.asm : 6732 (JSL Sprite_LoadProperties)
+org $86f9f3 ; bank06.asm : 6732 (JSL Sprite_LoadProperties)
 	JSL LoadProperties_PreserveCertainProps
 
-org $008BAA ; NMI hook
+org $808BAA ; NMI hook
 	JSL TransferPotGFX
 
-org $06828A
+org $86828A
 	JSL CheckSprite_Spawn
 
-org $07B169
+org $87B169
 	JSL PreventPotSpawn : NOP
 
-org $07B17D
+org $87B17D
 	JSL PreventPotSpawn2
 
-org $068275
+org $868275
 	JSL SubstitionFlow
 
-org $00A9DC
+org $80A9DC
 dw $1928, $1938, $5928, $5938 ; change weird ugly black diagonal pot to blue-ish pot
 
-org $018650
+org $818650
 dw $B395 ; change tile type to normal pot
 
-org $01B3D5
+org $81B3D5
 JSL CheckIfPotIsSpecial
 
 
 ; refs to other functions
-org $0681F4
+org $8681F4
 Sprite_SpawnSecret_pool_ID:
-org $068283
+org $868283
 Sprite_SpawnSecret_NotRandomBush:
-org $06828A
+org $86828A
 Sprite_SpawnSecret_SpriteSpawnDynamically:
-org $06d23a
+org $86d23a
 Sprite_DrawAbsorbable:
-org $1eff81
+org $9eff81
 Sprite_DrawRippleIfInWater:
-org $0db818
+org $8db818
 Sprite_LoadProperties:
-org $06D038
+org $86D038
 KeyRoomFlagMasks:
+org $80FDEE
+InitializeMirrorHDMA:
+org $80E3C4
+LoadCommonSprites_long:
 
 ; defines
 ; Ram usage
@@ -591,6 +598,11 @@ CheckIfPotIsSpecial:
 	.specialpot ; zero flag already set, so gtg
 RTL
 
+SetTheSceneFix:
+	STZ.b $6C
+	JSL InitializeMirrorHDMA
+	JSL LoadCommonSprites_long
+RTL
 
 incsrc dynamic_si_vram.asm
 
