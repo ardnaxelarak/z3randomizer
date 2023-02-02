@@ -56,11 +56,6 @@ org $828b54 ; <- Bank02.asm : 2200 (JSL UseImplicitRegIndexedLocalJumpTable)
 jsl InroomStairsTrapDoor
 org $82c146
 jsl HandleSpecialDoorLanding
-org $82c23a
-HandleIncomingDoorStateLocal:
-jsl HandleIncomingDoorState : rts
-org $82c172
-jsr HandleIncomingDoorStateLocal
 
 org $8289a0 ; JSL $0091C4
 jsl QuadrantLoadOrderBeforeScroll
