@@ -179,6 +179,8 @@ JSL RainPrevention : BCC + : RTS : NOP : +
 org $9edabf ; <- sprite_energy_ball.asm : 86-7 Sprite_EnergyBall (LDA.b #$10 : LDX.b #$00)
 JSL StandardAgaDmg
 
+org $89F7B2 ; 09F7B2 Module17_01 S&Q
+JSL StandardSaveAndQuit
 
 org $89a681 ; < - similar to talalong.asm : 1157 (JSL Main_ShowTextMessage)
 JSL BlindsAtticHint : NOP #2

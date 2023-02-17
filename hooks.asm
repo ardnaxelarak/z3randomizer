@@ -188,6 +188,9 @@ db Password_Tilemap>>16
 org $0CD527 ; <- 65527 : Bank0C.asm : 2913 (LDA.w #$0004 : STA $02) [LDA.w #$0006 : STA $02]
 JSL.l DrawPlayerFile : NOP ; hijack hearts draw routine to draw a full inventory
 
+; Random incredible patch that I should add right now - File Select Fairy
+org $1BF029+1 : db $10
+
 org $0ccdd5 ; Bank0C.asm:1881 (LDX.w #$00FD)
 JSL.l AltBufferTable : NOP #8 ; Selection screen
 org $0cd393 ; Bank0c.asm:2674 (LDX.w #$00FD)

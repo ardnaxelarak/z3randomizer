@@ -120,6 +120,14 @@ StandardAgaDmg:
 		LDA.b #$10 ; hurt him!
 	+ RTL ; A is zero if the AND results in zero and then Agahnim's invincible!
 
+StandardSaveAndQuit:
+	LDA.b #$0F : STA.b $95 ; what we wrote over
+	LDA.l ProgressFlags : AND #$04 : BNE +
+	LDA.l DRMode : BEQ +
+	LDA.l StartingEntrance : CMP.b #$02 : BCC +
+		LDA.b #$03 : STA.l StartingEntrance  ; set spawn to uncle if >=
++ RTL
+
 ; note: this skips both maiden dialog triggers if the hole is open
 BlindsAtticHint:
 	REP #$20
