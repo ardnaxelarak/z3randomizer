@@ -421,23 +421,20 @@ InroomStairsTrapDoor:
 HandleSpecialDoorLanding: {
     LDA.l $7F2000,X ; what we wrote over
     SEP #$30
-    JSL HandleIncomingDoorState
+    ; A = tiletype
+    HandleIncomingDoorState:
+    PHA
+        LDA.l DRMode : BEQ .noDoor
+        PLA : PHA : AND.b #$FA : CMP.b #$80 : bne .noDoor
+
+        .setDoorState
+        LDA.w $0418 : AND.b #$02 : BNE + : INC
+        + STA.b $6C
+
+        .noDoor
+	PLA
     CMP #$34 : bne + ; inroom stairs
         PHA : LDA #$26 : STA $045E : PLA
     +
-}
-
-; A = tiletype
-HandleIncomingDoorState:
-{
-    PHA
-    LDA.l DRMode : BEQ .noDoor
-    PLA : PHA : AND.b #$FA : CMP.b #$80 : bne .noDoor
-    
-    .setDoorState
-    LDA.w $0418 : AND.b #$02 : BNE + : INC
-    + STA.b $6C
-
-    .noDoor
-    PLA : RTL
+RTL
 }
