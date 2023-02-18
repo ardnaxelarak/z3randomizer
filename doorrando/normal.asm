@@ -422,9 +422,9 @@ HandleSpecialDoorLanding: {
     LDA.l $7F2000,X ; what we wrote over
     SEP #$30
     JSL HandleIncomingDoorState
-    CMP #$34 : bne + ; inroom stairs
+    CMP #$34 : BNE + ; inroom stairs
         PHA : LDA #$26 : STA $045E : PLA
-    +
+    + RTL
 }
 
 ; A = tiletype
