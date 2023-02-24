@@ -52,6 +52,7 @@ incsrc edges.asm
 incsrc math.asm
 incsrc hudadditions.asm
 incsrc dr_lobby.asm
+incsrc entrance_fixes.asm
 warnpc $A79C00
 
 incsrc doortables.asm

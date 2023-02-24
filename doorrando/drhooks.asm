@@ -44,8 +44,6 @@ org $8293d1 ; <- 113d1 - Bank02.asm : 3683 (ADD $20 : STA $20 BRANCH_IOTA)
 jsl StraightStairsFix : nop
 org $829396 ; <- 11396 - Bank02.asm : 3641 (LDA $01C322, X)
 jsl StraightStairLayerFix
-org $82c06d ; <- Bank02.asm : 9874 (LDX $0418, CMP.b #$02)
-jsl DoorToStraight : nop
 org $82c092 ; STA $0020, Y : LDX #$00
 jsl DoorToInroom : nop
 org $82c0f8 ; CMP $02C034, X
@@ -175,9 +173,6 @@ JSL RetrieveBunnyState : NOP
 org $82d9ce ; <- Bank02.asm : Dungeon_LoadEntrance 10829 (STA $A0 : STA $048E)
 JSL CheckDarkWorldSpawn : NOP
 
-org $81891e ; <- Bank 01.asm : 991 Dungeon_LoadType2Object (LDA $00 : XBA : AND.w #$00FF)
-JSL RainPrevention : BCC + : RTS : NOP : +
-
 org $9edabf ; <- sprite_energy_ball.asm : 86-7 Sprite_EnergyBall (LDA.b #$10 : LDX.b #$00)
 JSL StandardAgaDmg
 
@@ -216,3 +211,10 @@ jsl CheckIfDoorsOpen
 bcs .normal
 rts
 .normal
+
+; fixes an issue with edges -> normal doors (bombable, dashable, keydoor)
+org $82C06A
+JSL TransitionCalculateLanding_Fix : NOP #2
+
+org $82C157
+JSL AlwaysPushThroughFDoors

@@ -364,7 +364,8 @@ DoorToStraight:
         lda $a0 : cmp #$51 : bne .skip
         lda #$04 : sta $4e
     .skip pla
-    .end ldx $0418 : cmp #$02 ;what we wrote over
+    ; the ldx $0418 is now taken care of by TransitionCalculateLanding_Fix
+    .end cmp #$02 ;what we wrote over
     rtl
 }
 
@@ -421,23 +422,19 @@ InroomStairsTrapDoor:
 HandleSpecialDoorLanding: {
     LDA.l $7F2000,X ; what we wrote over
     SEP #$30
-    JSL HandleIncomingDoorState
-    CMP #$34 : BNE + ; inroom stairs
+    ; A = tiletype
+    HandleIncomingDoorState:
+    PHA
+        LDA.l DRMode : BEQ .noDoor
+        PLA : PHA : AND.b #$FA : CMP.b #$80 : bne .noDoor
+
+        .setDoorState
+        LDA.w $0418 : AND.b #$02 : BNE + : INC
+        + STA.b $6C
+
+        .noDoor
+	PLA
+    CMP #$34 : bne + ; inroom stairs
         PHA : LDA #$26 : STA $045E : PLA
     + RTL
-}
-
-; A = tiletype
-HandleIncomingDoorState:
-{
-    PHA
-    LDA.l DRMode : BEQ .noDoor
-    PLA : PHA : AND.b #$FA : CMP.b #$80 : bne .noDoor
-    
-    .setDoorState
-    LDA.w $0418 : AND.b #$02 : BNE + : INC
-    + STA.b $6C
-
-    .noDoor
-    PLA : RTL
 }
