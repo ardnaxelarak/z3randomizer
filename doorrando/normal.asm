@@ -364,7 +364,8 @@ DoorToStraight:
         lda $a0 : cmp #$51 : bne .skip
         lda #$04 : sta $4e
     .skip pla
-    .end ldx $0418 : cmp #$02 ;what we wrote over
+    ; the ldx $0418 is now taken care of by TransitionCalculateLanding_Fix
+    .end cmp #$02 ;what we wrote over
     rtl
 }
 

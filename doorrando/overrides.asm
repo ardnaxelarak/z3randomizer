@@ -93,26 +93,6 @@ RetrieveBunnyState:
 		STA $5D
 + RTL
 
-RainPrevention:
-	LDA $00 : XBA : AND #$00FF : STA.b $0A ; what we wrote over
-	PHA
-		LDA ProgressIndicator : AND #$00FF : CMP #$0002 : !BGE .done ; only in rain states (0 or 1)
-		LDA.l ProgressFlags : AND #$0004 : BNE .done ; zelda's been rescued
-			LDA.l BlockSanctuaryDoorInRain : BEQ + ;flagged
-			LDA $A0 : CMP #$0012 : BNE + ;we're in the sanctuary
-				LDA.l FollowerIndicator : AND #$00FF : CMP #$0001 : BEQ .done ; zelda is following
-					LDA $00 : AND #$00FF : CMP #$00A1 : BNE .done ; position is a1
-						PLA : LDA #$0008 : RTL
-			+ LDA.l BlockCastleDoorsInRain : AND #$00FF : BEQ .done ;flagged
-			LDX #$FFFE
-			- INX #2 : LDA.l RemoveRainDoorsRoom, X : CMP #$FFFF : BEQ .done
-			CMP $A0 : BNE -
-				SEP #$20 : LDA.l RainDoorMatch, X : CMP $00 : BNE .continue
-					INC.w $0460 : INC.w $0460 : REP #$20 : PLA : SEC : RTL
-				.continue
-				REP #$20 : BRA -
-	.done PLA : CLC : RTL
-
 ; A should be how much dmg to do to Aga when leaving this function
 StandardAgaDmg:
 	LDX.b #$00 ; part of what we wrote over

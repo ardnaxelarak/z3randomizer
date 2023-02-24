@@ -1,4 +1,9 @@
+; defines
+; Ram usage
+EdgeToNormalFlag = $7E1200
+
 HorzEdge:
+	LDA.b #$00 : STA.l EdgeToNormalFlag
     cpy #$ff : beq +
         jsr DetectWestEdge : ldy #$02 : bra ++
     + jsr DetectEastEdge
@@ -13,6 +18,7 @@ HorzEdge:
     + clc : rts
 
 VertEdge:
+	LDA.b #$00 : STA.l EdgeToNormalFlag
     cpy #$ff : beq +
         jsr DetectNorthEdge : bra ++
     + jsr DetectSouthEdge
@@ -56,6 +62,7 @@ LoadEdgeRoomVert:
     lda $04 : and #$80 : bne .edge
     lda $04 : sta $01 ; load up flags in $01
     and #$03 : cmp #$03 : beq .inroom
+    LDA.b #$01 : STA.l EdgeToNormalFlag
     ldy #$01 : jsr ShiftVariablesMainDir
     jsr PrepScrollToNormal
     bra .scroll
@@ -296,4 +303,23 @@ DetectEastEdge:
     .end txa : rts
 
 
+TransitionCalculateLanding_Fix:
+	LDA.l EdgeToNormalFlag : BEQ +
+	LDX.w $0418 : CPX.b #$01 : BNE +
+		LDA.b $20 : SBC #$08 : STA.b $20
+	+ PHK : PEA.w .jslrtsreturn-1
+	PEA.w $02802C
+    JML CalculateTransitionLanding
+    .jslrtsreturn
+    LDX.w $0418 : CPX.b #$01 : BNE .zero  ; the LDX is vanilla and needs to always run
+    LDA.l EdgeToNormalFlag : BEQ +
+    	LDA.b $20 : ADC #$08 : STA.b $20
+    .zero LDA.b #$00 : STA.l EdgeToNormalFlag
+    + JSL DoorToStraight
+RTL
 
+AlwaysPushThroughFDoors:
+	PHA : AND.b #$F0 : CMP.b #$F0 : BNE +
+		PLA : RTL
+	+ PLA : AND.b #$8E : CMP.b #$80
+	RTL
