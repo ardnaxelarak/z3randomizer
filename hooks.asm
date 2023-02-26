@@ -1299,6 +1299,9 @@ org $08D395 ; <- 45395 - ancilla_bird_travel_intro.asm : 253
 JSL.l UpgradeFlute
 NOP #2
 ;--------------------------------------------------------------------------------
+org $07A408 ; LDA.l $7EF34C
+JSL.l FluteCallForDuck
+;--------------------------------------------------------------------------------
 org $05E4D7 ; <- 2E4D7 - sprite_witch.asm : 213
 JSL.l RemoveMushroom
 NOP #2
