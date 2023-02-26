@@ -337,9 +337,9 @@ AddInventory:
 			LDA PreMirrorLocations : INC : STA PreMirrorLocations ; Increment Pre Mirror Counter
 			SEP #$20
 		+
-		LDA FluteEquipment : BNE + ; Check for Mirror
+		LDA FluteEquipment : BNE + ; Check for Flute
 			REP #$20
-			LDA PreFluteLocations : INC : STA PreFluteLocations ; Increment Pre Mirror Counter
+			LDA PreFluteLocations : INC : STA PreFluteLocations ; Increment Pre Flute Counter
 			SEP #$20
 		+
 		REP #$20
