@@ -217,8 +217,6 @@ incsrc msu.asm
 incsrc dungeonmap.asm
 incsrc multiworld.asm
 incsrc terrorpin.asm
-incsrc special_weapons.asm
-incsrc variable_ganon_vulnerability.asm
 if !FEATURE_NEW_TEXT
     incsrc textrenderer.asm
 endif
@@ -227,6 +225,8 @@ warnpc $A58000
 ;org $228000 ; contrib area
 org $A28000 ; contrib area
 incsrc contrib.asm
+incsrc special_weapons.asm
+incsrc variable_ganon_vulnerability.asm
 warnpc $A38000
 
 org $A38000
