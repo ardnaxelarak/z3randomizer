@@ -337,9 +337,9 @@ AddInventory:
 			LDA PreMirrorLocations : INC : STA PreMirrorLocations ; Increment Pre Mirror Counter
 			SEP #$20
 		+
-		LDA FluteEquipment : BNE + ; Check for Mirror
+		LDA FluteEquipment : BNE + ; Check for Flute
 			REP #$20
-			LDA PreFluteLocations : INC : STA PreFluteLocations ; Increment Pre Mirror Counter
+			LDA PreFluteLocations : INC : STA PreFluteLocations ; Increment Pre Flute Counter
 			SEP #$20
 		+
 		REP #$20
@@ -838,6 +838,22 @@ RTS
 UpgradeFlute:
 	LDA InventoryTracking : AND #$FC : ORA #$01 : STA InventoryTracking ; switch to the working flute
 	LDA.b #$03 : STA FluteEquipment ; upgrade primary inventory
+RTL
+;--------------------------------------------------------------------------------
+
+;--------------------------------------------------------------------------------
+; FluteCallForDuck:
+;--------------------------------------------------------------------------------
+; sets A to #$02 to ignore summoning the duck
+FluteCallForDuck:
+	LDA.l WarningFlags : AND.b #$20 : BNE .vanilla ; glitched modes allowed flute in rain state
+	LDA.l ProgressIndicator : CMP.b #$02 : BCS .vanilla ; must rescue Zelda first
+
+	.noDuck
+	LDA.b #$02 : RTL 
+
+	.vanilla
+	LDA.l FluteEquipment ; what we wrote over
 RTL
 ;--------------------------------------------------------------------------------
 

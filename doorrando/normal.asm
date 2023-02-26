@@ -296,7 +296,6 @@ StraightStairsAdj:
             stz $046d
         .noScroll
         jsr GetTileAttribute : tax
-        jsl HandleIncomingDoorState
         lda $11 : cmp #$12 : beq .goingNorth
             lda $a2 : cmp #$51 : bne ++
                 rep #$20 : lda #$0018 : !add $20 : sta $20 : sep #$20 ; special fix for throne room
@@ -365,7 +364,8 @@ DoorToStraight:
         lda $a0 : cmp #$51 : bne .skip
         lda #$04 : sta $4e
     .skip pla
-    .end ldx $0418 : cmp #$02 ;what we wrote over
+    ; the ldx $0418 is now taken care of by TransitionCalculateLanding_Fix
+    .end cmp #$02 ;what we wrote over
     rtl
 }
 
@@ -422,20 +422,19 @@ InroomStairsTrapDoor:
 HandleSpecialDoorLanding: {
     LDA.l $7F2000,X ; what we wrote over
     SEP #$30
-    CMP #$34 : bne + ; inroom stairs
-        PHA : LDA #$26 : STA $045E : PLA
-    +
-}
-
-; Y = tiletype, also written to $4E
-HandleIncomingDoorState:
-{
+    ; A = tiletype
+    HandleIncomingDoorState:
     PHA
-    LDA.l DRMode : BEQ .noDoor
-    CPY.b #$01 : !bge .noDoor
+        LDA.l DRMode : BEQ .noDoor
+        PLA : PHA : AND.b #$FA : CMP.b #$80 : bne .noDoor
+
+        .setDoorState
         LDA.w $0418 : AND.b #$02 : BNE + : INC
         + STA.b $6C
-    .noDoor
-    STY.b $4E : TYA ; what we wrote over
-    PLY : RTL
+
+        .noDoor
+	PLA
+    CMP #$34 : bne + ; inroom stairs
+        PHA : LDA #$26 : STA $045E : PLA
+    + RTL
 }

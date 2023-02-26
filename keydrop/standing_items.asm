@@ -229,6 +229,9 @@ LoadMultiWorldPotItem:
 	PLX
 
 	BRA SaveMajorItemDrop
+MultiItemExit:
+	LDA.w #$0008 : STA.w $0B9C
+RTL
 
 LoadMajorPotItem:
 	INY : INY
@@ -240,7 +243,9 @@ SaveMajorItemDrop:
 	STA.w SpawnedItemID
 	STX.w SpawnedItemIndex
 	INC.w SpawnedItemFlag
-	TAY : LDA.w #$0008
+	TAY
+	LDA.l SpawnedItemIsMultiWorld : BNE MultiItemExit
+	LDA.w #$0008
 	CPY.w #$0036 : BNE +  ; Red Rupee
 		LDA.w #$0016 : BRA .substitute
 	+ CPY.w #$0044 : BNE + ; 10 pack arrows
