@@ -364,8 +364,7 @@ DoorToStraight:
         lda $a0 : cmp #$51 : bne .skip
         lda #$04 : sta $4e
     .skip pla
-    ; the ldx $0418 is now taken care of by TransitionCalculateLanding_Fix
-    .end cmp #$02 ;what we wrote over
+    .end LDX.w $0418 : CMP.b #$02 ; what we wrote over
     rtl
 }
 
@@ -434,8 +433,8 @@ HandleSpecialDoorLanding: {
 
         .noDoor
 	PLA
-    CMP #$34 : bne + ; inroom stairs
-        PHA : LDA #$26 : STA $045E : PLA
+    CMP.b #$34 : BNE + ; inroom stairs
+        PHA : LDA.b #$26 : STA.w $045E : PLA
     +
 RTL
 }
