@@ -133,6 +133,7 @@ AdjustEscapeDoorGraphics:
 	STA.l $7E2000+$102,X
 	ORA.w #$4000 ; horizontally flip
 	STA.l $7E2000+$104,X
+	RTL
 
 .fix_swamp_entrance
 	LDY.w $0460 ; get door index
