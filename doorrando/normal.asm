@@ -1,6 +1,6 @@
 WarpLeft:
     lda.l DRMode : beq .end
-	lda $040c : cmp.b #$ff : beq .end
+	JSR CheckIfCave : BCS .end
 	lda $20 : ldx $aa
 	jsr CalcIndex
 	!add #$06 : ldy #$01 ; offsets in A, Y
@@ -11,7 +11,7 @@ WarpLeft:
 
 WarpRight:
     lda.l DRMode : beq .end
-	lda $040c : cmp.b #$ff : beq .end
+	JSR CheckIfCave : BCS .end
 	lda $20 : ldx $aa
 	jsr CalcIndex
 	!add #$12 : ldy #$ff ; offsets in A, Y
@@ -22,7 +22,7 @@ WarpRight:
 
 WarpUp:
     lda.l DRMode : beq .end
-	lda $040c : cmp.b #$ff : beq .end
+	JSR CheckIfCave : BCS .end
 	lda $22 : ldx $a9
 	jsr CalcIndex
 	ldy #$02 ; offsets in A, Y
@@ -40,7 +40,7 @@ endmacro
 
 WarpDown:
     lda.l DRMode : beq .end
-	lda $040c : cmp.b #$ff : beq .end
+	JSR CheckIfCave : BCS .end
 	lda $22 : ldx $a9
 	jsr CalcIndex
 	!add #$0c : ldy #$ff ; offsets in A, Y
@@ -78,6 +78,14 @@ Cleanup:
 	+ inc $11
 	lda $ef
 	rts
+
+; carry set if cave, clear otherwise
+CheckIfCave:
+	REP #$30
+	LDA.b $A2 : CMP.w #$00E1 : BCS .invalid
+	SEP #$30 : CLC : RTS
+	.invalid
+	SEP #$30 : SEC : RTS
 
 ;A needs be to the low coordinate, x needs to be either 0 for left,upper or non-zero for right,down
 ; This sets A (00,02,04) and stores half that at $04 for later use, (src door)

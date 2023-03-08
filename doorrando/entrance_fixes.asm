@@ -30,6 +30,9 @@ warnpc $018939
 org $01BF43
 	JSL AdjustEscapeDoorCollision
 
+org $01C132  ; ADC.w #$0040 : TAX : LDA.b $00
+	JSL AdjustEscapeDoorCollision_LowEntrance : NOP #2
+
 pullpc
 
 ;===================================================================================================
@@ -211,6 +214,7 @@ BlockedEntrance:
 AdjustEscapeDoorCollision:
 	LSR ; vanilla shift
 
+AdjustEscapeDoorCollisionShared:
 	; save our parameters
 	; but one or both of these may not be necessary depending on how you detect these doors
 	; all that matters is that after identifying blockage, we have:
@@ -235,6 +239,10 @@ AdjustEscapeDoorCollision:
 	LDA.w #$0101 ; load tile type for solid collision
 
 	RTL
+
+AdjustEscapeDoorCollision_LowEntrance:
+	ADC.w #$0040 ; vanilla add
+	JMP AdjustEscapeDoorCollisionShared
 
 ;===================================================================================================
 
