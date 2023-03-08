@@ -131,7 +131,10 @@ BigKeyDoorCheck:
 
 ; FixOvalFadeOutMirror:
 ; 	LDA.b $10 : CMP.b #$0F : BEQ .skip_activation
-; 	LDA.l CurrentWorld : BNE .skip_activation
+; 	LDA.l InvertedMode : BNE +
+; 		LDA.l CurrentWorld : BNE .skip_activation
+; 		RTL
+; 	+ LDA.l CurrentWorld : BEQ .skip_activation
 ; 	RTL
 ; 	.skip_activation
 ; 	PLA : PLA : PLA : JML Sprite_6C_MirrorPortal_missing_mirror
