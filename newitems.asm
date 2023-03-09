@@ -44,7 +44,6 @@
 ; #$B2 - Fairy
 ; #$B3 - Chicken
 ; #$B4 - Big Magic
-; #$B5 - 5 Arrows
 ; #$B6/B7 - Reserved for Kara
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
@@ -436,9 +435,6 @@ AddReceivedItemExpandedGetItem:
 	+ CMP.b #$B4 : BNE + ; Big Magic
 		LDA.b #$80 : STA MagicFiller ; fill magic
 		BRA .done
-	+ CMP.b #$B5 : BNE + ; 5 Arrows
-		LDA.b #$05 : STA ArrowsFiller ; add 5 arrows
-		BRA .done
 	+
 	.done
 	PLX
@@ -636,7 +632,7 @@ org $A08A00
 	db -4 ; Fairy
 	db -4 ; Chicken
 	db -4 ; Big Magic
-	db -4 ; 5 Arrows
+	db -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
@@ -682,7 +678,7 @@ org $A08A00
 	db  0 ; Fairy
 	db  0 ; Chicken
 	db  4 ; Big Magic
-	db  0 ; 5 Arrows
+	db  0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
@@ -733,7 +729,7 @@ org $A08A00
 	db $47 ; Fairy
 	db $47 ; Chicken
 	db $3B ; Big Magic
-	db $02 ; 5 Arrows
+	db $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -778,7 +774,7 @@ org $A08A00
 	db $02 ; Fairy
 	db $02 ; Chicken
 	db $00 ; Big Magic
-	db $02 ; 5 Arrows
+	db $02 ; Unused
 
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
@@ -825,7 +821,7 @@ org $A08A00
 	db  1 ; Fairy
 	db  1 ; Chicken
 	db  4 ; Big Magic
-	db  2 ; 5 Arrows
+	db  4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
@@ -872,7 +868,7 @@ org $A08A00
 	dw $F36A ; Fairy
 	dw $F36A ; Chicken
 	dw $F373 ; Big Magic
-	dw $F376 ; 5 Arrows
+	dw $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
@@ -921,7 +917,7 @@ org $A08A00
 	db $FF ; Fairy
 	db $FF ; Chicken
 	db $80 ; Big Magic
-	db $05 ; 5 Arrows
+	db $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
@@ -1012,7 +1008,7 @@ Link_ReceiveItemAlternatesExpanded:
 	db -1 ; Fairy
 	db -1 ; Chicken
 	db -1 ; Big Magic
-	db -1 ; 5 Arrows
+	db -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused

@@ -452,8 +452,6 @@ OWBonkDrops:
         LDA.b #$DF : CLC : BRA .sprite_transform ; transform to small magic
     + CMP.b #$B4 : BNE +
         LDA.b #$E0 : CLC : BRA .sprite_transform ; transform to big magic
-    + CMP.b #$B5 : BNE +
-        LDA.b #$E1 : CLC : BRA .sprite_transform ; transform to 5 arrows
     + CMP.b #$44 : BNE +
         LDA.b #$E2 : CLC : BRA .sprite_transform ; transform to 10 arrows
     + CMP.b #$B1 : BNE +
