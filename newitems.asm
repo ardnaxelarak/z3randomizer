@@ -44,6 +44,7 @@
 ; #$B2 - Fairy
 ; #$B3 - Chicken
 ; #$B4 - Big Magic
+; #$B5 - Good Bee
 ; #$B6/B7 - Reserved for Kara
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
@@ -416,14 +417,14 @@ AddReceivedItemExpandedGetItem:
 		LDA.b #$FF : STA.w $0B58,Y ; allows them to expire
 		++ JMP .done
 	+ CMP.b #$B2 : BNE + ; Fairy
-		LDA.b #$E3 : JSL Sprite_SpawnDynamically : BMI .done
+		LDA.b #$E3 : JSL Sprite_SpawnDynamically : BMI ++
 		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
 			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
 		LDA.b $20 : SEC : SBC.b #$10 : STA.w $0D00,Y
 			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 16 pixels
 		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
 		LDA.b #$FF : STA.w $0B58,Y ; allows them to expire
-		BRA .done
+		++ BRA .done
 	+ CMP.b #$B3 : BNE + ; Chicken
 		LDA.b #$0B : JSL Sprite_SpawnDynamically : BMI .done
 		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
@@ -434,6 +435,14 @@ AddReceivedItemExpandedGetItem:
 		BRA .done
 	+ CMP.b #$B4 : BNE + ; Big Magic
 		LDA.b #$80 : STA MagicFiller ; fill magic
+		BRA .done
+	+ CMP.b #$B5 : BNE + ; Good Bee
+		LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI .done
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
+		LDA $20 : STA $0D00, Y : LDA $21 : STA $0D20, Y
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
+		JSL GoldBee_SpawnSelf_SetProperties
 		BRA .done
 	+
 	.done
@@ -632,7 +641,7 @@ org $A08A00
 	db -4 ; Fairy
 	db -4 ; Chicken
 	db -4 ; Big Magic
-	db -4 ; Unused
+	db -4 ; Good Bee
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
@@ -678,7 +687,7 @@ org $A08A00
 	db  0 ; Fairy
 	db  0 ; Chicken
 	db  4 ; Big Magic
-	db  0 ; Unused
+	db  0 ; Good Bee
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
@@ -729,7 +738,7 @@ org $A08A00
 	db $47 ; Fairy
 	db $47 ; Chicken
 	db $3B ; Big Magic
-	db $49 ; Unused
+	db $47 ; Good Bee
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -774,7 +783,7 @@ org $A08A00
 	db $02 ; Fairy
 	db $02 ; Chicken
 	db $00 ; Big Magic
-	db $02 ; Unused
+	db $02 ; Good Bee
 
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
@@ -821,7 +830,7 @@ org $A08A00
 	db  1 ; Fairy
 	db  1 ; Chicken
 	db  4 ; Big Magic
-	db  4 ; Unused
+	db  1 ; Good Bee
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
@@ -868,7 +877,7 @@ org $A08A00
 	dw $F36A ; Fairy
 	dw $F36A ; Chicken
 	dw $F373 ; Big Magic
-	dw $F36A ; Unused
+	dw $F36A ; Good Bee
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
@@ -917,7 +926,7 @@ org $A08A00
 	db $FF ; Fairy
 	db $FF ; Chicken
 	db $80 ; Big Magic
-	db $FF ; Unused
+	db $FF ; Good Bee
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
@@ -1008,7 +1017,7 @@ Link_ReceiveItemAlternatesExpanded:
 	db -1 ; Fairy
 	db -1 ; Chicken
 	db -1 ; Big Magic
-	db -1 ; Unused
+	db -1 ; Good Bee
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused

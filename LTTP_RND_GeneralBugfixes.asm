@@ -813,6 +813,9 @@ DiggingGameGuy_AttemptPrizeSpawn:
 org $1EDE28
 Sprite_GetEmptyBottleIndex: ; this is totally in sprite_bees.asm
 
+org $1EDE8A
+GoldBee_SpawnSelf:
+
 org $1EF4E7
 Sprite_PlayerCantPassThrough:
 ;================================================================================
