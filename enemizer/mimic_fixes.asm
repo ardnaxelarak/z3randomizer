@@ -40,7 +40,7 @@ notItemSprite_Mimic:
 {
     ; if we set killable thief we want to update the sprite id so it can be killed
     LDA $0E20, X
-    CMP.l [!KILLABLE_THIEVES_ID] : BEQ .changeSpriteId ; thief #$C4 (default is B8/dialog tester)
+    CMP.l !KILLABLE_THIEVES_ID : BEQ .changeSpriteId ; thief #$C4 (default is B8/dialog tester)
 
     ; if we don't have mimic code turned on we want to skip, but we also need to reload the sprite id because we just smoked it with this LDA
     LDA !ENABLE_MIMIC_OVERRIDE : BEQ .reloadSpriteIdAndSkipMimic ; skip to what it would have done normally
