@@ -1,27 +1,3 @@
-;================================================================================
-; Lamp Mantle & Light Cone Fix
-;--------------------------------------------------------------------------------
-; Output: 0 for darkness, 1 for lamp cone
-;--------------------------------------------------------------------------------
-LampCheckOverride:
-	LDA $7F50C4 : CMP.b #$01 : BNE + : RTL : +
-				  CMP.b #$FF : BNE + : INC : RTL : +
-
-	LDA LampEquipment : BNE .done ; skip if we already have lantern
-
-	LDA CurrentWorld : BNE +
-		.lightWorld
-		LDA $040C : CMP.b #$04 : !BGE ++ ; check if we're in HC
-			LDA LampConeSewers : BRA .done
-		++
-			LDA LampConeLightWorld : BRA .done
-	+
-		.darkWorld
-		LDA LampConeDarkWorld
-	.done
-	;BNE + : STZ $1D : + ; remember to turn cone off after a torch
-RTL
-
 GtBossHeartCheckOverride:
     lda $a0 : cmp #$1c : beq ++
     cmp #$6c : beq ++
@@ -117,32 +93,20 @@ RetrieveBunnyState:
 		STA $5D
 + RTL
 
-RainPrevention:
-	LDA $00 : XBA : AND #$00FF : STA.b $0A ; what we wrote over
-	PHA
-		LDA ProgressIndicator : AND #$00FF : CMP #$0002 : !BGE .done ; only in rain states (0 or 1)
-		LDA.l ProgressFlags : AND #$0004 : BNE .done ; zelda's been rescued
-			LDA.l BlockSanctuaryDoorInRain : BEQ .done ;flagged
-			LDA $A0 : CMP #$0012 : BNE + ;we're in the sanctuary
-				LDA.l FollowerIndicator : AND #$00FF : CMP #$0001 : BEQ .done ; zelda is following
-					LDA $00 : AND #$00FF : CMP #$00A1 : BNE .done ; position is a1
-						PLA : LDA #$0008 : RTL
-			+ LDA.l BlockCastleDoorsInRain : AND #$00FF : BEQ .done ;flagged
-			LDX #$FFFE
-			- INX #2 : LDA.l RemoveRainDoorsRoom, X : CMP #$FFFF : BEQ .done
-			CMP $A0 : BNE -
-				SEP #$20 : LDA.l RainDoorMatch, X : CMP $00 : BNE .continue
-					INC.w $0460 : INC.w $0460 : REP #$20 : PLA : SEC : RTL
-				.continue
-				REP #$20 : BRA -
-	.done PLA : CLC : RTL
-
 ; A should be how much dmg to do to Aga when leaving this function
 StandardAgaDmg:
 	LDX.b #$00 ; part of what we wrote over
 	LDA.l ProgressFlags : AND #$04 : BEQ + ; zelda's not been rescued
 		LDA.b #$10 ; hurt him!
 	+ RTL ; A is zero if the AND results in zero and then Agahnim's invincible!
+
+StandardSaveAndQuit:
+	LDA.b #$0F : STA.b $95 ; what we wrote over
+	LDA.l ProgressFlags : AND #$04 : BNE +
+	LDA.l DRMode : BEQ +
+	LDA.l StartingEntrance : CMP.b #$02 : BCC +
+		LDA.b #$03 : STA.l StartingEntrance  ; set spawn to uncle if >=
++ RTL
 
 ; note: this skips both maiden dialog triggers if the hole is open
 BlindsAtticHint:
@@ -158,10 +122,18 @@ BlindZeldaDespawnFix:
 		PLA : PLA : PEA.w SpritePrep_BlindMaiden_despawn_follower-1 : RTL
 	+ PLA : PLA : PEA.w SpritePrep_BlindMaiden_kill_the_girl-1 : RTL
 
-
 BigKeyDoorCheck:
 	CPY.w #$001E : BNE + ; skip if it isn't a BK door
 	LDA.l DRFlags : AND #$0400 : BNE + ; skip if the flag is set - bk doors can be double-sided
 		 PLA : PEA.w RoomDraw_OneSidedShutters_South_onesided_shutter_or_big_key_door-1
 + LDA.w #$0000 : RTL
 
+FixOvalFadeOutMirror:
+	LDA.b $10 : CMP.b #$0F : BEQ .skip_activation
+	LDA.l InvertedMode : BNE +
+		LDA.l CurrentWorld : BNE .skip_activation
+		RTL
+	+ LDA.l CurrentWorld : BEQ .skip_activation
+	RTL
+	.skip_activation
+	PLA : PLA : PLA : JML Sprite_6C_MirrorPortal_missing_mirror

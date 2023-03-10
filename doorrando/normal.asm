@@ -1,6 +1,6 @@
 WarpLeft:
     lda.l DRMode : beq .end
-	lda $040c : cmp.b #$ff : beq .end
+	JSR CheckIfCave : BCS .end
 	lda $20 : ldx $aa
 	jsr CalcIndex
 	!add #$06 : ldy #$01 ; offsets in A, Y
@@ -11,7 +11,7 @@ WarpLeft:
 
 WarpRight:
     lda.l DRMode : beq .end
-	lda $040c : cmp.b #$ff : beq .end
+	JSR CheckIfCave : BCS .end
 	lda $20 : ldx $aa
 	jsr CalcIndex
 	!add #$12 : ldy #$ff ; offsets in A, Y
@@ -22,7 +22,7 @@ WarpRight:
 
 WarpUp:
     lda.l DRMode : beq .end
-	lda $040c : cmp.b #$ff : beq .end
+	JSR CheckIfCave : BCS .end
 	lda $22 : ldx $a9
 	jsr CalcIndex
 	ldy #$02 ; offsets in A, Y
@@ -40,7 +40,7 @@ endmacro
 
 WarpDown:
     lda.l DRMode : beq .end
-	lda $040c : cmp.b #$ff : beq .end
+	JSR CheckIfCave : BCS .end
 	lda $22 : ldx $a9
 	jsr CalcIndex
 	!add #$0c : ldy #$ff ; offsets in A, Y
@@ -78,6 +78,14 @@ Cleanup:
 	+ inc $11
 	lda $ef
 	rts
+
+; carry set if cave, clear otherwise
+CheckIfCave:
+	REP #$30
+	LDA.b $A2 : CMP.w #$00E1 : BCS .invalid
+	SEP #$30 : CLC : RTS
+	.invalid
+	SEP #$30 : SEC : RTS
 
 ;A needs be to the low coordinate, x needs to be either 0 for left,upper or non-zero for right,down
 ; This sets A (00,02,04) and stores half that at $04 for later use, (src door)
@@ -324,7 +332,7 @@ GetTileAttribute:
 {
     phk : pea.w .jslrtsreturn-1
     pea.w $02802c
-    jml $02c11d ; mucks with x/y sets a to Tile Attribute, I think
+    jml CalculateTransitionLanding ; mucks with x/y sets a to Tile Attribute, I think
     .jslrtsreturn
     rts
 }
@@ -364,7 +372,7 @@ DoorToStraight:
         lda $a0 : cmp #$51 : bne .skip
         lda #$04 : sta $4e
     .skip pla
-    .end ldx $0418 : cmp #$02 ;what we wrote over
+    .end LDX.w $0418 : CMP.b #$02 ; what we wrote over
     rtl
 }
 
@@ -416,4 +424,25 @@ InroomStairsTrapDoor:
     pla : pla : pla
     jsl StraightStairsTrapDoor_reset
     jml $028b15 ; just some RTS in bank 02
+}
+
+HandleSpecialDoorLanding: {
+    LDA.l $7F2000,X ; what we wrote over
+    SEP #$30
+    ; A = tiletype
+    HandleIncomingDoorState:
+    PHA
+        LDA.l DRMode : BEQ .noDoor
+        PLA : PHA : AND.b #$FA : CMP.b #$80 : bne .noDoor
+
+        .setDoorState
+        LDA.w $0418 : AND.b #$02 : BNE + : INC
+        + STA.b $6C
+
+        .noDoor
+	PLA
+    CMP.b #$34 : BNE + ; inroom stairs
+        PHA : LDA.b #$26 : STA.w $045E : PLA
+    +
+RTL
 }

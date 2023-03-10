@@ -1,24 +1,28 @@
 RecordStairType: {
     pha
     lda.l DRMode : beq .norm
-    lda $040c : cmp #$ff : beq .norm
+ 	REP #$30 : LDA.b $A2 : CMP.w #$00E1 : BCS .norm
+	CMP #$00DF : BEQ .norm
+	SEP #$30
         lda $0e
         cmp #$25 : bcc ++ ; don't record straight staircases
             sta $045e
         ++ pla : bra +
-    .norm pla : sta $a0
+    .norm SEP #$30 : pla : sta $a0
     + lda $063d, x
     rtl
 }
 
 SpiralWarp: {
     lda.l DRMode : beq .abort ; abort if not DR
-    lda $040c : cmp.b #$ff : beq .abort ; abort if not in dungeon
+    REP #$30 : LDA.b $A2 : CMP.w #$00E1 : BCS .abort
+    CMP #$00DF : BEQ .abort
+    SEP #$30
     lda $045e : cmp #$5e : beq .gtg ; abort if not spiral - intended room is in A!
     cmp #$5f : beq .gtg
     cmp #$26 : beq .inroom
     .abort
-    stz $045e : lda $a2 : and #$0f : rtl ; clear,run hijacked code and get out
+    SEP #$30 : stz $045e : lda $a2 : and.b #$0f : rtl ; clear,run hijacked code and get out
     .inroom
     jsr InroomStairsWarp
     lda $a2 : and #$0f ; this is the code we are hijacking
@@ -207,19 +211,16 @@ InroomStairsWarp: {
     .normal
         lda $01 : sta $fe ; trap door
         lda $07 : sta $03 : beq +
-            ldy $a0 : cpy #$51 : beq .specialFix ; throne room
-            cpy #$02 : beq .specialFix ; sewers pull switch
-            cpy #$71 : beq .specialFix ; castle armory
-            lda #$e0
-            bra ++
+            lda $01 : and #$04 : bne .specialFix
+            lda #$e0 : bra ++
             .specialFix
-            lda #$c8
-            bra ++
+            lda #$c8 : bra ++
         +
             %StonewallCheck($43)
-            lda #$1b
-        ++
-        sta $20
+            lda $01 : and #$04 : bne +
+            lda #$1b : bra ++
+            + lda #$33
+        ++ sta $20
         inc $07 : stz $02 : lda #$78 : sta $22
         lda $01 : and #$03 : beq ++
             cmp #$02 : !bge +

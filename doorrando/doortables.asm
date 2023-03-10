@@ -1,4 +1,4 @@
-org $279C00
+org $A79C00
 KeyDoorOffset:
 ;      0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f --Offset Ruler
 dw $0000,$0001,$0003,$0000,$0006,$0000,$000b,$0000,$0000,$0000,$000c,$000d,$0010,$0011,$0012,$0000
@@ -18,7 +18,7 @@ dw $01f1,$01f3,$01f7,$0000,$0000,$01f8,$01fa,$0000,$01fd,$0200,$0203,$0204,$0206
 dw $0207
 
 
-org $279E00
+org $A79E00
 SpiralOffset:
 ;    0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f --Offset Ruler
 db $00,$01,$02,$00,$03,$00,$00,$04,$00,$05,$07,$00,$08,$00,$0b,$00
@@ -37,7 +37,7 @@ db $67,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 db $6a,$6d,$6e,$00,$00,$00,$00,$00,$00,$00,$6f,$00,$00,$00,$00,$00
 db $70
 
-org $279F00
+org $A79F00
 DoorOffset:
 db $00,$01,$02,$00,$03,$00,$04,$00,$00,$00,$00,$00,$9A,$05,$99,$00
 db $00,$06,$07,$08,$09,$0A,$0B,$00,$00,$0C,$0D,$0E,$00,$0F,$10,$11
@@ -56,7 +56,7 @@ db $00,$81,$82,$83,$84,$85,$86,$87,$88,$89,$00,$8A,$8B,$00,$8C,$00
 db $00,$8D,$8E,$00,$00,$8F,$90,$00,$91,$92,$93,$94,$95,$00,$00,$00
 db $9f
 
-org $27A000
+org $A7A000
 DoorTable:
 ;; NW 00  N  01  NE 02  WN 00  W  01  WS 02  SW 00  S  01  SE 02  EN 00  E  01  ES 02 - Door ruler
 dw $0003, $0003, $0003, $0003, $0003, $0003, $0003, $0003, $0003, $0003, $0003, $0003 ; Default/Garbage row
@@ -226,7 +226,7 @@ dw $0003, $0003, $0003, $0003, $0003, $0003, $0003, $0003, $0003, $0003, $0003, 
 ;dw $0072, $4ff8 ; ->HC Map Room
 ;dw $0080, $1f50 ; ->zelda's cellblock
 
-org $27B000
+org $A7B000
 SpiralTable: ;113 4 byte entries - should end at 27B1C4
 dw $0203, $8080 ;null row
 dw $0203, $8080 ;HC Backhallway
@@ -309,7 +309,7 @@ dw $0203, $8080 ;East Attic Start
 dw $0203, $8080 ;Tower Entrance
 
 
-org $27C000 ;ends around 27C418
+org $A7C000 ;ends around 27C418
 PairedDoorTable:
 dw $0000 ; the bad template
 dw $0000,$0000
@@ -503,7 +503,7 @@ dw $0000,$0000,$0000,$0000
 dw $ffff ; indicates the end - we can drop this
 
 ; Edge Transition Table (Target Room, Flags, MultiDiv ratio for edges)
-org $27C500 ;ends around 27C5F(9) 4 bytes would be 27C649
+org $A7C500 ;ends around 27C5F(9) 4 bytes would be 27C649
 ;I kind of want to split the 3rd byte into two
 NorthOpenEdge:
 db $00,$80,$11, $00,$80,$11, $00,$80,$11, $00,$80,$11
@@ -559,11 +559,11 @@ db $01, $02, $03, $04, $05, $06, $0a, $14
 
 ; In-room stairs in North/South pairs. From left to right:
 ; PoD, IP right side, IP Freezor chest and GT
-org $27C700
+org $A7C700
 InroomStairsTable:
 dw $0003,$0003, $0003,$0003, $0003,$0003, $0003,$0003
 
-org $27C720
+org $A7C720
 InroomStairsRoom:
 db $0B,$1B, $3F,$1F, $7E,$5E, $96,$3D
 InroomStairsX:
@@ -572,7 +572,7 @@ InroomStairsY:
 dw $0058, $0148, $0198, $0190
 
 
-org $27E000
+org $A7E000
 CutoffRooms:
 ; TT Alcove, Mire Bridge Left & Right, Mire Bent Bridge, Mire Hub
 ; Pod Falling & Harmless, SW Star Pits, TR Lava Escape & TR Dual Pipes, Bob's Room & GT Big Chest
@@ -588,7 +588,7 @@ dw $ffff
 
 ; dungeon tables
 ;   HC   HC   EP   DP   AT   SP   PD   MM   SW   IP   TH   TT   TR   GT
-org $27f000
+org $A7f000
 CompassBossIndicator:
 dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
 TotalKeys: ;27f020
@@ -603,13 +603,13 @@ TotalLocationsLow: ;27f080
 db $08, $08, $06, $06, $02, $00, $04, $08, $08, $08, $06, $08, $02, $07, $00, $00
 TotalLocationsHigh: ;27f090
 db $00, $00, $00, $00, $00, $01, $01, $00, $00, $00, $00, $00, $01, $02, $00, $00
-org $27f0a0
+org $A7f0a0
 TotalLocations:
 db $08, $08, $06, $06, $02, $0a, $0e, $08, $08, $08, $06, $08, $0c, $1b, $00, $00
 ; no more room here
 
 ; Vert 0,6,0 Horz 2,0,8
-org $27f0b0
+org $A7f0b0
 CoordIndex: ; Horizontal 1st
 db 2, 0 ; Coordinate Index $20-$23
 OppCoordIndex:
@@ -631,16 +631,16 @@ dw $00ff, $010b ; Right/Bot camera bounds when not frozen + appropriate low byte
 dw $017f, $0187 ; Right/Bot camera bound when at edge or layout frozen
 ;27f0ce next free byte
 
-org $27f0f0
+org $A7f0f0
 RemoveRainDoorsRoom:
 dw $0060, $0062, $ffff ; ffff indicates end of list
-RainDoorMatch: ; org $27f0f6 and f8 for now
+RainDoorMatch: ; org $A7f0f6 and f8 for now
 dw $0081, $0061 ; not xba'd
 BlockSanctuaryDoorInRain: ;27f0fa
 dw $0000
 
 
-org $27f100
+org $A7f100
 TilesetTable:
 ;    0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f --Offset Ruler
 db $13,$04,$04,$06,$0d,$ff,$08,$05,$06,$07,$07,$07,$0e,$0e,$0b,$ff
@@ -680,14 +680,14 @@ db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$14,$20
 db $00,$07,$20,$20,$07,$07,$07,$07,$07,$20,$20,$07,$20,$20,$20,$20
 db $07,$07,$02,$02,$02,$02,$07,$07,$07,$20,$20,$07,$20,$20,$20,$07
 
-;27f300
+;A7f300
 DungeonTilesets:
 db $04,$04,$05,$12,$04,$08,$07,$0C,$09,$0B,$05,$0A,$0D,$0E,$06,$06
 
 ;
-;org $27ff00
+;org $A7ff00
 
-org $27fff0
+org $A7fff0
 LinksHouseDarkWorld:
 dw $ffff
 SanctuaryDarkWorld:

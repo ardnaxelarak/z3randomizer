@@ -2,7 +2,7 @@
 !MC_FLAG = "$7F5420"
 
 ; tables
-org $0ABDF6
+org $8ABDF6
 WorldMapIcon_posx_vanilla:
 dw $0F31 ; prize1
 dw $08D0 ; prize2
@@ -24,7 +24,7 @@ dw $FFFF ; reserved - not used
 dw $FFFF
 dw $FFFF
 
-org $0ABE16
+org $8ABE16
 WorldMapIcon_posy_vanilla:
 dw $0620 ; prize1
 dw $0080 ; prize2
@@ -46,7 +46,7 @@ dw $FFFF ; reserved - not used
 dw $FFFF
 dw $FFFF
 
-org $0ABE36
+org $8ABE36
 WorldMapIcon_posx_located:
 dw $FF00 ; prize1
 dw $FF00 ; prize2
@@ -68,7 +68,7 @@ dw $FFFF ; reserved - not used
 dw $FFFF
 dw $FFFF
 
-org $0ABE56
+org $8ABE56
 WorldMapIcon_posy_located:
 dw $FF00 ; prize1
 dw $FF00 ; prize2
@@ -90,7 +90,7 @@ dw $FFFF ; reserved - not used
 dw $FFFF
 dw $FFFF
 
-org $0ABE76
+org $8ABE76
 WorldMapIcon_tile:
 db $38, $62 ; green pendant
 db $32, $60 ; red pendant
@@ -112,30 +112,30 @@ db $00, $00 ; unused red x's
 db $00, $00
 db $00, $00
 
-org $0ABE96
+org $8ABE96
 CompassExists:
 ; dw $37FC ; todo: convert to two bytes with masks? so much extra code...
 ; eastern hera desert pod skull trock thieves mire ice swamp gt at escape
 db $01, $01, $01, $01, $01, $01, $01, $01, $01, $01, $01, $00, $00, $00, $00, $00
 
 ; 0 = light world, 1 = dark world
-org $0ABEA6
+org $8ABEA6
 WorldCompassMask:
 db $00, $00, $00, $01, $01, $01, $01, $01, $01, $01, $01, $00, $00, $00, $00, $00
 
 ; eastern desert hera pod skull trock thieves mire ice swamp gt at escape x1 x2 x3
 
 ; refs
-org $0AC59B
+org $8AC59B
 WorldMapIcon_AdjustCoordinate:
-org $0AC3B1
+org $8AC3B1
 WorldMap_CalculateOAMCoordinates:
-org $0AC52E
+org $8AC52E
 WorldMap_HandleSpriteBlink:
-org $0ABF70
+org $8ABF70
 WorldMap_RedXChars:
 
-org $0AC02B
+org $8AC02B
 DrawPrizesOverride:
 LDX.b #$FF
 .loopStart

@@ -1,3 +1,6 @@
+; defines
+; Ram usage
+
 HorzEdge:
     cpy #$ff : beq +
         jsr DetectWestEdge : ldy #$02 : bra ++
@@ -295,5 +298,8 @@ DetectEastEdge:
         ldx #$08
     .end txa : rts
 
-
-
+AlwaysPushThroughFDoors:
+	PHA : AND.b #$F0 : CMP.b #$F0 : BNE +
+		PLA : RTL
+	+ PLA : AND.b #$8E : CMP.b #$80
+	RTL

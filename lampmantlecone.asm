@@ -8,16 +8,13 @@ LampCheck:
 				  CMP.b #$FF : BNE + : INC : RTL : +
 	
 	LDA LampEquipment : BNE .done ; skip if we already have lantern
-	
-	LDA CurrentWorld : BNE +
-		.lightWorld
-		LDA $040C : BNE ++ ; check if we're in sewers
+
+	LDA $040C : CMP.b #$FF : BEQ +
+		CMP.b #$04 : BCS + ; check if we're in HC
 			LDA LampConeSewers : BRA .done
-		++
-			LDA LampConeLightWorld : BRA .done
-	+
-		.darkWorld
-		LDA LampConeDarkWorld
+	+ LDA CurrentWorld : BNE +
+		LDA LampConeLightWorld : BRA .done
+	+ LDA LampConeDarkWorld
 	.done
 	;BNE + : STZ $1D : + ; remember to turn cone off after a torch
 RTL
