@@ -266,6 +266,9 @@ LoadIndoorValue:
 		++
 			%GetPossiblyEncryptedItem(HeartPiece_Graveyard_Warp, HeartPieceIndoorValues)
 			JMP .done
+	+ CMP.w #288 : BNE +
+		LDA.l OWBonkPrizeTable[42].loot
+		JMP .done
 	+ CMP.w #294 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Mire_Warp, HeartPieceIndoorValues)
 		JMP .done

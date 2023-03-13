@@ -506,7 +506,6 @@ OWBonkGoodBeeDrop:
     PLY
     LDA #$08 ; makes original good bee not spawn
     RTL
-    nop #20
 }
 
 ; Y = sprite slot index of bonk sprite
