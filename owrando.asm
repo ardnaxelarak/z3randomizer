@@ -238,6 +238,19 @@ OWWhirlpoolEnd:
     RTL
 }
 
+OWDestroyItemSprites:
+{
+    PHX : LDX.b #$0F
+    .nextSprite
+    LDA.w $0E20,X
+    CMP.b #$D8 : BCC .continue
+    CMP.b #$EC : BCS .continue
+    .killSprite ; need to kill sprites from D8 to EB on screen transition
+    STZ.w $0DD0,X
+    .continue
+    DEX : BPL .nextSprite
+    PLX : RTL
+}
 OWMirrorSpriteOnMap:
 {
     lda.w $1ac0,x : bit.b #$f0 : beq .continue
@@ -648,6 +661,7 @@ OWBonkSpritePrep:
 org $aa9000
 OWDetectEdgeTransition:
 {
+    JSL OWDestroyItemSprites
     STZ.w $06FC
     LDA.l OWMode : ORA.l OWMode+1 : BEQ .vanilla
         JSR OWShuffle
