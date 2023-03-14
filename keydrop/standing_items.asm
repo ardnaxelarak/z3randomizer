@@ -307,7 +307,7 @@ RTS
 
 ClearSpriteData:
 	STZ.b $02 : STZ.b $03 ; what we overrode
-ClearSpriteData_Shared:
+	.shared
 	PHX
 		LDA #$00 : LDX #$00
 		.loop
@@ -319,7 +319,7 @@ ClearSpriteData_Shared:
 
 ClearSpriteData2:
 	LDA.b #$82 : STA.b $99
-	JMP ClearSpriteData_Shared
+	JMP ClearSpriteData_shared
 
 ; Runs during sprite load of the room
 LoadSpriteData:
