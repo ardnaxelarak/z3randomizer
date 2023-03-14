@@ -9,6 +9,10 @@ org $829C25
 org $89C2BB
 	JSL ClearSpriteData
 
+; underworld -> overworld transition
+org $8282D1
+	JSL ClearSpriteData2
+
 org $89C327
 	JSL LoadSpriteData
 
@@ -303,6 +307,7 @@ RTS
 
 ClearSpriteData:
 	STZ.b $02 : STZ.b $03 ; what we overrode
+ClearSpriteData_Shared:
 	PHX
 		LDA #$00 : LDX #$00
 		.loop
@@ -311,6 +316,10 @@ ClearSpriteData:
 			INX : CPX #$10 : BCC .loop
 	PLX
 	RTL
+
+ClearSpriteData2:
+	LDA.b #$82 : STA.b $99
+	JMP ClearSpriteData_Shared
 
 ; Runs during sprite load of the room
 LoadSpriteData:
