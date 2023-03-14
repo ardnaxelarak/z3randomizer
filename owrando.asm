@@ -11,9 +11,11 @@ OWMode:
 dw 0
 OWFlags:
 dw 0
-org $aa8010
 OWReserved:
 dw 0
+org $aa8010
+OWVersionInfo:
+dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
 
 ;Hooks
 org $02a929
