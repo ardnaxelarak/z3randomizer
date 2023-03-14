@@ -29,7 +29,7 @@ SaveDataWRAM = $7EF000
 ; Example: We can use RoomDataWRAM[$37].high to read or write the pot key in the first
 ; floodable room in Swamp Palace (bit $04). To check if a boss has been killed we can
 ; take the room index for a boss room (e.g. $07 for Tower of Hera) and bitmask $FF00
-; like this: RoomDataWRAM[$07].l : AND #$FF00
+; like this: RoomDataWRAM[$07].l : AND.w #$FF00
 ;--------------------------------------------------------------------------------
 ; .high Byte:  d d d d b k u t
 ; .low Byte:   s e h c q q q q
@@ -318,12 +318,12 @@ HeartPieceCounter: skip 1       ; Total Number of heartpieces collected (integer
 CrystalCounter: skip 1          ; Total Number of crystals collected (integer)
 DungeonsCompleted: skip 2       ; Bitfield indicating whether a dungeon's prize has been collected.
                                 ; This has the same shape as the dungeon item bitfields.
+MapCountDisplay: skip 2         ;
 BombsPlaced: skip 2             ; Total Number of bombs placed (16-bit integer)
-skip 42                         ; Unused
-ServiceSequenceRx:              ; Service sequence receive
-ServiceSequenceTx:              ; Service sequence transmit
-ServiceSequence: skip 8         ; Service request block. See servicerequest.asm
-skip 8                          ; Unused
+skip 40                         ; Unused
+ServiceSequence:                ; See servicerequest.asm
+ServiceSequenceRx: skip 8       ; Service sequence receive
+ServiceSequenceTx: skip 8       ; Service sequence transmit
 DungeonAbsorbedKeys:            ; \  Absorbed key counters (integers)
 SewerAbsorbedKeys: skip 1       ;  | Sewer Passage
 HCAbsorbedKeys: skip 1          ;  | Hyrule Castle
@@ -378,37 +378,17 @@ skip 13                         ; Unused
 InverseChecksumWRAM: skip 2     ; Vanilla Inverse Checksum. Don't write unless computing checksum.
 
 ;================================================================================
-; Temporary Effects ($7F50C0 - $7F50CF)
-;--------------------------------------------------------------------------------
-base $7F50C0
-SwordModifier: skip 1
-ShieldModifier: skip 1 ; (not implemented)
-ArmorModifier: skip 1
-MagicModifier: skip 1
-LightConeModifier: skip 1
-CuccoStormModifier: skip 1
-OldManDashModifier: skip 1
-IcePhysicsModifier: skip 1
-InfiniteArrowsModifier: skip 1
-InfiniteBombsModifier: skip 1
-InfiniteMagicModifier: skip 1
-InvertDPadModifier: skip 1
-TemporaryOHKO: skip 1
-SpriteSwapper: skip 1
-BootsModifier: skip 1 ; (0=Off, 1=Always, 2=Never)
-
-;================================================================================
 ; Expanded SRAM ($7F6000 - $7F6FFF)
 ;--------------------------------------------------------------------------------
 ; This $1000 byte segment is saved beginning where the second save file was in SRAM
 ; beginning at $700500
 ;--------------------------------------------------------------------------------
-base $7F6000                    ; $1000 byte buffer we place beginning at second save file
-ExtendedFileNameWRAM: skip 24   ; File name, 12 word-length characters.
-RoomPotData: skip 592           ; Table for expanded pot shuffle. One word per room.
-SpritePotData: skip 592         ; Table for expanded pot shuffle. One word per room.
-PurchaseCounts: skip 96         ; Keeps track of shop purchases
-PrivateBlock: skip 513          ; Reserved for 3rd party developers
+base $7F6000                     ; $1000 byte buffer we place beginning at second save file
+ExtendedFileNameWRAM: skip 24    ; File name, 12 word-length characters.
+RoomPotData: skip 592            ; Table for expanded pot shuffle. One word per room.
+SpritePotData: skip 592          ; Table for expanded pot shuffle. One word per room.
+PurchaseCounts: skip 96          ; Keeps track of shop purchases
+PrivateBlockPersistent: skip 513 ; Reserved for 3rd party developers
 
 ;================================================================================
 ; Direct SRAM Assignments ($700000 - $7080000)
@@ -423,7 +403,10 @@ RoomDataSRAM:                   ;
 skip $280                       ;
 OverworldEventDataSRAM:         ;
 skip $C0                        ;
-EquipmentSRAM: skip 76          ;
+EquipmentSRAM: skip 3           ;
+BombsEquipmentSRAM: skip 31     ;
+DisplayRupeesSRAM: skip 21      ;
+CurrentArrowsSRAM: skip 21      ;
 InventoryTrackingSRAM: skip 2   ;
 BowTrackingSRAM: skip 2         ;
 skip 53                         ;
@@ -451,8 +434,8 @@ base off
 ; If these move (most likely by placing initsramtable.asm somewhere else) these
 ; bank definitions need to be changed as well.
 ;================================================================================
-SRAMBank = $70
-SRAMTableBank = $30|$80
+!SRAMBank = $70
+!SRAMTableBank = $30|$80
 
 ;================================================================================
 ; Assertions
@@ -623,10 +606,11 @@ endmacro
 %assertSRAM(HeartPieceCounter, $7EF470)
 %assertSRAM(CrystalCounter, $7EF471)
 %assertSRAM(DungeonsCompleted, $7EF472)
+%assertSRAM(MapCountDisplay, $7EF474)
 ;--------------------------------------------------------------------------------
 %assertSRAM(ServiceSequence, $7EF4A0)
 %assertSRAM(ServiceSequenceRx, $7EF4A0)
-%assertSRAM(ServiceSequenceTx, $7EF4A0)
+%assertSRAM(ServiceSequenceTx, $7EF4A8)
 ;--------------------------------------------------------------------------------
 %assertSRAM(DungeonAbsorbedKeys, $7EF4B0)
 %assertSRAM(SewerAbsorbedKeys, $7EF4B0)
@@ -675,27 +659,11 @@ endmacro
 %assertSRAM(GTCollectedKeys, $7EF4ED)
 %assertSRAM(FileMarker, $7EF4F0)
 ;--------------------------------------------------------------------------------
-%assertSRAM(SwordModifier, $7F50C0)
-%assertSRAM(ShieldModifier, $7F50C1)
-%assertSRAM(ArmorModifier, $7F50C2)
-%assertSRAM(MagicModifier, $7F50C3)
-%assertSRAM(LightConeModifier, $7F50C4)
-%assertSRAM(CuccoStormModifier, $7F50C5)
-%assertSRAM(OldManDashModifier, $7F50C6)
-%assertSRAM(IcePhysicsModifier, $7F50C7)
-%assertSRAM(InfiniteArrowsModifier, $7F50C8)
-%assertSRAM(InfiniteBombsModifier, $7F50C9)
-%assertSRAM(InfiniteMagicModifier, $7F50CA)
-%assertSRAM(InvertDPadModifier, $7F50CB)
-%assertSRAM(TemporaryOHKO, $7F50CC)
-%assertSRAM(SpriteSwapper, $7F50CD)
-%assertSRAM(BootsModifier, $7F50CE)
-;--------------------------------------------------------------------------------
 %assertSRAM(ExtendedFileNameWRAM, $7F6000)
 %assertSRAM(RoomPotData, $7F6018)
 %assertSRAM(SpritePotData, $7F6268)
 %assertSRAM(PurchaseCounts, $7F64B8)
-%assertSRAM(PrivateBlock, $7F6518)
+%assertSRAM(PrivateBlockPersistent, $7F6518)
 
 ;================================================================================
 ; Direct SRAM Assertions
@@ -704,6 +672,9 @@ endmacro
 %assertSRAM(RoomDataSRAM, $700000)
 %assertSRAM(OverworldEventDataSRAM, $700280)
 %assertSRAM(EquipmentSRAM, $700340)
+%assertSRAM(BombsEquipmentSRAM, $700343)
+%assertSRAM(DisplayRupeesSRAM, $700362)
+%assertSRAM(CurrentArrowsSRAM, $700377)
 %assertSRAM(InventoryTrackingSRAM, $70038C)
 %assertSRAM(BowTrackingSRAM, $70038E)
 %assertSRAM(ProgressIndicatorSRAM, $7003C5)

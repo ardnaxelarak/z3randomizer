@@ -71,7 +71,7 @@ DamageClassCalc:
 	LDA #$03
 	BRA .done
 .stalfos_knight
-	LDA !StalfosBombDamage : BEQ .special_level
+	LDA StalfosBombDamage : BEQ .special_level
 	LDA #$08
 	BRA .done
 .helmasaur_king

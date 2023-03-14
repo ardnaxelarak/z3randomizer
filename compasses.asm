@@ -1,56 +1,82 @@
-;--------------------------------------------------------------------------------
-; $7F5010 - Scratch Space
-;--------------------------------------------------------------------------------
-
-DrawDungeonCompassCounts:
-	LDX $1B : BNE + : RTL : + ; Skip if outdoors
-
+DrawDungeonItemCounts:
+	LDX.b IndoorsFlag : BNE + : RTL : + ; Skip if outdoors
 	; extra hard safeties for getting dungeon ID to prevent crashes
 	PHA
-	LDA.w $040C : AND.w #$00FE : TAX ; force dungeon ID to be multiple of 2
+	LDA.w DungeonID : AND.w #$00FE : TAX ; force dungeon ID to be multiple of 2
 	PLA
-
 	CPX.b #$1B : BCS .done ; Skip if not in a valid dungeon ID
 
-	BIT.w #$0002 : BNE ++ ; if CompassMode==2, we don't check for the compass
-		LDA CompassField : AND.l DungeonItemMasks, X ; Load compass values to A, mask with dungeon item masks
-		BEQ .done ; skip if we don't have compass
-	++
-	
+        JSR.w DrawCompassCounts
+        JSR.w DrawMapCounts
+	.done
+RTL
+
+DrawCompassCounts:
+        PHX
+	LDA.l CompassMode : BEQ .done
+                BIT.w #$0002 : BNE + ; if CompassMode==2, we don't check for the compass
+		        LDA.l CompassField : AND.l DungeonItemMasks, X ; Load compass values to A, mask with dungeon item masks
+		        BEQ .done ; skip if we don't have compass
+	+
         TXA : LSR : TAX
-        BNE +
-                INC
-        +
-        LDA.l CompassTotalsWRAM, X : AND #$00FF
+        LDA.l CompassTotalsWRAM, X : AND.w #$00FF
         SEP #$20
 	JSR HudHexToDec2Digit
 	REP #$20
         PHX
-		LDX.b $06 : TXA : ORA #$2400 : STA $7EC79A
-		LDX.b $07 : TXA : ORA #$2400 : STA $7EC79C
+		LDX.b Scrap06 : TXA : ORA.w #$2400 : STA.l HUDTileMapBuffer+$9A
+		LDX.b Scrap07 : TXA : ORA.w #$2400 : STA.l HUDTileMapBuffer+$9C
 	PLX
-
-        LDA DungeonLocationsChecked, X : AND #$00FF
+        LDA.l DungeonLocationsChecked, X : AND.w #$00FF
 	SEP #$20
 	JSR HudHexToDec2Digit
 	REP #$20
-	LDX.b $06 : TXA : ORA #$2400 : STA $7EC794 ; Draw the item count
-	LDX.b $07 : TXA : ORA #$2400 : STA $7EC796
-	
-	LDA.w #$2830 : STA $7EC798 ; draw the slash
+	LDX.b Scrap06 : TXA : ORA.w #$2400 : STA.l HUDTileMapBuffer+$94 ; Draw the item count
+	LDX.b Scrap07 : TXA : ORA.w #$2400 : STA.l HUDTileMapBuffer+$96
+	LDA.w #$2830 : STA.l HUDTileMapBuffer+$98 ; draw the slash
+        .done
+        PLX
+RTS
 
-	.done
-RTL
+DrawMapCounts:
+        PHX
+	LDA.l MapHUDMode : BEQ .done
+                BIT.w #$0002 : BNE + ; if MapHUDMode==2, we don't check for map
+		        LDA.l MapField : AND.l DungeonItemMasks, X ; Load map values to A, mask with dungeon item masks
+		        BEQ .done ; skip if we don't have map
+	+
+        TXA : LSR : TAX
+        LDA.l MapTotalsWRAM, X : AND.w #$00FF
+        SEP #$20
+	JSR HudHexToDec2Digit
+	REP #$20
+        PHX
+		LDX.b Scrap07 : TXA : ORA.w #$2400 : STA.l HUDTileMapBuffer+$A6
+	PLX
+        LDA.l DungeonCollectedKeys, X : AND.w #$00FF
+	SEP #$20
+	JSR HudHexToDec2Digit
+	REP #$20
+	LDX.b Scrap07 : TXA : ORA.w #$2400 : STA.l HUDTileMapBuffer+$A2
+	LDA.w #$2830 : STA.l HUDTileMapBuffer+$A4 ; draw the slash
+        .done
+        PLX
+RTS
 
 DungeonItemMasks: ; these are dungeon correlations to $7EF364 - $7EF369 so it knows where to store compasses, etc
-    dw $8000, $4000, $2000, $1000, $0800, $0400, $0200, $0100
+    dw $C000, $C000, $2000, $1000, $0800, $0400, $0200, $0100
     dw $0080, $0040, $0020, $0010, $0008, $0004
 ;--------------------------------------------------------------------------------
-InitCompassTotalsRAM:
-        LDX #$00
+InitDungeonCounts:
+        LDX.b #$0F
         -
-                LDA CompassTotalsROM, X : STA CompassTotalsWRAM, X
-                INX
-                CPX #$0F : !BLT -
+                LDA.l CompassTotalsROM, X : STA.l CompassTotalsWRAM, X
+                DEX
+        BPL -
+        LDX.b #$0F
+        -
+                LDA.l ChestKeys, X : STA.l MapTotalsWRAM, X
+                DEX
+        BPL -
 RTL
 
