@@ -36,6 +36,10 @@ LoadSwordForDamage:
 		CMP.b #$04 : !BLT + : DEC : + ; if it's gold sword, change it to tempered
 		RTL
 	.notMoth
+		CMP.b #$CE : BNE .notBlind
+		LDA.b #$01
+		RTL
+	.notBlind
 	JSR.w LoadModifiedSwordLevel ; load normal sword value
 RTL
 ;================================================================================
@@ -115,8 +119,10 @@ LoadModifiedIceFloorValue:
 	LDA $5D : CMP #$01 : BEQ + : CMP #$17 : BEQ + : CMP #$1C : BEQ +
 	LDA $5E : CMP #$02 : BEQ +
 	LDA $5B : BNE +
+	LDA.w $0308 : BIT #$80 : BNE .yes
 	LDA.l $30802D : BIT #$01 : BEQ ++
 	LDA $A0 : CMP #$16 : BEQ ++ ; swamp supertile with current -- fine for temporary physics but impossible without boots for permanent
+	.yes
 	LDA.w $0348 : ORA $7F50C7 : ORA #$10 : RTS
 	++ : LDA.w $0348 : ORA $7F50C7 : RTS
 	+ : LDA.w $0348

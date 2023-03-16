@@ -23,7 +23,11 @@ CuccoStorm:
 	
 	SEP #$30 ; set 8-bit accumulator index registers
 	LDA.l !CUCCO_STORM : BEQ + ; only if storm is on
-	LDA.b $10 : CMP.b #$09 : BNE + ; only if outdoors
+	LDA.b $10 : CMP.b #$09 : BEQ .check ; only if outdoors
+	.indoors
+		LDA.b #$00 : STA.l !CUCCO_STORM ; turn off cucco storm if indoors
+		BRA +
+	.check
 	LDA.l LoopFrames : AND.b #$7F : BNE + ; check every 128 frames
 	
 	-
