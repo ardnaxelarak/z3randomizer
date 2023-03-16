@@ -158,6 +158,7 @@ incsrc msu.asm
 incsrc dungeonmap.asm
 incsrc special_weapons.asm
 incsrc variable_ganon_vulnerability.asm
+incsrc trolls.asm
 if !FEATURE_NEW_TEXT
     incsrc textrenderer.asm
 endif

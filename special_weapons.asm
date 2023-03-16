@@ -274,13 +274,17 @@ Utility_CheckHammerHelmasaurKingMask:
 	RTL
 ;--------------------------------------------------------------------------------
 Utility_CheckImpervious:
-	LDA $0E20, X : CMP.b #$CB : BNE .normal
+	LDA $0E20, X : CMP.b #$CE : BEQ .blind
+	               CMP.b #$CB : BNE .normal
 .trinexx
 	LDA SpecialWeapons : CMP #$01 : BEQ +
 	                     CMP #$03 : BEQ +
 	                     CMP #$04 : BEQ +
 	                     CMP #$05 : BEQ +
 	                     CMP #$06 : BEQ .check_sidenexx
+	BRA .normal
+.blind
+	LDA $0301 : AND.b #$0A : BNE .impervious ; impervious to hammer
 	BRA .normal
 +
 	LDA $0301 : AND.b #$0A : BNE .impervious ; impervious to hammer

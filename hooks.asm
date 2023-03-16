@@ -2014,11 +2014,11 @@ JSL.l Overworld_LoadNewTiles : NOP #$02
 org $02EC2E ;<- 016C2E
 JSL.l Overworld_LoadNewTiles : NOP #$02
 ;================================================================================
-org $07A3E2 ;<- 3A3E2 Bank07.asm:5764 (LDA.b #$80 : STA $03F0)
-JSL.l FreeDuckCheck : BEQ +
-	NOP
-	skip 3 ; a JSR we need to keep
-+
+; org $07A3E2 ;<- 3A3E2 Bank07.asm:5764 (LDA.b #$80 : STA $03F0)
+; JSL.l FreeDuckCheck : BEQ +
+; 	NOP
+; 	skip 3 ; a JSR we need to keep
+; +
 ;================================================================================
 org $07A9AC ; <- 3A9AC - Bank07.asm:6628 (LDA $0C : ORA $0E : STA $00 : AND.b #$0C : BEQ BRANCH_BETA)
 JML.l MirrorBonk
@@ -2623,3 +2623,26 @@ JSL.l TransferVRAMStripes
 ;===================================================================================================
 org $9BF029+1 : db $10
 
+;--------------------------------------------------------------------------------
+; Various nonsense
+;--------------------------------------------------------------------------------
+org $0780B9 ; LDA.b #$3A : STA.w $031F
+JSL CalcIFrames
+NOP
+
+org $09814E ; LDA.w Bomb_timer : STA.w $039F, X
+JSL SetBombTimer
+NOP #2
+
+org $07B282 ; LDA.b #$1D : STA.w $0374
+JSL SetDashTimer
+NOP
+
+org $07A3E7 ; LDA.b #$13 : JSR PlaySFX_Set2 : ...
+JSL ProcessFlute
+BCS +
+RTS
+NOP #14 : +
+
+org $08E073 ; LDA.b #$0E : STA.b $10
+JSL FluteMap

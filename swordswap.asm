@@ -9,6 +9,10 @@ LoadSwordForDamage:
 		CMP.b #$04 : !BLT + : DEC : + ; if it's gold sword, change it to tempered
 		RTL
 	.notMoth
+		CMP.b #$CE : BNE .notBlind
+		LDA.b #$01
+		RTL
+	.notBlind
 	JSR.w LoadModifiedSwordLevel ; load normal sword value
 RTL
 ;================================================================================
@@ -81,8 +85,10 @@ LoadModifiedIceFloorValue:
 	LDA.b LinkState : CMP.b #$01 : BEQ + : CMP.b #$17 : BEQ + : CMP.b #$1C : BEQ +
 	LDA.b LinkSpeed : CMP.b #$02 : BEQ +
 	LDA.b LinkSlipping : BNE +
+	LDA.w $0308 : BIT #$80 : BNE .yes
 	LDA.l ChallengeModes : BIT #$01 : BEQ ++
 	LDA.l RoomIndex : CMP #$16 : BEQ ++ ; swamp supertile with current -- fine for temporary physics but impossible without boots for permanent
+	.yes
 	LDA.w TileActIce : ORA.l IceModifier : ORA.b #$10 : RTS
 	++ : LDA.w TileActIce : ORA.l IceModifier : RTS
 	+ : LDA.w TileActIce
