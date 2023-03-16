@@ -3095,3 +3095,9 @@ NOP #14 : +
 
 org $08E073 ; LDA.b #$0E : STA.b $10
 JSL FluteMap
+
+org $07A329
+JSL UseShovel
+BCS +
+RTS
+NOP #4 : +

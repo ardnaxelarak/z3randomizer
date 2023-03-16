@@ -68,3 +68,21 @@ FluteMap:
 	LDA.b #$0E
 	STA.b $10
 	RTL
+
+UseShovel:
+	LDA.b $1B
+	BEQ .normal
+.indoors
+	REP #$20
+	LDA.w #$0200
+	STA.w $03F5
+	SEP #$20
+	CLC
+	RTL
+.normal
+	LDA.l $07A310
+	STA.b $3D
+	STZ.w $030D
+	STZ.w $0300
+	SEC
+	RTL
