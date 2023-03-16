@@ -538,6 +538,9 @@ Underworld_LoadSpawnEntrance:
 org $02E99D
 FluteMenu_LoadTransport:
 
+org $02FD6D
+LoadGearPalettes_link:
+
 org $02FD8A ; 17D8A - Bank0E.asm: 3732 Note: Different bank
 LoadGearPalettes_bunny:
 
