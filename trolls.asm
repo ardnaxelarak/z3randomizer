@@ -86,3 +86,11 @@ UseShovel:
 	STZ.w $0300
 	SEC
 	RTL
+
+BunnyThrowPot:
+	LDA.b #$02
+	JSL $068156
+	LDA.b $3B
+	AND.b #$7F
+	STA.b $3B
+	RTL

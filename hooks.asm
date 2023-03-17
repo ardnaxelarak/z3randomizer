@@ -2776,11 +2776,9 @@ org $07839E ; bunny BAGE check
 BunnyRead:
 	JSR.w $07B5A9 ; check A button
 	BCC .noA
-	JSR.w CheckIfReading
-	BNE .noread
-	JSR.w $07B4DB
-	NOP
-.noread
+	JSL BunnyThrowPot
+	BRA .noA
+	NOP #3
 .noA
 
 org $07FFF4
