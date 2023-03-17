@@ -118,3 +118,48 @@ SwordSwingDelay:
 	LDA.l $079CAF, X
 	STA.b $3D
 	RTL
+
+MaybeRecoil:
+	LDA.w $0E20, Y
+	CMP.b #$09 ; skip recoil on the giant 'dorm
+	BEQ .done
+	LDA.l $088E75, X
+	STA.w $0F40, Y
+	LDA.l $088E79, X
+	STA.w $0F30, Y
+.done
+	RTL
+
+MaybeRecoil2:
+	LDA.w $0E20, X
+	CMP.b #$09
+	BEQ .moldorm
+	LDA.b $00
+	EOR.b #$FF
+	INC
+	STA.w $0F30, X
+	LDA.b $01
+	EOR.b #$FF
+	INC
+	STA.w $0F40, X
+	RTL
+.moldorm ; skip recoil on the giant 'dorm and unstun
+	STZ.w $0B58, X
+	STZ.w $0D90, X
+	RTL
+
+CheckMoldormRepel:
+	CMP.b #$09
+	BNE .not_moldorm
+	LDA.w $0D90, X
+	BEQ .repel
+	LDA.w $0B58, X
+	BEQ .repel
+.no_repel
+	LDA.b #$01
+	SEC : RTL
+.repel
+	LDA.b #$00
+	SEC : RTL
+.not_moldorm
+	CLC : RTL

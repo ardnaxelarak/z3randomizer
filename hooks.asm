@@ -3106,3 +3106,28 @@ org $079DAB
 JSL SwordSwingDelay : NOP
 org $079DEE
 JSL SwordSwingDelay : NOP
+
+org $088E4A
+JSL MaybeRecoil
+BRA + : NOP #6 : +
+
+org $06EC4D
+JSL MaybeRecoil2
+BRA + : NOP #10 : +
+
+; make moldorm check head for hitbox instead of tail
+org $1DDADD
+; BRA + : NOP #22 : +
+BRA + : NOP #26 : +
+org $1DDAF9
+BRA + : NOP : +
+org $1DDB01
+BRA + : NOP #3 : +
+
+; make moldorm repel sword when not stunned
+org $06F354
+JSL CheckMoldormRepel
+BCC .not_moldorm
+NOP
+skip 17
+.not_moldorm

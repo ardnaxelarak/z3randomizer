@@ -126,6 +126,8 @@ Utility_CheckAncillaOverlapWithSprite:
 	RTL
 .giant_moldorm
 	LDA $0E10, Y : BNE .ignore_collision ; Moldy can have little a I-Frames, as a treat
+	LDA $0C4A, X : CMP #$1F : BEQ .check_collision_moldorm ; hookshot
+	               CMP #$05 : BEQ .check_collision_moldorm ; boomerang
 	LDA.l SpecialWeapons : CMP #$01 : BNE ++
 	LDA $0C4A, X : CMP #$07 : BEQ .check_collision_moldorm
 	BRA .ignore_collision ; don't collide with non-bombs
@@ -274,29 +276,29 @@ Utility_CheckHammerHelmasaurKingMask:
 	RTL
 ;--------------------------------------------------------------------------------
 Utility_CheckImpervious:
-	LDA $0E20, X : CMP.b #$CE : BEQ .blind
-	               CMP.b #$CB : BNE .normal
+	LDA.w $0E20, X : CMP.b #$CE : BEQ .blind
+	                 CMP.b #$CB : BNE .normal
 .trinexx
-	LDA SpecialWeapons : CMP #$01 : BEQ +
+	LDA.l SpecialWeapons : CMP #$01 : BEQ +
 	                     CMP #$03 : BEQ +
 	                     CMP #$04 : BEQ +
 	                     CMP #$05 : BEQ +
 	                     CMP #$06 : BEQ .check_sidenexx
 	BRA .normal
 .blind
-	LDA $0301 : AND.b #$0A : BNE .impervious ; impervious to hammer
+	LDA.w $0301 : AND.b #$0A : BNE .impervious ; impervious to hammer
 	BRA .normal
 +
-	LDA $0301 : AND.b #$0A : BNE .impervious ; impervious to hammer
+	LDA.w $0301 : AND.b #$0A : BNE .impervious ; impervious to hammer
 .check_sidenexx
 	LDA.w $0DD1 : ORA.w $0DD2 : BNE .impervious ; at least one sidenexx alive
 	LDA.w $0D80, X : CMP.b #$02 : BCS .impervious ; at least one sidenexx alive
 	BRA .not_impervious
 .normal
-	LDA $0E60, X : AND.b #$40 : BNE .impervious
-	LDA $0CF2 : CMP #$FF : BEQ .impervious ; special "always-impervious" class
-	LDA $0E20, X : CMP.b #$CC : BEQ .sidenexx : CMP.b #$CD : BEQ .sidenexx
-	LDA $0301 : AND.b #$0A : BEQ .not_impervious ; normal behavior if not hammer
+	LDA.w $0E60, X : AND.b #$40 : BNE .impervious
+	LDA.w $0CF2 : CMP.b #$FF : BEQ .impervious ; special "always-impervious" class
+	LDA.w $0E20, X : CMP.b #$CC : BEQ .sidenexx : CMP.b #$CD : BEQ .sidenexx
+	LDA.w $0301 : AND.b #$0A : BEQ .not_impervious ; normal behavior if not hammer
 	JSL Ganon_CheckHammerVulnerability : BCS .not_impervious
 	LDA SpecialWeapons : CMP #$01 : BEQ +
 	                     CMP #$03 : BEQ +
@@ -304,7 +306,7 @@ Utility_CheckImpervious:
 	                     CMP #$05 : BEQ +
 	BRA .not_impervious
 +
-	LDA $0E20, X : CMP.b #$1E : BEQ .not_impervious ; crystal switch
+	LDA.w $0E20, X : CMP.b #$1E : BEQ .not_impervious ; crystal switch
 	CMP.b #$40 : BEQ .not_impervious ; aga barrier
 	BRA .impervious
 .not_impervious
@@ -336,12 +338,6 @@ Utility_CheckImpervious:
 ; start with X = sprite index
 ;--------------------------------------------------------------------------------
 AllowBombingMoldorm:
-	LDA SpecialWeapons : CMP #$01 : BEQ .no_disable_projectiles
-	                     CMP #$03 : BEQ .no_disable_projectiles
-	                     CMP #$04 : BEQ .no_disable_projectiles
-	                     CMP #$05 : BEQ .no_disable_projectiles
-	                     CMP #$06 : BEQ .no_disable_projectiles
-	INC $0BA0, X
 .no_disable_projectiles
 	JSL !SPRITE_INITIALIZED_SEGMENTED
 	RTL
