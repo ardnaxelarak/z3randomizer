@@ -94,3 +94,27 @@ BunnyThrowPot:
 	AND.b #$7F
 	STA.b $3B
 	RTL
+
+SwordSwingDelay:
+	LDA.l SwordEquipment : CMP.b #$02 : !BLT .normal
+	                       CMP.b #$FF : BEQ .normal
+	CPX.b #$04 : BEQ .section_4
+	CPX.b #$05 : BEQ .section_5
+	CPX.b #$06 : BNE .normal
+.section_6
+	LDA.l SwordEquipment : CMP.b #$04 : !BGE .normal
+	BRA .add_one
+.section_5
+	LDA.l SwordEquipment : CMP.b #$02 : !BGE .normal
+	BRA .add_one
+.section_4
+	LDA.l SwordEquipment : CMP.b #$03 : !BGE .normal
+.add_one
+	LDA.l $079CAF, X
+	STA.b $3D
+	INC
+	RTL
+.normal
+	LDA.l $079CAF, X
+	STA.b $3D
+	RTL

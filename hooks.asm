@@ -3099,3 +3099,10 @@ JSL UseShovel
 BCS +
 RTS
 NOP #4 : +
+
+org $079D11
+JSL SwordSwingDelay : NOP
+org $079DAB
+JSL SwordSwingDelay : NOP
+org $079DEE
+JSL SwordSwingDelay : NOP
