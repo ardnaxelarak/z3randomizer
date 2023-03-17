@@ -40,7 +40,7 @@ ProcessFlute:
 .cucco
 	JSR PlayCluck       ; outdoors; play cucco sound
 	LDA.b #$01
-	STA.l $7F50C5       ; turn on cucco storm
+	STA.l CuccoStormer  ; turn on cucco storm
 	CLC : RTL           ; do not summon duck
 .play_and_leave
 	JSR PlayDuck
@@ -64,7 +64,7 @@ PlayCluck:
 
 FluteMap:
 	LDA.b #$00
-	STA.l $7F50C5 ; turn off cuccos
+	STA.l CuccoStormer ; turn off cuccos
 	LDA.b #$0E
 	STA.b $10
 	RTL
