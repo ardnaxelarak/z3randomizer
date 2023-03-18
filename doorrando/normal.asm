@@ -412,7 +412,7 @@ StraightStairsTrapDoor:
             .animateTraps
             lda #$05 : sta $11
             inc $0468 : stz $068e : stz $0690
-        ++ JSL Underworld_DoorDown_Call : rtl
+        ++ JML Underworld_SetBossOrSancMusicUponEntry_long
     + JML Dungeon_ApproachFixedColor ; what we wrote over
 }
 
