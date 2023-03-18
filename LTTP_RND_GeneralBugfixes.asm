@@ -535,6 +535,9 @@ CalculateTransitionLanding:
 org $02C176
 Overworld_FinalizeEntryOntoScreen_Data:
 
+org $82C3F2
+OverworldLoadScreensPaletteSet_long:
+
 org $02D9B9
 Underworld_LoadSpawnEntrance:
 
