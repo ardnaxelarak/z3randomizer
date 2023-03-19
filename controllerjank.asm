@@ -23,7 +23,10 @@ InvertDPad:
 
 .crowd_control
 	LDA.l ControllerInverter : BNE +
+	LDA.b RoomIndex : CMP.b #$DE : BNE .off
+	LDA.b #$01 : BRA +
 
+.off
 	LDA.w JOY1L : STA.b Scrap00
 	LDA.w JOY1H : STA.b Scrap01
 	JML.l InvertDPadReturn
