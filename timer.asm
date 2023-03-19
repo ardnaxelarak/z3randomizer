@@ -110,7 +110,7 @@ dw #$003C, #$0000
 dw #$FFFF, #$7FFF
 ;--------------------------------------------------------------------------------
 DrawChallengeTimer:
-	LDA.l RoomIndex : AND.w #$00FF : CMP.w #$00C8 : BEQ .is_ohko
+	LDA.b RoomIndex : AND.w #$00FF : CMP.w #$00C8 : BEQ .is_ohko
 	LDA.l OHKOFlag : AND.w #$00FF : BEQ +
 	.is_ohko
 		LDA.w #$2807 : STA.l HUDTileMapBuffer+$90
@@ -164,7 +164,7 @@ DrawChallengeTimer:
 RTL
 ;--------------------------------------------------------------------------------
 OHKOTimer:
-	LDA.l RoomIndex : CMP.b #$C8 : BEQ .kill
+	LDA.b RoomIndex : CMP.b #$C8 : BEQ .kill
 	LDA.l OHKOFlag : BNE .kill
 	LDA.l TimeoutBehavior : CMP.b #$02 : BNE +
 	LDA.l ClockStatus : AND.b #$02 : BEQ +

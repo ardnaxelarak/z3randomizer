@@ -3,9 +3,11 @@
 ;--------------------------------------------------------------------------------
 ModifyBoots:
     PHA
+        LDA.b RoomIndex : CMP.b #$06 : BEQ .no_boots
         LDA.l BootsModifier : CMP.b #$01 : BNE +
             PLA : AND.l AbilityFlags : ORA.b #$04 : RTL ; yes boots
         + : CMP.b #$02 : BNE +
+            .no_boots
             PLA : AND.l AbilityFlags : AND.b #$FB : RTL ; no boots
         + : LDA.l FakeBoots : CMP.b #$01 : BNE +
             LDA.b LinkSlipping : BEQ ++ : LDA.b $59 : BNE + ; hover check
