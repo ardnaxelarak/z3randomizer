@@ -176,3 +176,12 @@ SetLanmolaVelocity:
 	ASL
 	STA.w $0D50, X
 	RTL
+
+CheckMushroom:
+	PHP
+	SEP #$20
+	LDA.l InventoryTracking
+	AND.b #$20
+	BEQ +
+	PLP : SEC : RTL
++	PLP : CLC : RTL

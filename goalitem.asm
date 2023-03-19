@@ -1,7 +1,9 @@
 GoalItemGanonCheck:
 	LDA.w SpriteTypeTable, X : CMP.b #$D6 : BNE .success ; skip if not ganon
 		JSL.l CheckGanonVulnerability
-		BCS .success
+		BCC .fail
+		JSL.l CheckMushroom
+		BCC .success
 
 		.fail
 		LDA.w SpriteActivity, X : CMP.b #17 : !BLT .success ; decmial 17 because Acmlm's chart is decimal
