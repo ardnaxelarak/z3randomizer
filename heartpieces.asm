@@ -643,6 +643,9 @@ HeartPieceGetPlayer:
 		++
 			LDA HeartPiece_Graveyard_Warp_Player
 			BRL .done
+	+ CMP.w #288 : BNE +
+		LDA.l OWBonkPrizeTable[$2A].mw_player
+		BRL .done
 	+ CMP.w #294 : BNE +
 		LDA HeartPiece_Mire_Warp_Player
 		BRL .done
@@ -667,21 +670,21 @@ HeartPieceGetPlayer:
 			LDA EtherItem_Player
 			BRL .done
 	+ CMP.w #$05 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$01].mw_player
 			BRL .done
 		++
 			LDA HeartPiece_Mountain_Warp_Player
 			BRL .done
 	+ CMP.w #$0A : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$02].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$03].mw_player
 			BRL .done
 	+ CMP.w #$10 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$04].mw_player
 			BRL .done
 		++
@@ -694,28 +697,28 @@ HeartPieceGetPlayer:
 		LDA.l OWBonkPrizeTable[$07].mw_player
 		BRL .done
 	+ CMP.w #$13 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$08].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$09].mw_player
 			BRL .done
 	+ CMP.w #$15 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$0A].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$0B].mw_player
 			BRL .done
 	+ CMP.w #$18 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$0C].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$0D].mw_player
 			BRL .done
 	+ CMP.w #$1A : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$0E].mw_player
 			BRL .done
 		++
@@ -734,7 +737,7 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Maze_Player
 		BRL .done
 	+ CMP.w #$2A : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$14].mw_player
 			BRL .done
 		++ CMP.w #$0008 : BNE ++
@@ -747,7 +750,7 @@ HeartPieceGetPlayer:
 		LDA.l OWBonkPrizeTable[$16].mw_player
 		BRL .done
 	+ CMP.w #$2E : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$17].mw_player
 			BRL .done
 		++
@@ -761,7 +764,7 @@ HeartPieceGetPlayer:
 			LDA BombosItem_Player
 			BRL .done
 	+ CMP.w #$32 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$19].mw_player
 			BRL .done
 		++
@@ -774,7 +777,7 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Swamp_Player
 		BRL .done
 	+ CMP.w #$42 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1B].mw_player
 			BRL .done
 		++
@@ -784,14 +787,14 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Cliffside_Player
 		BRL .done
 	+ CMP.w #$51 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1C].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$1D].mw_player
 			BRL .done
 	+ CMP.w #$54 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1E].mw_player
 			BRL .done
 		++ CMP.w #$0008 : BNE ++
@@ -801,7 +804,7 @@ HeartPieceGetPlayer:
 			LDA.l OWBonkPrizeTable[$20].mw_player
 			BRL .done
 	+ CMP.w #$55 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$21].mw_player
 			BRL .done
 		++
@@ -811,7 +814,7 @@ HeartPieceGetPlayer:
 		LDA.l OWBonkPrizeTable[$23].mw_player
 		BRL .done
 	+ CMP.w #$5B : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$24].mw_player
 			BRL .done
 		++
@@ -824,7 +827,7 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Digging_Player
 		BRL .done
 	+ CMP.w #$6E : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$26].mw_player
 			BRL .done
 		++ CMP.w #$0008 : BNE ++
