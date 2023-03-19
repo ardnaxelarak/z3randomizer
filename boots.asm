@@ -3,7 +3,9 @@
 ;--------------------------------------------------------------------------------
 ModifyBoots:
     PHA
-        LDA.b RoomIndex : CMP.b #$06 : BEQ .no_boots
+        LDA.b RoomIndex : CMP.b #$06 : BNE +
+        LDA.b RoomIndex+1 : CMP.b #$00 : BEQ .no_boots
+        +
         LDA.l BootsModifier : CMP.b #$01 : BNE +
             PLA : AND.l AbilityFlags : ORA.b #$04 : RTL ; yes boots
         + : CMP.b #$02 : BNE +
