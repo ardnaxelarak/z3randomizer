@@ -1,5 +1,6 @@
 GoalItemGanonCheck:
 	LDA.w SpriteTypeTable, X : CMP.b #$D6 : BNE .success ; skip if not ganon
+		LDA.w $0D80, X : CMP.b #$12 : BEQ .fail
 		JSL.l CheckGanonVulnerability
 		BCC .fail
 		JSL.l CheckMushroom
