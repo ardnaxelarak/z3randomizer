@@ -83,7 +83,7 @@ LCode:
 RTS
 
 IsItemAvailable:
-	LDA.l InfiniteBombs : BEQ .finite
+	JSL CheckInfiniteBombs : BEQ .finite
 	.infinite
 		CPX.b #$04 : BNE .finite
 		LDA.b #$01 : RTL

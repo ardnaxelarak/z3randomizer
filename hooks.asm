@@ -2714,3 +2714,7 @@ NOP #2
 ; helmie's mask is brittle
 org $1E8112
 db $03, $03, $03, $03, $00
+
+; vitreous - bombs work a bit better
+org $0DB938
+db $0C

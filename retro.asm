@@ -1,25 +1,25 @@
 LoadBombCount:
-	LDA.l InfiniteBombs : BNE .infinite
+	JSL CheckInfiniteBombs : BNE .infinite
 	.finite
 		LDA.l BombsEquipment
 	.infinite
 RTL
 LoadBombCount16:
-	LDA.l InfiniteBombs : AND.w #$00FF : BNE .infinite
+	JSL CheckInfiniteBombs16 : BNE .infinite
 	.finite
 		LDA.l BombsEquipment
 	.infinite
 RTL
 StoreBombCount:
 	JSL IncrementBombsPlacedCounter
-	PHA : LDA.l InfiniteBombs : BEQ .finite
+	PHA : JSL CheckInfiniteBombs : BEQ .finite
 	.infinite
 		PLA : LDA.b #$01 : RTL
 	.finite
 		PLA : STA.l BombsEquipment
 RTL
 SearchForEquippedItem:
-	LDA.l InfiniteBombs : BEQ +
+	JSL CheckInfiniteBombs : BEQ +
 		LDA.b #$01 : LDX.b #$00 : RTL
 	+
 	LDA.l BowEquipment ; thing we wrote over

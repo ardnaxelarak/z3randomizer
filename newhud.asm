@@ -4,7 +4,7 @@ NewDrawHud:
 ; Draw bomb count
 ;================================================================================
 
-	LDA.l InfiniteBombs : BNE .infinite_bombs
+	JSL CheckInfiniteBombs : BNE .infinite_bombs
 	.finite_bombs
 		LDA.l SpecialWeapons : CMP #$01 : BNE .normal
 		LDA.l SpecialWeaponLevel : BEQ .no_bombs

@@ -1,5 +1,5 @@
 IFrameData:
-	db $00, $14, $28
+	db $00, $10, $20
 CalcIFrames:
 	LDA.l ArmorEquipment
 	PHX : TAX
@@ -198,4 +198,28 @@ AgaDecision:
 .aga2
 	STZ.w $0E30, X
 	CMP.b #$04
+	RTL
+
+CheckInfiniteBombs:
+	LDA.l InfiniteBombs : BNE .yes
+	LDA.b RoomIndex
+	CMP.b #$90
+	BEQ .yes
+.no
+	LDA.b #$00
+	RTL
+.yes
+	LDA.b #$01
+	RTL
+
+CheckInfiniteBombs16:
+	LDA.l InfiniteBombs : AND.w #$00FF : BNE .yes
+	LDA.b RoomIndex : AND.w #$00FF
+	CMP.w #$0090
+	BEQ .yes
+.no
+	LDA.w #$0000
+	RTL
+.yes
+	LDA.w #$0001
 	RTL
