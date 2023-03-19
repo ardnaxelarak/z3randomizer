@@ -2689,3 +2689,8 @@ db $30, $2C, $22, $12, $00, $EE, $DE, $D4
 db $D0, $D4, $DE, $EE, $00, $12, $22, $2C
 db $00, $12, $22, $2C, $30, $2C, $22, $12
 db $00, $EE, $DE, $D4, $D0, $D4, $DE, $EE
+
+; make lanmolas faster
+org $05A4BD
+JSL SetLanmolaVelocity
+BRA + : NOP #4 : +
