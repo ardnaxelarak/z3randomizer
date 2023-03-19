@@ -2711,5 +2711,6 @@ JSL AgaDecision : NOP
 org $1ED6ED
 NOP #2
 
-; org $1ED67E
-; BRA + : NOP #8 : +
+; helmie's mask is brittle
+org $1E8112
+db $03, $03, $03, $03, $00
