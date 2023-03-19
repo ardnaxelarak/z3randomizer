@@ -85,6 +85,7 @@ LoadModifiedIceFloorValue:
 	LDA.b LinkState : CMP.b #$01 : BEQ + : CMP.b #$17 : BEQ + : CMP.b #$1C : BEQ +
 	LDA.b LinkSpeed : CMP.b #$02 : BEQ +
 	LDA.b LinkSlipping : BNE +
+	LDA.b RoomIndex : CMP.b #$29 : BEQ .yes
 	LDA.w $0308 : BIT #$80 : BNE .yes
 	LDA.l ChallengeModes : BIT #$01 : BEQ ++
 	LDA.l RoomIndex : CMP #$16 : BEQ ++ ; swamp supertile with current -- fine for temporary physics but impossible without boots for permanent
