@@ -483,6 +483,16 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
+%smallcredits("WHATEVER THIS NONSENSE IS", "yellow")
+
+%blankline()
+%blankline()
+
+%bigcredits("KARAFRUIT")
+
+%blankline()
+%blankline()
+
 %smallcredits("SPRITE DEVELOPMENT", "green")
 
 %blankline()
@@ -591,13 +601,6 @@ CreditsLineBlank:
 
 %blankline()
 
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
 %emptyline()
 %emptyline()
 %emptyline()

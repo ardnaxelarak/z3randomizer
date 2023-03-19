@@ -2702,3 +2702,14 @@ db $08
 ; ganon - randomize vulnerability when stunned
 org $1D9010
 JSL StunGanon : NOP
+
+; agahnim - pattern? we don't need no steenken pattern!
+org $1ED637
+JSL AgaDecision : NOP
+
+; agahnim - no guaranteed normal balls
+org $1ED6ED
+NOP #2
+
+; org $1ED67E
+; BRA + : NOP #8 : +

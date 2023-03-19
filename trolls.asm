@@ -185,3 +185,17 @@ CheckMushroom:
 	BEQ +
 	PLP : SEC : RTL
 +	PLP : CLC : RTL
+
+AgaDecision:
+	LDA.b RoomIndex
+	CMP.b #$20
+	BNE .aga2
+	JSL RNG_Agahnim1
+	AND.b #$04
+	STA.w $0E30, X
+	CMP.b #$04
+	RTL
+.aga2
+	STZ.w $0E30, X
+	CMP.b #$04
+	RTL
