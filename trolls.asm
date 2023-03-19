@@ -18,7 +18,11 @@ SetBombTimer:
 
 SetDashTimer:
 	JSL GetRandomInt
-	AND.b #$3F
+	AND.b #$1F
+	STA.w $0374
+	JSL GetRandomInt
+	AND.b #$0F
+	CLC : ADC.w $0374
 	STA.w $0374
 	RTL
 
