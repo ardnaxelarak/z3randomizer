@@ -2694,3 +2694,11 @@ db $00, $EE, $DE, $D4, $D0, $D4, $DE, $EE
 org $05A4BD
 JSL SetLanmolaVelocity
 BRA + : NOP #4 : +
+
+; ganon - silvers just don't work like they used to
+org $0DB93D
+db $08
+
+; ganon - randomize vulnerability when stunned
+org $1D9010
+JSL StunGanon : NOP

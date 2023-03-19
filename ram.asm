@@ -525,7 +525,7 @@ OHKOFlag: skip 1                   ; Any non-zero write sets OHKO mode
 SpriteSwapper: skip 1              ; Loads new link sprite and glove/armor palette. No gfx or
                                    ; code currently in base ROM for this.
 BootsModifier: skip 1              ; $01 = Give dash ability
-skip 1                             ; Unused
+GanonVulnerabilityItem: skip 1     ; Item Ganon is vulnerable to while stunned
                                    ; Crypto Block ($7F50D0 - $7F51FF)
 KeyBase: skip $10                  ;
 y: skip 4                          ;

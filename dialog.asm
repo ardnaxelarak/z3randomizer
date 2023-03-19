@@ -252,8 +252,8 @@ DialogGanon2:
 		LDA.w #$018D : JMP .done
 	+
 	JSL CheckMushroom
-		LDA.w #$0198 : JMP .done
 	BCC +
+		LDA.w #$0198 : JMP .done
 	+
 		LDA.l GanonVulnerabilityItem : AND #$00FF : BNE .special_item
 		LDA.l SpecialWeapons : AND.w #$00FF
