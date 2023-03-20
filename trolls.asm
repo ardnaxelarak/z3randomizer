@@ -168,15 +168,6 @@ CheckMoldormRepel:
 .not_moldorm
 	CLC : RTL
 
-SetLanmolaVelocity:
-	LDA.b $00
-	ASL
-	STA.w $0D40, X
-	LDA.b $01
-	ASL
-	STA.w $0D50, X
-	RTL
-
 CheckMushroom:
 	PHP
 	SEP #$20

@@ -2691,9 +2691,8 @@ db $00, $12, $22, $2C, $30, $2C, $22, $12
 db $00, $EE, $DE, $D4, $D0, $D4, $DE, $EE
 
 ; make lanmolas faster
-org $05A4BD
-JSL SetLanmolaVelocity
-BRA + : NOP #4 : +
+org $05A4B7
+LDA.b #$18
 
 ; ganon - silvers just don't work like they used to
 org $0DB93D
@@ -2718,3 +2717,10 @@ db $03, $03, $03, $03, $00
 ; vitreous - bombs work a bit better
 org $0DB938
 db $0C
+
+; tile rooms - make them a bit faster
+org $09BA20
+LDA.b #$B8
+
+org $1EBC56
+LDA.b #$28
