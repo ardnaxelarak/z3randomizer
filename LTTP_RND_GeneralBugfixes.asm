@@ -526,6 +526,9 @@ Dungeon_SaveRoomData_justKeys:
 org $02A4E3
 Overworld_ActualScreenID:
 
+org $02A9F3
+OverworldHandleTransitions_change_palettes:
+
 org $02B861
 Dungeon_SaveRoomQuadrantData:
 
