@@ -1079,8 +1079,16 @@ db $00, $00, $00
 org $308358
 AllowAccidentalMajorGlitch:
 db $00
+; left a byte buffer here
+;--------------------------------------------------------------------------------
+; $30835A (0x18035A) fixes the Prize On The Eyes glitch
+; 0x00 - don't fix
+; this should be turned on for Door Rando and Boss Shuffle
+org $30835A
+FixPrizeOnTheEyes:
+db $00
 ;================================================================================
-; 0x180359 - 0x1814FF (unused)
+; 0x18035B - 0x1814FF (unused)
 ;================================================================================
 ; $309500 (0x181500) - $309FFF (0x181FFF) original 0x39C bytes
 ; Replacement Ending Sequence Text Data

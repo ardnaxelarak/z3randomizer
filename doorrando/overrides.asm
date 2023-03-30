@@ -40,9 +40,9 @@ FixShopCode:
     + rtl
 
 VitreousKeyReset:
-    lda.l DRMode : beq +
-        stz $0cba, x
-    + JML $0db818 ;restore old code
+    LDA.l FixPrizeOnTheEyes : BEQ +
+        STZ.w $0CBA, X
+    + JML $0DB818 ;restore old code - SpritePrep_LoadProperties
 
 GuruguruFix:
     lda $a0 : cmp #$df : !bge +
@@ -62,7 +62,7 @@ SuctionOverworldFix:
         stz $49
     + rtl
 
-!CutoffTable = "$27E000"
+!CutoffTable = "$A7E000"
 
 CutoffEntranceRug:
     PHA : PHX

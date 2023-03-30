@@ -32,9 +32,9 @@ incsrc DMA.asm
 
 org $B68000 ; the original org is 368000 and B6 is the same bank but fastrom
 EnemizerTablesStart:
-incsrc enemizer_info_table.asm
-incsrc enemizerflags.asm
-incsrc bushes_table.asm
+incsrc enemizer_info_table.asm ; B68000-B680FF
+incsrc enemizerflags.asm  ; B68100-B6811F
+incsrc bushes_table.asm   ; B68120-B6373
 
 EnemizerCodeStart:
 incsrc bushes.asm
@@ -46,7 +46,7 @@ incsrc bossdrop.asm
 incsrc moldorm.asm
 incsrc kodongo_fixes.asm
 incsrc mimic_fixes.asm
-; todo: vitreous key fix for boss shuffle
+; vitreous key fix for boss shuffle - uses FixPrizeOnTheEyes flag
 
 incsrc overworld_sprites.asm
 incsrc underworld_sprites.asm
