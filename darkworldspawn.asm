@@ -10,12 +10,14 @@ DoWorldFix:
 	LDA InvertedMode : BEQ +
 		JMP DoWorldFix_Inverted
 	+
-	LDA FollowerIndicator : CMP #$04 : BEQ .aga1Alive ; if old man following, skip mirror/aga check
 	LDA.l Bugfix_MirrorlessSQToLW : BEQ .skip_mirror_check
-		LDA MirrorEquipment : AND #$02 : BEQ .noMirror ; check if we have the mirror
+		LDA FollowerIndicator : CMP #$04 : BNE + ; if old man following, skip mirror/aga check
+			LDA.l OldManRetrievalWorld
+			BRA .noMirror
+		+ LDA MirrorEquipment : AND #$02 : BEQ .noMirror ; check if we have the mirror
 	.skip_mirror_check ; alt entrance point
 	LDA ProgressIndicator : CMP.b #$03 : BCS .done ; check if agahnim 1 is alive
-	.aga1Alive
+	.setLightWorld
 	LDA #$00
 	.noMirror
 	STA CurrentWorld ; set flag to light world
@@ -54,14 +56,18 @@ JMP DoWorldFix_skip_mirror_check
 RTL
 ;================================================================================
 DoWorldFix_Inverted:
-	LDA FollowerIndicator : CMP #$04 : BEQ .aga1Alive ; if old man following, skip mirror/aga check
 	LDA.l Bugfix_MirrorlessSQToLW : BEQ .skip_mirror_check
-            LDA.l MirrorEquipment : AND #$02 : BEQ .noMirror ; check if we have the mirror
+		LDA FollowerIndicator : CMP #$04 : BNE + ; if old man following, skip mirror/aga check
+			LDA.l OldManRetrievalWorld
+			BRA .setWorld
+	    + LDA.l MirrorEquipment : AND #$02 : BEQ .noMirror ; check if we have the mirror
 	.skip_mirror_check ; alt entrance point
 	LDA ProgressIndicator : CMP.b #$03 : BCS .done ; check if agahnim 1 is alive
 	.noMirror
-	.aga1Alive
-	LDA #$40 : STA CurrentWorld ; set flag to dark world
+	.setDarkWorld
+	LDA #$40
+	.setWorld
+	STA CurrentWorld ; set flag to dark world
 	LDA.l SmithDeleteOnSave : BEQ .transform
 		LDA FollowerIndicator
 		CMP #$07 : BEQ .clear ; clear frog
