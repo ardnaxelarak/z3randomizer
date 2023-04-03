@@ -92,11 +92,15 @@ UseShovel:
 	RTL
 
 BunnyThrowPot:
+	LDA.b RoomIndex : CMP.b #$0D : BNE .throw
+	LDA.b RoomIndex+1 : CMP.b #$00 : BEQ .no_throw
+.throw
 	LDA.b #$02
 	JSL $068156
 	LDA.b $3B
 	AND.b #$7F
 	STA.b $3B
+.no_throw
 	RTL
 
 SwordSwingDelay:
