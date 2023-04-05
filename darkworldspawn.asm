@@ -114,17 +114,23 @@ RefreshRainAmmo:
 		+ CMP.b #$03 : BNE + ; Uncle
 			%SetMinimum(CurrentMagic,MagicFiller,RainDeathRefillMagic_Uncle)
 			%SetMinimum(BombsEquipment,BombsFiller,RainDeathRefillBombs_Uncle)
-			%SetMinimum(CurrentArrows,ArrowsFiller,RainDeathRefillArrows_Uncle)
-			BRA .done
+			LDA.l ArrowMode : BEQ ++
+			LDA.l BowEquipment : BEQ +++
+			++ %SetMinimum(CurrentArrows,ArrowsFiller,RainDeathRefillArrows_Uncle)
+			+++ BRA .done
 		+ CMP.b #$02 : BNE + ; Cell
 			%SetMinimum(CurrentMagic,MagicFiller,RainDeathRefillMagic_Cell)
 			%SetMinimum(BombsEquipment,BombsFiller,RainDeathRefillBombs_Cell)
-			%SetMinimum(CurrentArrows,ArrowsFiller,RainDeathRefillArrows_Cell)
+			LDA.l ArrowMode : BEQ ++
+			LDA.l BowEquipment : BEQ .done
+			++ %SetMinimum(CurrentArrows,ArrowsFiller,RainDeathRefillArrows_Cell)
 			BRA .done
 		+ CMP.b #$04 : BNE + ; Mantle
 			%SetMinimum(CurrentMagic,MagicFiller,RainDeathRefillMagic_Mantle)
 			%SetMinimum(BombsEquipment,BombsFiller,RainDeathRefillBombs_Mantle)
-			%SetMinimum(CurrentArrows,ArrowsFiller,RainDeathRefillArrows_Mantle)
+			LDA.l ArrowMode : BEQ ++
+			LDA.l BowEquipment : BEQ .done
+			++ %SetMinimum(CurrentArrows,ArrowsFiller,RainDeathRefillArrows_Mantle)
 		+
 	.done
 RTL

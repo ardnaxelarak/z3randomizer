@@ -41,6 +41,11 @@ DRScroll:
 db 0
 OffsetTable:
 dw -8, 8
+org $A78010
+DRVersionInfo:
+dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
+
+org $A78020
 
 incsrc normal.asm
 incsrc scroll.asm

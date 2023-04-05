@@ -512,6 +512,9 @@ Module_PreDungeon:
 org $028296
     .setAmbientSfx
 
+org $828AD9
+Underworld_SetBossOrSancMusicUponEntry:
+
 org $02A0A8
 Dungeon_SaveRoomData:
 

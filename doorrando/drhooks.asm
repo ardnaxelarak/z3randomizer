@@ -192,10 +192,9 @@ JSL.l Underworld_DoorDown_Entry : CPX #$FF
 BEQ + : db $80, $1C ; BRA $028B04
 NOP #6 : +
 
-org $82C3F2 ; <- Bank02.asm:10521 Unused call
-Underworld_DoorDown_Call:
-org $82C3F3
-dw $8AD9 ; address of Bank02.asm:2085
+org $82FD00 ; unreachable code
+Underworld_SetBossOrSancMusicUponEntry_long:
+JSR Underworld_SetBossOrSancMusicUponEntry : RTL
 
 org $81AA90
 JSL BigKeyDoorCheck : NOP
