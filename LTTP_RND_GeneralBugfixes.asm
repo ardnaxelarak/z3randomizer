@@ -612,14 +612,17 @@ Ancilla_ReceiveItem:
 org $08C505
 Ancilla_ReceiveItem_objectFinished:
 
-org $08CE93
-Ancilla_BreakTowerSeal_draw_single_crystal:
+org $08CE2E
+GTCutscene_AnimateCrystals_NoRotate:
+
+org $08CEB6
+GTCutscene_DrawSingleCrystal_SkipCrystal:
 
 org $08CEC3
-Ancilla_BreakTowerSeal_stop_spawning_sparkles:
+GTCutscene_DrawSingleCrystal_SkipSparkle:
 
 org $08CF59
-BreakTowerSeal_ExecuteSparkles:
+GTCutscene_SparkleALot:
 
 org $08F710
 Ancilla_SetOam_XY_Long:
