@@ -110,28 +110,64 @@ BRA .all_dungeons
 
 
 ;--------------------------------------------------------------------------------
-GetRequiredCrystalsForTower:
-	BEQ + : JSL.l BreakTowerSeal_ExecuteSparkles : + ; thing we wrote over
-	LDA.l NumberOfCrystalsRequiredForTower : CMP.b #$00 : BNE + : JML.l Ancilla_BreakTowerSeal_stop_spawning_sparkles : +
-	LDA.l NumberOfCrystalsRequiredForTower : CMP.b #$01 : BNE + : JML.l Ancilla_BreakTowerSeal_draw_single_crystal : +
-	LDA.l NumberOfCrystalsRequiredForTower : DEC #2 : TAX
-JML.l GetRequiredCrystalsForTower_continue
+GTCutscene_CrystalMasks:
+db %00000000 ; 0 crystals
+db %10000000 ;     BIT INDEX DIAGRAM
+db %00010010 ;             0
+db %00010101 ;          5     1
+db %10010101 ;             7
+db %10110110 ;          4     2
+db %00111111 ;             3
+db %10111111 ; 7 crystals
 ;--------------------------------------------------------------------------------
-GetRequiredCrystalsInX:
-	LDA.l NumberOfCrystalsRequiredForTower : CMP.b #$00 : BNE +
-		TAX
-		RTL
-	+
+GTCutscene_ConditionalAnimateCrystals:
+	PHX : PHX
+	LDA.l NumberOfCrystalsRequiredForTower : TAX : LDA.l GTCutscene_CrystalMasks,X
+	PLX
+	- LSR : DEX : BPL -
+	PLX : BCC .skip_crystal
 
-	TXA
+.draw_crystal
+	LDA.b $11 : BEQ + : JML.l GTCutscene_AnimateCrystals_NoRotate ; what we wrote over
+	+ JML.l GTCutscene_AnimateCrystals_NextCrystal+4
 
-- 	CMP.l NumberOfCrystalsRequiredForTower : BCC +
-	SBC.l NumberOfCrystalsRequiredForTower ; carry guaranteed set
-	BRA -
+.skip_crystal
+	JML.l GTCutscene_DrawSingleCrystal-3
+;--------------------------------------------------------------------------------
+GTCutscene_ConditionalDrawSingleCrystal:
+	LDA.w $06FA : BEQ .draw_crystal : STZ.w $06FA
+	LDA.l NumberOfCrystalsRequiredForTower : TAX
+	LDA.l GTCutscene_CrystalMasks,X : AND.b #$80 : BEQ .skip_crystal
+.draw_crystal
+	LDX.w $0FA0 : PHY ; what we wrote over
+	JML.l GTCutscene_DrawSingleCrystal+4
+.skip_crystal
+	JML.l GTCutscene_DrawSingleCrystal_SkipCrystal
+;--------------------------------------------------------------------------------
+GTCutscene_AnimateCrystals_Prep:
+	BEQ + : JSL.l GTCutscene_SparkleALot : + ; thing we wrote over
+	LDA.l NumberOfCrystalsRequiredForTower : BNE +
+		JML.l GTCutscene_DrawSingleCrystal_SkipSparkle
+	+ CMP.b #$01 : BNE +
+		JML.l GTCutscene_DrawSingleCrystal
+	+ INC.w $06FA ; some free ram OWR also uses
+	JML.l GTCutscene_AnimateCrystals_NextCrystal-2
+;--------------------------------------------------------------------------------
+GTCutscene_ActivateSparkle_SelectCrystal:
+	LDA.l NumberOfCrystalsRequiredForTower : BNE +
+		TAX : RTL
+	+ TXA
 
-	+ INC : CMP.l NumberOfCrystalsRequiredForTower : BNE +
-		LDA.b #$08
-	+ : DEC : TAX
+	- CMP.l NumberOfCrystalsRequiredForTower : BCC +
+	SBC.l NumberOfCrystalsRequiredForTower : BRA - ; carry guaranteed set
+
+	+ PHY : TAY
+	LDA.l NumberOfCrystalsRequiredForTower : TAX : LDA.l GTCutscene_CrystalMasks,X
+	LDX.b #$FF
+	- LSR : INX : BCC + 
+		DEY
+	+ BPL -
+	PLY
 RTL
 ;--------------------------------------------------------------------------------
 CheckEnoughCrystalsForGanon:

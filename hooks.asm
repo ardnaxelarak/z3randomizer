@@ -502,16 +502,21 @@ JSL.l CheckEnoughCrystalsForTower
 NOP #4
 db #$90 ; BCC
 ;--------------------------------------------------------------------------------
-org $08CE0C ; <- 44E0C - ancilla_break_tower_seal.asm : 168 (BEQ #$03 : JSR BreakTowerSeal_ExecuteSparkles : LDX.b #$06)
-JML.l GetRequiredCrystalsForTower
-NOP #3
-GetRequiredCrystalsForTower_continue:
+org $08CE0C ; <- 44E0C - ancilla_break_tower_seal.asm : 168 (BEQ #$03 : JSR GTCutscene_SparkleALot : LDX.b #$06)
+JML.l GTCutscene_AnimateCrystals_Prep : NOP
+LDX.b #$05
+GTCutscene_AnimateCrystals_NextCrystal:
+JML.l GTCutscene_ConditionalAnimateCrystals
+;--------------------------------------------------------------------------------
+org $08CE93
+GTCutscene_DrawSingleCrystal:
+JML.l GTCutscene_ConditionalDrawSingleCrystal
 ;--------------------------------------------------------------------------------
 org $08CF19 ; <- 44F19 - ancilla_break_tower_seal.asm : 336 (TXA : AND.b #$07 : TAX)
-JSL.l GetRequiredCrystalsInX
+JSL.l GTCutscene_ActivateSparkle_SelectCrystal
 ;--------------------------------------------------------------------------------
 org $08CFC9 ; <- 44FC9 - ancilla_break_tower_seal.asm : 414 (RTS)
-db #$6B
+RTL
 ;--------------------------------------------------------------------------------
 
 ;================================================================================
