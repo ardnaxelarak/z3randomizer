@@ -101,6 +101,11 @@ StairCleanup: {
     rts
 }
 
+LookupSpiralOffset_long:
+    PHB : PHK : PLB
+    JSR LookupSpiralOffset
+    PLB : RTL
+
 ;Sets the offset in A
 LookupSpiralOffset: {
     ;where link currently is in $a2: quad in a8 & #$03

@@ -376,8 +376,15 @@ CheckMusicLoadRequest:
 ; Fade out music if we're changing tracks on a stair transition
 ;--------------------------------------------------------------------------------
 SpiralStairsPreCheck:
-    REP #$20    ; thing we wrote over
-    LDA.l DRMode : BNE .done ; exit if door rando enabled
+    LDA.l DRMode : BEQ + ; if door rando enabled
+        JSL LookupSpiralOffset_long
+        REP #$30 : AND.w #$00FF : ASL #2 : TAX
+        LDA.l SpiralTable,X
+        SEP #$10 : TAX : CPX.b #$07 : BNE .done ; check if hera boss
+        JSL CheckHeraBossDefeated : BCS .done
+        LDX.b #$F1 : STX !REG_MUSIC_CONTROL_REQUEST
+        BRA .done
+    + REP #$20 ; thing we wrote over
     LDA $A0
     CMP.w #$000C : BNE +
         LDA !REG_CURRENT_MSU_TRACK : AND.w #$00FF : CMP.w #59 : BNE .done
@@ -407,8 +414,11 @@ SpiralStairsPreCheck:
 ; Change music on stair transition (ToH/GT)
 ;--------------------------------------------------------------------------------
 SpiralStairsPostCheck:
-    LDA.l DRMode : BNE .done ; exit if door rando enabled
-    LDA $A0
+    LDA.l DRMode : BEQ + ; if door rando enabled
+        LDA.b $A2 : CMP.w #$0007 : BNE .done
+        LDX.b #$16 : STX !REG_MUSIC_CONTROL_REQUEST
+        BRA .done
+    + LDA $A0
     CMP.w #$000C : BNE +
         ; Ganon's tower entrance
         LDX $0130 : CPX.b #$F1 : BNE .done  ; Check that we were fading out
