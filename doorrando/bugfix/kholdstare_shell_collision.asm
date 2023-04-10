@@ -17,12 +17,12 @@ LDA.w $0D30, X
 XBA
 LDA.w $0D10, X  ; full 16 bit X coordinate of sprite
 
-REP #$21
+REP #$21  ; carry is guaranteed clear
 SBC.w #$0020
 CMP.b $22
 BCS .not_colliding
 
-ADC.w #$0040
+ADC.w #$0040  ; carry is guaranteed clear
 CMP.b $22
 BCC .not_colliding
 
@@ -31,12 +31,12 @@ LDA.w $0D20, X
 XBA
 LDA.w $0D00, X  ; full 16 bit Y coordinate of sprite
 
-REP #$21
-SBC.w #$001F  ; could go to 27 and let link squeeze in at Lanmo 2 (please adjust the following one)
+REP #$21 ; carry is guaranteed clear
+SBC.w #$001F  ; could go to 27 and still let link squeeze in
 CMP.b $20
 BCS .not_colliding
 
-ADC.w #$0037
+ADC.w #$0037 ; carry is guaranteed clear
 CMP.b $20
 BCC .not_colliding
 
