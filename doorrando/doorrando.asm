@@ -58,6 +58,7 @@ incsrc math.asm
 incsrc hudadditions.asm
 incsrc dr_lobby.asm
 incsrc entrance_fixes.asm
+incsrc bugfix/kholdstare_shell_collision.asm
 warnpc $A79C00
 
 incsrc doortables.asm

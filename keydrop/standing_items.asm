@@ -307,7 +307,7 @@ RTS
 
 ClearSpriteData:
 	STZ.b $02 : STZ.b $03 ; what we overrode
-	.shared
+	.shared:
 	PHX
 		LDA #$00 : LDX #$00
 		.loop
