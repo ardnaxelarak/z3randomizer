@@ -18,8 +18,9 @@ db #$00 ;408106 : 200106 ; toggle to turn on terrorpin ai "fix"
 db #$00 ;368107
 .killable_theives_id  ; must be set to C4 to make thieves killable...
 db #$B8 ;368108
+.enemies_live_upon_falling
+db #$00 ; 368109  ; when set to 1 enemies don't die when falling into a hole
 
-db #$00 ;408109 : 200109
 db #$00 ;40810A : 20010A
 db #$00 ;40810B : 20010B
 db #$00 ;40810C : 20010C

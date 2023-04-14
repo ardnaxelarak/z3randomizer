@@ -20,6 +20,7 @@ lorom
 ;!ENABLE_TERRORPIN_AI_FIX = "$368106" # moved to baserom already
 !CENTER_BOSS_DROP_FLAG = "$368107"
 !KILLABLE_THIEVES_ID = "$368108"
+!ENEMY_FALLING_STAY_ALIVE = "$368109"
 
 ; Enemizer reserved memory
 ; $7F50B0 - $7F50BF - Downstream Reserved (Enemizer)
@@ -52,6 +53,7 @@ incsrc overworld_sprites.asm
 incsrc underworld_sprites.asm
 
 incsrc blindboss.asm
+incsrc falling_death.asm
 
 incsrc shell_gfx.asm
 warnpc $B6FFFF ;if we hit this we need to split stuff by bank
