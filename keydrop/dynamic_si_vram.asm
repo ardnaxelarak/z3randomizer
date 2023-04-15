@@ -5,6 +5,7 @@ DynamicDropGFX = $7EF500
 ; we're expecting 5 items max per room, and order is irrelevant
 ; we just need to keep track of where they go
 DynamicDropGFXIndex = $7E1E70
+!DynamicDropGFXSlotCount = (FreeUWGraphics_end-FreeUWGraphics)>>1
 
 ; this will keep track of the above for each item
 SprItemGFX = $7E0780
@@ -17,20 +18,23 @@ DynamicDropQueue = $7E1E72
 ;   A = item receipt ID
 ;   X = slot
 RequestStandingItemVRAMSlot:
-	STA.w DynamicDropQueue
+	CMP.b #$34 : BCC +
+	CMP.b #$37 : BCS + ; if rupees, use animated rupee OAM slot
+		LDA.b #!DynamicDropGFXSlotCount : STA.w SprItemGFX,X
+		RTL
+	+ STA.w DynamicDropQueue
 	LDA.b #$01
 	STA.w DynamicDropRequest
 
 	LDA.w DynamicDropGFXIndex
 	INC
-	CMP.b #$05 : BCC .fine
+	CMP.b #!DynamicDropGFXSlotCount : BCC .fine
 
 	LDA.b #$00
 
 .fine
 	STA.w DynamicDropGFXIndex
 	STA.w SprItemGFX,X
-
 
 	; decompress graphics
 	PHX
@@ -49,7 +53,6 @@ RequestStandingItemVRAMSlot:
 	PLX
 
 	RTL
-
 
 ;===================================================================================================
 
@@ -94,16 +97,11 @@ FreeUWGraphics:
 	dw $8800>>1
 	dw $8840>>1
 	dw $8980>>1
-	dw $9CA0>>1
-	dw $9DC0>>1
-
-;	dw $8800>>1
-;	dw $8840>>1
-;	dw $8980>>1
 ;	dw $9960>>1 # Arghuss Splash apparently
 ;	dw $9C00>>1
-;	dw $9CA0>>1
-;	dw $9DC0>>1
+	dw $9CA0>>1
+	dw $9DC0>>1
+.end
 
 ;===================================================================================================
 
@@ -162,6 +160,11 @@ DynamicOAMTile_thin:
 
 	dw 0, 0 : db $EE, $00, $20, $00
 	dw 0, 8 : db $FE, $00, $20, $00
+
+	; add new slots above this line
+
+	dw 0, 0 : db $0B, $00, $20, $00 ; animated rupees slot
+	dw 0, 8 : db $1B, $00, $20, $00
 
 DynamicOAMTile_full:
 	dw -4, -1 : db $40, $00, $20, $02
