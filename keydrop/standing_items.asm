@@ -618,6 +618,14 @@ SetTheSceneFix:
 	JSL LoadCommonSprites_long
 RTL
 
+ConditionalLoadCommonSprites_Do3To4Low:
+	LDA.b $10 : CMP.b #$01 : BEQ + ; what we wrote over
+	CMP.b #$0E : BEQ ++
+		JML LoadCommonSprites_Prep3To4Low
+	+ JML LoadCommonSprites_in_file_select
+++ LDA.b #$50 : STA.w $2117 ; skip over some DMA bytes
+JML Sound_LoadLightWorldSongBank-1 ; just some RTS in Bank 00
+
 incsrc dynamic_si_vram.asm
 
 ;===================================================================================================

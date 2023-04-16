@@ -500,6 +500,9 @@ Attract_DecompressStoryGfx:
 org $00E529
 LoadSelectScreenGfx:
 
+org $00E784
+LoadCommonSprites_in_file_select:
+
 org $00F945
 PrepDungeonExit:
 
