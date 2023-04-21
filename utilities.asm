@@ -412,7 +412,7 @@ PrepDynamicTile:
 	TXA
 	JSR.w LoadDynamicTileOAMTable
 	CMP.b #$34 : BCC +
-	CMP.b #$37 : BCS + : BRA ++ ; if rupees, don't draw to OAM
+	CMP.b #$36+1 : BCS + : BRA ++ ; if rupees, don't draw to OAM
 		+ JSL.l GetSpriteID ; convert loot id to sprite id
 		JSL.l GetAnimatedSpriteTile_variable
 	++ LDA.b #$00 : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
@@ -436,7 +436,7 @@ LoadDynamicTileOAMTable:
 		LDA.w #$0200 : STA.l !SPRITE_OAM+6
 		SEP #$20 ; set 8-bit accumulator
 		LDA $01,s : CMP.b #$34 : BCC +
-		CMP.b #$37 : BCS + ; if rupees, use animated gfx already in OAM
+		CMP.b #$36+1 : BCS + ; if rupees, use animated gfx already in OAM
 			LDA.b #$0B : BRA ++
 		+ LDA.b #$24
 		++ STA.l !SPRITE_OAM+4
@@ -452,9 +452,11 @@ LoadDynamicTileOAMTable:
 
 	.narrow
 	LDA $02,s : CMP.b #$34 : BCC +
-	CMP.b #$37 : REP #$20 : BCS + ; if rupees, use animated gfx already in OAM
+	CMP.b #$36+1 : BCS + ; if rupees, use animated gfx already in OAM
+		REP #$20
 		LDA.w #$1B00 : BRA ++
-	+ LDA.w #$3400
+	+ REP #$20
+	LDA.w #$3400
 	++ STA.l !SPRITE_OAM+11
 	LDA.w #$0000 : STA.l !SPRITE_OAM+7
 	               STA.l !SPRITE_OAM+14
@@ -566,7 +568,7 @@ LoadModifiedTileBufferAddress:
 	PHA
 	LDA !TILE_UPLOAD_OFFSET_OVERRIDE : BEQ +
 		TAX
-    	LDY.w #$0002
+		LDY.w #$0002
 		LDA.w #$0000 : STA !TILE_UPLOAD_OFFSET_OVERRIDE
 		BRA .done
 	+
