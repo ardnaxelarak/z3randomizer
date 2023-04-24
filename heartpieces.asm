@@ -129,12 +129,18 @@ RTL
 RTL
 ;--------------------------------------------------------------------------------
 HeartUpgradeSpawnDecision: ; this should return #$00 to make the hp spawn
-	LDA !FORCE_HEART_SPAWN : BEQ .normal_behavior
+	LDA !FORCE_HEART_SPAWN : BEQ .bonk_prize_check
 	
 	DEC : STA !FORCE_HEART_SPAWN
 	LDA #$00
 RTL
-	
+	.bonk_prize_check
+	PHX
+		LDA 2,S : TAX : LDA.w $0ED0, X : BEQ .normal_behavior-1
+	PLX
+	LDA.b #$00
+RTL
+	PLX
 	.normal_behavior
 	LDA OverworldEventDataWRAM, X
 RTL
