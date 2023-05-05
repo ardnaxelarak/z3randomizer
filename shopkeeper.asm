@@ -4,7 +4,6 @@
 ;--------------------------------------------------------------------------------
 !BIGRAM = "$7EC900";
 ;--------------------------------------------------------------------------------
-!SPRITE_OAM = "$7EC025"
 ; A = Tile ID
 macro UploadOAM(dest)
 	PHA : PHP
@@ -770,8 +769,6 @@ RTS
 ;--------------------------------------------------------------------------------
 ;!SHOP_TYPE = "$7F5051"
 ;!SHOP_INVENTORY = "$7F5052"
-!SPRITE_OAM = "$7EC025"
-!REDRAW = "$7F5000"
 Shopkeeper_DrawItems:
 	PHB : PHK : PLB
 	PHX : PHY
@@ -786,14 +783,6 @@ Shopkeeper_DrawItems:
 		JSR.w Shopkeeper_DrawNextItem : BRA ++
 	+ CMP.b #$01 : BNE + : ++
 		JSR.w Shopkeeper_DrawNextItem
-	+
-	LDA $A0 : CMP.b #$09 : BNE + ; render powder slot if potion shop
-	LDA !REDRAW : BNE + ; if not redrawing
-	LDA $02DA : BNE + ; if not buying item
-	LDA $7F505E : BEQ + ; if potion slot filled
-	LDA $0ABF : BEQ + ; haven't left the room
-	LDA NpcFlags+1 : AND.b #$20 : BNE +
-		LDX.b #$0C : LDY.b #$03 : JSR.w Shopkeeper_DrawNextItem
 	+
 	PLY : PLX
 	PLB

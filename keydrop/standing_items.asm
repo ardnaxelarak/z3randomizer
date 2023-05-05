@@ -436,36 +436,40 @@ SpriteKeyPrep:
 		LDA.w SpawnedItemMWPlayer : STA SprItemMWPlayer, X
 		LDA.w SpawnedItemFlag : STA SprItemFlags, X : BEQ +
 		LDA.l SpawnedItemID : STA $0E80, X
-		PHA
-			JSL.l GetSpritePalette : STA $0F50, X ; setup the palette
-		PLA
 		CMP #$24 : BNE ++ ;
 			LDA $A0 : CMP.b #$80 : BNE +
 			LDA SpawnedItemFlag : BNE +
 				LDA #$24  ; it's the big key drop?
-		++ JSL RequestStandingItemVRAMSlot
+		++ JSL RequestSlottedTile
 	+ PLA
 	RTL
 
 SpriteKeyDrawGFX:
-    JSL Sprite_DrawRippleIfInWater
-    PHA
-    LDA $0E80, X
-   	CMP.b #$24 : BNE +
-   		LDA $A0 : CMP #$80 : BNE ++
-   		LDA SpawnedItemFlag : BNE ++
-    		LDA #$24 : BRA +
-    	++ PLA
-		   PHK : PEA.w .jslrtsreturn-1
-		   PEA.w $068014 ; an rtl address - 1 in Bank06
-		   JML Sprite_DrawAbsorbable
-		   .jslrtsreturn
-		   RTL
-	+ JSL DrawPotItem
-    CMP #$03 : BNE +
-        PHA : LDA $0E60, X : ORA.b #$20 : STA $0E60, X : PLA
-    + JSL.l Sprite_DrawShadowLong
-    PLA : RTL
+	JSL Sprite_DrawRippleIfInWater
+	PHA
+	LDA.w !SPRITE_REDRAW, X : BEQ +
+		LDA $0E80, X
+		JSL RequestSlottedTile
+		BRA .skipDraw
+	+ LDA $0E80, X
+	CMP.b #$24 : BNE +
+		LDA $A0 : CMP #$80 : BNE ++
+		LDA SpawnedItemFlag : BNE ++
+			LDA #$24 : BRA +
+		++ PLA
+			PHK : PEA.w .jslrtsreturn-1
+			PEA.w $068014 ; an rtl address - 1 in Bank06
+			JML Sprite_DrawAbsorbable
+			.jslrtsreturn
+			RTL
+	+ JSL DrawSlottedTile : BCS .skipDraw
+		; draw shadow
+		CMP #$03 : BNE +
+			PHA : LDA $0E60, X : ORA.b #$20 : STA $0E60, X : PLA
+		+ JSL.l Sprite_DrawShadowLong
+	.skipDraw
+	PLA
+	RTL
 
 KeyGet:
     LDA CurrentSmallKeys ; what we wrote over

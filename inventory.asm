@@ -952,8 +952,7 @@ LoadPowder:
 	LDA.l WitchItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	%GetPossiblyEncryptedItem(WitchItem, SpriteItemValues)
 	STA $0DA0, Y ; Store item type
-	JSL.l PrepDynamicTile
-	STA $7F505E
+	LDA.b #$01 : STA.w !SPRITE_REDRAW, Y
 	LDA #$00
 	STA $7F505F
 	STA $7F5060
@@ -977,21 +976,16 @@ RTL
 ;--------------------------------------------------------------------------------
 ; DrawPowder:
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
-;--------------------------------------------------------------------------------
 DrawPowder:
 	LDA $02DA : BNE .defer ; defer if link is buying a potion
-	LDA.l !REDRAW : BEQ +
+	LDA.w !SPRITE_REDRAW, X : BEQ +
 		LDA.l WitchItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 		LDA $0DA0, X ; Retrieve stored item type
-		JSL.l PrepDynamicTile
-		LDA #$00 : STA.l !REDRAW ; reset redraw flag
-		BRA .defer
+		JML RequestSlottedTile
 	+
 	; this fights with the shopkeep code, so had to move the powder draw there when potion shop is custom
-	LDA !SHOP_TYPE : CMP.b #$FF : BNE .defer
-		LDA $0DA0, X ; Retrieve stored item type
-		JSL.l DrawDynamicTile
+	LDA $0DA0, X ; Retrieve stored item type
+	JML DrawSlottedTile
 	.defer
 RTL
 ;--------------------------------------------------------------------------------
@@ -1002,19 +996,12 @@ RTL
 LoadMushroom:
 	LDA.b #$00 : STA $0DC0, X ; thing we wrote over
 	.justGFX
-	;LDA MushroomItem
-	;JSL.l PrepDynamicTile
-
 	PHA
 
-	LDA #$01 : STA !REDRAW
-	LDA $5D : CMP #$14 : BEQ .skip ; skip if we're mid-mirror
-
-	LDA #$00 : STA !REDRAW
 	LDA.l MushroomItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	%GetPossiblyEncryptedItem(MushroomItem, SpriteItemValues)
 	STA $0E80, X ; Store item type
-	JSL.l PrepDynamicTile
+	JSL.l RequestSlottedTile
 
 	.skip
 	PLA
@@ -1024,19 +1011,17 @@ RTL
 ;--------------------------------------------------------------------------------
 ; DrawMushroom:
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
-;--------------------------------------------------------------------------------
 DrawMushroom:
 	PHA : PHY
-		LDA !REDRAW : BEQ .skipInit ; skip init if already ready
-		JSL.l LoadMushroom_justGFX
-		BRA .done ; don't draw on the init frame
+		LDA.w !SPRITE_REDRAW, X : BEQ .skipInit ; skip init if already ready
+			JSL.l LoadMushroom_justGFX
+			BRA .done ; don't draw on the init frame
 
 		.skipInit
 		LDA $0E80, X ; Retrieve stored item type
-		JSL.l DrawDynamicTile
+		JSL.l DrawSlottedTile
 
-		.done
+	.done
 	PLY : PLA
 RTL
 ;--------------------------------------------------------------------------------
@@ -1130,11 +1115,13 @@ RTL
 ;--------------------------------------------------------------------------------
 ; SpawnShovelItem:
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
+SpawnShovelGamePrize:
+	JSL Sprite_SpawnDynamically ; thing we wrote over
+	LDA.b #$01 : STA.w !SPRITE_REDRAW, Y
+RTL
+;--------------------------------------------------------------------------------
 SpawnShovelItem:
-	LDA.b #$01 : STA !REDRAW
-
-    LDA $03FC : BEQ +
+	LDA $03FC : BEQ +
     	JSL DiggingGameGuy_AttemptPrizeSpawn
 		JMP .skip
 	+

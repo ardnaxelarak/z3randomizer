@@ -495,32 +495,34 @@ OWBonkGoodBeeDrop:
     ; spawn itemget item
     .spawn_item ; A = item id ; Y = bonk sprite slot ; S = Collected
     PLX : BEQ + : LDA.b #$00 : STA.w $0DD0,Y : BRA .return
-        + LDA.b #$01 : STA !REDRAW
+        + PHA
 
         LDA.b #$EB : STA.l $7FFE00
         JSL Sprite_SpawnDynamically+15 ; +15 to skip finding a new slot, use existing sprite
 
-        TYX : STZ.w $0F20,X ; layer the sprite is on
-        
+        LDA.b #$01 : STA.w !SPRITE_REDRAW,Y
+
+        PLA : STA.w $0E80,Y
+
         ; affects the rate the item moves in the Y/X direction
-        STZ.w $0D40,X
+        LDA.b #$00 : STA.w $0D40,Y
         LDA.b #$0A : STA.w $0D50,Y
 
         LDA.b #$1A : STA.w $0F80,Y ; amount of force (gives height to the arch)
         LDA.b #$FF : STA.w $0B58,Y ; stun timer
         LDA.b #$30 : STA.w $0F10,Y ; aux delay timer 4 ?? dunno what that means
 
+        LDA.b #$00 : STA.w $0F20,Y ; layer the sprite is on
+
         ; sets the tile type that is underneath the sprite, water
-        LDA.b #$09 : STA.l $7FF9C2,X ; TODO: Figure out how to get the game to set this
+        TYX : LDA.b #$09 : STA.l $7FF9C2,X ; TODO: Figure out how to get the game to set this
 
         ; sets OW event bitmask flag, uses free RAM
         LDA.l OWBonkPrizeTable[42].flag : STA.w $0ED0,Y
-        
+
         ; determines the initial spawn point of item
         LDA.w $0D00,Y : SEC : SBC.l OWBonkPrizeTable[42].vert_offset : STA.w $0D00,Y
             LDA.w $0D20,Y : SBC #$00 : STA.w $0D20,Y
-
-        LDA.b #$01 : STA !REDRAW
 
     .return
     PLY
@@ -618,12 +620,14 @@ OWBonkDrops:
     ; spawn itemget item
     .spawn_item ; A = item id ; Y = tree sprite slot ; S = Collected, FlagBitmask, X (row + 2)
     PLX : BEQ + : LDA.b #$00 : STA.w $0DD0,Y : JMP .return ; S = FlagBitmask, X (row + 2)
-        + LDA 2,S : TAX : INX
-
-        LDA.b #$01 : STA !REDRAW
+        + PHA
 
         LDA.b #$EB : STA.l $7FFE00
         JSL Sprite_SpawnDynamically+15 ; +15 to skip finding a new slot, use existing sprite
+
+        LDA.b #$01 : STA.w !SPRITE_REDRAW,Y
+
+        PLA : STA.w $0E80,Y
 
         ; affects the rate the item moves in the Y/X direction
         LDA.b #$00 : STA.w $0D40,Y
@@ -637,14 +641,12 @@ OWBonkDrops:
 
         ; sets OW event bitmask flag, uses free RAM
         PLA : STA.w $0ED0,Y ; S = X (row + 2)
-        
+
         ; determines the initial spawn point of item
         PLX : INX : INX : INX
         LDA.w $0D00,Y : SEC : SBC.w OWBonkPrizeData,X : STA.w $0D00,Y
             LDA.w $0D20,Y : SBC #$00 : STA.w $0D20,Y
 
-        LDA.b #$01 : STA !REDRAW
-        
         PLB : RTL
 
     .return
@@ -958,7 +960,9 @@ OWNewDestination:
 OWLoadSpecialArea:
 {
     LDA.l Overworld_LoadSpecialOverworld_RoomId,X : STA.b $A0
-    JSL Overworld_LoadSpecialOverworld ; sets M and X flags
+    CMP.w #$0182 : BNE +
+        JSL ZoraSplashGfxFix
+    + JSL Overworld_LoadSpecialOverworld ; sets M and X flags
     TYX
     LDY.b #$00
     CPX.b #$01 : BNE + ; check if going to water transition

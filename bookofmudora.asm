@@ -5,13 +5,12 @@ LoadLibraryItemGFX:
 	LDA.l LibraryItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	%GetPossiblyEncryptedItem(LibraryItem, SpriteItemValues)
 	STA $0E80, X ; Store item type
-	JSL.l PrepDynamicTile
-RTL
+	JML RequestSlottedTile
 ;--------------------------------------------------------------------------------
 DrawLibraryItemGFX:
 	PHA
     LDA $0E80, X ; Retrieve stored item type
-	JSL.l DrawDynamicTile
+	JSL.l DrawSlottedTile
 	PLA
 RTL
 ;--------------------------------------------------------------------------------
@@ -25,27 +24,22 @@ RTL
 ;================================================================================
 ; Randomize Bonk Keys
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
-;--------------------------------------------------------------------------------
 LoadBonkItemGFX:
 	LDA.b #$08 : STA $0F50, X ; thing we wrote over
 LoadBonkItemGFX_inner:
-	LDA.b #$00 : STA !REDRAW
 	JSR LoadBonkItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	JSR LoadBonkItem
-	JSL.l PrepDynamicTile
-RTL
+	JML RequestSlottedTile
 ;--------------------------------------------------------------------------------
 DrawBonkItemGFX: 
 	PHA
-	LDA !REDRAW : BEQ .skipInit ; skip init if already ready
-	JSL.l LoadBonkItemGFX_inner
-	BRA .done ; don't draw on the init frame
+	LDA.w !SPRITE_REDRAW, X : BEQ .skipInit ; skip init if already ready
+		JSL.l LoadBonkItemGFX_inner
+		BRA .done ; don't draw on the init frame
 	
 	.skipInit
-	
-    JSR LoadBonkItem
-	JSL.l DrawDynamicTileNoShadow
+	JSR LoadBonkItem
+	JSL DrawSlottedTile
 	
 	.done
 	PLA

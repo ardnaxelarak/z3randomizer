@@ -10,6 +10,7 @@ Init_Primary:
 	LDX #$00 ; initalize our ram
 	-
 		STA $7EC025, X
+		STA $7EC035, X
 		STA $7F5000, X
 		INX
 		CPX #$10 : !BLT -

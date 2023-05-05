@@ -411,8 +411,7 @@ PrepDynamicTile:
 	+
 	TXA
 	JSR.w LoadDynamicTileOAMTable
-	CMP.b #$34 : BCC +
-	CMP.b #$36+1 : BCS + : BRA ++ ; if rupees, don't draw to OAM
+	CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS + : BRA ++ ; if rupees, don't draw to OAM
 		+ JSL.l GetSpriteID ; convert loot id to sprite id
 		JSL.l GetAnimatedSpriteTile_variable
 	++ LDA.b #$00 : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
@@ -424,8 +423,6 @@ RTL
 ; LoadDynamicTileOAMTable
 ; in:	A - Loot ID
 ;-------------------------------------------------------------------------------- 20/847B
-!SPRITE_OAM = "$7EC025"
-;--------------------------------------------------------------------------------
 LoadDynamicTileOAMTable:
 	PHA : PHP
 
@@ -435,8 +432,8 @@ LoadDynamicTileOAMTable:
 		               STA.l !SPRITE_OAM+2
 		LDA.w #$0200 : STA.l !SPRITE_OAM+6
 		SEP #$20 ; set 8-bit accumulator
-		LDA $01,s : CMP.b #$34 : BCC +
-		CMP.b #$36+1 : BCS + ; if rupees, use animated gfx already in OAM
+		LDA $01,s
+		CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS + ; if rupees, use animated gfx already in OAM
 			LDA.b #$0B : BRA ++
 		+ LDA.b #$24
 		++ STA.l !SPRITE_OAM+4
@@ -451,8 +448,8 @@ LoadDynamicTileOAMTable:
 	BRA .done
 
 	.narrow
-	LDA $02,s : CMP.b #$34 : BCC +
-	CMP.b #$36+1 : BCS + ; if rupees, use animated gfx already in OAM
+	LDA $02,s
+	CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS + ; if rupees, use animated gfx already in OAM
 		REP #$20
 		LDA.w #$1B00 : BRA ++
 	+ REP #$20
@@ -474,7 +471,6 @@ RTS
 ;--------------------------------------------------------------------------------
 ; This wastes two OAM slots if you don't want a shadow - fix later - I wrote "fix later" over a year ago and it's still not fixed (Aug 6, 2017) - lol (May 25th, 2019)
 ;-------------------------------------------------------------------------------- 2084B8
-!SPRITE_OAM = "$7EC025"
 !SKIP_EOR = "$7F5008"
 ;--------------------------------------------------------------------------------
 DrawDynamicTile:

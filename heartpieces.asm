@@ -49,28 +49,26 @@ HeartContainerGet:
 
 	BRA HeartPieceGet_skipLoad
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
 DrawHeartPieceGFX:
 	PHP
 	JSL.l Sprite_IsOnscreen : BCC .offscreen
 	
 	PHA : PHY
-	LDA !REDRAW : BEQ .skipInit ; skip init if already ready
-	JSL.l HeartPieceSpritePrep
-	JMP .done ; don't draw on the init frame
+	LDA.w !SPRITE_REDRAW, X : BEQ .skipInit ; skip init if already ready
+		JSL.l HeartPieceSpritePrep
+		BRA .done ; don't draw on the init frame
 	
 	.skipInit
 	LDA $0E80, X ; Retrieve stored item type
-
+	
 	.skipLoad
-	
-	JSL.l DrawDynamicTile
-	
-	CMP #$03 : BNE +
-		PHA : LDA $0E60, X : ORA.b #$20 : STA $0E60, X : PLA
-	+
-
-	JSL.l Sprite_DrawShadowLong
+	JSL DrawSlottedTile : BCS .done
+		; draw shadow
+		CMP #$03 : BNE +
+			INC.b $00 : INC.b $00 : INC.b $00 : INC.b $00 ; move narrow sprite shadow over 4 pixels
+			PHA : LDA $0E60, X : ORA.b #$20 : STA $0E60, X : PLA
+		+
+		JSL.l Sprite_DrawShadowLong
 	
 	.done
 	PLY : PLA
@@ -78,20 +76,17 @@ DrawHeartPieceGFX:
 	PLP
 RTL
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
 DrawHeartContainerGFX:
 	PHP
 	JSL.l Sprite_IsOnscreen : BCC DrawHeartPieceGFX_offscreen
 	
 	PHA : PHY
-	LDA !REDRAW : BEQ .skipInit ; skip init if already ready
-	JSL.l HeartContainerSpritePrep
-	BRA DrawHeartPieceGFX_done ; don't draw on the init frame
+	LDA.w !SPRITE_REDRAW, X : BEQ .skipInit ; skip init if already ready
+		JSL.l HeartContainerSpritePrep
+		BRA DrawHeartPieceGFX_done ; don't draw on the init frame
 	
 	.skipInit
-	LDA $0E80, X ; Retrieve stored item type
-
-	BRA DrawHeartPieceGFX_skipLoad
+	BRA DrawHeartPieceGFX_skipInit
 ;--------------------------------------------------------------------------------
 HeartContainerSound:
 	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +
@@ -160,34 +155,28 @@ RTL
 	LDA OverworldEventDataWRAM, X : ORA.b #$40 : STA OverworldEventDataWRAM, X
 RTL
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
 HeartPieceSpritePrep:
 	PHA
 	
 	LDA ServerRequestMode : BEQ + :  : +
 	
-	LDA #$01 : STA !REDRAW
-	LDA $5D : CMP #$14 : BEQ .skip ; skip if we're mid-mirror
-
-	LDA #$00 : STA !REDRAW
+	LDA.b #$01 : STA.w !SPRITE_REDRAW, X
 	JSL.l HeartPieceGetPlayer : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	JSL.l LoadHeartPieceRoomValue ; load item type
 	STA $0E80, X ; Store item type
-	JSL.l PrepDynamicTile
+	JSL.l RequestSlottedTile
 	
 	.skip
 	PLA
 RTL
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
 HeartContainerSpritePrep:
 	PHA
 	
-	LDA #$00 : STA !REDRAW
 	JSL.l HeartPieceGetPlayer : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	JSL.l LoadHeartContainerRoomValue ; load item type
 	STA $0E80, X ; Store item type
-	JSL.l PrepDynamicTile
+	JSL.l RequestSlottedTile
 	
 	PLA
 RTL
@@ -202,7 +191,6 @@ LoadHeartPieceRoomValue:
 	.done
 RTL
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
 HPItemReset:
 	PHA
 	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE .skip
@@ -212,7 +200,6 @@ HPItemReset:
 	.skip
 	PLA
 	.done
-	PHA : LDA #$01 : STA !REDRAW : PLA
 RTL
 ;--------------------------------------------------------------------------------
 MaybeMarkDigSpotCollected:
@@ -857,3 +844,37 @@ HeartPieceGetPlayer:
 	PLY
 RTL
 }
+;--------------------------------------------------------------------------------
+HeartPieceSetRedraw:
+	PHY
+		LDY.b #$0F
+		.next
+		LDA.w $0DD0,Y : BEQ ++
+			LDA.w $0E20,Y : CMP.b #$EB : BEQ + ; heart piece
+			CMP.b #$E4 : BEQ + ; enemy key drop
+			CMP.b #$3B : BEQ + ; bonk item (book/key)
+			CMP.b #$E5 : BEQ + ; enemy big key drop
+			CMP.b #$E7 : BEQ + ; mushroom item
+			CMP.b #$E9 : BEQ + ; powder item
+			BRA ++
+				+ LDA.b #$01 : STA.w !SPRITE_REDRAW,Y
+		++ DEY : BPL .next
+	PLY
+RTL
+HeartPieceGetRedraw:
+	PHY
+		LDY.b #$0F
+		.next
+		LDA.w $0DD0,Y : BEQ ++
+			LDA.w $0E20,Y : CMP.b #$EB : BEQ + ; heart piece
+			CMP.b #$E4 : BEQ + ; enemy key drop
+			CMP.b #$3B : BEQ + ; bonk item (book/key)
+			CMP.b #$E5 : BEQ + ; enemy big key drop
+			CMP.b #$E7 : BEQ + ; mushroom item
+			CMP.b #$E9 : BEQ + ; powder item
+			BRA ++
+				+ LDA.w !SPRITE_REDRAW,Y : BEQ ++
+					PLY : SEC : RTL
+		++ DEY : BPL .next
+	PLY
+CLC : RTL

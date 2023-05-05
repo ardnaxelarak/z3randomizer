@@ -44,7 +44,10 @@ dw !ROM_VERSION_HIGH
 
 !MS_GOT = "$7F5031"
 
-!REDRAW = "$7F5000"
+;!REDRAW = "$7F5000"
+!SPRITE_REDRAW = "$7E0790"          ; 16 bytes
+!SPRITE_OAM = "$7EC025"             ; 16 bytes
+!SPRITE_DYNAMIC_OAM = "$7EC035"     ; 16 bytes
 !GANON_WARP_CHAIN = "$7F5032";
 
 !TILE_UPLOAD_BUFFER = "$7EA180";

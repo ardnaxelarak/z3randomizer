@@ -318,9 +318,7 @@ RTL
 IndoorTileTransitionCounter:
 JMP StatTransitionCounter
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
 IndoorSubtileTransitionCounter:
-	LDA.b #$01 : STA !REDRAW ; set redraw flag for items
     STZ $0646 ; stuff we wrote over
     STZ $0642
 JMP StatTransitionCounter

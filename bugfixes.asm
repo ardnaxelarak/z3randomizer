@@ -201,6 +201,27 @@ LDA $1B : BNE +
 RTL
 
 ;--------------------------------------------------------------------------------
+; Fix losing VRAM gfx when using quake
+PostNMIUpdateBGCharHalf:
+	STA.w $420B : SEP #$10 ; what we wrote over
+	LDA.w $0116 : CMP.b #$46 : BNE .return ; checks to see if this is the last VRAM write
+	LDA.b $5D : CMP.b #$08 : BCC + : CMP.b #$0A+1 : BCS + ; skip if we're mid-medallion
+		RTL
+	+ JSL HeartPieceSetRedraw ; set redraw flag for items
+.return
+RTL
+
+; Force redraws of items following map checks
+PostOverworldGfxLoad:
+	INC.b $11 : STZ.b $13 ; what we wrote over
+	JSL HeartPieceSetRedraw
+RTL
+PostUnderworldMap:
+	JSL HeartPieceSetRedraw
+	LDA.l $7EC229 ; what we wrote over
+RTL
+
+;--------------------------------------------------------------------------------
 FixJingleGlitch:
 	LDA.b $11
 	BEQ .set_doors

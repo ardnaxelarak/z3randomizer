@@ -36,6 +36,9 @@ org $00821B ; <- 21B - Bank00.asm : 329 (LDA $13 : STA $2100)
 JML.l PostNMIHookAction : NOP
 PostNMIHookReturn:
 ;--------------------------------------------------------------------------------
+org $008F6C
+JSL PostNMIUpdateBGCharHalf : NOP
+;--------------------------------------------------------------------------------
 
 ;================================================================================
 ; Anti-ZSNES Hook
@@ -1069,6 +1072,10 @@ JSL HandleBombAbsorbtion
 ;org $09873F ; <- 04873F - ancilla_init.asm : 960 (ADC [$00] : STA [$00] )
 ;JSL.l AddToStock
 ;--------------------------------------------------------------------------------
+org $02EB18
+JSL PostOverworldGfxLoad
+org $18BD55
+JSL PostUnderworldMap
 
 ;================================================================================
 ; Kholdstare Shell Fix
@@ -1324,7 +1331,7 @@ NOP #5
 ;--------------------------------------------------------------------------------
 org $05EE5F ; <- 2EE5F - sprite_mushroom.asm : 30
 JSL.l LoadMushroom
-NOP
+BRA + : NOP #7 : +
 ;--------------------------------------------------------------------------------
 org $05EE78 ; <- 2EE78 - sprite_mushroom.asm : 58
 JSL.l DrawMushroom
@@ -1371,6 +1378,8 @@ org $07A303 ; 3A303 - Bank07.asm : 5622
 org $07A3A2 ; 3A3A2 - Bank07.asm : 5720 - JSL DiggingGameGuy_AttemptPrizeSpawn
 JSL.l SpawnShovelItem
 BRA _Bank07_5726
+org $1DFDAC
+JSL.l SpawnShovelGamePrize
 org $07A3AB ; 3A3AB - Bank07.asm : 5726 - LDA.b #$12 : JSR Player_DoSfx2
 _Bank07_5726:
 ;org $07A381 ; 3A381 - Bank07.asm : 5693 - ORA $035B
