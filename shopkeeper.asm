@@ -815,8 +815,13 @@ Shopkeeper_DrawNextItem:
 	CMP.b #$2E : BNE + : BRA .potion
 	+ CMP.b #$2F : BNE + : BRA .potion
 	+ CMP.b #$30 : BEQ .potion
+	+ CMP.b #$34 : BCC .normal : CMP.b #$36+1 : BCS .normal
+		BRA .rupee
 	.normal
 		LDA.w .tile_indices, Y : BRA + ; get item gfx index
+	.rupee
+		LDA.b #$0B ; rupee is #$0B because it's already there in VRAM
+		BRA .vramLoc
 	.potion
 		LDA.b #$C0 ; potion is #$C0 because it's already there in VRAM
 	+
@@ -828,18 +833,23 @@ Shopkeeper_DrawNextItem:
 	XBA
 
 	AND #$FE
+	.vramLoc
 	STA.l !SPRITE_OAM+4
+	PHA
 
-	PHX : LDA #0 : XBA : TXA : LSR #2 : TAX : LDA.l !SHOP_INVENTORY_DISGUISE, X : PLX : CMP #$0 : BNE ++
-		LDA.l !SHOP_INVENTORY, X ; get item palette
-	++
-	JSL.l GetSpritePalette : STA.l !SPRITE_OAM+5
+		PHX : LDA #0 : XBA : TXA : LSR #2 : TAX : LDA.l !SHOP_INVENTORY_DISGUISE, X : PLX : CMP #$0 : BNE ++
+			LDA.l !SHOP_INVENTORY, X ; get item palette
+		++
+		JSL.l GetSpritePalette : STA.l !SPRITE_OAM+5
 
-	LDA.w .tile_indices, Y : AND.b #$01 : BEQ +; get tile index sheet
+	PLA
+	AND.b #$01 : BNE .oam1 ; special case for rupee item
+	LDA.w .tile_indices, Y : AND.b #$01 : BEQ ++ ; get tile index sheet
+		.oam1
 		LDA.l !SPRITE_OAM+5
 		ORA.b #$1
 		STA.l !SPRITE_OAM+5
-	+
+	++
 
 	LDA.b #$00 : STA.l !SPRITE_OAM+6
 
