@@ -424,14 +424,16 @@ LoadMapDarkOrMixed:
 
 OWBonkGoodBeeDrop:
 {
-    LDA.l OWFlags+1 : AND.b #$02 : BNE .shuffled
+    LDA.l OWFlags+1 : AND.b #!FLAG_OW_BONKDROP : BNE .shuffled
         .vanilla ; what we wrote over
         STZ.w $0DD0,X
         LDA.l BottleContentsOne : ORA.l BottleContentsTwo
             ORA.l BottleContentsThree : ORA.l BottleContentsFour
         RTL
     .shuffled
-    PHY : TXY
+    LDA.w $0DD0,X : BNE +
+        JMP .return+1
+    + PHY : TXY
     LDA.l RoomDataWRAM[$0120].high : AND.b #$02 : PHA : BNE + ; check if collected
         LDA.b #$1B : STA $12F ; JSL Sound_SetSfx3PanLong ; seems that when you bonk, there is a pending bonk sfx, so we clear that out and replace with reveal secret sfx
     +
@@ -497,6 +499,8 @@ OWBonkGoodBeeDrop:
     PLX : BEQ + : LDA.b #$00 : STA.w $0DD0,Y : BRA .return
         + PHA
 
+        LDA.b #$01 : STA !FORCE_HEART_SPAWN
+
         LDA.b #$EB : STA.l $7FFE00
         JSL Sprite_SpawnDynamically+15 ; +15 to skip finding a new slot, use existing sprite
 
@@ -535,8 +539,10 @@ OWBonkDrops:
 {
     CMP.b #$D8 : BEQ +
         RTL
-    + LDA.l OWFlags+1 : AND.b #!FLAG_OW_CROSSED : BNE +
+    + LDA.l OWFlags+1 : AND.b #!FLAG_OW_BONKDROP : BNE +
         JSL.l Sprite_TransmuteToBomb : RTL
+    + LDA.w $0DD0,Y : BNE +
+        RTL
     +
 
     ; loop thru rando bonk table to find match
@@ -621,6 +627,8 @@ OWBonkDrops:
     .spawn_item ; A = item id ; Y = tree sprite slot ; S = Collected, FlagBitmask, X (row + 2)
     PLX : BEQ + : LDA.b #$00 : STA.w $0DD0,Y : JMP .return ; S = FlagBitmask, X (row + 2)
         + PHA
+
+        LDA.b #$01 : STA !FORCE_HEART_SPAWN
 
         LDA.b #$EB : STA.l $7FFE00
         JSL Sprite_SpawnDynamically+15 ; +15 to skip finding a new slot, use existing sprite
