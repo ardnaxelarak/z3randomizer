@@ -16,7 +16,7 @@ HudAdditions:
         + JSL HexToDec_fast
         .skip
         LDA #$207F : STA !GOAL_DRAW_ADDRESS+2 : STA !GOAL_DRAW_ADDRESS+4
-		PLA : PHA : CMP.w #100 : !BLT +
+		LDA.b 1,S : CMP.w #100 : !BLT +
 			LDX.b $05 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+2 ; draw 100's digit
 		+ PLA : CMP.w #10 : !BLT +
 		 	LDX.b $06 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+4 ; draw 10's digit

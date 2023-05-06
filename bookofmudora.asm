@@ -63,7 +63,7 @@ RTL
 LoadBonkItem:
 	LDA $A0 ; check room ID - only bonk keys in 2 rooms so we're just checking the lower byte
 	CMP #115 : BNE + ; Desert Bonk Key
-    	LDA.l BonkKey_Desert
+		LDA.l BonkKey_Desert
 		BRA ++
 	+ : CMP #140 : BNE + ; GTower Bonk Key
 		LDA.l BonkKey_GTower
@@ -79,7 +79,7 @@ LoadBonkItem_Player:
 		LDA.l BonkKey_Desert_Player
 		BRA ++
 	+ : CMP #140 : BNE + ; GTower Bonk Key
-    	LDA.l BonkKey_GTower_Player
+		LDA.l BonkKey_GTower_Player
 		BRA ++
 	+
 		LDA.b #$00

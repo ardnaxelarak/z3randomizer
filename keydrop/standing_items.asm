@@ -472,21 +472,21 @@ SpriteKeyDrawGFX:
 	RTL
 
 KeyGet:
-    LDA CurrentSmallKeys ; what we wrote over
-    PHA
-    	LDA.l StandingItemsOn : BNE +
-    		PLA : RTL
-    	+ LDY $0E80, X
-    	LDA SprItemIndex, X : STA SpawnedItemIndex
-    	LDA SprItemFlags, X : STA SpawnedItemFlag
-    	LDA $A0 : CMP #$87 : BNE + ;check for hera cage
-    	LDA SpawnedItemFlag : BNE + ; if it came from a pot, it's fine
-    		JSR ShouldKeyBeCountedForDungeon : BCC ++
+	LDA CurrentSmallKeys ; what we wrote over
+	PHA
+		LDA.l StandingItemsOn : BNE +
+			PLA : RTL
+		+ LDY $0E80, X
+		LDA SprItemIndex, X : STA SpawnedItemIndex
+		LDA SprItemFlags, X : STA SpawnedItemFlag
+		LDA $A0 : CMP #$87 : BNE + ;check for hera cage
+		LDA SpawnedItemFlag : BNE + ; if it came from a pot, it's fine
+			JSR ShouldKeyBeCountedForDungeon : BCC ++
 			JSL CountChestKeyLong
-    		++ PLA : RTL
-    	+ STY $00
-    	LDA SprItemMWPlayer, X : STA !MULTIWORLD_ITEM_PLAYER_ID : BNE .receive
-    	PHX
+			++ PLA : RTL
+		+ STY $00
+		LDA SprItemMWPlayer, X : STA !MULTIWORLD_ITEM_PLAYER_ID : BNE .receive
+		PHX
 			LDA $040C : CMP #$FF : BNE +
 				LDA $00 : CMP.b #$AF : BNE .skip
 				LDA CurrentGenericKeys : INC : STA CurrentGenericKeys
@@ -499,10 +499,10 @@ KeyGet:
 				++ PLX : PLA : RTL
 			+ CMP.b #$AF : beq .countIt ; universal key
 			CMP.b #$24 : beq .countIt   ; small key for this dungeon
-    	.skip PLX
-    	.receive
-    	JSL $0791b3 ; Player_HaltDashAttackLong
-    	JSL.l Link_ReceiveItem
+		.skip PLX
+		.receive
+		JSL $0791b3 ; Player_HaltDashAttackLong
+		JSL.l Link_ReceiveItem
 	PLA : DEC : RTL
 
 KeyTable:
