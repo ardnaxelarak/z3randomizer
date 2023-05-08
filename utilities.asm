@@ -295,7 +295,7 @@ RTL
 	db $08 ; Fairy
 	db $08 ; Chicken
 	db $08 ; Big Magic
-	db $08 ; Good Bee
+	db $04 ; Good Bee
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
@@ -364,7 +364,7 @@ IsNarrowSprite:
 	LDX.b #$00 ; set index counter to 0
 	;----
 	-
-	CPX.b #$24 : !BGE .false ; finish if we've done the whole list
+	CPX.b #(.smallSprites_end-.smallSprites) : !BGE .false ; finish if we've done the whole list
 	CMP.l .smallSprites, X : BNE + ; skip to next if we don't match
 	;--
 	SEC ; set true state
@@ -387,7 +387,8 @@ RTL
 	db $15, $18, $24, $2A, $34, $35, $36, $42
 	db $43, $45, $59, $A0, $A1, $A2, $A3, $A4
 	db $A5, $A6, $A7, $A8, $A9, $AA, $AB, $AC
-	db $AD, $AE, $AF, $B4, $FF, $FF, $FF, $FF
+	db $AD, $AE, $AF, $B4, $B5
+	.smallSprites_end
 }
 ;--------------------------------------------------------------------------------
 

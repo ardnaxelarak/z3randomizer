@@ -809,18 +809,53 @@ Shopkeeper_DrawNextItem:
 	SEP #$20 ; set 8-bit accumulator
 	PLY
 	
+	STZ $0E ; $0E will be used temporarily to store a non-zero value if VRAM slot is in OAM1
 	PHX : LDA #0 : XBA : TXA : LSR #2 : TAX : LDA.l !SHOP_INVENTORY_DISGUISE, X : PLX : CMP #$0 : BNE ++
-		LDA.l !SHOP_INVENTORY, X ; get item palette
+		LDA.l !SHOP_INVENTORY, X
 	++
-	CMP.b #$2E : BNE + : BRA .potion
-	+ CMP.b #$2F : BNE + : BRA .potion
-	+ CMP.b #$30 : BEQ .potion
-	+ CMP.b #$34 : BCC .normal : CMP.b #$36+1 : BCS .normal
+	CMP.b #$2E : BNE + : JMP .potion
+	+ CMP.b #$2F : BNE + : JMP .potion
+	+ CMP.b #$30 : BNE + : JMP .potion
+	+ CMP.b #$B2 : BNE + : BRA .fairy
+	+ CMP.b #$B5 : BNE + : BRA .goodbee
+	+ CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS +
 		BRA .rupee
+	+
 	.normal
 		LDA.w .tile_indices, Y : BRA + ; get item gfx index
 	.rupee
 		LDA.b #$0B ; rupee is #$0B because it's already there in VRAM
+		STA.b $0E
+		BRA .vramLoc
+	.fairy
+		REP #$20
+			LDA.b $1A : SEC : SBC.w #$10 : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
+				LDA.l !SPRITE_OAM+2 : SEC : SBC.w #$02 ; move fairy up 2 pixels
+				STA.l !SPRITE_OAM+2
+			++
+		SEP #$20
+		LDA.b $1A : AND.b #$20 : BEQ ++ ; alternate every 32 frames
+			LDA.b #$EC ; use other fairy GFX
+			STA.b $0E
+			BRA .vramLoc
+		++
+		LDA.b #$EA ; fairy is #$EA/EC because it's already there in VRAM
+		STA.b $0E
+		BRA .vramLoc
+	.goodbee
+		REP #$20
+			LDA.b $1A : SEC : SBC.w #$10 : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
+				LDA.l !SPRITE_OAM+2 : SEC : SBC.w #$02 ; move bee up 2 pixels
+				STA.l !SPRITE_OAM+2
+			++
+		SEP #$20
+		LDA.b $1A : AND.b #$20 : BEQ ++ ; alternate every 32 frames
+			LDA.b #$D4 ; use other bee GFX
+			STA.b $0E
+			BRA .vramLoc
+		++
+		LDA.b #$E4 ; good bee is #$E4/D4 because it's already there in VRAM
+		STA.b $0E
 		BRA .vramLoc
 	.potion
 		LDA.b #$C0 ; potion is #$C0 because it's already there in VRAM
@@ -835,15 +870,13 @@ Shopkeeper_DrawNextItem:
 	AND #$FE
 	.vramLoc
 	STA.l !SPRITE_OAM+4
-	PHA
 
-		PHX : LDA #0 : XBA : TXA : LSR #2 : TAX : LDA.l !SHOP_INVENTORY_DISGUISE, X : PLX : CMP #$0 : BNE ++
-			LDA.l !SHOP_INVENTORY, X ; get item palette
-		++
-		JSL.l GetSpritePalette : STA.l !SPRITE_OAM+5
+	PHX : LDA #0 : XBA : TXA : LSR #2 : TAX : LDA.l !SHOP_INVENTORY_DISGUISE, X : PLX : CMP #$0 : BNE ++
+		LDA.l !SHOP_INVENTORY, X ; get item palette
+	++
+	JSL.l GetSpritePalette : STA.l !SPRITE_OAM+5
 
-	PLA
-	AND.b #$01 : BNE .oam1 ; special case for rupee item
+	LDA.b $0E : BNE .oam1 ; item uses VRAM in OAM1
 	LDA.w .tile_indices, Y : AND.b #$01 : BEQ ++ ; get tile index sheet
 		.oam1
 		LDA.l !SPRITE_OAM+5
@@ -866,6 +899,10 @@ Shopkeeper_DrawNextItem:
 		LDA.b #$00
 		STA.l !SPRITE_OAM+7
 		JSR.w PrepNarrowLower
+		LDA.b $0E : AND.b #$0F : CMP.b #$04 : BNE +
+			; special exception for bee gfx, need top tile to be blank
+			LDA.b #$7C : STA.l !SPRITE_OAM+4
+		+
 		LDA.b #$02
 	++
 	PHX : PHA : LDA !SCRATCH_TEMP_X : TAX : PLA : JSR.w RequestItemOAM : PLX

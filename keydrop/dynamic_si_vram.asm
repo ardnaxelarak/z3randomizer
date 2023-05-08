@@ -54,6 +54,20 @@ RequestSlottedTile:
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
 		+++ INC : STA.w SprItemGFX,X
 		JMP .success
+	+ CMP.b #$B5 : BNE + ; if good bee, use bee OAM slot
+		LDA.b $1B : BEQ ++
+			LDA.b #!DynamicDropGFXSlotCount_UW
+			BRA +++
+		++ LDA.b #!DynamicDropGFXSlotCount_OW
+		+++ INC : INC : STA.w SprItemGFX,X
+		JMP .success
+	+ CMP.b #$B2 : BNE + ; if fairy, use fairy OAM slot
+		LDA.b $1B : BEQ ++
+			LDA.b #!DynamicDropGFXSlotCount_UW
+			BRA +++
+		++ LDA.b #!DynamicDropGFXSlotCount_OW
+		+++ STA.w SprItemGFX,X
+		JMP .success
 	+
 	
 	PHA : PHX
@@ -202,6 +216,7 @@ DrawSlottedTile:
 			PLA : SEC : RTL
 		+
 	PLA
+	STA.b $BD ; store loot ID temporarily, will get overwritten in Sprite_DrawMultiple_quantity_preset call
 	JSL.l IsNarrowSprite : BCS .narrow
 
 	; TODO: Instead of loading the whole fixed 16 bytes from DynamicOAMTile**_** into !SPRITE_DYNAMIC_OAM
@@ -254,6 +269,23 @@ DrawSlottedTile:
 				STA.w !SPRITE_DYNAMIC_OAM : STA.w !SPRITE_DYNAMIC_OAM+8
 
 		.draw
+		; special handling
+		LDY.b $BD : CPY.b #$B2 : BNE + ; fairy
+			LDA.b $1A : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
+				LDA.w !SPRITE_DYNAMIC_OAM+4 : CLC : ADC.w #$02 ; use other fairy GFX
+				STA.w !SPRITE_DYNAMIC_OAM+4
+			++ LDA.b $1A : SEC : SBC.w #$10 : AND.w #$0020 : BEQ + ; alternate every 32 frames
+				LDA.w !SPRITE_DYNAMIC_OAM+2 : SEC : SBC.w #$02 ; move fairy up 2 pixels
+				STA.w !SPRITE_DYNAMIC_OAM+2
+		+ CPY.b #$B5 : BNE + ; good bee
+			LDA.b $1A : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
+				LDA.w !SPRITE_DYNAMIC_OAM+12 : SEC : SBC.w #$10 ; use other fairy GFX
+				STA.w !SPRITE_DYNAMIC_OAM+12
+			++ LDA.b $1A : SEC : SBC.w #$10 : AND.w #$0020 : BEQ + ; alternate every 32 frames
+				LDA.w !SPRITE_DYNAMIC_OAM+10 : SEC : SBC.w #$02 ; move fairy up 2 pixels
+				STA.w !SPRITE_DYNAMIC_OAM+10
+		+
+
 		LDA.w #!SPRITE_DYNAMIC_OAM : STA.b $08
 		SEP #$20
 		STZ.b $07
@@ -292,6 +324,9 @@ DynamicOAMTileUW_thin:
 	dw 0, 0 : db $6B, $00, $20, $00 ; key
 	dw 0, 8 : db $7B, $00, $20, $00
 
+	dw 0, 0 : db $7C, $00, $20, $00 ; good bee
+	dw 0, 8 : db $F4, $00, $20, $00
+
 DynamicOAMTileUW_full:
 	dw -4, -1 : db $40, $00, $20, $02
 	dd 0, 0
@@ -306,6 +341,11 @@ DynamicOAMTileUW_full:
 	dd 0, 0
 
 	dw -4, -1 : db $EE, $00, $20, $02
+	dd 0, 0
+
+	; add new slots above this line
+
+	dw -4, -1 : db $EA, $00, $20, $02 ; fairy
 	dd 0, 0
 
 DynamicOAMTileOW_thin:
@@ -332,6 +372,9 @@ DynamicOAMTileOW_thin:
 	dw 0, 0 : db $6B, $00, $20, $00 ; key
 	dw 0, 8 : db $7B, $00, $20, $00
 
+	dw 0, 0 : db $7C, $00, $20, $00 ; good bee
+	dw 0, 8 : db $F4, $00, $20, $00
+
 DynamicOAMTileOW_full:
 	; dw 0, 0 : db $40, $00, $20, $02
 	; dd 0, 0
@@ -347,4 +390,9 @@ DynamicOAMTileOW_full:
 
 	;dw 0, 0 : db $EE, $00, $20, $02
 	;dd 0, 0
+
+	; add new slots above this line
+
+	dw 0, 0 : db $EA, $00, $20, $02 ; fairy
+	dd 0, 0
 
