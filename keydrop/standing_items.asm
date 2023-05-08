@@ -258,6 +258,10 @@ SaveMajorItemDrop:
 		LDA.w #$0018 : BRA .substitute
 	+ CPY.w #$0031 : BNE + ; 10 pack bombs
 		LDA.w #$0019 : BRA .substitute
+	+ CPY.w #$00B1 : BNE +  ; Apples
+		LDA.w #$001A : BRA .substitute
+	+ CPY.w #$00B0 : BNE +  ; Bee Trap
+		LDA.w #$001B : BRA .substitute
 	+ STA $0B9C ; indicates we should use the key routines or a substitute
 RTL
 	.substitute
@@ -553,7 +557,9 @@ SubstitionTable:
 	db $DB ; RED RUPEE - 0x16
 	db $E2 ; ARROW REFILL 10 - 0x17
 	db $DD ; BOMB REFILL 4 - 0x18
-    db $DE ; BOMB REFILL 8  - 0x19
+    db $DE ; BOMB REFILL 8 - 0x19
+	db $AC ; APPLES - 0x1A
+	db $79 ; BEE TRAP - 0x1B
 
 
 SubstituteSpriteId:
