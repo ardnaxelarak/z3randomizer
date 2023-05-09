@@ -48,6 +48,9 @@ RequestSlottedTile:
 		+++ STA.w SprItemGFX,X
 		JMP .success
 	+ CMP.b #$A0 : BCC + : CMP.b #$AF+1 : BCS + ; if key, use key OAM slot
+		LDY.b $5D : CPY.b #$19 : BCC ++ : CPY.b #$1A+1 : BCS ++ ; if getting tablet item, don't use key slot
+			BRA +
+		++
 		LDA.b $1B : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
