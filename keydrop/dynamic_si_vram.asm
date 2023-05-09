@@ -219,7 +219,7 @@ DrawSlottedTile:
 			PLA : SEC : RTL
 		+
 	PLA
-	STA.b $BD ; store loot ID temporarily, will get overwritten in Sprite_DrawMultiple_quantity_preset call
+	STA.b $07 ; store loot ID temporarily, will get overwritten in Sprite_DrawMultiple_quantity_preset call
 	JSL.l IsNarrowSprite : BCS .narrow
 
 	; TODO: Instead of loading the whole fixed 16 bytes from DynamicOAMTile**_** into !SPRITE_DYNAMIC_OAM
@@ -273,7 +273,7 @@ DrawSlottedTile:
 
 		.draw
 		; special handling
-		LDY.b $BD : CPY.b #$B2 : BNE + ; fairy
+		LDY.b $07 : CPY.b #$B2 : BNE + ; fairy
 			LDA.b $1A : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
 				LDA.w !SPRITE_DYNAMIC_OAM+4 : CLC : ADC.w #$02 ; use other fairy GFX
 				STA.w !SPRITE_DYNAMIC_OAM+4
