@@ -84,6 +84,9 @@ GetAnimatedSpriteGfxFile:
     CMP.b #$48 : BNE +
 		LDY.b #$60 : JML GetAnimatedSpriteGfxFile_return
 	+
+    CMP.b #$4B : BNE +
+		LDY.b #$50 : JML GetAnimatedSpriteGfxFile_return
+	+
 
     CMP.b #$24 : !BGE +
 		LDY.b #$5B : JML GetAnimatedSpriteGfxFile_return
@@ -123,6 +126,7 @@ dw $09F0 ; Null-Item
 dw $09C0 ; Clock
 dw $0A20 ; Triforce
 dw $0A50 ; Power Star
+dw $09F0 ; Chicken
 
 GetAnimatedSpriteBufferPointer:
 	;PHB : PHK : PLB

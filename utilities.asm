@@ -157,7 +157,7 @@ RTL
 	db $2C ; Bee Trap
 	db $4A ; Apples
 	db $4A ; Fairy
-	db $4A ; Chicken
+	db $4B ; Chicken
 	db $3B ; Big Magic
 	db $4A ; Good Bee
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -293,7 +293,7 @@ RTL
 	db $04 ; Bee Trap
 	db $08 ; Apples
 	db $08 ; Fairy
-	db $08 ; Chicken
+	db $02 ; Chicken
 	db $08 ; Big Magic
 	db $04 ; Good Bee
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
