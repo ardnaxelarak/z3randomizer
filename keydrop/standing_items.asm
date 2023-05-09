@@ -75,6 +75,8 @@ org $868283
 Sprite_SpawnSecret_NotRandomBush:
 org $86828A
 Sprite_SpawnSecret_SpriteSpawnDynamically:
+org $8682A5
+Sprite_SpawnSecret_SetCoords:
 org $86d23a
 Sprite_DrawAbsorbable:
 org $9eff81
@@ -262,6 +264,8 @@ SaveMajorItemDrop:
 		LDA.w #$001A : BRA .substitute
 	+ CPY.w #$00B0 : BNE +  ; Bee Trap
 		LDA.w #$001B : BRA .substitute
+	+ CPY.w #$00B5 : BNE +  ; Good Bee
+		LDA.w #$001C : BRA .substitute
 	+ STA $0B9C ; indicates we should use the key routines or a substitute
 RTL
 	.substitute
@@ -560,6 +564,7 @@ SubstitionTable:
     db $DE ; BOMB REFILL 8 - 0x19
 	db $AC ; APPLES - 0x1A
 	db $79 ; BEE TRAP - 0x1B
+	db $79 ; GOOD BEE - 0x1C
 
 
 SubstituteSpriteId:
@@ -577,6 +582,22 @@ RTS
 
 CheckSprite_Spawn:
 	JSR SubstituteSpriteId
+	CPY.b #$1C : BNE + ; good bee handling
+		JSL Sprite_SpawnDynamically
+		BMI .check
+		PHX
+			TYX : JSL.l Sprite_LoadProperties
+		PLX
+		JSL.l GoldBee_SpawnSelf_SetProperties
+		PLA : PLA : PLA ; pop the return address
+		PHX : LDX.b #$03
+		JML Sprite_SpawnSecret_SetCoords
+	+ CPY.b #$1A : BCC + ; all other non-normal pot sprite spawns
+		JSL Sprite_SpawnDynamically
+		BMI .check
+		LDA.b #$10 : STA.b $0D ; lets the outside code treat this sprite like a Stal (most normal table values)
+		RTL
+	+
 	JSL Sprite_SpawnDynamically
 	BMI .check
 RTL
