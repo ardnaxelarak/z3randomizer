@@ -155,8 +155,8 @@ RTL
 
 	;Bx
 	db $2C ; Bee Trap
-	db $4A ; Apples
-	db $4A ; Fairy
+	db $4D ; Apples
+	db $4C ; Fairy
 	db $4B ; Chicken
 	db $3B ; Big Magic
 	db $4A ; Good Bee
@@ -291,7 +291,7 @@ RTL
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Big Key
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Small Key
 	db $04 ; Bee Trap
-	db $08 ; Apples
+	db $02 ; Apples
 	db $08 ; Fairy
 	db $02 ; Chicken
 	db $08 ; Big Magic

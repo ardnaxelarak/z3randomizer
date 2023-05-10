@@ -816,6 +816,7 @@ Shopkeeper_DrawNextItem:
 	CMP.b #$2E : BNE + : JMP .potion
 	+ CMP.b #$2F : BNE + : JMP .potion
 	+ CMP.b #$30 : BNE + : JMP .potion
+	+ CMP.b #$B1 : BNE + : BRA .apple
 	+ CMP.b #$B2 : BNE + : BRA .fairy
 	+ CMP.b #$B5 : BNE + : BRA .goodbee
 	+ CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS +
@@ -855,6 +856,10 @@ Shopkeeper_DrawNextItem:
 			BRA .vramLoc
 		++
 		LDA.b #$E4 ; good bee is #$E4/D4 because it's already there in VRAM
+		STA.b $0E
+		BRA .vramLoc
+	.apple
+		LDA.b #$E5 ; apple is #$E5 because it's already there in VRAM
 		STA.b $0E
 		BRA .vramLoc
 	.potion

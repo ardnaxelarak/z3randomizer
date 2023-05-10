@@ -982,6 +982,9 @@ JSL.l ChestPrep
 NOP #3
 db $90 ; !BCC .cantOpen
 ;--------------------------------------------------------------------------------
+org $008A9D
+JSL ConditionalPushBlockTransfer : NOP
+
 org $00D531 ; 5531 - Bank00.asm:3451 (LDY.b #$5D)
 JML.l GetAnimatedSpriteGfxFile
 

@@ -71,6 +71,13 @@ RequestSlottedTile:
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
 		+++ STA.w SprItemGFX,X
 		JMP .success
+	+ CMP.b #$B1 : BNE + ; if apple, use apple OAM slot
+		LDA.b $1B : BEQ ++
+			LDA.b #!DynamicDropGFXSlotCount_UW
+			BRA +++
+		++ LDA.b #!DynamicDropGFXSlotCount_OW
+		+++ INC : STA.w SprItemGFX,X
+		JMP .success
 	+
 	
 	PHA : PHX
@@ -194,16 +201,17 @@ FreeUWGraphics:
 	dw $8840>>1
 	dw $8980>>1
 ;	dw $9960>>1 ; Arghuss Splash apparently
-;	dw $9C00>>1
-	dw $9CA0>>1
+	dw $9C00>>1
+;	dw $9CA0>>1
 	dw $9DC0>>1
 .end
 
 FreeOWGraphics:
+	dw $8180>>1 ; Push Block
 	;dw $8800>>1 ; Shovel Dirt
 	dw $9960>>1 ; Arghuss/Zora Splash
 	dw $9C00>>1 ; Heart Piece
-	dw $9CA0>>1 ; Apple
+	;dw $9CA0>>1 ; Apple
 	;dw $9DC0>>1 ; Whirlpool
 .end
 
@@ -313,8 +321,8 @@ DynamicOAMTileUW_thin:
 	dw 0, 0 : db $4C, $00, $20, $00
 	dw 0, 8 : db $5C, $00, $20, $00
 
-	dw 0, 0 : db $E5, $00, $20, $00
-	dw 0, 8 : db $F5, $00, $20, $00
+	dw 0, 0 : db $E0, $00, $20, $00
+	dw 0, 8 : db $F0, $00, $20, $00
 
 	dw 0, 0 : db $EE, $00, $20, $00
 	dw 0, 8 : db $FE, $00, $20, $00
@@ -340,7 +348,7 @@ DynamicOAMTileUW_full:
 	dw -4, -1 : db $4C, $00, $20, $02
 	dd 0, 0
 
-	dw -4, -1 : db $E5, $00, $20, $02
+	dw -4, -1 : db $E0, $00, $20, $02
 	dd 0, 0
 
 	dw -4, -1 : db $EE, $00, $20, $02
@@ -351,7 +359,13 @@ DynamicOAMTileUW_full:
 	dw -4, -1 : db $EA, $00, $20, $02 ; fairy
 	dd 0, 0
 
+	dw -4, -1 : db $E5, $00, $20, $02 ; apple
+	dd 0, 0
+
 DynamicOAMTileOW_thin:
+	dw 0, 0 : db $0C, $00, $20, $00
+	dw 0, 8 : db $1C, $00, $20, $00
+
 	; dw 0, 0 : db $40, $00, $20, $00
 	; dw 0, 8 : db $50, $00, $20, $00
 
@@ -361,8 +375,8 @@ DynamicOAMTileOW_thin:
 	dw 0, 0 : db $E0, $00, $20, $00
 	dw 0, 8 : db $F0, $00, $20, $00
 
-	dw 0, 0 : db $E5, $00, $20, $00
-	dw 0, 8 : db $F5, $00, $20, $00
+	;dw 0, 0 : db $E5, $00, $20, $00
+	;dw 0, 8 : db $F5, $00, $20, $00
 
 	;dw 0, 0 : db $EE, $00, $20, $00
 	;dw 0, 8 : db $FE, $00, $20, $00
@@ -379,6 +393,9 @@ DynamicOAMTileOW_thin:
 	dw 0, 8 : db $F4, $00, $20, $00
 
 DynamicOAMTileOW_full:
+	dw 0, 0 : db $0C, $00, $20, $02
+	dd 0, 0
+
 	; dw 0, 0 : db $40, $00, $20, $02
 	; dd 0, 0
 
@@ -388,8 +405,8 @@ DynamicOAMTileOW_full:
 	dw 0, 0 : db $E0, $00, $20, $02
 	dd 0, 0
 
-	dw 0, 0 : db $E5, $00, $20, $02
-	dd 0, 0
+	;dw 0, 0 : db $E5, $00, $20, $02
+	;dd 0, 0
 
 	;dw 0, 0 : db $EE, $00, $20, $02
 	;dd 0, 0
@@ -398,4 +415,16 @@ DynamicOAMTileOW_full:
 
 	dw 0, 0 : db $EA, $00, $20, $02 ; fairy
 	dd 0, 0
+
+	dw 0, 0 : db $E5, $00, $20, $02 ; apple
+	dd 0, 0
+
+ConditionalPushBlockTransfer:
+  LDA.b $1B : BNE +
+	LDA.b #$0F ; don't transfer push block when on the OW
+	BRA .return-3
+  +
+  LDA.b #$1F : STA.w $420B ; what we wrote over
+  .return
+RTL
 

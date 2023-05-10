@@ -11,7 +11,7 @@ ZoraSplashGfxFix:
 		; below should be set to the index used for Arrghus/Zora Splash
 		; FreeOWGraphics in dynamic_si_vram.asm, whatever index is $9960
 		; this makes it so the first gfx that is loading is AFTER the splash
-		LDA.b #$00 : STA.w DynamicDropGFXIndex 
+		LDA.b #$01 : STA.w DynamicDropGFXIndex 
 		JSL LoadCommonSprites_long
 	REP #$30 : PLY : PLX : PLA
 	RTL
