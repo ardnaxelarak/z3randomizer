@@ -200,7 +200,7 @@ FreeUWGraphics:
 	dw $8800>>1
 	dw $8840>>1
 	dw $8980>>1
-;	dw $9960>>1 ; Arghuss Splash apparently
+	dw $9960>>1 ; Arghuss Splash apparently
 	dw $9C00>>1
 ;	dw $9CA0>>1
 	dw $9DC0>>1
@@ -321,6 +321,9 @@ DynamicOAMTileUW_thin:
 	dw 0, 0 : db $4C, $00, $20, $00
 	dw 0, 8 : db $5C, $00, $20, $00
 
+	dw 0, 0 : db $CB, $00, $20, $00
+	dw 0, 8 : db $DB, $00, $20, $00
+
 	dw 0, 0 : db $E0, $00, $20, $00
 	dw 0, 8 : db $F0, $00, $20, $00
 
@@ -346,6 +349,9 @@ DynamicOAMTileUW_full:
 	dd 0, 0
 
 	dw -4, -1 : db $4C, $00, $20, $02
+	dd 0, 0
+
+	dw -4, -1 : db $CB, $00, $20, $02
 	dd 0, 0
 
 	dw -4, -1 : db $E0, $00, $20, $02
@@ -427,4 +433,10 @@ ConditionalPushBlockTransfer:
   LDA.b #$1F : STA.w $420B ; what we wrote over
   .return
 RTL
+
+pushpc
+; fix Arghuss/Zora splash graphics
+org $068595
+    db $E7, $E7, $E7, $E7, $E7, $C0, $C0
+pullpc
 

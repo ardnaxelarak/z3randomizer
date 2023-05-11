@@ -370,7 +370,7 @@ RevealSpriteDrop:
 	LDY.w $0CBA, X : BEQ .no_forced_drop
 		RTL
 	.no_forced_drop
-	PLA : PLA ; remove the JSL reswamturn lower 16 bits
+	PLA : PLA ; remove the JSL return lower 16 bits
 	PEA.w $06F996-1 ; change return address to .no_forced_drop of (Sprite_DoTheDeath)
 	RTL
 
@@ -381,7 +381,7 @@ RevealSpriteDrop2:
 	LDY.w $0CBA, X : BEQ .no_forced_drop
 		RTL
 	.no_forced_drop
-	PLA : PLA ; remove the JSL reswamturn lower 16 bits
+	PLA : PLA ; remove the JSL return lower 16 bits
 	PEA.w $06E3CE-1 ; change return address to .no_forced_drop of (Sprite_DoTheDeath)
 	RTL
 
@@ -389,7 +389,7 @@ BitFieldMasks:
 dw $8000, $4000, $2000, $1000, $0800, $0400, $0200, $0100
 dw $0080, $0040, $0020, $0010, $0008, $0004, $0002, $0001
 
-; Runs during Sprite_E4_SmallKey and duning Sprite_E5_BigKey spawns
+; Runs during Sprite_E4_SmallKey and during Sprite_E5_BigKey spawns
 ShouldSpawnItem:
 	LDA $048E : CMP.b #$87 : BNE + ; check for hera basement cage
 	LDA $A8 : AND.b #$03 : CMP.b #$02 : BNE + ; we're not in that quadrant
