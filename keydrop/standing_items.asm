@@ -445,6 +445,7 @@ SpriteKeyPrep:
 		LDA.w SpawnedItemFlag : STA SprItemFlags, X : BEQ +
 		LDA.l SpawnedItemID : STA $0E80, X
 		CMP #$24 : BNE ++ ;
+			JSL.l GetSpritePalette : STA.w $0F50, X ; setup the palette
 			LDA $A0 : CMP.b #$80 : BNE +
 			LDA SpawnedItemFlag : BNE +
 				LDA #$24  ; it's the big key drop?
