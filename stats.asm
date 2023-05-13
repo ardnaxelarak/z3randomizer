@@ -7,8 +7,7 @@
 ;--------------------------------------------------------------------------------
 IncrementBonkCounter:
 	LDA StatsLocked : BNE +
-		LDA BonkCounter : INC
-		CMP.b #100 : BEQ + ; decimal 100
+		LDA BonkCounter : INC : BEQ + ; overflow
 			STA BonkCounter
 	+
 RTL
