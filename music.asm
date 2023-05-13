@@ -210,6 +210,6 @@ Underworld_DoorDown_Entry:
 ;
 ; A=16bit XY=8bit
 CheckHeraBossDefeated:
-LDA RoomDataWRAM[$08].high : AND.w #$00FF : BEQ +
+LDA RoomDataWRAM[$07].high : AND.w #$00FF : BEQ +
     SEC : RTL
 + CLC : RTL
