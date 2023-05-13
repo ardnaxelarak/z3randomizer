@@ -2318,7 +2318,7 @@ JSL.l DrawHeartPieceGFX
 org $05F08A ; <- 2F08A - sprite_heart_upgrades.asm : 324 - (LDA $7EF36B : INC A : AND.b #$03 : STA $7EF36B : BNE .got_4_piecese) item determination
 JSL.l HeartPieceGet
 BCS $18 ; reinsert the near branch that appears midway through what we overrode
-NOP #22
+BRA + : NOP #20 : +
 ;--------------------------------------------------------------------------------
 org $06C0B0 ; <- 340B0 - sprite prep
 JSL.l HeartPieceSpritePrep
