@@ -623,6 +623,9 @@ Sprite_PrepAndDrawSingleLargeLong:
 org $06DC00
 Sprite_PrepAndDrawSingleSmallLong:
 
+org $06E41C
+Sprite_PrepOAMCoordLong:
+
 org $06EA18
 Sprite_ApplySpeedTowardsPlayerLong:
 

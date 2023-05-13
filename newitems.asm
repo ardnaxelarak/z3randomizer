@@ -181,14 +181,18 @@ ProcessEventItems:
 			LDA RNGItem : INC : STA RNGItem
 
 			SEP #$10 ; set 8-bit index registers
-                        REP #$20 ; set 16-bit accumulator
+			REP #$20 ; set 16-bit accumulator
 			LDA GoalItemRequirement : BEQ ++
 			LDA GoalCounter : INC : STA GoalCounter
 			CMP GoalItemRequirement : !BLT ++
 			LDA TurnInGoalItems : AND.w #$00FF : BNE ++
-				JSL.l ActivateGoal
+				SEP #$20 ; set 8-bit accumulator
+				LDA.b $8A : CMP.b #$80 : BNE +++
+				LDA.b $23 : BNE +++
+					JSL.l ActivateGoal
+				+++
 			++
-                        SEP #$20 ; set 8-bit accumulator
+			SEP #$20 ; set 8-bit accumulator
 			LDX.b #$01 : BRA .done
 		+
 		LDX.b #$00
@@ -330,20 +334,27 @@ AddReceivedItemExpandedGetItem:
 	+ CMP.b #$65 : BNE + ; Progressive Bow
 		JMP .done
 	+ CMP.b #$6A : BNE + ; Goal Collectable (Single/Triforce)
-		JSL.l ActivateGoal
+		LDA.b $8A : CMP.b #$80 : BNE ++
+		LDA.b $23 : BNE ++
+			JSL.l ActivateGoal
+		++
 		JMP .done
 	+ CMP.b #$6B : BNE + ; Goal Collectable (Multi/Power Star)
 		BRA .multi_collect
 	+ CMP.b #$6C : BNE + ; Goal Collectable (Multi/Power Star) Alternate Graphic
 		.multi_collect
-                REP #$20 ; set 16-bit accumulator
+		REP #$20 ; set 16-bit accumulator
 		LDA.l GoalItemRequirement : BEQ ++
 		LDA.l GoalCounter : INC : STA.l GoalCounter
 		CMP.w GoalItemRequirement : !BLT ++
 		LDA.l TurnInGoalItems : AND.w #$00FF : BNE ++
+			SEP #$20 ; set 8-bit accumulator
+			LDA.b $8A : CMP.b #$80 : BNE +++
+			LDA.b $23 : BNE +++
 				JSL.l ActivateGoal
+			+++
 		++
-                SEP #$20 ; set 8-bit accumulator
+		SEP #$20 ; set 8-bit accumulator
 		JMP .done
 	+ CMP.b #$6D : BNE + ; Server Request F0
 		JSL.l ItemGetServiceRequest_F0
@@ -1261,6 +1272,13 @@ ChestPrep:
 	+
     LDY $0C ; get item value
 	SEC
+RTL
+;--------------------------------------------------------------------------------
+Ancilla22_ItemReceipt_ContinueB:
+    CMP.b #$6A : BNE .return
+        JSL ActivateTriforceCutscene
+    .return
+    STZ.w $0C4A,X : STZ.w $0FC1 ; what we wrote over
 RTL
 ;--------------------------------------------------------------------------------
 ; Set a flag in SRAM if we pick up a compass in its own dungeon with HUD compass

@@ -995,8 +995,14 @@ org $00D557 ; 5557 - Bank00.asm:3486 (LDA $00 : ADC $D469, X)
 JSL.l GetAnimatedSpriteBufferPointer
 NOP
 
+org $05FA50
+JSL Sprite_ConditionalPrepOAMCoord
+
 org $0799F7 ; 399F7 - Bank07.asm:4107 (JSL AddReceivedItem)
 JSL.l AddReceivedItemExpanded
+
+org $08C505
+JSL Ancilla22_ItemReceipt_ContinueB : NOP #2
 
 org $098605 ; 48605 - ancilla_init.asm:709 (TYA : STA $02E4 : PHX)
 JML.l Multiworld_AddReceivedItem_notCrystal

@@ -69,15 +69,23 @@ RequestSlottedTile:
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ STA.w SprItemGFX,X
+		+++ INC : STA.w SprItemGFX,X
 		JMP .success
 	+ CMP.b #$B1 : BNE + ; if apple, use apple OAM slot
 		LDA.b $1B : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC : STA.w SprItemGFX,X
+		+++ INC : INC : STA.w SprItemGFX,X
 		JMP .success
+	+ CMP.b #$6A : BNE + ; if triforce, use cutscene OAM slot
+		PHA
+		LDA.b $1B : BEQ ++
+			LDA.b #!DynamicDropGFXSlotCount_UW
+			BRA +++
+		++ LDA.b #!DynamicDropGFXSlotCount_OW
+		+++ STA.w SprItemGFX,X
+		JMP .initRequest ; don't jump to end, we need the TF GFX to draw at $E7 
 	+
 
 	PHA
@@ -210,6 +218,7 @@ FreeUWGraphics:
 	dw $9DC0>>1
 	; add new slots above this line
 .end
+	dw $9CE0>>1
 	; above this line, add slots that we want to draw to specific slots
 
 FreeOWGraphics:
@@ -221,6 +230,7 @@ FreeOWGraphics:
 	;dw $9DC0>>1 ; Whirlpool
 	; add new slots above this line
 .end
+	dw $9CE0>>1
 	; above this line, add slots that we want to draw to specific slots
 
 ;===================================================================================================
@@ -374,7 +384,8 @@ DynamicOAMTileUW_full:
 
 	; add new rotating slots above this line
 
-	; <none>
+	dw -4, -1 : db $E7, $00, $20, $02 ; triforce
+	dd 0, 0
 
 	; above this line, add slots that we want to draw to specific slots
 
@@ -439,7 +450,8 @@ DynamicOAMTileOW_full:
 
 	; add new slots above this line
 
-	; <none>
+	dw 0, 0 : db $E7, $00, $20, $02 ; triforce
+	dd 0, 0
 
 	; above this line, add slots that we want to draw to specific slots
 
