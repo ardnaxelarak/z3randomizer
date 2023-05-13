@@ -1,6 +1,6 @@
 NewElderCode:
 {
-LDA $8A : CMP #$1B : BEQ .newCodeContinue
+LDA $8A : AND.b #$3F : CMP #$1B : BEQ .newCodeContinue
 ;Restore Jump we can keep the RTL so JML
 JML $05F0CD
 .newCodeContinue
