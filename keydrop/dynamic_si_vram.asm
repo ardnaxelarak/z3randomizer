@@ -17,7 +17,7 @@ DynamicDropQueue = $7E1E72 ; 0x08 bytes, occupies 1 byte for each slot in the re
 
 ; Come in with
 ;   A = item receipt ID
-;   X = slot
+;   X = sprite slot
 RequestSlottedTile:
 	PHX : PHY
 
@@ -36,7 +36,7 @@ RequestSlottedTile:
 			TYX
 		+
 
-		LDA 1,S : JSL.l GetSpritePalette : STA $0F50, X ; setup the palette
+		LDA.b 1,S : JSL.l GetSpritePalette : STA.w $0F50, X ; setup the palette
 	PLA
 	
 	; gfx that are already present, use that instead of a new slot
@@ -79,39 +79,42 @@ RequestSlottedTile:
 		+++ INC : STA.w SprItemGFX,X
 		JMP .success
 	+
+
+	PHA
+		LDA.w DynamicDropGFXIndex
+		INC
+		PHX
+		LDX.b $1B : BEQ +
+			CMP.b #!DynamicDropGFXSlotCount_UW : BCC .setIndex
+			BRA ++
+		+ CMP.b #!DynamicDropGFXSlotCount_OW : BCC .setIndex
+		++ LDA.b #$00
+
+		.setIndex
+		PLX
+		STA.w DynamicDropGFXIndex
+		STA.w SprItemGFX,X
 	
-	PHA : PHX
-		LDY.b #$00
-		LDA.w DynamicDropRequest
-		- LSR : INY : BCS -
-		CPY.b #$08 : BCC +
-			; all request slots occupied, exit without drawing
-			PLX : PLA
-			LDY.b #$FE ; indicate failure
-			BRA .return
-		+ TYX
-		LDA.b #$00 : SEC
-		- ROL : DEX : BNE -
-		DEY ; y = slot index, a = new request bit flag
-		ORA.w DynamicDropRequest
-		STA.w DynamicDropRequest
-	PLX : PLA
+	
+		.initRequest
+		PHX
+			LDY.b #$00
+			LDA.w DynamicDropRequest
+			- LSR : INY : BCS -
+			CPY.b #$08 : BCC +
+				; all request slots occupied, exit without drawing
+				PLX : PLA
+				LDY.b #$FE ; indicate failure
+				BRA .return
+			+ TYX
+			LDA.b #$00 : SEC
+			- ROL : DEX : BNE -
+			DEY ; y = slot index, a = new request bit flag
+			ORA.w DynamicDropRequest
+			STA.w DynamicDropRequest
+		PLX
+	PLA
 	STA.w DynamicDropQueue,Y
-
-	LDA.w DynamicDropGFXIndex
-	INC
-	PHX
-	LDX.b $1B : BEQ +
-		CMP.b #!DynamicDropGFXSlotCount_UW : BCC .fine
-		BRA ++
-	+ CMP.b #!DynamicDropGFXSlotCount_OW : BCC .fine
-
-	++ LDA.b #$00
-
-.fine
-	PLX
-	STA.w DynamicDropGFXIndex
-	STA.w SprItemGFX,X
 
 	; decompress graphics
 	PHX : PHY
@@ -129,8 +132,9 @@ RequestSlottedTile:
 
 	SEP #$30
 	PLY : PLX
-	LDA.w DynamicDropGFXIndex : STA.w DynamicDropQueue,Y
-	LDA.w DynamicDropQueue,Y ; we want A to return the loot id
+	LDA.w DynamicDropQueue,Y : PHA ; we want A to return the loot id
+	LDA.w SprItemGFX,X : STA.w DynamicDropQueue,Y
+	PLA
 
 	.success
 	STZ.w !SPRITE_REDRAW, X
@@ -204,7 +208,9 @@ FreeUWGraphics:
 	dw $9C00>>1
 ;	dw $9CA0>>1
 	dw $9DC0>>1
+	; add new slots above this line
 .end
+	; above this line, add slots that we want to draw to specific slots
 
 FreeOWGraphics:
 	dw $8180>>1 ; Push Block
@@ -213,7 +219,9 @@ FreeOWGraphics:
 	dw $9C00>>1 ; Heart Piece
 	;dw $9CA0>>1 ; Apple
 	;dw $9DC0>>1 ; Whirlpool
+	; add new slots above this line
 .end
+	; above this line, add slots that we want to draw to specific slots
 
 ;===================================================================================================
 ; Come in with
@@ -332,6 +340,10 @@ DynamicOAMTileUW_thin:
 
 	; add new slots above this line
 
+	; <none>
+
+	; above this line, add slots that we want to draw to specific slots
+
 	dw 0, 0 : db $0B, $00, $20, $00 ; animated rupees slot
 	dw 0, 8 : db $1B, $00, $20, $00
 
@@ -360,7 +372,11 @@ DynamicOAMTileUW_full:
 	dw -4, -1 : db $EE, $00, $20, $02
 	dd 0, 0
 
-	; add new slots above this line
+	; add new rotating slots above this line
+
+	; <none>
+
+	; above this line, add slots that we want to draw to specific slots
 
 	dw -4, -1 : db $EA, $00, $20, $02 ; fairy
 	dd 0, 0
@@ -388,6 +404,10 @@ DynamicOAMTileOW_thin:
 	;dw 0, 8 : db $FE, $00, $20, $00
 
 	; add new slots above this line
+
+	; <none>
+
+	; above this line, add slots that we want to draw to specific slots
 
 	dw 0, 0 : db $0B, $00, $20, $00 ; animated rupees slot
 	dw 0, 8 : db $1B, $00, $20, $00
@@ -418,6 +438,10 @@ DynamicOAMTileOW_full:
 	;dd 0, 0
 
 	; add new slots above this line
+
+	; <none>
+
+	; above this line, add slots that we want to draw to specific slots
 
 	dw 0, 0 : db $EA, $00, $20, $02 ; fairy
 	dd 0, 0
