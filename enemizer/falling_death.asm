@@ -14,5 +14,5 @@ CheckFallingDeathFlag:
 	LDA.l !ENEMY_FALLING_STAY_ALIVE
 	BEQ +
 	RTL
-	+ JMP Sprite_ManuallySetDeathFlagUW  ; original code
+	+ JML.l Sprite_ManuallySetDeathFlagUW  ; original code
 
