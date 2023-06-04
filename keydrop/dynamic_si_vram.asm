@@ -294,7 +294,7 @@ DrawSlottedTile:
 				BRA .draw
 			+ ; narrow
 			LDA.w $0E20, X : AND.w #$00FF : CMP.w #$003B : BEQ .draw ; bonk item
-			LDA.w $0ED0, X : AND.w #$00FF : BNE .draw ; bonk drop check
+			LDA.b $A0 : CMP.w #$0120 : BEQ .draw ; good bee statue
 				LDA.w #$0004
 				STA.w !SPRITE_DYNAMIC_OAM : STA.w !SPRITE_DYNAMIC_OAM+8
 
