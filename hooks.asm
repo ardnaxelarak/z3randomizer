@@ -2397,11 +2397,11 @@ org $02EC2E ;<- 016C2E
 JSL.l Overworld_LoadNewTiles
 NOP #$02
 ;================================================================================
-org $07A3E2 ;<- 3A3E2 Bank07.asm:5764 (LDA.b #$80 : STA $03F0)
-JSL.l FreeDuckCheck : BEQ +
-	NOP
-	skip 3 ; a JSR we need to keep
-+
+; org $07A3E2 ;<- 3A3E2 Bank07.asm:5764 (LDA.b #$80 : STA $03F0)
+; JSL.l FreeDuckCheck : BEQ +
+; 	NOP
+; 	skip 3 ; a JSR we need to keep
+; +
 ;================================================================================
 org $07A9AC ; <- 3A9AC - Bank07.asm:6628 (LDA $0C : ORA $0E : STA $00 : AND.b #$0C : BEQ BRANCH_BETA)
 JML MirrorBonk
@@ -2776,11 +2776,9 @@ org $07839E ; bunny BAGE check
 BunnyRead:
 	JSR.w $07B5A9 ; check A button
 	BCC .noA
-	JSR.w CheckIfReading
-	BNE .noread
-	JSR.w $07B4DB
-	NOP
-.noread
+	JSL BunnyThrowPot
+	BRA .noA
+	NOP #3
 .noA
 
 org $07FFF4
@@ -3071,3 +3069,107 @@ NOP
 
 org $02D7D2 ; BEQ .face_up
 NOP #2 ; this fixes Link's direction after mirroring and falling after entering through back of tavern
+
+;--------------------------------------------------------------------------------
+; Various nonsense
+;--------------------------------------------------------------------------------
+org $0780B9 ; LDA.b #$3A : STA.w $031F
+JSL CalcIFrames
+NOP
+
+org $09814E ; LDA.w Bomb_timer : STA.w $039F, X
+JSL SetBombTimer
+NOP #2
+
+org $07B282 ; LDA.b #$1D : STA.w $0374
+JSL SetDashTimer
+NOP
+
+org $07A3E7 ; LDA.b #$13 : JSR PlaySFX_Set2 : ...
+JSL ProcessFlute
+BCS +
+RTS
+NOP #14 : +
+
+org $08E073 ; LDA.b #$0E : STA.b $10
+JSL FluteMap
+
+org $07A329
+JSL UseShovel
+BCS +
+RTS
+NOP #4 : +
+
+org $079D11
+JSL SwordSwingDelay : NOP
+org $079DAB
+JSL SwordSwingDelay : NOP
+org $079DEE
+JSL SwordSwingDelay : NOP
+
+org $088E4A
+JSL MaybeRecoil
+BRA + : NOP #6 : +
+
+org $06EC4D
+JSL MaybeRecoil2
+BRA + : NOP #10 : +
+
+; make moldorm check head for hitbox instead of tail
+org $1DDADD
+; BRA + : NOP #22 : +
+BRA + : NOP #26 : +
+org $1DDAF9
+BRA + : NOP : +
+org $1DDB01
+BRA + : NOP #3 : +
+
+; make moldorm repel sword when not stunned
+org $06F354
+JSL CheckMoldormRepel
+BCC .not_moldorm
+NOP
+skip 17
+.not_moldorm
+
+; make mini moldorms faster
+org $0697DF
+db $30, $2C, $22, $12, $00, $EE, $DE, $D4
+db $D0, $D4, $DE, $EE, $00, $12, $22, $2C
+db $00, $12, $22, $2C, $30, $2C, $22, $12
+db $00, $EE, $DE, $D4, $D0, $D4, $DE, $EE
+
+; make lanmolas faster
+org $05A4B7
+LDA.b #$18
+
+; ganon - silvers just don't work like they used to
+org $0DB93D
+db $08
+
+; ganon - randomize vulnerability when stunned
+org $1D9010
+JSL StunGanon : NOP
+
+; agahnim - pattern? we don't need no steenken pattern!
+org $1ED637
+JSL AgaDecision : NOP
+
+; agahnim - no guaranteed normal balls
+org $1ED6ED
+NOP #2
+
+; helmie's mask is brittle
+org $1E8112
+db $03, $03, $03, $03, $00
+
+; vitreous - bombs work a bit better
+org $0DB938
+db $0C
+
+; tile rooms - make them a bit faster
+org $09BA20
+LDA.b #$B8
+
+org $1EBC56
+LDA.b #$28

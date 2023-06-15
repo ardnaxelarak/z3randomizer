@@ -4,9 +4,13 @@
 !BOOTS_MODIFIER = "$7F50CE"
 ModifyBoots:
     PHA
+        LDA.b $A0 : CMP.b #$06 : BNE +
+        LDA.b $A1 : CMP.b #$00 : BEQ .no_boots
+        +
         LDA !BOOTS_MODIFIER : CMP.b #$01 : BNE +
             PLA : AND AbilityFlags : ORA.b #$04 : RTL ; yes boots
         + : CMP.b #$02 : BNE +
+            .no_boots
             PLA : AND AbilityFlags : AND.b #$FB : RTL ; no boots
         + : LDA FakeBoots : CMP.b #$01 : BNE +
             LDA $5B : BEQ ++ : LDA $59 : BNE + ; hover check

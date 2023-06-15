@@ -126,6 +126,8 @@ Utility_CheckAncillaOverlapWithSprite:
 	RTL
 .giant_moldorm
 	LDA $0E10, Y : BNE .ignore_collision ; Moldy can have little a I-Frames, as a treat
+	LDA $0C4A, X : CMP #$1F : BEQ .check_collision_moldorm ; hookshot
+	               CMP #$05 : BEQ .check_collision_moldorm ; boomerang
 	LDA.l SpecialWeapons : CMP #$01 : BNE ++
 	LDA $0C4A, X : CMP #$07 : BEQ .check_collision_moldorm
 	BRA .ignore_collision ; don't collide with non-bombs
@@ -274,13 +276,17 @@ Utility_CheckHammerHelmasaurKingMask:
 	RTL
 ;--------------------------------------------------------------------------------
 Utility_CheckImpervious:
-	LDA $0E20, X : CMP.b #$CB : BNE .normal
+	LDA $0E20, X : CMP.b #$CE : BEQ .blind
+	               CMP.b #$CB : BNE .normal
 .trinexx
 	LDA SpecialWeapons : CMP #$01 : BEQ +
 	                     CMP #$03 : BEQ +
 	                     CMP #$04 : BEQ +
 	                     CMP #$05 : BEQ +
 	                     CMP #$06 : BEQ .check_sidenexx
+	BRA .normal
+.blind
+	LDA.w $0301 : AND.b #$0A : BNE .impervious ; impervious to hammer
 	BRA .normal
 +
 	LDA $0301 : AND.b #$0A : BNE .impervious ; impervious to hammer
@@ -332,12 +338,6 @@ Utility_CheckImpervious:
 ; start with X = sprite index
 ;--------------------------------------------------------------------------------
 AllowBombingMoldorm:
-	LDA SpecialWeapons : CMP #$01 : BEQ .no_disable_projectiles
-	                     CMP #$03 : BEQ .no_disable_projectiles
-	                     CMP #$04 : BEQ .no_disable_projectiles
-	                     CMP #$05 : BEQ .no_disable_projectiles
-	                     CMP #$06 : BEQ .no_disable_projectiles
-	INC $0BA0, X
 .no_disable_projectiles
 	JSL !SPRITE_INITIALIZED_SEGMENTED
 	RTL

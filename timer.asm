@@ -122,8 +122,10 @@ dw #$FFFF, #$7FFF
 ;--------------------------------------------------------------------------------
 !TEMPORARY_OHKO = "$7F50CC"
 DrawChallengeTimer:
+	LDA.b $A0 : AND.w #$00FF : CMP.w #$00C8 : BEQ .is_ohko
 	LDA !TEMPORARY_OHKO : AND.w #$00FF : BEQ +
-    	LDA.w #$2807 : STA $7EC790
+	.is_ohko
+		LDA.w #$2807 : STA $7EC790
 		LDA.w #$280A : STA $7EC792
 		LDA.w #$280B : STA $7EC794
 		LDA.w #$280C : STA $7EC796
@@ -175,6 +177,7 @@ DrawChallengeTimer:
 RTL
 ;--------------------------------------------------------------------------------
 OHKOTimer:
+	LDA.b $A0 : CMP.b #$C8 : BEQ .kill
 	LDA TemporaryOHKO : BNE .kill
 	LDA.l TimeoutBehavior : CMP #$02 : BNE +
 	LDA !Status : AND.b #$02 : BEQ +

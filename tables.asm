@@ -107,7 +107,7 @@ ChallengeModes:
 db #$00 ; #$00 = Default behavior;
 ;--------------------------------------------------------------------------------
 org $30802E ; PC 0x18003E
-GanonVulnerabilityItem:
+DONOTUSE__GanonVulnerabilityItem:
 db #$00 ; #$00 = Default behavior (silver arrows)
 ;--------------------------------------------------------------------------------
 org $30802F ; PC 0x18003F

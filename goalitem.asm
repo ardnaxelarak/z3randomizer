@@ -7,8 +7,11 @@
 ;--------------------------------------------------------------------------------
 GoalItemGanonCheck:
 	LDA $0E20, X : CMP.b #$D6 : BNE .success ; skip if not ganon
+		LDA.w $0D80, X : CMP.b #$12 : BEQ .fail
 		JSL.l CheckGanonVulnerability
-		BCS .success
+		BCC .fail
+		JSL CheckMushroom
+		BCC .success
 
 		.fail
 		LDA $0D80, X : CMP.b #17 : !BLT .success ; decmial 17 because Acmlm's chart is decimal

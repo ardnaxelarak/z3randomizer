@@ -5,7 +5,7 @@ NewDrawHud:
 !BOMBCOUNT_DRAW_ADDRESS = "$7EC75A"
 ;================================================================================
 
-	LDA InfiniteBombsModifier : BNE .infinite_bombs
+	JSL CheckInfiniteBombs : BNE .infinite_bombs
 	.finite_bombs
 		LDA.l SpecialWeapons : CMP #$01 : BNE .normal
 		LDA.l SpecialWeaponLevel : BEQ .no_bombs

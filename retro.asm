@@ -1,5 +1,5 @@
 IsItemAvailable:
-	LDA InfiniteBombsModifier : BEQ .finite
+	JSL CheckInfiniteBombs : BEQ .finite
 	.infinite
 		CPX.b #$04 : BNE .finite
 		LDA.b #$01 : RTL
@@ -7,27 +7,27 @@ IsItemAvailable:
                 LDA EquipmentWRAM-1, X
 RTL
 LoadBombCount:
-	LDA InfiniteBombsModifier : BNE .infinite
+	JSL CheckInfiniteBombs : BNE .infinite
 	.finite
 		LDA BombsEquipment
 	.infinite
 RTL
 LoadBombCount16:
-	LDA InfiniteBombsModifier : AND.w #$00FF : BNE .infinite
+	JSL CheckInfiniteBombs16 : BNE .infinite
 	.finite
 		LDA BombsEquipment
 	.infinite
 RTL
 StoreBombCount:
 	JSL IncrementBombsPlacedCounter
-	PHA : LDA InfiniteBombsModifier : BEQ .finite
+	PHA : JSL CheckInfiniteBombs : BEQ .finite
 	.infinite
 		PLA : LDA.b #$01 : RTL
 	.finite
 		PLA : STA BombsEquipment
 RTL
 SearchForEquippedItem:
-	LDA InfiniteBombsModifier : BEQ +
+	JSL CheckInfiniteBombs : BEQ +
 		LDA.b #$01 : LDX.b #$00 : RTL
 	+
 	LDA BowEquipment ; thing we wrote over

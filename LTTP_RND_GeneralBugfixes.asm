@@ -227,6 +227,7 @@ org $A28000 ; contrib area
 incsrc contrib.asm
 incsrc special_weapons.asm
 incsrc variable_ganon_vulnerability.asm
+incsrc trolls.asm
 warnpc $A38000
 
 org $A38000

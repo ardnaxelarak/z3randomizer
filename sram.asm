@@ -392,6 +392,7 @@ InvertDPadModifier: skip 1
 TemporaryOHKO: skip 1
 SpriteSwapper: skip 1
 BootsModifier: skip 1 ; (0=Off, 1=Always, 2=Never)
+GanonVulnerabilityItem: skip 1 ; item ganon is vulnerable to while stunned
 
 ;================================================================================
 ; Expanded SRAM ($7F6000 - $7F6FFF)

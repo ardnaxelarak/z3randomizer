@@ -79,7 +79,10 @@ InvertDPad:
 
 .crowd_control
 	LDA !INVERT_DPAD : BNE +
+	LDA.b $A0 : CMP.b #$DE : BNE .off
+	LDA.b #$01 : BRA +
 
+	.off
 	LDA $4218 : STA $00
 	LDA $4219 : STA $01
 	JML.l InvertDPadReturn

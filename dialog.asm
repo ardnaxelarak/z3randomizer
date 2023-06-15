@@ -284,7 +284,10 @@ DialogGanon1:
 	REP #$20
 	LDA.w #$018C
 	BCC +
+	JSL CheckMushroom
 	LDA.w #$016D
+	BCC +
+	LDA.w #$0197
 +	STA $1CF0
 	SEP #$20
 	JSL.l Sprite_ShowMessageMinimal_Alt
@@ -304,6 +307,10 @@ DialogGanon2:
 	REP #$20
 	BCS +
 		LDA.w #$018D : JMP .done
+	+
+		JSL CheckMushroom
+		BCC +
+		LDA.w #$0198 : JMP .done
 	+
 		LDA.l GanonVulnerabilityItem : AND #$00FF : BNE .special_item
 		LDA.l SpecialWeapons : AND.w #$00FF
