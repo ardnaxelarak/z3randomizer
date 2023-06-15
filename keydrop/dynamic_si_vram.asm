@@ -22,7 +22,8 @@ RequestSlottedTile:
 	PHX : PHY
 
 	PHA
-		; skip sending the request if busy with other 
+		JSL Sprite_IsOnscreen : BCC ++
+		; skip sending the request if busy with other things
 		LDA.b $11 : CMP.b #$21 : BCS ++ ; skip if OW is loading Map16 GFX ; TODO: Figure out how to allow submodule 22, check DMA status instead
 		LDA.b $5D : CMP.b #$14 : BEQ ++ ; skip if we're mid-mirror
 		LDA.b $1B : BEQ + ; OW current doesn't occupy any slots that medallion gfx do
@@ -45,7 +46,7 @@ RequestSlottedTile:
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ STA.w SprItemGFX,X
+		+++ INC : STA.w SprItemGFX,X
 		JMP .success
 	+ CMP.b #$A0 : BCC + : CMP.b #$AF+1 : BCS + ; if key, use key OAM slot
 		LDY.b $5D : CPY.b #$19 : BCC ++ : CPY.b #$1A+1 : BCS ++ ; if getting tablet item, don't use key slot
@@ -55,28 +56,28 @@ RequestSlottedTile:
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC : STA.w SprItemGFX,X
+		+++ INC : INC : STA.w SprItemGFX,X
 		JMP .success
 	+ CMP.b #$B5 : BNE + ; if good bee, use bee OAM slot
 		LDA.b $1B : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC : INC : STA.w SprItemGFX,X
+		+++ INC : INC : INC : STA.w SprItemGFX,X
 		JMP .success
 	+ CMP.b #$B2 : BNE + ; if fairy, use fairy OAM slot
 		LDA.b $1B : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC : STA.w SprItemGFX,X
+		+++ INC : INC : STA.w SprItemGFX,X
 		JMP .success
 	+ CMP.b #$B1 : BNE + ; if apple, use apple OAM slot
 		LDA.b $1B : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC : INC : STA.w SprItemGFX,X
+		+++ INC : INC : INC : STA.w SprItemGFX,X
 		JMP .success
 	+ CMP.b #$6A : BNE + ; if triforce, use cutscene OAM slot
 		PHA
@@ -84,7 +85,7 @@ RequestSlottedTile:
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ STA.w SprItemGFX,X
+		+++ INC : STA.w SprItemGFX,X
 		JMP .initRequest ; don't jump to end, we need the TF GFX to draw at $E7 
 	+
 
@@ -102,7 +103,26 @@ RequestSlottedTile:
 		PLX
 		STA.w DynamicDropGFXIndex
 		STA.w SprItemGFX,X
-	
+		PHX
+			; loop thru other sprites, check if any use the same gfx slot
+			LDY.b #$0F
+			- TYA : CMP 1,S : BEQ + ; don't check self
+			LDA.w $0DD0,Y : BEQ +
+			LDA.w !SPRITE_REDRAW, Y : BNE +
+			LDA.w SprItemGFX,Y : CMP.w DynamicDropGFXIndex : BNE +
+			LDA.w $0E20,Y : CMP.b #$EB : BEQ ++ : CMP.b #$E4 : BEQ ++
+				BRA +
+			++
+				; slot already in use, use overflow slot
+				LDA.b #$02 : STA.w !SPRITE_REDRAW, X
+				LDA.b $1B : BEQ ++
+					LDA.b #!DynamicDropGFXSlotCount_UW
+					BRA +++
+				++ LDA.b #!DynamicDropGFXSlotCount_OW
+				+++ STA.w SprItemGFX,X
+				PLX : PLA : BRA .return
+			+ DEY : BPL -
+		PLX
 	
 		.initRequest
 		PHX
@@ -351,7 +371,8 @@ DynamicOAMTileUW_thin:
 
 	; add new slots above this line
 
-	; <none>
+	dw 0, 0 : db $E3, $00, $20, $00 ; overflow slot
+	dw 0, 8 : db $F3, $00, $20, $00
 
 	; above this line, add slots that we want to draw to specific slots
 
@@ -385,6 +406,9 @@ DynamicOAMTileUW_full:
 
 	; add new rotating slots above this line
 
+	dw -4, -1 : db $A0, $00, $20, $02 ; overflow slot
+	dd 0, 0
+
 	dw -4, -1 : db $E7, $00, $20, $02 ; triforce
 	dd 0, 0
 
@@ -417,7 +441,8 @@ DynamicOAMTileOW_thin:
 
 	; add new slots above this line
 
-	; <none>
+	dw 0, 0 : db $E3, $00, $20, $00 ; overflow slot
+	dw 0, 8 : db $F3, $00, $20, $00
 
 	; above this line, add slots that we want to draw to specific slots
 
@@ -451,6 +476,9 @@ DynamicOAMTileOW_full:
 
 	; add new slots above this line
 
+	dw 0, 0 : db $A0, $00, $20, $02 ; overflow slot
+	dd 0, 0
+
 	dw 0, 0 : db $E7, $00, $20, $02 ; triforce
 	dd 0, 0
 
@@ -463,12 +491,12 @@ DynamicOAMTileOW_full:
 	dd 0, 0
 
 ConditionalPushBlockTransfer:
-  LDA.b $1B : BNE +
-	LDA.b #$0F ; don't transfer push block when on the OW
-	BRA .return-3
-  +
-  LDA.b #$1F : STA.w $420B ; what we wrote over
-  .return
+	LDA.b $1B : BNE +
+		LDA.b #$0F ; don't transfer push block when on the OW
+		BRA .return-3
+	+
+	LDA.b #$1F : STA.w $420B ; what we wrote over
+	.return
 RTL
 
 pushpc

@@ -459,6 +459,7 @@ SpriteKeyDrawGFX:
 	LDA.w !SPRITE_REDRAW, X : BEQ +
 		LDA $0E80, X
 		JSL RequestSlottedTile
+		LDA.w !SPRITE_REDRAW, X : CMP.b #$02 : BEQ +
 		BRA .skipDraw
 	+ LDA $0E80, X
 	CMP.b #$24 : BNE +

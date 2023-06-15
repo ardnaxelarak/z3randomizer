@@ -56,6 +56,7 @@ DrawHeartPieceGFX:
 	PHA : PHY
 	LDA.w !SPRITE_REDRAW, X : BEQ .skipInit ; skip init if already ready
 		JSL.l HeartPieceSpritePrep
+		LDA.w !SPRITE_REDRAW, X : CMP.b #$02 : BEQ .skipInit
 		BRA .done ; don't draw on the init frame
 	
 	.skipInit
@@ -191,6 +192,8 @@ LoadHeartPieceRoomValue:
 	.done
 RTL
 ;--------------------------------------------------------------------------------
+!DynamicDropGFXSlotCount_UW = (FreeUWGraphics_end-FreeUWGraphics)>>1
+!DynamicDropGFXSlotCount_OW = (FreeOWGraphics_end-FreeOWGraphics)>>1
 HPItemReset:
 	PHA
 	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE .skip
@@ -200,6 +203,14 @@ HPItemReset:
 	.skip
 	PLA
 	.done
+	PHA : PHY
+		LDY.b #$0F
+		- LDA.w $0DD0,Y : BEQ +
+		LDA.w !SPRITE_REDRAW, Y : CMP.b #$02 : BNE +
+			; attempt redraw of any sprite using the overflow slot
+			LDA.b #$01 : STA.w !SPRITE_REDRAW, Y
+		+ DEY : BPL -
+	PLY : PLA
 RTL
 ;--------------------------------------------------------------------------------
 MaybeMarkDigSpotCollected:

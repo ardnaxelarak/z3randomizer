@@ -35,6 +35,7 @@ DrawBonkItemGFX:
 	PHA
 	LDA.w !SPRITE_REDRAW, X : BEQ .skipInit ; skip init if already ready
 		JSL.l LoadBonkItemGFX_inner
+		LDA.w !SPRITE_REDRAW, X : CMP.b #$02 : BEQ .skipInit
 		BRA .done ; don't draw on the init frame
 	
 	.skipInit
