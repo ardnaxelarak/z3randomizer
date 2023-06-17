@@ -22,6 +22,7 @@ RequestSlottedTile:
 	PHX : PHY
 
 	PHA
+		LDA.b #$01 : STA.w !SPRITE_REDRAW, X
 		JSL Sprite_IsOnscreen : BCC ++
 		; skip sending the request if busy with other things
 		LDA.b $11 : CMP.b #$21 : BCS ++ ; skip if OW is loading Map16 GFX ; TODO: Figure out how to allow submodule 22, check DMA status instead
@@ -110,8 +111,12 @@ RequestSlottedTile:
 			LDA.w $0DD0,Y : BEQ +
 			LDA.w !SPRITE_REDRAW, Y : BNE +
 			LDA.w SprItemGFX,Y : CMP.w DynamicDropGFXIndex : BNE +
-			LDA.w $0E20,Y : CMP.b #$EB : BEQ ++ : CMP.b #$E4 : BEQ ++
-				BRA +
+			LDA.w $0E20,Y ; don't need E5 enemy big key drop and E9 powder item
+				CMP.b #$EB : BEQ ++ ; heart piece
+				CMP.b #$E4 : BEQ ++ ; enemy drop
+				CMP.b #$3B : BEQ ++ ; bonk item
+				CMP.b #$E7 : BEQ ++ ; mushroom
+					BRA +
 			++
 				; slot already in use, use overflow slot
 				LDA.b #$02 : STA.w !SPRITE_REDRAW, X
