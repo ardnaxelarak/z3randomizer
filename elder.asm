@@ -121,6 +121,9 @@ pushpc
     org $0589B1
     MasterSword_ConditionalHandleReceipt_DoReceipt:
 
+    org $0588DF
+    JSL MasterSword_CheckIfPulled : PLX : NOP #2
+    db $90 ; BCC instead of BEQ
     org $05890E
     JSL MasterSword_ConditionalActivateCutscene
     org $05895F
@@ -133,6 +136,12 @@ pushpc
     org $0589A3
     JSL MasterSword_ConditionalHandleReceipt : NOP #2
 pullpc
+
+MasterSword_CheckIfPulled:
+    CPX.b #$80 : BEQ +
+        - CLC : RTL ; not on pedestal screen, continue with cutscene
+    + LDA.l $7EF280,X : AND.b #$40 ; what we wrote over
+    BEQ - : SEC : RTL
 
 MasterSword_ConditionalActivateCutscene:
     LDA.w $0D90,X : BNE .specialCutscene
