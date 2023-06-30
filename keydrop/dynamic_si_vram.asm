@@ -243,7 +243,8 @@ FreeUWGraphics:
 	dw $9DC0>>1
 	; add new slots above this line
 .end
-	dw $9CE0>>1
+	dw $0000 ; overflow slot, intentionally blank
+	dw $9CE0>>1 ; Triforce
 	; above this line, add slots that we want to draw to specific slots
 
 FreeOWGraphics:
@@ -255,7 +256,8 @@ FreeOWGraphics:
 	;dw $9DC0>>1 ; Whirlpool
 	; add new slots above this line
 .end
-	dw $9CE0>>1
+	dw $0000 ; overflow slot, intentionally blank
+	dw $9CE0>>1 ; Triforce
 	; above this line, add slots that we want to draw to specific slots
 
 ;===================================================================================================
