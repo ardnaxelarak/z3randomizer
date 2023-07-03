@@ -2557,6 +2557,10 @@ JSL Overworld_MosaicDarkWorldChecks : NOP
 org $05CC58 ; <- Bank05.asm:1307 (LDA $040A : CMP.b #$18)
 JSL PsychoSolder_MusicCheck
 NOP #1
+;
+org $06F96A
+JSL PsychoSolder_MusicCheck
+NOP #1
 ;--------------------------------------------------------------------------------
 org $02B13A ; <- Bank02.asm:7647
 dl Overworld_FinishMirrorWarp
