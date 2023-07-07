@@ -321,7 +321,13 @@ DrawSlottedTile:
 				BRA .draw
 			+ ; narrow
 			LDA.w $0E20, X : AND.w #$00FF : CMP.w #$003B : BEQ .draw ; bonk item
-			LDA.b $A0 : CMP.w #$0120 : BEQ .draw ; good bee statue
+			LDA.b $A0 : CMP.w #$0120 : BNE +
+				LDA.b $1B : BNE .draw ; good bee statue
+			+
+			; TODO: Figure out how to target bottle vendor fish item better than this
+			LDA.b $8A : AND.w #$00FF : CMP.w #$0018 : BNE + 
+				LDA.b $1B : BEQ .draw ; bottle vendor key
+			+
 				LDA.w #$0004
 				STA.w !SPRITE_DYNAMIC_OAM : STA.w !SPRITE_DYNAMIC_OAM+8
 

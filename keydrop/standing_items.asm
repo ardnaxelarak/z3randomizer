@@ -651,6 +651,24 @@ SetTheSceneFix:
 	JSL LoadCommonSprites_long
 RTL
 
+pushpc
+org $868072
+JSL SetBottleVendorKey : NOP #4
+pullpc
+SetBottleVendorKey:
+	LDA.w $0E20,Y : CMP.b #$E4 : BNE +
+		; small key from bottle vendor
+		LDA.b #$AF : STA.w $0E80,Y
+		LDA.b #$01 : STA.w !SPRITE_REDRAW, Y
+		BRA .shift
+	+ CMP.b #$DE : BEQ .return
+	CMP.b #$E2 : BEQ .return
+		; shift narrow sprite to left by 4
+		.shift
+		LDA.b $00 : CLC : ADC.b #$04 : STA.w $0D10,Y ; what we wrote over
+.return
+RTL
+
 ConditionalLoadCommonSprites_Do3To4Low:
 	LDA.b $10 : CMP.b #$01 : BEQ + ; what we wrote over
 	CMP.b #$0E : BEQ ++
