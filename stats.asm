@@ -97,6 +97,7 @@ IncrementSmallKeysNoPrimary:
 			PHP : REP #$20 ; set 16-bit accumulator
 				LDA $048E : CMP.w #$0087 : BNE ++ ; check for hera basement cage
 				LDA $A8 : AND #$0003 : CMP #$0002 : BNE ++ ; must be quadrant 2
+				LDA SprDropsItem, X : AND #$00FF : BNE ++ ; must not be a standing item
 					PLP : PHY : LDY.b #$24 : JSL.l FullInventoryExternal
 					LDA StandingItemsOn : BNE +++
 						JSR CountChestKey

@@ -144,6 +144,10 @@ PotCollectionRateTable:
 ; Reserved $250 296 * 2
 
 org $A8ACB0
+UWEnemyItemFlags:
+; Reserved $250 296 * 2
+
+org $A8AF00
 
 RevealPotItem:
 	STA.b $04 ; save tilemap coordinates
