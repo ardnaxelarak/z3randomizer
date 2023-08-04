@@ -21,7 +21,7 @@ dw #$91B6 ; New sprite_prep
 org $0DB818
 SpritePrep_LoadProperties:
 
-org $1EC6FA
+org $1EC70D
 SpritePrep_Eyegore_become_mimic:
 
 ;org $06EC08 ; Sprite_AttemptZapDamage
