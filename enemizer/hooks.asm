@@ -10,8 +10,6 @@ incsrc hooks/bosses_hooks.asm
 
 incsrc hooks/moldorm_hooks.asm
 
-incsrc hooks/mimic_hooks.asm
-
 incsrc hooks/damage_hooks.asm
 
 incsrc hooks/overworld_sprite_hooks.asm
