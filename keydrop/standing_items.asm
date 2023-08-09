@@ -147,6 +147,22 @@ org $A8ACB0
 UWEnemyItemFlags:
 ; Reserved $250 296 * 2
 
+
+; Thoughs on multitile dungeon design
+; Initial table indexed by room id
+; Special values: $FF indicates the room can use the UWEnemyItemFlags table
+;                 Any other value tell you where to start in the special table
+
+; Simple mask table, 3 bytes per entry: 1st byte what dungeon it applies, if $FF, then the list is done
+; 2nd and 3rd bytes are the mask
+
+; For indicator idea:
+; EOR between a mask and the equivalent SRAM should result in zero if all items are obtained
+
+; For whether to spawn:
+; $FF indicates a spawn without further checking, otherwise need to check the mask in the simple table
+; this should be checked in addition to SRAM
+
 org $A8AF00
 
 RevealPotItem:
@@ -348,7 +364,9 @@ RevealSpriteDrop:
 		LDA.l StandingItemsOn : BNE +
 			INY ; big key routine
 		+
-		PHX : LDX.b #$00
+		PHX
+	    LDA.l SpawnedItemMWPlayer : BNE .done ; abort check for absorbables it belong to someone else
+	    LDX.b #$00 ; see if the item should be replaced by an absorbable
 		- CPX.b #$1A : BCS .done
 			LDA.l MinorForcedDrops, X
 			CMP.b $00 : BNE +
@@ -403,7 +421,7 @@ IncrementCountForMinor:
 		ORA $0A : STA SpritePotData, X
 		SEP #$30
 		LDA $040C : CMP #$FF : BEQ +
-			BNE ++
+			CMP #$00 : BNE ++
 				INC #2 ; treat sewers as HC
 			++ LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
