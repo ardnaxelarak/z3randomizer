@@ -1,5 +1,5 @@
 HexToDec4Digit_fast:
-	LDY.b #$00
+	LDY.w #$0000
 	-
 		CMP.w #1000 : !BLT +
 		INY

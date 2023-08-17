@@ -96,6 +96,7 @@ SpawnedItemIsMultiWorld = $7E0724 ; 0x02
 SpawnedItemFlag = $7E0726 ; 0x02 - one for pot, 2 for sprite drop
 ; (flag used as a bitmask in conjunction with StandingItemCounterMask)
 SpawnedItemMWPlayer = $7E0728 ; 0x02
+;!EnemyDropIndicator = $7E072A ; 0x02 either the blank tile or the blue square
 ; clear all of them in a loop during room load
 SprDropsItem = $7E0730 ; 0x16
 SprItemReceipt = $7E0740 ; 0x16
@@ -148,12 +149,43 @@ UWEnemyItemFlags:
 ; Reserved $250 296 * 2
 
 
-; Thoughs on multitile dungeon design
+org $A8AF00
+UWSpecialFlagIndex:
+; Reserved $128 (296)
 ; Initial table indexed by room id
 ; Special values: $FF indicates the room can use the UWEnemyItemFlags table
 ;                 Any other value tell you where to start in the special table
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
 
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+
+
+org $A8B028
+UWSpecialFlag:
+; reserved exactly $100 or 256 bytes for now estimated usage is at 159 bytes right now
 ; Simple mask table, 3 bytes per entry: 1st byte what dungeon it applies, if $FF, then the list is done
+; Lists that has even numbers of entries will end with $FF $FF to keep everything 2 byte aligned
+; (if not matched, assume mask of value 0)
 ; 2nd and 3rd bytes are the mask
 
 ; For indicator idea:
@@ -163,8 +195,7 @@ UWEnemyItemFlags:
 ; $FF indicates a spawn without further checking, otherwise need to check the mask in the simple table
 ; this should be checked in addition to SRAM
 
-org $A8AF00
-
+org $A8B128
 RevealPotItem:
 	STA.b $04 ; save tilemap coordinates
 	STZ.w SpawnedItemFlag
@@ -320,12 +351,56 @@ ClearSpriteData:
 			STA SprDropsItem, X :  STA SprItemReceipt, X : STA SprItemIndex, X
 			STA SprItemMWPlayer, X : STA SprItemFlags, X
 			INX : CPX #$10 : BCC .loop
+		JSR SetupEnemyDropIndicator
 	PLX
 	RTL
 
 ClearSpriteData2:
 	LDA.b #$82 : STA.b $99
 	JMP ClearSpriteData_shared
+
+
+; this routine determines whether enemies still have drops or not
+; and sets EnemyDropIndicator appropriately
+; uses X register, assumes flags are (MX) but (mX) is fine
+SetupEnemyDropIndicator:
+	REP #$20
+	LDA.w #!BlankTile : STA.w !EnemyDropIndicator
+	LDX.b $1B : BEQ .done
+	; do we have a flag for enemy drops on? could check it here
+	LDA.w $040C : AND.w #$00FF : CMP.w #$00FF : BEQ .skipCompassChecks
+	; compass checks
+	; does compass for dungeon exist?
+	LSR : TAX : LDA.l ExistsTransfer, X : TAX : LDA.l CompassExists, X : BEQ .skipCompassChecks
+	; doe we have the compass
+	; todo: sewers?
+	LDA.l CompassField : LDX.w $040C : AND.l DungeonMask, X : BEQ .done
+
+.skipCompassChecks
+	; either we're in a cave ($040C: $FF), compass doesn't exist, or we have the compass
+	; check if there are enemy drops
+	LDA.b $02 : PHA : REP #$10 ; store 02/03 for later
+	LDX.b $A0 : LDA.l UWSpecialFlagIndex, X : AND.w #$00FF ; determine if special case or not
+	CMP.w #$00FF : BEQ .loadNormalFlags
+	JSR FetchBitmaskForSpecialCase
+	PHA : LDA $A0 : ASL : TAX : PLA
+	BRA .testAgainstMask
+
+.loadNormalFlags
+	TXA : ASL : TAX : LDA.l UWEnemyItemFlags, X
+
+.testAgainstMask
+	STA.b $02 : LDA.l SpritePotData, X : AND.b $02 : EOR.b $02
+	BEQ .cleanup
+	LDA.w #!BlueSquare : STA.w !EnemyDropIndicator
+
+.cleanup
+	SEP #$10 : PLA : STA.b $02
+
+.done
+SEP #$20
+RTS
+
 
 ; Runs during sprite load of the room
 LoadSpriteData:
@@ -354,7 +429,24 @@ LoadSpriteData:
 
 ; Run when a sprite dies ... Sets Flag to #$02 and Index to sprite slot for
 RevealSpriteDrop:
-	LDA.l SprDropsItem, X : BEQ .normal
+	LDA.l SprDropsItem, X : BNE CheckIfDropValid
+	JMP DoNormalDrop
+
+CheckIfDropValid:
+	REP #$30 : PHX ; save it for later
+	TXA : ASL : TAX : LDA.l BitFieldMasks, X : STA.b $00  ; stores the bitmask for the specific drop
+	; check sram, if gotten, run normal
+	LDA.b $A0 : ASL : TAX : LDA.l SpritePotData, X : PLX ; restore X in case we're done
+	BIT.b $00 : BNE DoNormalDrop ; zero indicates the item has not been obtained
+	PHX  ; save it for later
+	LDX.b $A0 : LDA.l UWSpecialFlagIndex, X : AND.w #$00FF
+	CMP.w #$00FF : BEQ + ; $FF indicates the EnemyItemFlags are sufficient
+		JSR FetchBitmaskForSpecialCase
+		BRA .test
+	+ TXA : ASL : TAX : LDA.l UWEnemyItemFlags, X
+	.test PLX : BIT.b $00 : BEQ DoNormalDrop ; zero indicates the enemy doesn't drop
+	SEP #$30
+	;This section sets up the drop
 		LDA #$02 : STA.l SpawnedItemFlag
 		STX.w SpawnedItemIndex
 		LDA.l SprItemReceipt, X : STA SpawnedItemID
@@ -377,7 +469,9 @@ RevealSpriteDrop:
 			+ INX #2 : BRA -
 		.done PLX
 		 RTL ; unstun if stunned
-	.normal
+
+DoNormalDrop:
+	SEP #$30
 	LDY.w $0CBA, X : BEQ .no_forced_drop
 		RTL
 	.no_forced_drop
@@ -395,6 +489,21 @@ RevealSpriteDrop2:
 	PLA : PLA ; remove the JSL reswamturn lower 16 bits
 	PEA.w $06E3CE-1 ; change return address to .no_forced_drop of (Sprite_DoTheDeath)
 	RTL
+
+; input - A the index from UWSpecialFlagIndex
+; uses X for loop, $02 for comparing first byte to dungeon
+; output - A the correct bitmask
+FetchBitmaskForSpecialCase:
+	ASL : TAX
+	LDA.w $040C : BNE +   ; could check if we are in a cave here and branch to different function?
+		INC #2 ; move sewers to HC
+	+ STA.b $02
+	- LDA.l UWSpecialFlag, X : AND.w #$00FF
+	CMP.w #$00FF : BNE +  ; if the value is FF we are done, use 0 as bitmask
+		LDA.w #$0000 : RTS
+	+  CMP.b $02 : BNE +  ; if the value matches the dungeon, use next 2 bytes as bitmasl
+		INX : LDA.l UWSpecialFlag, X : RTS
+	+ INX #3 : BRA - ; else move to the next row
 
 MinorForcedDrops:
 ; Item ID -> Sprite ID
@@ -420,6 +529,7 @@ IncrementCountForMinor:
 	LDA.l SpritePotData, X : BIT $0A : BNE .obtained
 		ORA $0A : STA SpritePotData, X
 		SEP #$30
+		JSR SetupEnemyDropIndicator
 		LDA $040C : CMP #$FF : BEQ +
 			CMP #$00 : BNE ++
 				INC #2 ; treat sewers as HC
@@ -472,7 +582,9 @@ MarkSRAMForItem:
 		TAX : LDA.l BitFieldMasks, X : STA $00
 		TYX
 		LDA.w SpawnedItemFlag : CMP #$0001 : BEQ +
-			LDA SpritePotData, X : ORA $00 : STA SpritePotData, X : BRA .end
+			LDA SpritePotData, X : ORA $00 : STA SpritePotData, X
+			SEP #$10 : JSR SetupEnemyDropIndicator
+			BRA .end
 		+ LDA RoomPotData, X : ORA $00 : STA RoomPotData, X
 	.end
 	SEP #$30 : PLY : PLX
