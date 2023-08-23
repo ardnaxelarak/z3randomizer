@@ -23,51 +23,14 @@ DrHudOverride:
 	PLB
 
 DRHUD_DrawItemCounter:
-    LDA.l DRFlags : AND #$08 : BNE .draw
-    JMP DRHUD_DrawIndicators
-
-.draw
+	; hides total for mystery seeds
+	LDA.l DRFlags+1 : LSR : BCC DRHUD_DrawIndicators
 	REP #$30
-	LDY.w #!SlashTile : STY.w !GOAL_DRAW_ADDRESS+8
-	LDA.l TotalItemCounter : PHA
-	JSR DRHUDHex4Digit
-
-	LDY.w #!BlankTile ; copy these from newhud
-	LDA.b $04 : TAX : STX.w !GOAL_DRAW_ADDRESS+0
-    LDA.b $05 : TAX : STX.w !GOAL_DRAW_ADDRESS+2
-    LDA.b $06 : TAX : STX.w !GOAL_DRAW_ADDRESS+4
-    LDA.b $07 : TAX : STX.w !GOAL_DRAW_ADDRESS+6
-    PLX
-    CPX.w #1000 : BCS .leave_remaining_digits
-    STY.w !GOAL_DRAW_ADDRESS
-    CPX.w #100 : BCS .leave_remaining_digits
-	STY.w !GOAL_DRAW_ADDRESS+2
-	CPX.w #10 : BCS .leave_remaining_digits
-    STY.w !GOAL_DRAW_ADDRESS+4
-.leave_remaining_digits
-	LDA.l DRFlags+1 : LSR : BCC .real_goal
-	LDY.w #!HyphenTile : STA.w !GOAL_DRAW_ADDRESS+10 : STA.w !GOAL_DRAW_ADDRESS+12
-                       STA.w !GOAL_DRAW_ADDRESS+14 : STA.w !GOAL_DRAW_ADDRESS+16
-    BRA DRHUD_DrawIndicators
-
-.real_goal
-    REP #$30
-	LDA.l MultiClientFlagsWRAM+1 : CMP.w #1000 : BCS .four_digits
-	JSR DRHUDHex3Digit
-	LDA.b $05 : TAX : STX.w !GOAL_DRAW_ADDRESS+10
-	LDA.b $06 : TAX : STX.w !GOAL_DRAW_ADDRESS+12
-	LDA.b $07 : TAX : STX.w !GOAL_DRAW_ADDRESS+14
-	BRA DRHUD_DrawIndicators
-
-.four_digits
-	JSR DRHUDHex4Digit ; carry will be preserved
-	LDA.b $04 : TAX : STX.w !GOAL_DRAW_ADDRESS+10
-	LDA.b $05 : TAX : STX.w !GOAL_DRAW_ADDRESS+12
-	LDA.b $06 : TAX : STX.w !GOAL_DRAW_ADDRESS+14
-	LDA.b $07 : TAX : STX.w !GOAL_DRAW_ADDRESS+16
+	LDY.w #!HyphenTile : STA.w HUDGoalIndicator+$0A : STA.w HUDGoalIndicator+$0C
+                       STA.w HUDGoalIndicator+$0E : STA.w HUDGoalIndicator+$10
+    SEP #$30
 
 DRHUD_DrawIndicators:
-	SEP #$30
 	LDA.b $1B : BNE .continue
 	JMP DRHUD_Finished
 .continue
@@ -122,35 +85,10 @@ DRHUD_DrawKeyCounter:
 .total_only
 	LDA.l ChestKeys, x : JSR ConvertToDisplay : STA.w !KeysTotal
 
-;===================================================================================================
-
 DRHUD_Finished:
     PLB : RTL
 
 ;===================================================================================================
-
-DRHUDHex3Digit:
-	JSL HexToDec_fast
-	JMP DRHUDHex4Digit_shared
-
-DRHUDHex4Digit:
-	JSL HexToDec4Digit_fast
-.shared
-	REP #$30
-	LDA.l $04
-	ORA.w #$9090
-	STA.b $04
-
-	LDA.l $06
-	ORA.w #$9090
-	STA.b $06
-	LDA.w #$2400  ; 2490
-
-	SEP #$20
-	RTS
-
-;===================================================================================================
-
 
 ;column distance for BK/Smalls
 HudOffsets:
@@ -317,39 +255,6 @@ CountAbsorbedKeys:
         lsr : tax
         lda DungeonAbsorbedKeys, x : inc : sta DungeonAbsorbedKeys, x
     + plx : rtl
-
-;================================================================================
-; 16-bit A, 8-bit X
-; in:	A(b) - Byte to Convert
-; out:	$04 - $07 (high - low)
-;================================================================================
-HudHexToDec4DigitCopy:
-    LDY.b #$90
-    -
-        CMP.w #1000 : !BLT +
-        INY
-        SBC.w #1000 : BRA -
-    +
-    STY $04 : LDY #$90 ; Store 1000s digit & reset Y
-    -
-        CMP.w #100 : !BLT +
-        INY
-        SBC.w #100 : BRA -
-    +
-    STY $05 : LDY #$90 ; Store 100s digit & reset Y
-    -
-        CMP.w #10 : !BLT +
-        INY
-        SBC.w #10 : BRA -
-    +
-    STY $06 : LDY #$90 ; Store 10s digit & reset Y
-    CMP.w #1 : !BLT +
-    -
-        INY
-        DEC : BNE -
-    +
-    STY $07 ; Store 1s digit
-RTS
 
 ;================================================================================
 ; 8-bit registers

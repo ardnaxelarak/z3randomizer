@@ -23,154 +23,133 @@
 ;--------------------------------------------------------------------------------
 
 ItemCheck_FairySword:
-	LDA NpcFlags+1 : AND.b #$08
+	LDA.l NpcFlags+1 : AND.b #$08
 RTL
 
 ItemCheck_SmithSword:
-	LDA NpcFlags+1 : AND.b #$04
+	LDA.l NpcFlags+1 : AND.b #$04
 RTL
 
 ItemCheck_MagicBat:
-	LDA NpcFlags+1 : AND.b #$80
+	LDA.l NpcFlags+1 : AND.b #$80
 RTL
 
 ItemCheck_OldMan:
-	LDA NpcFlags : AND.b #$01 : CMP #$01
+	LDA.l NpcFlags : AND.b #$01 : CMP.b #$01
 RTL
 
 ItemCheck_ZoraKing:
-	LDA NpcFlags : AND.b #$02
+	LDA.l NpcFlags : AND.b #$02
 RTL
 
 ItemCheck_SickKid:
-	LDA NpcFlags : AND.b #$04
+	LDA.l NpcFlags : AND.b #$04
 RTL
 
 ItemCheck_TreeKid:
-	LDA NpcFlags : AND.b #$08 ; FluteBoy_Chillin - 73: LDA FluteEquipment
+	LDA.l NpcFlags : AND.b #$08
 RTL
 
 ItemCheck_TreeKid2:
-	LDA NpcFlags : AND.b #$08 : LSR #$02 ; FluteAardvark_InitialStateFromFluteState - 225: LDA FluteEquipment : AND.b #$03
+	LDA.l NpcFlags : AND.b #$08 : CMP.b #$08
+        TDC ; ?? TODO
 RTL
 
 ItemCheck_TreeKid3:
-	JSL $0DD030 ; FluteAardvark_Draw - thing we wrote over
-	LDA NpcFlags : AND.b #$08
-	BEQ .normal
-	BRA .done
+	JSL $8DD030 ; FluteAardvark_Draw - thing we wrote over
+	LDA.l NpcFlags : AND.b #$08
+	BNE .done
 	LDA.b #$05
-	.normal
-	LDA $0D80, X
-	.done
-RTL
+.normal
+	LDA.w SpriteActivity, X
+.done
+	RTL
 
 ItemCheck_Sahasrala:
-	LDA NpcFlags : AND.b #$10
+	LDA.l NpcFlags : AND.b #$10
 RTL
 
 ItemCheck_Library:
-	LDA NpcFlags : AND.b #$80
+	LDA.l NpcFlags : AND.b #$80
 RTL
 
 ItemCheck_Mushroom:
-	LDA NpcFlags+1 : ROL #4 ; does the same thing as below
-;	LDA NpcFlags+1 : AND.b #$10 : BEQ .clear
-;	SEC
-;RTL
-;	.clear
-;	CLC
+	LDA.l NpcFlags+1 : AND.b #$10 : CMP.b #$10 ; does the same thing as below
 RTL
 
 ItemCheck_Powder:
-	LDA NpcFlags+1 : AND.b #$20
+	LDA.l NpcFlags+1 : AND.b #$20
 RTL
 
 ItemCheck_Catfish:
-	;LDA CatfishGoodItem : BEQ .junk
-	;PHX
-	;	LDA CatfishGoodItem+1 : TAX
-	;	LDA BowEquipment-1, X
-	;PLX
-	;--
-	;CMP CatfishGoodItem : !BLT .oursNewer
-	;.theirsNewer
-	;LDA #$20 : RTL ; don't give item
-	;.oursNewers
-	;LDA #$00 : RTL ; give item
-	;.junk
-	LDA NpcFlags : AND.b #$20
+	LDA.l NpcFlags : AND.b #$20
 RTL
 ;--------------------------------------------------------------------------------
 ItemSet_FairySword:
-	PHA : LDA NpcFlags+1 : ORA.b #$08 : STA NpcFlags+1 : PLA
+	PHA : LDA.l NpcFlags+1 : ORA.b #$08 : STA.l NpcFlags+1 : PLA
 RTL
 
 ItemSet_SmithSword:
-	PHA : LDA NpcFlags+1 : ORA.b #$04 : STA NpcFlags+1 : PLA
+	PHA : LDA.l NpcFlags+1 : ORA.b #$04 : STA.l NpcFlags+1 : PLA
 RTL
 
 ItemSet_MagicBat:
-	PHA : LDA NpcFlags+1 : ORA.b #$80 : STA NpcFlags+1 : PLA
+	PHA : LDA.l NpcFlags+1 : ORA.b #$80 : STA.l NpcFlags+1 : PLA
 RTL
 
 ItemSet_OldMan:
 	PHA : LDA OldManItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID : PLA
 	JSL.l Link_ReceiveItem ; thing we wrote over
-	PHA : LDA NpcFlags : ORA.b #$01 : STA NpcFlags : PLA
+	PHA : LDA.l NpcFlags : ORA.b #$01 : STA.l NpcFlags : PLA
 RTL
 
 ItemSet_ZoraKing:
-	;JSL $1DE1AA ; Sprite_SpawnFlippersItem ; thing we wrote over
-	PHA : LDA NpcFlags : ORA.b #$02 : STA NpcFlags : PLA
+	PHA : LDA.l NpcFlags : ORA.b #$02 : STA.l NpcFlags : PLA
 RTL
 
 ItemSet_SickKid:
 	PHA : LDA SickKidItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID : PLA
 	JSL.l Link_ReceiveItem ; thing we wrote over
-	PHA : LDA NpcFlags : ORA.b #$04 : STA NpcFlags : PLA
+	PHA : LDA.l NpcFlags : ORA.b #$04 : STA.l NpcFlags : PLA
 RTL
 
 ItemSet_TreeKid:
 	PHA : LDA TreeKidItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID : PLA
 	JSL.l Link_ReceiveItem ; thing we wrote over
-	PHA : LDA NpcFlags : ORA.b #$08 : STA NpcFlags : PLA
+	PHA : LDA.l NpcFlags : ORA.b #$08 : STA.l NpcFlags : PLA
 RTL
 
 ItemSet_Sahasrala:
 	PHA : LDA SahasralaItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID : PLA
 	JSL.l Link_ReceiveItem ; thing we wrote over
-	PHA : LDA NpcFlags : ORA.b #$10 : STA NpcFlags : PLA
+	PHA : LDA.l NpcFlags : ORA.b #$10 : STA.l NpcFlags : PLA
 RTL
 
 ItemSet_Catfish:
-	;JSL $00D52D ; GetAnimatedSpriteTile.variable ; thing we wrote over
-	;JSL.l LoadCatfishItemGFX
-	PHA : LDA NpcFlags : ORA.b #$20 : STA NpcFlags : PLA
+	PHA : LDA.l NpcFlags : ORA.b #$20 : STA.l NpcFlags : PLA
 RTL
 
 ItemSet_Library:
 	PHA : LDA LibraryItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID : PLA
 	JSL.l Link_ReceiveItem ; thing we wrote over
-	PHA : LDA NpcFlags : ORA.b #$80 : STA NpcFlags : PLA
+	PHA : LDA.l NpcFlags : ORA.b #$80 : STA.l NpcFlags : PLA
 RTL
 
 ItemSet_Mushroom:
 	PHA
-		LDA NpcFlags+1 : ORA.b #$10 : STA NpcFlags+1
-		LDY $0E80, X ; Retrieve stored item type
+		LDA.l NpcFlags+1 : ORA.b #$10 : STA.l NpcFlags+1
+		LDY.w SpriteID, X ; Retrieve stored item type
 		BNE +
 			; if for any reason the item value is 0 reload it, just in case
 			%GetPossiblyEncryptedItem(MushroomItem, SpriteItemValues) : TAY
 		+
 	LDA MushroomItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
 	PLA
-	;LDY.b #$29
-	STZ $02E9 ; thing we wrote over - the mushroom is an npc for item purposes apparently
+	STZ.w ItemReceiptMethod ; thing we wrote over - the mushroom is an npc for item purposes apparently
 RTL
 
 ItemSet_Powder:
-	PHA : LDA NpcFlags+1 : ORA.b #$20 : STA NpcFlags+1 : PLA
+	PHA : LDA.l NpcFlags+1 : ORA.b #$20 : STA.l NpcFlags+1 : PLA
 RTL
 ;================================================================================
 
@@ -178,11 +157,11 @@ RTL
 ; Randomize 300 Rupee NPC
 ;--------------------------------------------------------------------------------
 Set300RupeeNPCItem:
-	INC $0D80, X ; thing we wrote over
+	INC.w SpriteActivity, X ; thing we wrote over
 
 	PHA : PHP
 	REP #$20 ; set 16-bit accumulator
-	LDA $A0 ; these are all decimal because i got them that way
+	LDA.b RoomIndex ; these are all decimal because i got them that way
 	CMP.w #291 : BNE +
 		%GetPossiblyEncryptedItem(RupeeNPC_MoldormCave, SpriteItemValues)
 		TAY ; load moldorm cave value into Y
@@ -201,4 +180,59 @@ Set300RupeeNPCItem:
 	STA !MULTIWORLD_ITEM_PLAYER_ID
 	PLP : PLA
 RTL
+
 ;================================================================================
+; Randomize Zora King
+;--------------------------------------------------------------------------------
+LoadZoraKingItemGFX:
+        LDA.l $9DE1C3 ; location randomizer writes zora item to
+        JSL.l ResolveLootIDLong
+        STA.w SpriteID,Y
+        TYX
+        JML.l PrepDynamicTile_loot_resolved
+;--------------------------------------------------------------------------------
+JumpToSplashItemTarget:
+	LDA.w SpriteMovement, X
+	CMP.b #$FF : BNE + : JML.l SplashItem_SpawnSplash : +
+	CMP.b #$00 : JML.l SplashItem_SpawnOther
+
+;================================================================================
+; Randomize Catfish
+;--------------------------------------------------------------------------------
+LoadCatfishItemGFX:
+		LDA.l CatfishItem_Player : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+        LDA.l $9DE185 ; location randomizer writes catfish item to
+        JSL.l ResolveLootIDLong
+	STA.w SpriteID, Y
+        TYX
+	JML.l PrepDynamicTile_loot_resolved
+;--------------------------------------------------------------------------------
+DrawThrownItem:
+        LDA.b OverworldIndex : CMP.b #$81 : BNE .catfish
+                .zora
+                LDA.b #$01 : STA.l RedrawFlag
+                BRA .draw
+                .catfish
+                .draw
+                LDA.w SpriteID,X
+                JML DrawDynamicTile
+;--------------------------------------------------------------------------------
+MarkThrownItem:
+	PHA
+
+	LDA.b OverworldIndex : CMP.b #$81 : BNE .catfish
+
+	.zora
+    JSL ItemSet_ZoraKing
+	LDA.l ZoraItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+	BRA .done
+
+	.catfish
+    JSL ItemSet_Catfish
+	LDA.l CatfishItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+
+	.done
+	PLA
+	JSL Link_ReceiveItem ; thing we wrote over
+RTL
+;--------------------------------------------------------------------------------

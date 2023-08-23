@@ -7,10 +7,10 @@ GetMagicBatItem:
 	CMP.b #$FF : BEQ .normalLogic
 	TAY
 	PHA : LDA MagicBatItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID : PLA
-	STZ $02E9 ; 0 = Receiving item from an NPC or message
+	STZ.b ItemReceiptMethod ; 0 = Receiving item from an NPC or message
 	JML.l Link_ReceiveItem
 .normalLogic
-	LDA HalfMagic
-	STA MagicConsumption
+	LDA.l HalfMagic
+	STA.l MagicConsumption
 RTL
 ;--------------------------------------------------------------------------------

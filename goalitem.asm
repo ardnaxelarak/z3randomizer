@@ -1,21 +1,14 @@
-;--------------------------------------------------------------------------------
-; $7F5010 - Scratch Space (Callee Preserved)
-;--------------------------------------------------------------------------------
-!GOAL_DRAW_ADDRESS = "$7EC72A"
-;--------------------------------------------------------------------------------
-; DrawGoalIndicator moved to newhud.asm
-;--------------------------------------------------------------------------------
 GoalItemGanonCheck:
-	LDA $0E20, X : CMP.b #$D6 : BNE .success ; skip if not ganon
+	LDA.w SpriteTypeTable, X : CMP.b #$D6 : BNE .success ; skip if not ganon
 		JSL.l CheckGanonVulnerability
 		BCS .success
 
 		.fail
-		LDA $0D80, X : CMP.b #17 : !BLT .success ; decmial 17 because Acmlm's chart is decimal
+		LDA.w SpriteActivity, X : CMP.b #17 : !BLT .success ; decmial 17 because Acmlm's chart is decimal
 		LDA.b #$00
 RTL
 		.success
-		LDA $44 : CMP.b #$80 ; thing we wrote over
+		LDA.b OAMOffsetY : CMP.b #$80 ; thing we wrote over
 RTL
 ;--------------------------------------------------------------------------------
 ;Carry clear = ganon invincible
@@ -46,6 +39,7 @@ CheckGanonVulnerability:
 	dw .crystals_and_bosses
 	dw .bosses_only
 	dw .all_dungeons_no_agahnim
+	dw .all_items
 	dw .completionist
 
 ; 00 = always vulnerable
@@ -100,14 +94,20 @@ CheckGanonVulnerability:
 .bosses_only
 	JMP CheckForCrystalBossesDefeated
 
-; 0a = Check Item counter
-.completionist
-		REP #$20
-	LDA.l TotalItemCounter : CMP.l MaxItemCounter
-		SEP #$20
-	BCC .fail
-BRA .all_dungeons
+; 09 = 100% item collection rate
+.all_items
+        REP #$20
+        LDA.l TotalItemCounter : CMP.l TotalItemCount
+        SEP #$20
+        RTS
 
+; 0A = 100% item collection rate and all dungeons
+.completionist
+        REP #$20
+        LDA.l TotalItemCounter : CMP.l TotalItemCount
+        SEP #$20
+        BCC .fail
+        BRA .all_dungeons
 
 ;--------------------------------------------------------------------------------
 GTCutscene_CrystalMasks:
@@ -164,19 +164,19 @@ GTCutscene_ActivateSparkle_SelectCrystal:
 	+ PHY : TAY
 	LDA.l NumberOfCrystalsRequiredForTower : TAX : LDA.l GTCutscene_CrystalMasks,X
 	LDX.b #$FF
-	- LSR : INX : BCC + 
+	- LSR : INX : BCC +
 		DEY
 	+ BPL -
 	PLY
 RTL
 ;--------------------------------------------------------------------------------
 CheckEnoughCrystalsForGanon:
-	LDA CrystalCounter
+	LDA.l CrystalCounter
 	CMP.l NumberOfCrystalsRequiredForGanon
 RTL
 ;--------------------------------------------------------------------------------
 CheckEnoughCrystalsForTower:
-	LDA CrystalCounter
+	LDA.l CrystalCounter
 	CMP.l NumberOfCrystalsRequiredForTower
 RTL
 
@@ -191,13 +191,13 @@ CheckAgaForPed:
 	BEQ .force_blue_ball
 
 .vanilla ; run vanilla check for phase
-	LDA.w $0E30, X
+	LDA.w SpriteAux, X
 	CMP.b #$02
 	RTL
 
 .force_blue_ball
-	LDA.b #$01 : STA.w $0DA0, Y
-	LDA.b #$20 : STA.w $0DF0, Y
+	LDA.b #$01 : STA.w SpriteAuxTable, Y
+	LDA.b #$20 : STA.w SpriteTimer, Y
 	CLC ; skip the RNG check
 	RTL
 
@@ -228,7 +228,7 @@ CheckForCrystalBossesDefeated:
 	REP #$30
 
 	; count of number of bosses killed
-	STZ.b $00
+	STZ.b Scrap00
 
 	LDY.w #10
 
@@ -248,7 +248,7 @@ CheckForCrystalBossesDefeated:
 	AND.w #$0800
 	BEQ ++
 
-	INC.b $00
+	INC.b Scrap00
 
 ++	DEY
 	BPL .next_check
@@ -256,7 +256,7 @@ CheckForCrystalBossesDefeated:
 	SEP #$30
 	PLY : PLX : PLB
 
-	LDA.b $00 : CMP.l NumberOfCrystalsRequiredForGanon
+	LDA.b Scrap00 : CMP.l NumberOfCrystalsRequiredForGanon
 
 
 	RTS

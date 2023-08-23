@@ -38,7 +38,7 @@ RequestStandingItemVRAMSlot:
 
 	REP #$20
 	LDA.w #DynamicDropGFX-$7E9000
-	STA.l !TILE_UPLOAD_OFFSET_OVERRIDE
+	STA.l TileUploadOffsetOverride
 	SEP #$20
 
 	LDA.w DynamicDropQueue
@@ -108,9 +108,11 @@ FreeUWGraphics:
 ;===================================================================================================
 
 DrawPotItem:
-	JSL.l IsNarrowSprite : BCS .narrow
+	PHX : TAX
+	LDA.l SpriteProperties_standing_width,X : BEQ .narrow
 
 	.full
+	PLX
 	LDA.b #$01 : STA $06
 	LDA #$0C : JSL.l OAM_AllocateFromRegionC
 	LDA #$02 : PHA
@@ -119,6 +121,7 @@ DrawPotItem:
 	BRA .draw
 
 	.narrow
+	PLX
 	LDA.b #$02 : STA $06
 	LDA #$10 : JSL.l OAM_AllocateFromRegionC
 	LDA #$03 : PHA
@@ -136,7 +139,7 @@ DrawPotItem:
 	SEP #$20
 	STZ.b $07
 
-	LDA.b #$00 : STA.l !SKIP_EOR
+	LDA.b #$00 : STA.l SpriteSkipEOR
 	JSL Sprite_DrawMultiple_quantity_preset
 
 	LDA.b $90 : CLC : ADC.b #$08 : STA.b $90

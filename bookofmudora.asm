@@ -2,22 +2,23 @@
 ; Randomize Book of Mudora
 ;--------------------------------------------------------------------------------
 LoadLibraryItemGFX:
-	LDA.l LibraryItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
-	%GetPossiblyEncryptedItem(LibraryItem, SpriteItemValues)
-	STA $0E80, X ; Store item type
-	JSL.l PrepDynamicTile
+		LDA.l LibraryItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
+        %GetPossiblyEncryptedItem(LibraryItem, SpriteItemValues)
+        JSL.l ResolveLootIDLong
+        STA.w SpriteID, X
+        JSL.l PrepDynamicTile_loot_resolved
 RTL
 ;--------------------------------------------------------------------------------
 DrawLibraryItemGFX:
-	PHA
-    LDA $0E80, X ; Retrieve stored item type
-	JSL.l DrawDynamicTile
-	PLA
+        PHA
+        LDA.w SpriteID, X
+        JSL.l DrawDynamicTile
+        PLA
 RTL
 ;--------------------------------------------------------------------------------
 SetLibraryItem:
-	LDY $0E80, X ; Retrieve stored item type
-	JSL.l ItemSet_Library ; contains thing we wrote over
+        LDY.w SpriteID, X
+        JSL.l ItemSet_Library ; contains thing we wrote over
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -25,39 +26,38 @@ RTL
 ;================================================================================
 ; Randomize Bonk Keys
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
-;--------------------------------------------------------------------------------
 LoadBonkItemGFX:
-	LDA.b #$08 : STA $0F50, X ; thing we wrote over
+	LDA.b #$08 : STA.w SpriteOAMProp, X ; thing we wrote over
 LoadBonkItemGFX_inner:
-	LDA.b #$00 : STA !REDRAW
+	LDA.b #$00 : STA.l RedrawFlag
 	JSR LoadBonkItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	JSR LoadBonkItem
+        STA.w SpriteItemType, X
+        STA.w SpriteID, X
 	JSL.l PrepDynamicTile
 RTL
 ;--------------------------------------------------------------------------------
 DrawBonkItemGFX: 
-	PHA
-	LDA !REDRAW : BEQ .skipInit ; skip init if already ready
-	JSL.l LoadBonkItemGFX_inner
-	BRA .done ; don't draw on the init frame
-	
+        PHA
+        LDA.l RedrawFlag : BEQ .skipInit
+        JSL.l LoadBonkItemGFX_inner
+        BRA .done ; don't draw on the init frame
+
 	.skipInit
-	
-    JSR LoadBonkItem
-	JSL.l DrawDynamicTileNoShadow
-	
-	.done
-	PLA
+        JSR LoadBonkItem
+        JSL.l DrawDynamicTileNoShadow
+
+        .done
+        PLA
 RTL
 ;--------------------------------------------------------------------------------
 GiveBonkItem:
 	JSR LoadBonkItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
 	JSR LoadBonkItem
-	CMP #$24 : BNE .notKey
+	CMP.b #$24 : BNE .notKey
 	.key
 		PHY : LDY.b #$24 : JSL.l AddInventory : PLY ; do inventory processing for a small key
-		LDA CurrentSmallKeys : INC A : STA CurrentSmallKeys
+		LDA.l CurrentSmallKeys : INC A : STA.l CurrentSmallKeys
 		LDA.b #$2F : JSL.l Sound_SetSfx3PanLong
 		JSL CountBonkItem
 RTL
@@ -67,12 +67,12 @@ RTL
 RTL
 ;--------------------------------------------------------------------------------
 LoadBonkItem:
-	LDA $A0 ; check room ID - only bonk keys in 2 rooms so we're just checking the lower byte
-	CMP #115 : BNE + ; Desert Bonk Key
+	LDA.b RoomIndex ; check room ID - only bonk keys in 2 rooms so we're just checking the lower byte
+	CMP.b #115 : BNE + ; Desert Bonk Key
     	LDA.l BonkKey_Desert
 		BRA ++
-	+ : CMP #140 : BNE + ; GTower Bonk Key
-		LDA.l BonkKey_GTower
+	+ : CMP.b #140 : BNE + ; GTower Bonk Key
+    	LDA.l BonkKey_GTower
 		BRA ++
 	+
 		LDA.b #$24 ; default to small key

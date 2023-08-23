@@ -2,23 +2,21 @@
 ; Frame Hook
 ;--------------------------------------------------------------------------------
 FrameHookAction:
-	JSL $0080B5 ; Module_MainRouting
-	JSL CheckMusicLoadRequest
-	PHP : REP #$30 : PHA
-	
-		SEP #$20
-		
-		LDA StatsLocked : BNE ++
-			REP #$20 ; set 16-bit accumulator
-				LDA LoopFrames : INC : STA LoopFrames : BNE +
-					LDA LoopFrames+2 : INC : STA LoopFrames+2
-				+
-				LDA $10 : CMP.w #$010E : BNE + ; move this to nmi hook?
-				LDA MenuFrames : INC : STA MenuFrames : BNE +
-					LDA MenuFrames+2 : INC : STA MenuFrames+2
-				+
-		++
-	REP #$30 : PLA : PLP
+        JSL $8080B5 ; Module_MainRouting
+        JSL CheckMusicLoadRequest
+        PHP : REP #$30 : PHA
+        SEP #$20
+        LDA.l StatsLocked : BNE ++
+                REP #$20 ; set 16-bit accumulator
+                LDA.l LoopFrames : INC : STA.l LoopFrames : BNE +
+                        LDA.l LoopFrames+2 : INC : STA.l LoopFrames+2
+                                +
+                                LDA.l GameMode : CMP.w #$010E : BNE ++ ; move this to nmi hook?
+                                LDA.l MenuFrames : INC : STA.l MenuFrames : BNE ++
+                                        LDA.l MenuFrames+2 : INC : STA.l MenuFrames+2
+                ++
+        REP #$30 : PLA : PLP
+
 RTL
 
 !NMI_MW = "$7F5047"
@@ -39,37 +37,43 @@ NMIHookAction:
 		+
 		PLP
 	++
-	
-	LDA StatsLocked : AND.w #$00FF : BNE ++
-		LDA NMIFrames : INC : STA NMIFrames : BNE +
-			LDA NMIFrames+2 : INC : STA NMIFrames+2
-		+
-	++
-	
+
+	LDA.l StatsLocked : AND.w #$00FF : BNE +
+		LDA.l NMIFrames : INC : STA.l NMIFrames : BNE +
+			LDA.l NMIFrames+2 : INC : STA.l NMIFrames+2
+	+
+
 JML.l NMIHookReturn
-;--------------------------------------------------------------------------------
-!NMI_AUX = "$7F5044"
 
+;--------------------------------------------------------------------------------
 PostNMIHookAction:
-    LDA.l !NMI_AUX+2 : BEQ .return
+        LDA.w NMIAux : BEQ +
+                PHK : PEA .return-1 ; push stack for RTL return
+                JMP.w [NMIAux]
+                .return
+                STZ.w NMIAux ; zero bank byte of NMI hook pointer
+        +
+        JSR.w TransferItemGFX
+        LDA.b INIDISPQ : STA.w INIDISP ; thing we wrote over, turn screen back on
 
-    PHK
-    PEA .return-1
-
-    PHA
-
-    LDA.b #$00 : STA.l !NMI_AUX+2
-
-    REP #$20
-    LDA.l !NMI_AUX+0 : DEC : PHA
-    SEP #$20
-
-    RTL
-
-.return
-    LDA.b $13 : STA.w $2100
-
-    JML.l PostNMIHookReturn
-
-
+JML.l PostNMIHookReturn
 ;--------------------------------------------------------------------------------
+TransferItemGFX:
+; Only used for shops now but could be used for anything. We should look at how door rando does this
+; and try to unify one approach.
+        REP #$30
+        LDX.w ItemQueuePtr : BEQ .done
+                -
+                        LDA.w ItemGFXQueue,X : STA.w ItemGFXPtr
+                        LDA.w ItemTargetQueue,X : STA.w ItemGFXTarget
+                        PHX
+                        JSL.l TransferItemToVRAM
+                        REP #$10
+                        PLX
+                        DEX #2
+                BPL -
+
+        STZ.w ItemQueuePtr
+        .done
+        SEP #$30
+RTS

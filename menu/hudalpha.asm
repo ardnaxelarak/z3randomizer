@@ -1,7 +1,7 @@
 OnMenuLoad:
-	LDA.b #UploadMenuOnlyIcons>>0 : STA !NMI_AUX
-	LDA.b #UploadMenuOnlyIcons>>8 : STA !NMI_AUX+1
-	LDA.b #UploadMenuOnlyIcons>>16 : STA !NMI_AUX+2
+	LDA.b #UploadMenuOnlyIcons>>0 : STA NMIAux
+	LDA.b #UploadMenuOnlyIcons>>8 : STA NMIAux+1
+	LDA.b #UploadMenuOnlyIcons>>16 : STA NMIAux+2
 	LDA.b #$0E : STA.b $10 ; what we overwrote
 RTL
 

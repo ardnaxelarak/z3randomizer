@@ -390,7 +390,7 @@ SetupEnemyDropIndicator:
 	TXA : ASL : TAX : LDA.l UWEnemyItemFlags, X
 
 .testAgainstMask
-	STA.b $02 : LDA.l SpritePotData, X : AND.b $02 : EOR.b $02
+	STA.b $02 : LDA.l SpriteDropData, X : AND.b $02 : EOR.b $02
 	BEQ .cleanup
 	LDA.w #!BlueSquare : STA.w !EnemyDropIndicator
 
@@ -436,7 +436,7 @@ CheckIfDropValid:
 	REP #$30 : PHX ; save it for later
 	TXA : ASL : TAX : LDA.l BitFieldMasks, X : STA.b $00  ; stores the bitmask for the specific drop
 	; check sram, if gotten, run normal
-	LDA.b $A0 : ASL : TAX : LDA.l SpritePotData, X : PLX ; restore X in case we're done
+	LDA.b $A0 : ASL : TAX : LDA.l SpriteDropData, X : PLX ; restore X in case we're done
 	BIT.b $00 : BNE DoNormalDrop ; zero indicates the item has not been obtained
 	PHX  ; save it for later
 	LDX.b $A0 : LDA.l UWSpecialFlagIndex, X : AND.w #$00FF
@@ -526,8 +526,8 @@ IncrementCountForMinor:
 	PHX : REP #$30
 	LDA.w SpawnedItemIndex : ASL : TAX : LDA.l BitFieldMasks, X : STA $0A
 	LDA.b $A0 : ASL : TAX
-	LDA.l SpritePotData, X : BIT $0A : BNE .obtained
-		ORA $0A : STA SpritePotData, X
+	LDA.l SpriteDropData, X : BIT $0A : BNE .obtained
+		ORA $0A : STA SpriteDropData, X
 		SEP #$30
 		JSR SetupEnemyDropIndicator
 		LDA $040C : CMP #$FF : BEQ +
@@ -561,7 +561,7 @@ ShouldSpawnItem:
 			TAX : LDA.l BitFieldMasks, X : STA $00
 		PLX ; restore X again
 		LDA.w SprItemFlags, X : AND #$00FF : CMP #$0001 : BEQ +
-			TYX : LDA.l SpritePotData, X : BIT $00 : BEQ .notObtained
+			TYX : LDA.l SpriteDropData, X : BIT $00 : BEQ .notObtained
 			BRA .obtained
 		+ TYX : LDA.l RoomPotData, X : BIT $00 : BEQ .notObtained
 			.obtained
@@ -582,7 +582,7 @@ MarkSRAMForItem:
 		TAX : LDA.l BitFieldMasks, X : STA $00
 		TYX
 		LDA.w SpawnedItemFlag : CMP #$0001 : BEQ +
-			LDA SpritePotData, X : ORA $00 : STA SpritePotData, X
+			LDA SpriteDropData, X : ORA $00 : STA SpriteDropData, X
 			SEP #$10 : JSR SetupEnemyDropIndicator
 			BRA .end
 		+ LDA RoomPotData, X : ORA $00 : STA RoomPotData, X
@@ -660,7 +660,7 @@ KeyGet:
 			LDA $00 : CMP.l KeyTable, X : BNE +
 				.countIt
 				LDA.l StandingItemCounterMask : AND SpawnedItemFlag : BEQ ++
-					JSL.l FullInventoryExternal : JSL CountChestKeyLong
+					JSL.l AddInventory : JSL CountChestKeyLong
 				++ PLX : PLA : RTL
 			+ CMP.b #$AF : beq .countIt ; universal key
 			CMP.b #$24 : beq .countIt   ; small key for this dungeon
