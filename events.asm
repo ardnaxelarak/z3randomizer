@@ -282,5 +282,5 @@ PostItemAnimation:
         SEP #$20
 
         STZ.w ItemReceiptMethod : LDA.w AncillaGet, X ; thing we wrote over to get here
-RTL
+JML Ancilla_ReceiveItem_optimus+6
 ;--------------------------------------------------------------------------------

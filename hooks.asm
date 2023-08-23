@@ -1892,7 +1892,6 @@ JSL AllowSQ
 org $88C45F ; <- 4445F - ancilla_recieve_item.asm:157 (STZ $02E9 : LDA $0C5E, X)
 Ancilla_ReceiveItem_optimus:
 JML PostItemAnimation : NOP #2
-; todo - JML vs JSL
 
 org $88C548 ; <- 44548 - ancilla_recieve_item.asm:297 (CMP.b #$28 : BNE .dontGiveRupees)
 JML.l Multiworld_Ancilla_ReceiveItem_stillInMotion

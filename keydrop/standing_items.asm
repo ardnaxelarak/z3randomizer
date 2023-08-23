@@ -43,8 +43,8 @@ org $86d18d ; <- 3518D - sprite_absorbable.asm : 274 (LDA $7EF36F : INC A : STA 
 org $86f9f3 ; bank06.asm : 6732 (JSL Sprite_LoadProperties)
 	JSL LoadProperties_PreserveCertainProps
 
-org $808BAA ; NMI hook
-	JSL TransferPotGFX
+;org $808BAA ; NMI hook
+;	JSL TransferPotGFX
 
 org $86828A
 	JSL CheckSprite_Spawn
@@ -602,7 +602,7 @@ SpriteKeyPrep:
 					BRA +
 		.continue
 		LDA.w SpawnedItemIndex : STA SprItemIndex, X
-		LDA.w SpawnedItemMWPlayer : STA SprItemMWPlayer, X
+		LDA.w SpawnedItemMWPlayer : STA SprItemMWPlayer, X : STA.w !MULTIWORLD_SPRITEITEM_PLAYER_ID
 		LDA.w SpawnedItemFlag : STA SprItemFlags, X : BEQ +
 		LDA.l SpawnedItemID : STA $0E80, X
 		PHA

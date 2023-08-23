@@ -118,7 +118,7 @@ ProcessEventItems:
 RTS
 ;--------------------------------------------------------------------------------
 AddReceivedItemExpanded:
-PHA : PHX
+	PHA : PHX
 		LDA.l RemoteItems : BEQ + : LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
 			LDA.w ItemReceiptMethod : BEQ ++ : CMP.b #$03 : BNE +++ : ++
 				; fromTextOrObject
@@ -129,7 +129,7 @@ PHA : PHX
 			STZ.w ItemReceiptID : STZ.w $02D9 : STZ.w ItemReceiptMethod
 			PHY : LDY.b #$00 : JSL AddInventory : PLY
 			PLX : PLA : RTL
-		+
+		+ PLX : PLA
         JSR.w ResolveReceipt
         PHB : PHK
 JML AddReceivedItem+2
@@ -647,7 +647,7 @@ ItemBehavior:
         RTS
 
 ResolveReceipt:
-
+		PHA : PHX
         PHK : PLB
         JSL.l PreItemGet
         LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE +

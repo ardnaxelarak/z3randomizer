@@ -32,19 +32,22 @@ RequestStandingItemVRAMSlot:
 	STA.w SprItemGFX,X
 
 
-	; decompress graphics
 	PHX
-	LDX.w DynamicDropQueue
-
-	REP #$20
-	LDA.w #DynamicDropGFX-$7E9000
-	STA.l TileUploadOffsetOverride
-	SEP #$20
-
 	LDA.w DynamicDropQueue
-	JSL.l GetSpriteID
-	JSL.l GetAnimatedSpriteTile_variable
+	; unsure about substitution rules here, because they aren't skipped properly for MW yet
+;	JSL AttemptItemSubstitutionLong
+	JSL ResolveLootIDLong
+	ASL : TAX : LDA.l StandingItemGraphicsOffsets,X
+	LDX.w ItemQueuePtr
+	STA.w ItemGFXQueue,X
 
+	PLX : PHX
+	REP #$20
+	LDA.l FreeUWGraphics,X
+	LDX.w ItemQueuePtr
+	STA.w ItemTargetQueue,X
+	SEP #$20
+	TXA : INC #2 : STA.w ItemQueuePtr
 	SEP #$30
 	PLX
 
