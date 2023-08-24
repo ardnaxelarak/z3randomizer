@@ -91,7 +91,7 @@ RetrieveBunnyState:
 	STY $5D : STZ $02D8 ; what we wrote over
 	LDA $5F : BEQ +
 		STA $5D
-+ RTL
+ + JML MaybeKeepLootID
 
 ; A should be how much dmg to do to Aga when leaving this function
 StandardAgaDmg:

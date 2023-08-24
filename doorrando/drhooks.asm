@@ -169,8 +169,8 @@ jsl CutoffEntranceRug : bra .nextTile : nop
 org $8799de ; <- Bank07.asm : 4088 (LDA.b #$15 : STA $5D)
 JSL StoreTempBunnyState
 ;
-org $88c450 ; <- ancilla_receive_item.asm : 146-148 (STY $5D : STZ $02D8)
-JSL RetrieveBunnyState : NOP
+org $88C450 ; <- ancilla_receive_item.asm : 146-148 (STY $5D : STZ $02D8)
+JSL RetrieveBunnyState : JMP.w $88C458 : NOP
 
 org $82d9ce ; <- Bank02.asm : Dungeon_LoadEntrance 10829 (STA $A0 : STA $048E)
 JSL CheckDarkWorldSpawn : NOP

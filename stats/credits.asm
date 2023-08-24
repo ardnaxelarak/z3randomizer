@@ -18,7 +18,7 @@ db 2, 55
 db $5F, $6B, $68, $68, $61, $5F, $70, $65, $6B, $6A, $9F, $6E, $5D, $70, $61  ; "Collection Rate"
 db $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F ; "        " 8 spaces
 print "Collection Rate High Start: ", pc
-db $9F, $A2 ; " /"
+db $9F, $DB ; " /"
 db $55, $54, $59 ; 216
 
 CollectionRateLo:
@@ -26,7 +26,7 @@ db 2, 55
 db $85, $91, $8E, $8E, $87, $85, $96, $8B, $91, $90, $9F, $94, $83, $96, $87  ; "Collection Rate"
 db $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F  ; "        " 8 spaces
 print "Collection Rate Low Start: ", pc
-db $9F, $C2 ; " /"
+db $9F, $EE ; " /"
 db $7B, $7A, $7F ; 216
 
 ;===================================================================================================

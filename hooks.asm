@@ -506,9 +506,8 @@ PreventEnterOnBonk_BRANCH_IX:
 ;================================================================================
 ; Crystals Mode
 ;--------------------------------------------------------------------------------
-org $899B7B ; <- ancilla_init.asm : 4136 (LDA $7EF37A : AND.b #$7F : CMP.b #$7F)
-JSL CheckEnoughCrystalsForTower : NOP #4
-db $90 ; BCC
+org $899B7F ; <- ancilla_init.asm : 4136 (LDA $7EF37A : AND.b #$7F : CMP.b #$7F)
+JSL CheckTowerOpen : BCC $899B6D
 ;--------------------------------------------------------------------------------
 org $88CE0C ; <- 44E0C - ancilla_break_tower_seal.asm : 168 (BEQ #$03 : JSR GTCutscene_SparkleALot : LDX.b #$06)
 JML.l GTCutscene_AnimateCrystals_Prep : NOP
@@ -565,6 +564,8 @@ JSL GoalItemGanonCheck
 org $86F2EA ; <- 372EA - Bank06.asm : 5791 (LDA $0E20, X : CMP.b #$D6 : BCS .no_collision)
 JSL CheckGanonHammerDamage : NOP
 ;--------------------------------------------------------------------------------
+org $858922
+JSL.l CheckPedestalPull : BCC MasterSword_InPedestal_exit
 
 ;================================================================================
 ; Stat Hooks
@@ -1032,7 +1033,7 @@ org $81C742 : JSL.l SpawnDungeonPrize
 org $8799EA : JML.l SetItemPose
 org $88C415 : JSL.l PendantMusicCheck
 BCS Ancilla22_ItemReceipt_is_pendant : BRA Ancilla22_ItemReceipt_wait_for_music
-org $88C452 : JSL.l MaybeKeepLootID : NOP #2
+;org $88C452 : JSL.l MaybeKeepLootID : NOP #2 DR overwrote hook see RetrieveBunnyState
 org $88C61D : JSL.l AnimatePrizeCutscene : NOP
 org $88C622 : BCC ItemReceipt_Animate_continue
 org $88C6BA : JSL.l CheckPoseItemCoordinates
@@ -1687,15 +1688,6 @@ JSL FlipLWDWFlag : NOP #2
 ;JSL OverworldMap_CheckObject : RTS
 ;org $8AC5D8 ; < 545D8 - Bank0A.asm:1885 - (LDA $7EF3C7 : CMP.b #$07 : BNE OverworldMap_CheckPendant_fail)
 ;JSL OverworldMap_CheckObject : RTS
-;================================================================================
-;Clear level to open doors - todo: unsure if needed
-org $81C50D ; 0xC50D - Bank01.asm:10032 - (LDA $7EF3CA : BNE .inDarkWorld)
-LDA CrystalPendantFlags_2, X
-;================================================================================
-;Kill enemy to clear level
-org $81C715 ; <- C715 - Bank01.asm:10358 - (LDA $7EF3CA : BNE .inDarkWorld)
-LDA CrystalPendantFlags_2, X
-;JSL.l GetPendantCrystalWorld
 ;================================================================================
 org $8AC53E ; <- 5453E - Bank0A.asm:1771 - (LDA $0AC50D, X : STA $0D)
 LDA.l CrystalNumberTable-1,X

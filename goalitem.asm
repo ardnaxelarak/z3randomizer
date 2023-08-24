@@ -15,7 +15,7 @@ RTL
 ;Carry set = ganon vulnerable
 CheckGanonVulnerability:
 	PHX
-	LDA.l InvincibleGanon
+	LDA.l GanonVulnerableMode
 	ASL
 	TAX
 
@@ -122,7 +122,7 @@ db %10111111 ; 7 crystals
 ;--------------------------------------------------------------------------------
 GTCutscene_ConditionalAnimateCrystals:
 	PHX : PHX
-	LDA.l NumberOfCrystalsRequiredForTower : TAX : LDA.l GTCutscene_CrystalMasks,X
+	JSR GTCutscene_NumberOfCrystals : TAX : LDA.l GTCutscene_CrystalMasks,X
 	PLX
 	- LSR : DEX : BPL -
 	PLX : BCC .skip_crystal
@@ -136,7 +136,7 @@ GTCutscene_ConditionalAnimateCrystals:
 ;--------------------------------------------------------------------------------
 GTCutscene_ConditionalDrawSingleCrystal:
 	LDA.w $06FA : BEQ .draw_crystal : STZ.w $06FA
-	LDA.l NumberOfCrystalsRequiredForTower : TAX
+	JSR GTCutscene_NumberOfCrystals : TAX
 	LDA.l GTCutscene_CrystalMasks,X : AND.b #$80 : BEQ .skip_crystal
 .draw_crystal
 	LDX.w $0FA0 : PHY ; what we wrote over
@@ -146,7 +146,7 @@ GTCutscene_ConditionalDrawSingleCrystal:
 ;--------------------------------------------------------------------------------
 GTCutscene_AnimateCrystals_Prep:
 	BEQ + : JSL.l GTCutscene_SparkleALot : + ; thing we wrote over
-	LDA.l NumberOfCrystalsRequiredForTower : BNE +
+	JSR GTCutscene_NumberOfCrystals : BNE +
 		JML.l GTCutscene_DrawSingleCrystal_SkipSparkle
 	+ CMP.b #$01 : BNE +
 		JML.l GTCutscene_DrawSingleCrystal
@@ -154,15 +154,16 @@ GTCutscene_AnimateCrystals_Prep:
 	JML.l GTCutscene_AnimateCrystals_NextCrystal-2
 ;--------------------------------------------------------------------------------
 GTCutscene_ActivateSparkle_SelectCrystal:
-	LDA.l NumberOfCrystalsRequiredForTower : BNE +
+	JSR GTCutscene_NumberOfCrystals : BNE +
 		TAX : RTL
-	+ TXA
+	+ STA.b Scrap00
+	TXA
 
-	- CMP.l NumberOfCrystalsRequiredForTower : BCC +
-	SBC.l NumberOfCrystalsRequiredForTower : BRA - ; carry guaranteed set
+	- CMP.l Scrap00 : BCC +
+	SBC.l Scrap00 : BRA - ; carry guaranteed set
 
 	+ PHY : TAY
-	LDA.l NumberOfCrystalsRequiredForTower : TAX : LDA.l GTCutscene_CrystalMasks,X
+	LDA.b Scrap00 : TAX : LDA.l GTCutscene_CrystalMasks,X
 	LDX.b #$FF
 	- LSR : INX : BCC +
 		DEY
@@ -170,43 +171,73 @@ GTCutscene_ActivateSparkle_SelectCrystal:
 	PLY
 RTL
 ;--------------------------------------------------------------------------------
+GTCutscene_NumberOfCrystals:
+	REP #$20
+	LDA.l GanonsTowerOpenAddress : CMP.w #CrystalCounter : BEQ +
+	LDA.w #$0001 : BRA .done
+	+ LDA.l GanonsTowerOpenTarget
+	.done
+	SEP #$20
+	RTS
+;--------------------------------------------------------------------------------
 CheckEnoughCrystalsForGanon:
+        REP #$20
 	LDA.l CrystalCounter
-	CMP.l NumberOfCrystalsRequiredForGanon
+	CMP.l GanonVulnerableTarget
+        SEP #$20
 RTL
 ;--------------------------------------------------------------------------------
-CheckEnoughCrystalsForTower:
-	LDA.l CrystalCounter
-	CMP.l NumberOfCrystalsRequiredForTower
+CheckTowerOpen:
+        REP #$30
+        LDA.l GanonsTowerOpenMode : ASL : TAX
+        JSR.w (.tower_open_modes,X)
+        SEP #$30
 RTL
+        .tower_open_modes
+        dw .vanilla
+        dw .arbitrary_cmp
+
+        .vanilla
+        LDA.l CrystalsField
+        AND.w #$007F : CMP.w #$007F
+        RTS
+
+        .arbitrary_cmp
+        LDA.l GanonsTowerOpenAddress : TAX
+        LDA.l $7E0000,X
+        CMP.l GanonsTowerOpenTarget
+        RTS
 
 ;---------------------------------------------------------------------------------------------------
 CheckAgaForPed:
-	LDA.l InvincibleGanon
-	CMP.b #$06 : BNE .vanilla
+        REP #$20
+        LDA.l GanonVulnerableMode
+        CMP.w #$0006 : BNE .vanilla
 
 .light_speed
-	LDA.l OverworldEventDataWRAM+$80 ; check ped flag
-	AND.b #$40
-	BEQ .force_blue_ball
+        SEP #$20
+        LDA.l OverworldEventDataWRAM+$80 ; check ped flag
+        AND.b #$40
+        BEQ .force_blue_ball
 
 .vanilla ; run vanilla check for phase
-	LDA.w SpriteAux, X
-	CMP.b #$02
-	RTL
+        SEP #$20
+        LDA.w SpriteAux, X
+        CMP.b #$02
+        RTL
 
 .force_blue_ball
-	LDA.b #$01 : STA.w SpriteAuxTable, Y
-	LDA.b #$20 : STA.w SpriteTimer, Y
-	CLC ; skip the RNG check
-	RTL
+        LDA.b #$01 : STA.w SpriteAuxTable, Y
+        LDA.b #$20 : STA.w SpriteTimer, Y
+        CLC ; skip the RNG check
+        RTL
 
 ;---------------------------------------------------------------------------------------------------
 
 KillGanon:
 	STA.l ProgressIndicator ; vanilla game state stuff we overwrote
 
-	LDA.l InvincibleGanon
+	LDA.l GanonVulnerableMode
 	CMP.b #$06 : BNE .exit
 
 .light_speed
@@ -218,7 +249,6 @@ KillGanon:
 	RTL
 
 ;---------------------------------------------------------------------------------------------------
-
 CheckForCrystalBossesDefeated:
 	PHB : PHX : PHY
 
@@ -256,8 +286,34 @@ CheckForCrystalBossesDefeated:
 	SEP #$30
 	PLY : PLX : PLB
 
-	LDA.b Scrap00 : CMP.l NumberOfCrystalsRequiredForGanon
+	LDA.b Scrap00 : CMP.l GanonVulnerableTarget
 
 
 	RTS
+;---------------------------------------------------------------------------------------------------
+CheckPedestalPull:
+; Out: c - Successful ped pull if set, do nothing if unset.
+        PHX
+        LDA.l PedCheckMode : ASL : TAX
+        JSR.w (.pedestal_modes,X)
+        PLX
+RTL
 
+        .pedestal_modes
+        dw .vanilla
+        dw .arbitrary_cmp
+
+        .vanilla
+        LDA.l PendantsField
+        AND.b #$07 : CMP.b #$07 : BNE ..nopull
+                SEC
+                RTS
+        ..nopull
+        CLC
+        RTS
+
+        .arbitrary_cmp
+        LDA.l PedPullAddress : TAX
+        LDA.l $7E000,X
+        CMP.l PedPullTarget
+        RTS

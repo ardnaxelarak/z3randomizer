@@ -605,9 +605,9 @@ SpriteKeyPrep:
 		LDA.w SpawnedItemMWPlayer : STA SprItemMWPlayer, X : STA.w !MULTIWORLD_SPRITEITEM_PLAYER_ID
 		LDA.w SpawnedItemFlag : STA SprItemFlags, X : BEQ +
 		LDA.l SpawnedItemID : STA $0E80, X
-		PHA
-			JSL.l GetSpritePalette : STA $0F50, X ; setup the palette
-		PLA
+		PHA : PHY : PHX
+			JSL.l GetSpritePalette : PLX : STA $0F50, X ; setup the palette
+		PLY : PLA
 		CMP #$24 : BNE ++ ;
 			LDA $A0 : CMP.b #$80 : BNE +
 			LDA SpawnedItemFlag : BNE +
