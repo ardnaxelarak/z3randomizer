@@ -531,6 +531,7 @@ LoadPowder:
 	JSL.l Sprite_SpawnDynamically ; thing we wrote over
 	LDA.l WitchItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	%GetPossiblyEncryptedItem(WitchItem, SpriteItemValues)
+        JSL.l AttemptItemSubstitution
         JSL.l ResolveLootIDLong
 	STA.w SpriteID, Y
 	STA.l PowderFlag
@@ -588,6 +589,7 @@ LoadMushroom:
 	LDA.b #$00 : STA.l RedrawFlag
 	LDA.l MushroomItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	%GetPossiblyEncryptedItem(MushroomItem, SpriteItemValues)
+        JSL.l AttemptItemSubstitution
         JSR.w ResolveLootID
 	STA.w SpriteID,X
 	JSL.l PrepDynamicTile

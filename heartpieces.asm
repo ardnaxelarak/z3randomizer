@@ -4,6 +4,7 @@
 HeartPieceGet:
         PHX : PHY
         JSL.l LoadHeartPieceRoomValue
+        JSL.l AttemptItemSubstitution
         JSL.l ResolveLootIDLong
         TAY
         JSL.l MaybeMarkDigSpotCollected
@@ -117,6 +118,7 @@ HeartPieceSpritePrep:
 	LDA.b #$00 : STA.l RedrawFlag
 	JSL HeartPieceGetPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	JSL.l LoadHeartPieceRoomValue
+        JSL.l AttemptItemSubstitution
         JSL.l ResolveLootIDLong
 	STA.w SpriteID, X
 	JSL.l PrepDynamicTile_loot_resolved
@@ -131,6 +133,7 @@ HeartContainerSpritePrep:
 	LDA.b #$00 : STA.l RedrawFlag
 	JSL HeartPieceGetPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	JSL.l LoadHeartContainerRoomValue ; load item type
+        JSL.l AttemptItemSubstitution
         JSL.l ResolveLootIDLong
 	STA.w SpriteID, X
 	JSL.l PrepDynamicTile_loot_resolved

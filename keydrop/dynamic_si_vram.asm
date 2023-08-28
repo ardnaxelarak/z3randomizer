@@ -35,19 +35,19 @@ RequestStandingItemVRAMSlot:
 	PHX
 	LDA.w DynamicDropQueue
 	; unsure about substitution rules here, because they aren't skipped properly for MW yet
-;	JSL AttemptItemSubstitutionLong
+	JSL AttemptItemSubstitution
 	JSL ResolveLootIDLong
 	ASL : TAX : LDA.l StandingItemGraphicsOffsets,X
-	LDX.w ItemQueuePtr
-	STA.w ItemGFXQueue,X
+	LDX.w ItemStackPtr
+	STA.w ItemGFXStack,X
 
 	PLX : PHX
 	REP #$20
 	LDA.l FreeUWGraphics,X
-	LDX.w ItemQueuePtr
-	STA.w ItemTargetQueue,X
+	LDX.w ItemStackPtr
+	STA.w ItemTargetStack,X
 	SEP #$20
-	TXA : INC #2 : STA.w ItemQueuePtr
+	TXA : INC #2 : STA.w ItemStackPtr
 	SEP #$30
 	PLX
 

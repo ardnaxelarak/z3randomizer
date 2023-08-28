@@ -87,7 +87,6 @@ SmithItemMode:
 db $01 ; #$00 = Classic Tempering Process - #$01 = Quick Item Get (default)
 SmithItem:
 db $02 ; #$02 = Tempered Sword (default)
-
 org $86B55C ; PC 0x3355C ; sprite_smithy_bros.asm : 634
 SmithSword:
 db $02 ; #$02 = Tempered Sword (default)
@@ -2781,10 +2780,17 @@ dw #$0C00          ; Blue
 dw #$1800          ; Green
 dw #$0800          ; Yellow
 
-org $B0F032
+org $B0F032 ; PC 0x187032
+RomSpeed:
+db $01      ; $01 = FastROM (default) | $00 = SlowROM
+
+org $B0F033 ; PC 0x187033
+
+;--------------------------------------------------------------------------------
+; 0x187033 - 187FFF (unused)
+;--------------------------------------------------------------------------------
 
 pushpc
-
 ;--------------------------------------------------------------------------------
 ; Overworld Map Tables
 ;--------------------------------------------------------------------------------

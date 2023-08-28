@@ -31,6 +31,7 @@ RTS
 SpawnTabletItem:
 	JSL HeartPieceGetPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	JSL.l LoadOutdoorValue
+        JSL.l AttemptItemSubstitution
         JSL.l ResolveLootIDLong
         PHA
         LDA.b #$EB : STA.l MiniGameTime
