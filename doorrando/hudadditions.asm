@@ -65,12 +65,12 @@ DRHUD_EnemyDropIndicator:
 	SEP #$10 : TAX : REP #$10
 
 DRHUD_DrawCurrentDungeonIndicator: ; mX
-    LDA.l DRMode : AND.b #$02 : BEQ DRHUD_Finished
+    LDA.l DRMode : BIT.b #$02 : BEQ DRHUD_Finished
     LDY.w #!BlankTile
     LDA.w CurrentHealth : BEQ .draw_indicator
 
-    REP #$20 : LDA.l DungeonReminderTable,X : SEP #$20
-	TAY
+    REP #$20 : LDA.l DungeonReminderTable,X : TAY
+    SEP #$20
 .draw_indicator
 	STY.w !CurrentDungeonIndicator
 

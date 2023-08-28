@@ -1214,7 +1214,7 @@ SpritePrep_PotionShopLong:
 org $85F539
 SpawnMagicPowder:
 ;--------------------------------------------------------------------------------
-org $05F568 ; <- 2F568 - sprite_potion_shop.asm
+org $85F568 ; <- 2F568 - sprite_potion_shop.asm
 LDA #$b0 : STA $0D00, Y : LDA #$90 : STA $0D10, Y ; manually set position of powder item
 LDA #$21 : STA $0D20, Y : LDA #$12 : STA $0D30, Y
 JMP $F61D

@@ -465,7 +465,7 @@ Shopkeeper_BuyItem:
                 REP #$20 : LDA.l CurrentRupees : !SUB ShopInventory+1, X : STA.l CurrentRupees : SEP #$20 ; Take price away
         ++
         PHX
-			LDA.b #0 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventory, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+			LDA.b #0 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
 			TXA : !ADD ShopSRAMIndex : TAX
 			LDA.l PurchaseCounts, X : BNE +++	;Is this the first time buying this slot?
 				LDA.l EnableShopItemCount, X : STA.l ShopEnableCount ; If so, store the permission to count the item here.
@@ -620,7 +620,7 @@ Shopkeeper_DrawItems:
 	LDA $A0 : CMP.b #$09 : BNE + ; render powder slot if potion shop
 	LDA RedrawFlag : BNE + ; if not redrawing
 	LDA $02DA : BNE + ; if not buying item
-	LDA $7F505E : BEQ + ; if potion slot filled
+	LDA PowderFlag : BEQ + ; if potion slot filled
 	LDA $0ABF : BEQ + ; haven't left the room
 	LDA NpcFlags+1 : AND.b #$20 : BNE +
 		LDX.b #$0C : LDY.b #$03 : JSR.w Shopkeeper_DrawNextItem
@@ -650,8 +650,10 @@ Shopkeeper_DrawNextItem:
 	PLY
 
 	PHX : LDA.b #0 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryDisguise, X : PLX : CMP.b #$0 : BNE ++
-	    LDA.l ShopInventory, X ; get item id
-        JSL.l ResolveLootIDLong
+		CPX.b #$0C : BCC .not_powder
+	    	LDA.l PowderFlag : BRA .resolve
+	    .not_powder LDA.l ShopInventory, X ; get item id
+        .resolve JSL.l ResolveLootIDLong
         STA.b Scrap0D
 	++
 	CMP.b #$2E : BNE + : BRA .potion
@@ -675,8 +677,10 @@ Shopkeeper_DrawNextItem:
 		LDA.b Scrap0D
 	++
         PHX
-	JSL.l GetSpritePalette_resolved : STA.l SpriteOAM+5
-        PLX
+	JSL.l GetSpritePalette_resolved
+	PLX : CPX.b #$0C : BCC + ; if this is powder item
+		ORA.b #$01
+	+ STA.l SpriteOAM+5
 
 	LDA.b #$00 : STA.l SpriteOAM+6
 
@@ -740,7 +744,7 @@ dw 8, -72
 .potion_offset
 dw -16, 0
 .tile_indices
-db $C6, $C8, $CA, $25 ; last bit is for sheet change
+db $C6, $C8, $CA, $24 ; last bit is for sheet change
 ;--------------------------------------------------------------------------------
 Shopkeeper_DrawNextPrice:
         PHB : PHK : PLB

@@ -139,15 +139,14 @@ AddReceivedItemExpandedGetItem:
 
 	LDA.w ItemReceiptID
 	JSL.l FreeDungeonItemNotice
-	PHA : LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
+	PHA : LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
 		PLA : BRA .done
 	+ PLA
         JSR ItemBehavior
         SEP #$30
-
-        PLB : PLX
         STZ.w ShopPurchaseFlag
 .done
+	PLB : PLX
 	LDA.w ItemReceiptMethod : CMP.b #$01 ; thing we wrote over
 RTL
 

@@ -533,13 +533,9 @@ LoadPowder:
 	%GetPossiblyEncryptedItem(WitchItem, SpriteItemValues)
         JSL.l ResolveLootIDLong
 	STA.w SpriteID, Y
-	STA.l $7F505E
+	STA.l PowderFlag
         TYX
 	JSL.l PrepDynamicTile_loot_resolved
-	LDA.b #$00
-	STA.l $7F505F
-	STA.l $7F5060
-	STA.l $7F5061
         PLX
 RTL
 ;--------------------------------------------------------------------------------
@@ -634,7 +630,7 @@ CollectPowder:
 		PLA
         STZ.w ItemReceiptMethod ; item from NPC
         JSL.l Link_ReceiveItem
-        PHA : LDA.b #$00 : STA.l ShopEnableCount : PLA
+        PHA : LDA.b #$00 : STA.l ShopEnableCount : STA.l PowderFlag : PLA
         JSL.l ItemSet_Powder
 RTL
 ;--------------------------------------------------------------------------------

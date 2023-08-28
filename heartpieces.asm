@@ -77,7 +77,7 @@ DrawHeartContainerGFX:
 	BRA DrawHeartPieceGFX_skipLoad
 ;--------------------------------------------------------------------------------
 HeartContainerSound:
-		LDA.l  !MULTIWORLD_ITEM_PLAYER_ID : BNE +
+		LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE +
         LDA.w ItemReceiptMethod : CMP.b #$03 : BEQ +
         JSL.l CheckIfBossRoom : BCC + ; Skip if not in a boss room
                 LDA.b #$2E
