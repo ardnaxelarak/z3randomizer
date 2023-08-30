@@ -76,11 +76,11 @@ JML $80D463	; The original target of the jump table that we hijacked
 ;===================================================================================================
 InitDungeonCounts:
         PHB
-        LDX.b #$0F
+        LDX.b #$1E
         REP #$20
         -
                 LDA.l CompassTotalsROM, X : STA.l CompassTotalsWRAM, X
-                DEX
+                DEX #2
         BPL -
         SEP #$20
         LDX.b #$0F
