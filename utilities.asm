@@ -148,7 +148,8 @@ RTL
 	db $13, $13, $13, $13, $13 ; reserved for bonk shuffle
 	db $13 ; Bomb Upgrade
 	db $07 ; Cane Upgrade
-	db $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
+	db $27 ; Bug Net Upgrade
+	db $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -211,7 +212,7 @@ RTL
 			LDA.b #$08 : RTL
 	++ : CMP.b #$FF : BNE ++ ; Progressive Armor
 		LDA.l HighestMail
-                CMP.l ProgressiveArmorLimit : !BLT + ; Progressive Armor Limit
+			CMP.l ProgressiveArmorLimit : !BLT + ; Progressive Armor Limit
 			LDA.l ProgressiveArmorReplacement
 			JMP GetSpritePalette
 		+ : CMP.b #$00 : BNE + ; Green Tunic
@@ -291,7 +292,8 @@ GfxPalettes:
 	db $08, $08, $08, $08, $08 ; reserved for bonk shuffle
 	db $F7 ; Bomb Upgrade
 	db $0A ; Cane Upgrade
-	db $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
+	db $02 ; Bug Net Upgrade
+	db $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused

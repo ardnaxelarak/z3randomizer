@@ -521,6 +521,12 @@ AddInventory:
 		CMP #$05 : !BGE ++ ; check if already maxed
 		INC : STA.l SpecialWeaponLevel
 		++ JMP .done
+	+ CPY.b #$B8 : BNE + ; Item $B8 - Bug Net Upgrade
+		JSR .stampSword ; update "first bug net" timestamp
+		LDA.l SpecialWeaponLevel ; get current bug net level
+		CMP #$05 : !BGE ++ ; check if already maxed
+		INC : STA.l SpecialWeaponLevel
+		++ JMP .done
 	+
 	.done
 	PLP : PLX : PLA
@@ -667,6 +673,7 @@ RTL
 	                       CMP.b #$03 : BEQ +
 	                       CMP.b #$04 : BEQ +
 	                       CMP.b #$05 : BEQ +
+	                       CMP.b #$08 : BEQ +
 	LDA.l SwordEquipment : BRA ++
 	+ : LDA.l SpecialWeaponLevel
 	++

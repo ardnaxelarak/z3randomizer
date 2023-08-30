@@ -47,6 +47,7 @@
 ; #$B5 - reserved for bonk shuffle
 ; #$B6 - Progressive Bomb
 ; #$B7 - Progressive Cane
+; #$B8 - Progressive Bug Net
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
 ;--------------------------------------------------------------------------------
@@ -385,6 +386,9 @@ AddReceivedItemExpandedGetItem:
 			LDA #$01 : STA SomariaEquipment
 			BRA .done
 		BRA .done
+	+ : CMP.b #$B8 : BNE + ; Cane Upgrade
+		LDA #$01 : STA BugNetEquipment
+		BRA .done
 	+
 	.done
 	PLX
@@ -547,7 +551,8 @@ AddReceivedItemExpanded:
 	db -4, -4, -4, -4, -4 ; reserved for bonk shuffle
 	db -4 ; Bomb Upgrade
 	db -4 ; Cane Upgrade
-	db -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
+	db -4 ; Bug Net Upgrade
+	db -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
@@ -591,7 +596,8 @@ AddReceivedItemExpanded:
 	db  0, 0, 0, 0, 0 ; reserved for bonk shuffle
 	db  0 ; Bomb Upgrade
 	db  4 ; Cane Upgrade
-	db  0, 0, 0, 0, 0, 0, 0, 0 ; Unused
+	db  0 ; Bug Net Upgrade
+	db  0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
@@ -639,7 +645,8 @@ AddReceivedItemExpanded:
 	db $49, $49, $49, $49, $49 ; reserved for bonk shuffle
 	db $13 ; Bomb Upgrade
 	db $07 ; Cane Upgrade
-	db $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
+	db $27 ; Bug Net Upgrade
+	db $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -682,7 +689,8 @@ AddReceivedItemExpanded:
 	db $02, $02, $02, $02, $02 ; reserved for bonk shuffle
 	db $02 ; Bomb Upgrade
 	db $00 ; Cane Upgrade
-	db $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
+	db $02 ; Bug Net Upgrade
+	db $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
@@ -726,7 +734,8 @@ AddReceivedItemExpanded:
 	db  4, 4, 4, 4, 4 ; reserved for bonk shuffle
 	db  5 ; Bomb Upgrade
 	db  5 ; Cane Upgrade
-	db  4, 4, 4, 4, 4, 4, 4, 4 ; Unused
+	db  1 ; Bug Net Upgrade
+	db  4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
@@ -771,7 +780,8 @@ AddReceivedItemExpanded:
 	dw $F36A, $F36A, $F36A, $F36A, $F36A ; reserved for bonk shuffle
 	dw $F38F ; Bomb Upgrade
 	dw $F38F ; Cane Upgrade
-	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
+	dw $F38F ; Bug Net Upgrade
+	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
@@ -818,7 +828,8 @@ AddReceivedItemExpanded:
 	db $FF, $FF, $FF, $FF, $FF ; reserved for bonk shuffle
 	db $FF ; Bomb Upgrade
 	db $FF ; Cane Upgrade
-	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
+	db $FF ; Bug Net Upgrade
+	db $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
@@ -907,7 +918,8 @@ Link_ReceiveItemAlternatesExpanded:
 	db -1, -1, -1, -1, -1 ; reserved for bonk shuffle
 	db -1 ; Bomb Upgrade
 	db -1 ; Cane Upgrade
-	db -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
+	db -1 ; Bug Net Upgrade
+	db -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused

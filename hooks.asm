@@ -2552,6 +2552,15 @@ Link_UseHammerLong:
 JSR Link_UseHammer : RTL
 warnpc $07F890
 ;--------------------------------------------------------------------------------
+org $06F2DC ; bank_06.asm@22763 (LDA.w $037A : AND.b #$10)
+JSL CheckBugNet : NOP
+
+org $06EB91 ; bank_06.asm@21178 (LDA.w $037A : AND.b #$10)
+JSL CheckBugNet : NOP
+;--------------------------------------------------------------------------------
+org $06ED77 ; bank_06.asm@21597 (LDA.w $0301 : AND.b #$0A : ...)
+JSL SetHammerClass
+BRA + : NOP #7 : +
 
 ;================================================================================
 ; Variable Ganon Vulnerability
