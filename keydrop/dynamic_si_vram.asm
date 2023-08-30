@@ -1,25 +1,8 @@
-; where we shove the decompressed graphics to send to WRAM
-DynamicDropGFX = $7EF500
-
-; this will just count from 0 to 4 to determine which slot we're using
-; we're expecting 5 items max per room, and order is irrelevant
-; we just need to keep track of where they go
-DynamicDropGFXIndex = $7E1E70
-
-; this will keep track of the above for each item
-SprItemGFX = $7E0780
-
-; this is the item requested and a flag
-DynamicDropRequest = $7E1E71
-DynamicDropQueue = $7E1E72
-
 ; Come in with
 ;   A = item receipt ID
 ;   X = slot
 RequestStandingItemVRAMSlot:
-	STA.w DynamicDropQueue
-	LDA.b #$01
-	STA.w DynamicDropRequest
+	PHA
 
 	LDA.w DynamicDropGFXIndex
 	INC
@@ -32,21 +15,19 @@ RequestStandingItemVRAMSlot:
 	STA.w SprItemGFX,X
 
 
-	PHX
-	LDA.w DynamicDropQueue
+	PLA : PHX
 	; unsure about substitution rules here, because they aren't skipped properly for MW yet
 	JSL AttemptItemSubstitution
 	JSL ResolveLootIDLong
-	ASL : TAX : LDA.l StandingItemGraphicsOffsets,X
+	REP #$30
+	ASL : TAX
+	LDA.l StandingItemGraphicsOffsets,X
 	LDX.w ItemStackPtr
-	STA.w ItemGFXStack,X
-
-	PLX : PHX
-	REP #$20
+	STA.l ItemGFXStack,X
+	LDA.w DynamicDropGFXIndex : AND.w #$000F : ASL : TAX
 	LDA.l FreeUWGraphics,X
 	LDX.w ItemStackPtr
-	STA.w ItemTargetStack,X
-	SEP #$20
+	STA.l ItemTargetStack,X
 	TXA : INC #2 : STA.w ItemStackPtr
 	SEP #$30
 	PLX
@@ -55,43 +36,6 @@ RequestStandingItemVRAMSlot:
 
 
 ;===================================================================================================
-
-TransferPotGFX:
-	SEP #$10
-	REP #$20
-	LDX.w DynamicDropRequest
-	BEQ .no
-
-	STZ.w DynamicDropRequest
-
-	LDA.w DynamicDropGFXIndex
-	ASL
-	TAX
-	LDA.l FreeUWGraphics,X
-	STA.w $2116
-
-	; calculate bottom row now
-	CLC : ADC.w #$0200>>1 : PHA
-
-	LDX.b #$7E : STX.w $4314
-	LDA.w #DynamicDropGFX : STA.w $4302
-
-	LDX.b #$80 : STX.w $2115
-	LDA.w #$1801 : STA.w $4300
-
-	LDA.w #$0040 : STA.w $4305
-	LDY.b #$01
-
-	STY.w $420B
-	STA.w $4305
-
-	PLA
-	STA.w $2116
-	STY.w $420B
-
-.no
-	RTL
-
 
 FreeUWGraphics:
 	dw $8800>>1

@@ -256,6 +256,7 @@ PostItemAnimation:
         LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
         		STZ $02E9
         		LDA #$00 : STA !MULTIWORLD_ITEM_PLAYER_ID
+        		PLB
         		JML.l Ancilla_ReceiveItem_objectFinished
 		+
 
@@ -291,6 +292,5 @@ PostItemAnimation:
 
         STZ.w ItemReceiptMethod : LDA.w AncillaGet, X ; thing we wrote over to get here
         PLB
-RTL
 JML Ancilla_ReceiveItem_optimus+6
 ;--------------------------------------------------------------------------------

@@ -39,6 +39,8 @@ DRHUD_DrawIndicators:
 DRHUD_BossIndicator:
 	LDA.l DRMode : BNE .continue
 .early_exit
+	REP #$10
+	LDY.w #!BlankTile : STY.w !IndicatorAddress
 	JMP DRHUD_Finished
 .continue
 	LDA.w $040C : CMP.b #$1B : BCS .early_exit

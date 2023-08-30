@@ -274,7 +274,24 @@ TileMapTile32 = $7E0698           ; Tilemap location of new tile32 objects, such
                                   ;
 SkipOAM = $7E0710                 ; Set to skip OAM updates. High byte written $FF with exploding walls
 OWScreenSize = $7E0712            ; Flags overworld screen size.
-                                  ;
+
+SpawnedItemID = $7E0720           ; ID of the Item Spawning. Word
+SpawnedItemIndex = $7E0722        ; Sprite/Pot Index of Item Spawning. Word
+SpawnedItemIsMultiWorld = $7E0724 ; Multiworld World Flag. Word
+SpawnedItemFlag = $7E0726         ; 0x02 - one for pot, 2 for sprite drop
+                                  ; (flag used as a bitmask in conjunction with StandingItemCounterMask)
+SpawnedItemMWPlayer = $7E0728     ; Player Id for spawned item if Multiworld item 0x02
+
+SprDropsItem = $7E0730            ; Array for whether a sprite drops an item 0x16
+SprItemReceipt = $7E0740          ; Array for item id for each sprite 0x16
+SprItemIndex = $7E0750            ; Array for item index (see code)
+SprItemMWPlayer = $7E0760         ; Player id for each sprite drop 0x16
+SprItemFlags = $7E0770            ; Array 0x16 (used for both pots and drops) (combine with SprDropsItem?)
+SprItemGFX = $7E0780              ; this will keepa track of the DynamicDropGFXIndex for each item
+DynamicDropGFXIndex = $7E0790     ; this will just count from 0 to 4 to determine which slot we're using
+                                  ; we're expecting 5 items max per room, and order is irrelevant
+                                  ; we just need to keep track of where they go
+DynamicDropQueue = $7E1E72        ; this is the item requested and a flag
 OAMBuffer = $7E0800               ; Main OAM buffer sent to OAM. $200 bytes.
 OAMBuffer2 = $7E0A00              ;
                                   ;
@@ -477,7 +494,7 @@ HUDKeyDigits = $7EC764            ;
                                   ;
 BigRAM = $7EC900                  ; Big buffer of free ram (0x1F00)
 ItemGFXStack = $7ECB00            ; Pointers to source of decompressed item tiles deferred to NMI loading.
-ItemGFXSBankStack = $7ECB20       ; Source bank byte for above.
+ItemGFXSBankStack = $7ECB20       ; Source bank byte for above. (not used yet)
 ItemTargetStack = $7ECB40         ; Pointers to VRAM targets for ItemGFXStack.
 TotalItemCountTiles = $7ECF00     ; Cached total item count tiles for HUD. Four words high to low.
 
@@ -774,6 +791,18 @@ endmacro
 %assertRAM(TileMapTile32, $7E0698)
 %assertRAM(SkipOAM, $7E0710)
 %assertRAM(OWScreenSize, $7E0712)
+%assertRAM(SpawnedItemID, $7E0720)
+%assertRAM(SpawnedItemIndex, $7E0722)
+%assertRAM(SpawnedItemIsMultiWorld, $7E0724)
+%assertRAM(SpawnedItemFlag, $7E0726)
+%assertRAM(SpawnedItemMWPlayer, $7E0728)
+%assertRAM(SprDropsItem, $7E0730)
+%assertRAM(SprItemReceipt, $7E0740)
+%assertRAM(SprItemIndex, $7E0750)
+%assertRAM(SprItemMWPlayer, $7E0760)
+%assertRAM(SprItemFlags, $7E0770)
+%assertRAM(SprItemGFX, $7E0780)
+%assertRAM(DynamicDropGFXIndex, $7E0790)
 %assertRAM(OAMBuffer, $7E0800)
 %assertRAM(OAMBuffer2, $7E0A00)
 %assertRAM(TransparencyFlag, $7E0ABD)

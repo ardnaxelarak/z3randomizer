@@ -88,22 +88,6 @@ InitializeMirrorHDMA:
 org $80E3C4
 LoadCommonSprites_long:
 
-; defines
-; Ram usage
-SpawnedItemID = $7E0720 ; 0x02
-SpawnedItemIndex = $7E0722 ; 0x02
-SpawnedItemIsMultiWorld = $7E0724 ; 0x02
-SpawnedItemFlag = $7E0726 ; 0x02 - one for pot, 2 for sprite drop
-; (flag used as a bitmask in conjunction with StandingItemCounterMask)
-SpawnedItemMWPlayer = $7E0728 ; 0x02
-;!EnemyDropIndicator = $7E072A ; 0x02 either the blank tile or the blue square
-; clear all of them in a loop during room load
-SprDropsItem = $7E0730 ; 0x16
-SprItemReceipt = $7E0740 ; 0x16
-SprItemIndex = $7E0750
-SprItemMWPlayer = $7E0760 ; 0x16
-SprItemFlags = $7E0770 ; 0x16 (used for both pots and drops) (combine with SprDropsItem?)
-
 org $09D62E
 UWSpritesPointers: ; 0x250 bytes for 0x128 rooms' 16-bit pointers
 
@@ -239,9 +223,10 @@ RevealPotItem:
 			; increment dungeon counts
 			SEP #$30
 			LDA $040C : CMP #$FF : BEQ +
-				BNE ++
+				CMP.b #$00 : BNE ++
 				 	INC #2 ; treat sewers as HC
 				++ LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
+				   INC.w UpdateHUD
 				; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 			+ REP #$30
 			LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
@@ -331,9 +316,10 @@ IncrementCountsForSubstitute:
 		ORA $0A : STA RoomPotData, X
 		SEP #$30
 		LDA $040C : CMP #$FF : BEQ +
-			BNE ++
+			CMP.b #$00 : BNE ++
 				INC #2 ; treat sewers as HC
 			++ LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
+		   INC.w UpdateHUD
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 		+ REP #$30
 		LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
@@ -531,9 +517,10 @@ IncrementCountForMinor:
 		SEP #$30
 		JSR SetupEnemyDropIndicator
 		LDA $040C : CMP #$FF : BEQ +
-			CMP #$00 : BNE ++
+			CMP.b #$00 : BNE ++
 				INC #2 ; treat sewers as HC
 			++ LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
+			INC.w UpdateHUD
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 		+ REP #$30
 		LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
