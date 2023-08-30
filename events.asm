@@ -131,7 +131,7 @@ JML.l InitializeSaveFile_checksum_done
 OnFileLoad:
 	REP #$10 ; set 16 bit index registers
 	JSL.l EnableForceBlank ; what we wrote over
-	REP #$20 : LDA.l $30F010 : STA.l MultiClientFlagsWRAM+1 : SEP #$20
+	REP #$20 : LDA.l TotalItemCount : STA.l MultiClientFlagsWRAM+1 : SEP #$20
 	LDA MultiClientFlagsROM : STA.l MultiClientFlagsWRAM
 
 	LDA.b #$07 : STA.w BG34NBA ; Restore screen 3 to normal tile area

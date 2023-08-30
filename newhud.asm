@@ -78,10 +78,14 @@ NewHUD_DrawGoal:
         LDA.b Scrap07 : TAX : STX.w HUDGoalIndicator+6 ; draw 1's digit
 
         REP #$20
+		LDX.w #!BlankTile
+        LDA.w GoalCounter
+		CMP.w #100 : BCS .req : STX.w HUDGoalIndicator+$02
+        CMP.w #10 : BCS .req : STX.w HUDGoalIndicator+$04
 
+.req
         LDA.l GoalItemRequirement : CMP.w #$FFFF : BNE .real_goal
 
-        LDX.w #!BlankTile
         STX.w HUDGoalIndicator+10
         STX.w HUDGoalIndicator+12
         STX.w HUDGoalIndicator+14
@@ -197,8 +201,11 @@ NewHUD_DrawPrizeIcon:
 ;================================================================================
 NewHUD_DrawItemCounter:
         REP #$20
-        LDA.w UpdateHUD : BEQ NewHUD_DrawMagicMeter
-        LDA.l ItemCounterHUD : AND.w #$00FF : BEQ NewHUD_DrawMagicMeter
+        LDA.w UpdateHUD : BNE .continue
+		.early_exit
+        	JMP NewHUD_DrawMagicMeter
+		.continue
+        LDA.l ItemCounterHUD : AND.w #$00FF : BEQ .early_exit
         LDA.w #!SlashTile : STA.w HUDGoalIndicator+$08
         LDA.l TotalItemCount : CMP.w #1000 : BCS .item_four_digits
         LDA.w TotalItemCountTiles+$02 : STA.w HUDGoalIndicator+$0A
@@ -210,6 +217,10 @@ NewHUD_DrawItemCounter:
         LDA.b $05 : TAX : STX.w HUDGoalIndicator+$02
         LDA.b $06 : TAX : STX.w HUDGoalIndicator+$04
         LDA.b $07 : TAX : STX.w HUDGoalIndicator+$06
+        REP #$20 : LDA.w TotalItemCounter
+		LDX.w #!BlankTile
+		CMP.w #100 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$02
+		CMP.w #10 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$04
         BRA NewHUD_DrawMagicMeter
 
         .item_four_digits
@@ -224,6 +235,11 @@ NewHUD_DrawItemCounter:
         LDA.b $05 : TAX : STX.w HUDGoalIndicator+$02
         LDA.b $06 : TAX : STX.w HUDGoalIndicator+$04
         LDA.b $07 : TAX : STX.w HUDGoalIndicator+$06
+        REP #$20 : LDA.w TotalItemCounter
+		LDX.w #!BlankTile
+		CMP.w #1000 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$00
+		CMP.w #100 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$02
+		CMP.w #10 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$04
 
 ;================================================================================
 DrawMagicMeter_mp_tilemap = $0DFE0F
@@ -275,37 +291,65 @@ MagicMeterColorMasks:
         dw $EBFF ; yellow
         dw $E3FF ; orange
 
-
-; todo: re-do this section
 ;================================================================================
 DrawCompassCounts:
-        LDA.l CompassMode : AND #$0F : BEQ .done
+        LDA.l CompassMode : AND.b #$0F : BNE .continue
+        .early_exit
+        JMP .done
+		.continue
 
         ; no compass needed if this bit is set
         BIT.b #$02 : BNE .draw_compass_count
+        TYX : LDA.l ExistsTransfer, X : TAX : LDA.l CompassExists, X : BEQ .draw_compass_count
         REP #$20
-        LDA.l CompassField : AND.l DungeonItemMasks,X : BEQ .done
+        LDX.w DungeonID : LDA.l CompassField : AND.l DungeonItemMasks,X : BEQ .early_exit
 
-.draw_compass_count
-        SEP #$20
-        TYX : BNE .not_sewers
-        INX
+		.draw_compass_count
+		LDX.w DungeonID
+		CPX.b #$00 : BNE .not_sewers
+        INX #2
 
-.not_sewers
+		.not_sewers
+		REP #$20
         LDA.l DungeonLocationsChecked, X
         PHA
 
+		LDA.w #!SlashTile : STA.w HUDTileMapBuffer+$98  ; always slash
         LDA.l CompassTotalsWRAM,X
+        CMP.w #100 : BCS .three_digits
+        CMP.w #10 : BCS .two_digits
 
-        JSR HUDHex2Digit
-        STY.w HUDTileMapBuffer+$9A : STX.w HUDTileMapBuffer+$9C
+        LDA.l CompassTotalsOneDigit, X : STA.w HUDTileMapBuffer+$9C
+        PLA
+		JSR HUDHex2Digit
+		STX.w HUDTileMapBuffer+$96
+        BRA .done
 
-        LDX.w #!BlankTile : STX.w HUDTileMapBuffer+$92
-        LDX.w #!SlashTile : STX.w HUDTileMapBuffer+$98
-
+        .two_digits
+        LDA.l CompassTotalsTensDigit, X : STA.w HUDTileMapBuffer+$9A
+        LDA.l CompassTotalsOneDigit, X : STA.w HUDTileMapBuffer+$9C
         PLA
         JSR HUDHex2Digit
-        STY.w HUDTileMapBuffer+$94 : STX.w HUDTileMapBuffer+$96
+        CPY.w #$2490 : BEQ +
+        	STY.w HUDTileMapBuffer+$94
+        + STX.w HUDTileMapBuffer+$96
+        BRA .done
+
+		.three_digits
+        LDA.l CompassTotalsHundredsDigit, X : STA.w HUDTileMapBuffer+$9A
+        LDA.l CompassTotalsTensDigit, X : STA.w HUDTileMapBuffer+$9C
+		LDA.l CompassTotalsOneDigit, X : STA.w HUDTileMapBuffer+$9E
+		PLA : PHA
+		JSR HUDHex4Digit
+		LDA.b Scrap05 : TAX : STX.w HUDTileMapBuffer+$92
+		LDA.b Scrap06 : TAX : STX.w HUDTileMapBuffer+$94
+		LDA.b Scrap07 : TAX : STX.w HUDTileMapBuffer+$96
+		REP #$20 : PLA
+		LDX.w #!BlankTile
+		CMP.w #100 : BCS .done
+		STX.w HUDTileMapBuffer+$92
+		CMP.w #10 : BCS .done
+		STX.w HUDTileMapBuffer+$94
 
 .done
         SEP #$20

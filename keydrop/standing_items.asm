@@ -221,14 +221,14 @@ RevealPotItem:
 		LDA.l RoomPotData, X : BIT $0A : BNE .obtained
 			ORA $0A : STA RoomPotData, X
 			; increment dungeon counts
-			SEP #$30
-			LDA $040C : CMP #$FF : BEQ +
-				CMP.b #$00 : BNE ++
-				 	INC #2 ; treat sewers as HC
-				++ LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
+			SEP #$10
+			LDX.w $040C : CPX.b #$FF : BEQ +
+				CPX.b #$00 : BNE ++
+				 	INX #2 ; treat sewers as HC
+				++ LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X
 				   INC.w UpdateHUD
 				; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
-			+ REP #$30
+			+ REP #$10
 			LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
 		.obtained
 	PLY : PLX
@@ -314,17 +314,17 @@ IncrementCountsForSubstitute:
 	LDA.b $A0 : ASL : TAX
 	LDA.l RoomPotData, X : BIT $0A : BNE .obtained
 		ORA $0A : STA RoomPotData, X
-		SEP #$30
-		LDA $040C : CMP #$FF : BEQ +
-			CMP.b #$00 : BNE ++
-				INC #2 ; treat sewers as HC
-			++ LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
+		SEP #$10
+		LDX.w $040C : CPX.b #$FF : BEQ +
+			CPX.b #$00 : BNE ++
+				INX #2 ; treat sewers as HC
+			++ LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X
 		   INC.w UpdateHUD
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
-		+ REP #$30
+		+
 		LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
 	.obtained
-	SEP #$30 : PLX
+	SEP #$20 : PLX
 RTS
 
 ClearSpriteData:
@@ -514,15 +514,15 @@ IncrementCountForMinor:
 	LDA.b $A0 : ASL : TAX
 	LDA.l SpriteDropData, X : BIT $0A : BNE .obtained
 		ORA $0A : STA SpriteDropData, X
-		SEP #$30
+		SEP #$10
 		JSR SetupEnemyDropIndicator
-		LDA $040C : CMP #$FF : BEQ +
-			CMP.b #$00 : BNE ++
-				INC #2 ; treat sewers as HC
-			++ LSR : TAX : LDA DungeonLocationsChecked, X : INC : STA DungeonLocationsChecked, X
+		LDX.w $040C : CPX.b #$FF : BEQ +
+			CPX.b #$00 : BNE ++
+				INX #2 ; treat sewers as HC
+			++ LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X
 			INC.w UpdateHUD
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
-		+ REP #$30
+		+ REP #$10
 		LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
 	.obtained
 	SEP #$30 : PLX

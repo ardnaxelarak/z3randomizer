@@ -87,8 +87,11 @@ PHX
         CLC : BRA .done
 
 	; see if hyrule castle has been completely cleared
-        .hyrule_castle
-	LDA.l CompassTotalsWRAM, X : SEC : SBC DungeonLocationsChecked, X : BEQ .fail
+	.hyrule_castle
+	REP #$20
+	LDA.l CompassTotalsWRAM, X : SEC : SBC.l DungeonLocationsChecked, X
+	SEP #$20
+	BEQ .fail
 	CLC : BRA .done
 
 	.fail

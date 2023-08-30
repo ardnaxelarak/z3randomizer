@@ -2757,9 +2757,10 @@ CrystalPendantFlags_3:
 	db $07 ; Turtle Rock
 	db $00 ; Ganons Tower
 ; 00 - No Prize. 01 - 07 Crystal Number 08 - Green Pendant 09 - Blue Pendant, 0A - Red Pendant
-org $B0F000 ; PC 0x187000-0x18700F
-CompassTotalsROM:
-db $08, $08, $06, $06, $02, $0A, $0E, $08, $08, $08, $06, $08, $0C, $1B, $00, $00
+
+;--------------------------------------------------------------------------------
+; 0x187000 - 18700F (unused)
+;--------------------------------------------------------------------------------
 
 org $B0F010
 ChestKeys: ; PC 0x187010-0x18701F
@@ -2784,10 +2785,31 @@ org $B0F032 ; PC 0x187032
 RomSpeed:
 db $01      ; $01 = FastROM (default) | $00 = SlowROM
 
-org $B0F033 ; PC 0x187033
+;--------------------------------------------------------------------------------
+; 0x187033 - 18703F (unused)
+;--------------------------------------------------------------------------------
+
+org $B0F040 ; PC 0x187040
+CompassTotalsROM:
+dw $0008, $0008, $0006, $0006, $0002, $000A, $000E, $0008
+dw $0008, $0008, $0006, $0008, $000C, $001B, $0000, $0000
+org $B0F060 ; PC 0x187060
+CompassTotalsHundredsDigit:
+dw !BlankTile, !BlankTile, !BlankTile, !BlankTile, !BlankTile, !BlankTile, !BlankTile, !BlankTile
+dw !BlankTile, !BlankTile, !BlankTile, !BlankTile, !BlankTile, !BlankTile, !BlankTile, !BlankTile
+org $B0F080 ; PC 0x187080
+CompassTotalsTensDigit:
+dw !BlankTile, !BlankTile, !BlankTile, !BlankTile, !BlankTile, $2491, $2491, !BlankTile
+dw !BlankTile, !BlankTile, !BlankTile, !BlankTile, $2491, $2492, !BlankTile, !BlankTile
+org $B0F0A0 ; PC 0x1870A0
+CompassTotalsOneDigit:
+dw $2498, $2498, $2496, $2496, $2492, $2490, $2494, $2498
+dw $2498, $2498, $2496, $2498, $2492, $2497, $2490, $2490
+
+org $B0F0C0 ; PC 0x1870C0
 
 ;--------------------------------------------------------------------------------
-; 0x187033 - 187FFF (unused)
+; 0x1870C0 - 187FFF (unused)
 ;--------------------------------------------------------------------------------
 
 pushpc

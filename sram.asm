@@ -327,38 +327,22 @@ skip 40                         ; Unused
 ServiceSequence:                ; See servicerequest.asm
 ServiceSequenceRx: skip 8       ; Service sequence receive
 ServiceSequenceTx: skip 8       ; Service sequence transmit
-DungeonAbsorbedKeys:            ; \  Absorbed key counters (integers)
-SewerAbsorbedKeys: skip 1       ;  | Sewer Passage
-HCAbsorbedKeys: skip 1          ;  | Hyrule Castle
-EPAbsorbedKeys: skip 1          ;  | Eastern Palace
-DPAbsorbedKeys: skip 1          ;  | Desert Palace
-CTAbsorbedKeys: skip 1          ;  | Agahnim's Tower
-SPAbsorbedKeys: skip 1          ;  | Swamp Palace
-PDAbsorbedKeys: skip 1          ;  | Palace of Darkness
-MMAbsorbedKeys: skip 1          ;  | Misery Mire
-SWAbsorbedKeys: skip 1          ;  | Skull Woods
-IPAbsorbedKeys: skip 1          ;  | Ice Palace
-THAbsorbedKeys: skip 1          ;  | Tower of Hera
-TTAbsorbedKeys: skip 1          ;  | Thieves' Town
-TRAbsorbedKeys: skip 1          ;  | Turtle Rock
-GTAbsorbedKeys: skip 1          ; /  Ganon's Tower
-skip 2                          ; Reserved for previous table
-DungeonLocationsChecked:        ; \  Dungeon locations checked counters (integers)
-SewersLocations: skip 1         ;  | Sewer Passage
-HCLocations: skip 1             ;  | Hyrule Castle
-EPLocations: skip 1             ;  | Eastern Palace
-DPLocations: skip 1             ;  | Desert Palace
-CTLocations: skip 1             ;  | Agahnim's Tower
-SPLocations: skip 1             ;  | Swamp Palace
-PDLocations: skip 1             ;  | Palace of Darkness
-MMLocations: skip 1             ;  | Misery Mire
-SWLocations: skip 1             ;  | Skull Woods
-IPLocations: skip 1             ;  | Ice Palace
-THLocations: skip 1             ;  | Tower of Hera
-TTLocations: skip 1             ;  | Thieves' Town
-TRLocations: skip 1             ;  | Turtle Rock
-GTLocations: skip 1             ; /  Ganon's Tower:
-skip 2                          ; Reserved for previous table
+DungeonLocationsChecked:        ; \  Dungeon locations checked counters (integers, word size)
+SewersLocations: skip 2         ;  | Sewer Passage
+HCLocations: skip 2             ;  | Hyrule Castle
+EPLocations: skip 2             ;  | Eastern Palace
+DPLocations: skip 2             ;  | Desert Palace
+CTLocations: skip 2             ;  | Agahnim's Tower
+SPLocations: skip 2             ;  | Swamp Palace
+PDLocations: skip 2             ;  | Palace of Darkness
+MMLocations: skip 2             ;  | Misery Mire
+SWLocations: skip 2             ;  | Skull Woods
+IPLocations: skip 2             ;  | Ice Palace
+THLocations: skip 2             ;  | Tower of Hera
+TTLocations: skip 2             ;  | Thieves' Town
+TRLocations: skip 2             ;  | Turtle Rock
+GTLocations: skip 2             ; /  Ganon's Tower:
+skip 4                          ; Reserved for previous table
 skip 16                         ; Currently occupied by multiworld stuff in DR, can be reclaimed
 DungeonCollectedKeys:           ; \  Chest Key Counters. Only counts keys placed in chests. (integers)
 SewerCollectedKeys: skip 1      ;  | Sewer Passage
@@ -393,6 +377,8 @@ RoomPotData: skip 592            ; Table for expanded pot shuffle. One word per 
 SpriteDropData: skip 592         ; Table for expanded drop shuffle. One word per room.
 PurchaseCounts: skip 96          ; Keeps track of shop purchases
 PrivateBlockPersistent: skip 513 ; Reserved for 3rd party developers
+skip 231
+DungeonLocationsCheckedBCD:
 
 ;================================================================================
 ; Direct SRAM Assignments ($700000 - $7080000)
@@ -607,36 +593,21 @@ endmacro
 %assertSRAM(ServiceSequenceRx, $7EF4A0)
 %assertSRAM(ServiceSequenceTx, $7EF4A8)
 ;--------------------------------------------------------------------------------
-%assertSRAM(DungeonAbsorbedKeys, $7EF4B0)
-%assertSRAM(SewerAbsorbedKeys, $7EF4B0)
-%assertSRAM(HCAbsorbedKeys, $7EF4B1)
-%assertSRAM(EPAbsorbedKeys, $7EF4B2)
-%assertSRAM(DPAbsorbedKeys, $7EF4B3)
-%assertSRAM(CTAbsorbedKeys, $7EF4B4)
-%assertSRAM(SPAbsorbedKeys, $7EF4B5)
-%assertSRAM(PDAbsorbedKeys, $7EF4B6)
-%assertSRAM(MMAbsorbedKeys, $7EF4B7)
-%assertSRAM(SWAbsorbedKeys, $7EF4B8)
-%assertSRAM(IPAbsorbedKeys, $7EF4B9)
-%assertSRAM(THAbsorbedKeys, $7EF4BA)
-%assertSRAM(TTAbsorbedKeys, $7EF4BB)
-%assertSRAM(TRAbsorbedKeys, $7EF4BC)
-%assertSRAM(GTAbsorbedKeys, $7EF4BD)
-%assertSRAM(DungeonLocationsChecked, $7EF4C0)
-%assertSRAM(SewersLocations, $7EF4C0)
-%assertSRAM(HCLocations, $7EF4C1)
-%assertSRAM(EPLocations, $7EF4C2)
-%assertSRAM(DPLocations, $7EF4C3)
-%assertSRAM(CTLocations, $7EF4C4)
-%assertSRAM(SPLocations, $7EF4C5)
-%assertSRAM(PDLocations, $7EF4C6)
-%assertSRAM(MMLocations, $7EF4C7)
-%assertSRAM(SWLocations, $7EF4C8)
-%assertSRAM(IPLocations, $7EF4C9)
-%assertSRAM(THLocations, $7EF4CA)
-%assertSRAM(TTLocations, $7EF4CB)
-%assertSRAM(TRLocations, $7EF4CC)
-%assertSRAM(GTLocations, $7EF4CD)
+%assertSRAM(DungeonLocationsChecked, $7EF4B0)
+%assertSRAM(SewersLocations, $7EF4B0)
+%assertSRAM(HCLocations, $7EF4B2)
+%assertSRAM(EPLocations, $7EF4B4)
+%assertSRAM(DPLocations, $7EF4B6)
+%assertSRAM(CTLocations, $7EF4B8)
+%assertSRAM(SPLocations, $7EF4BA)
+%assertSRAM(PDLocations, $7EF4BC)
+%assertSRAM(MMLocations, $7EF4BE)
+%assertSRAM(SWLocations, $7EF4C0)
+%assertSRAM(IPLocations, $7EF4C2)
+%assertSRAM(THLocations, $7EF4C4)
+%assertSRAM(TTLocations, $7EF4C6)
+%assertSRAM(TRLocations, $7EF4C8)
+%assertSRAM(GTLocations, $7EF4CA)
 %assertSRAM(DungeonCollectedKeys, $7EF4E0)
 %assertSRAM(SewerCollectedKeys, $7EF4E0)
 %assertSRAM(HCCollectedKeys, $7EF4E1)

@@ -185,10 +185,7 @@ DrHudDungeonItemsAdditions:
 				tya : !add #$003c : tay
 			+ lda CompassField : and.l $0098c0, x : beq + ; must have compass
                 phx ; total chest counts
-                    txa : lsr : tax
-                    sep #$30
-                    lda.l TotalLocations, x : !sub DungeonLocationsChecked, x : JSR HudHexToDec2DigitCopy
-                    rep #$30
+                    lda.l CompassTotalsWRAM, x : !sub DungeonLocationsChecked, x : JSR HudHexToDec2DigitCopy
                     lda $06 : jsr ConvertToDisplay2 : sta $1644, y : iny #2
                     lda $07 : jsr ConvertToDisplay2 : sta $1644, y
                 plx
@@ -252,11 +249,7 @@ ConvertToDisplay2:
     ++ lda #$2827 : rts ; 0/O for 0 or placeholder digit ;2483
 
 CountAbsorbedKeys:
-    jsl IncrementSmallKeysNoPrimary : phx
-    lda $040c : cmp #$ff : beq +
-        lsr : tax
-        lda DungeonAbsorbedKeys, x : inc : sta DungeonAbsorbedKeys, x
-    + plx : rtl
+    JML IncrementSmallKeysNoPrimary
 
 ;================================================================================
 ; 8-bit registers
