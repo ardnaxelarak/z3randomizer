@@ -226,10 +226,10 @@ RevealPotItem:
 				CPX.b #$00 : BNE ++
 				 	INX #2 ; treat sewers as HC
 				++ LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X
-				   INC.w UpdateHUD
 				; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 			+ REP #$10
 			LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
+			INC.w UpdateHUD
 		.obtained
 	PLY : PLX
 
@@ -319,10 +319,10 @@ IncrementCountsForSubstitute:
 			CPX.b #$00 : BNE ++
 				INX #2 ; treat sewers as HC
 			++ LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X
-		   INC.w UpdateHUD
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 		+
 		LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
+		INC.w UpdateHUD
 	.obtained
 	SEP #$20 : PLX
 RTS
@@ -520,10 +520,10 @@ IncrementCountForMinor:
 			CPX.b #$00 : BNE ++
 				INX #2 ; treat sewers as HC
 			++ LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X
-			INC.w UpdateHUD
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 		+ REP #$10
 		LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
+		INC.w UpdateHUD
 	.obtained
 	SEP #$30 : PLX
 RTS

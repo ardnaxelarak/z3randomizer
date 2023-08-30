@@ -345,12 +345,12 @@ endmacro
 %ReceiptProps($CD, -4, 0, $49, $F36A, $FF, skip, skip) ; CD - 
 %ReceiptProps($CE, -4, 0, $49, $F36A, $FF, skip, skip) ; CE - 
 %ReceiptProps($CF, -4, 0, $49, $F36A, $FF, skip, skip) ; CF - 
-%ReceiptProps($D0, -4, 0, $49, $F36A, $FF, skip, skip) ; D0 - 
-%ReceiptProps($D1, -4, 0, $49, $F36A, $FF, skip, skip) ; D1 - 
-%ReceiptProps($D2, -4, 0, $49, $F36A, $FF, skip, skip) ; D2 - 
-%ReceiptProps($D3, -4, 0, $49, $F36A, $FF, skip, skip) ; D3 - 
-%ReceiptProps($D4, -4, 0, $49, $F36A, $FF, skip, skip) ; D4 - 
-%ReceiptProps($D5, -4, 0, $49, $F36A, $FF, skip, skip) ; D5 - 
+%ReceiptProps($D0, -4, 0, $47, $F36A, $FF, bee_trap, skip) ; D0 - Bee trap
+%ReceiptProps($D1, -4, 0, $47, $F36A, $FF, skip, skip) ; D1 - Apples
+%ReceiptProps($D2, -4, 0, $47, $F36A, $FF, fairy, skip) ; D2 - Fairy
+%ReceiptProps($D3, -4, 0, $47, $F36A, $FF, chicken, skip) ; D3 - Chicken
+%ReceiptProps($D4, -4, 4, $3B, $F373, $80, skip, skip) ; D4 - Big Magic
+%ReceiptProps($D5, -4, 0, $02, $F376, $05, skip, skip) ; D5 - 5 Arrows
 %ReceiptProps($D6, -4, 0, $49, $F36A, $FF, skip, skip) ; D6 - 
 %ReceiptProps($D7, -4, 0, $49, $F36A, $FF, skip, skip) ; D7 - 
 %ReceiptProps($D8, -4, 0, $49, $F36A, $FF, skip, skip) ; D8 - 
@@ -624,12 +624,12 @@ endmacro
 %SpriteProps($CD, 2, 2, $04, $04, $0000)                                ; CD - 
 %SpriteProps($CE, 2, 2, $04, $04, $0000)                                ; CE - 
 %SpriteProps($CF, 2, 2, $04, $04, $0000)                                ; CF - 
-%SpriteProps($D0, 2, 2, $04, $04, $0000)                                ; D0 - 
-%SpriteProps($D1, 2, 2, $04, $04, $0000)                                ; D1 - 
-%SpriteProps($D2, 2, 2, $04, $04, $0000)                                ; D2 - 
-%SpriteProps($D3, 2, 2, $04, $04, $0000)                                ; D3 - 
-%SpriteProps($D4, 2, 2, $04, $04, $0000)                                ; D4 - 
-%SpriteProps($D5, 2, 2, $04, $04, $0000)                                ; D5 - 
+%SpriteProps($D0, 2, 2, $01, $01, PalettesVanilla_green_blue_guard+$0E) ; D0 - Bee Trap todo: sprite props
+%SpriteProps($D1, 2, 2, $01, $01, PalettesVanilla_green_blue_guard+$0E) ; D1 - Apples
+%SpriteProps($D2, 2, 2, $01, $01, PalettesVanilla_green_blue_guard+$0E) ; D2 - Fairy
+%SpriteProps($D3, 2, 2, $01, $01, PalettesVanilla_green_blue_guard+$0E) ; D3 - Chicken
+%SpriteProps($D4, 0, 0, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; D4 - Big Magic
+%SpriteProps($D5, 2, 2, $02, $02, PalettesVanilla_blue_ice+$0E)         ; D5 - 5 Arrows
 %SpriteProps($D6, 2, 2, $04, $04, $0000)                                ; D6 - 
 %SpriteProps($D7, 2, 2, $04, $04, $0000)                                ; D7 - 
 %SpriteProps($D8, 2, 2, $04, $04, $0000)                                ; D8 - 
@@ -900,12 +900,12 @@ endmacro
 %InventoryItem($CD, $01, $0000, $0000) ; CD - 
 %InventoryItem($CE, $01, $0000, $0000) ; CE - 
 %InventoryItem($CF, $01, $0000, $0000) ; CF - 
-%InventoryItem($D0, $01, $0000, $0000) ; D0 - 
-%InventoryItem($D1, $01, $0000, $0000) ; D1 - 
-%InventoryItem($D2, $01, $0000, $0000) ; D2 - 
-%InventoryItem($D3, $01, $0000, $0000) ; D3 - 
-%InventoryItem($D4, $01, $0000, $0000) ; D4 - 
-%InventoryItem($D5, $01, $0000, $0000) ; D5 - 
+%InventoryItem($D0, $01, $0000, $0000) ; D0 - Bee trap
+%InventoryItem($D1, $01, $0000, $0000) ; D1 - Apples
+%InventoryItem($D2, $01, $0000, $0000) ; D2 - Fairy
+%InventoryItem($D3, $01, $0000, $0000) ; D3 - Chicken
+%InventoryItem($D4, $01, $0000, $0000) ; D4 - Big Magic
+%InventoryItem($D5, $01, $0000, $0000) ; D5 - 5 Arrows
 %InventoryItem($D6, $01, $0000, $0000) ; D6 - 
 %InventoryItem($D7, $01, $0000, $0000) ; D7 - 
 %InventoryItem($D8, $01, $0000, $0000) ; D8 - 
@@ -1164,12 +1164,12 @@ ItemReceiptGraphicsOffsets:
 	dw $0                                  ; CD -
 	dw $0                                  ; CE -
 	dw $0                                  ; CF -
-	dw $0                                  ; D0 -
-	dw $0                                  ; D1 -
-	dw $0                                  ; D2 -
-	dw $0                                  ; D3 -
-	dw $0                                  ; D4 -
-	dw $0                                  ; D5 -
+	dw $11E0                               ; D0 - Bee trap
+	dw $11E0                               ; D1 - Apples
+	dw $11E0                               ; D2 - Fairy
+	dw $11E0                               ; D3 - Chicken
+	dw $11E0                               ; D4 - Big Magic
+	dw $11E0                               ; D5 - 5 Arrows
 	dw $0                                  ; D6 -
 	dw $0                                  ; D7 -
 	dw $0                                  ; D8 -
@@ -1434,12 +1434,12 @@ StandingItemGraphicsOffsets:
 	dw $0                                  ; CD -
 	dw $0                                  ; CE -
 	dw $0                                  ; CF -
-	dw $0                                  ; D0 -
-	dw $0                                  ; D1 -
-	dw $0                                  ; D2 -
-	dw $0                                  ; D3 -
-	dw $0                                  ; D4 -
-	dw $0                                  ; D5 -
+	dw $11E0                               ; D0 - Bee trap
+	dw $11E0                               ; D1 - Apples
+	dw $11E0                               ; D2 - Fairy
+	dw $11E0                               ; D3 - Chicken
+	dw $11E0                               ; D4 - Big Magic
+	dw $11E0                               ; D5 - 5 Arrows
 	dw $0                                  ; D6 -
 	dw $0                                  ; D7 -
 	dw $0                                  ; D8 -

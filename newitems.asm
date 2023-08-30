@@ -677,6 +677,36 @@ ItemBehavior:
         .done
         RTS
 
+        .bee_trap
+        SEP #$30
+        LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI + ; DashBeeHive_SpawnBee
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+		LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
+		LDA $20 : STA $0D00, Y : LDA $21 : STA $0D20, Y
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
+		+ RTS
+
+		.fairy
+		SEP #$30
+		LDA.b #$E3 : JSL Sprite_SpawnDynamically : BMI +
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+		LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
+		LDA.b $20 : SEC : SBC.b #$10 : STA.w $0D00,Y
+		LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 16 pixels
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
+		LDA.b #$FF : STA.w $0B58,Y ; allows them to expire
+		+ RTS
+
+		.chicken
+		SEP #$30
+		LDA.b #$0B : JSL Sprite_SpawnDynamically : BMI +
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+		LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
+		LDA.b $20 : SEC : SBC.b #$08 : STA.w $0D00,Y
+		LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 8 pixels
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
+		+ RTS
+
 ResolveReceipt:
 		PHA : PHX
         PHK : PLB

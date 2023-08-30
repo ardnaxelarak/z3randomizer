@@ -155,8 +155,7 @@ SpritePrep_ShopKeeper:
 				SEP #$10
 				JSL.l AttemptItemSubstitution
 				JSL.l ResolveLootIDLong
-				; todo: bee trap id
-				CMP.b #$C0 : BNE +
+				CMP.b #$D0 : BNE +
 					PHX : LDA.b #0 : XBA : TYA : LSR #2 : TAX ; This will convert the value back to the slot number (in 8-bit accumulator mode)
 					JSL GetRandomInt : AND.b #$3F
 					BNE ++ : LDA.b #$49 : ++ : CMP.b #$26 : BNE ++ : LDA.b #$6A : ++ ; if 0 (fighter's sword + shield), set to just sword, if filled container (bugged palette), switch to triforce piece
