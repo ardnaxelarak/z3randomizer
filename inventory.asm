@@ -215,11 +215,9 @@ DungeonIncrement:
                 CMP.l BallNChainDungeon : BNE +
                         CPY.b #$32 : BEQ .ballchain_bigkey
 	        +
-                CMP.b #$04 : BCS +
-                        REP #$20 : LDA.l SewersLocations : INC : STA.l SewersLocations : STA.l HCLocations : SEP #$20
-                        BRA .done
-                +
-                TAX : REP #$20 : LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X : SEP #$20
+                CMP.b #$00 : BNE +
+                	INC #2
+                + TAX : REP #$20 : LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X : SEP #$20
 	        CPX.b #$0D : BNE +
                         LDA.l BigKeyField : BIT.b #$04 : BNE ++
                                 LDA.l PreGTBKLocations : INC : STA.l PreGTBKLocations

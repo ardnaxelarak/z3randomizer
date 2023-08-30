@@ -378,7 +378,6 @@ SpriteDropData: skip 592         ; Table for expanded drop shuffle. One word per
 PurchaseCounts: skip 96          ; Keeps track of shop purchases
 PrivateBlockPersistent: skip 513 ; Reserved for 3rd party developers
 skip 231
-DungeonLocationsCheckedBCD:
 
 ;================================================================================
 ; Direct SRAM Assignments ($700000 - $7080000)
