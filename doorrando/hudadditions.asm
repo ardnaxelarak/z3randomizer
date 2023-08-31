@@ -185,7 +185,8 @@ DrHudDungeonItemsAdditions:
 				tya : !add #$003c : tay
 			+ lda CompassField : and.l $0098c0, x : beq + ; must have compass
                 phx ; total chest counts
-                    lda.l CompassTotalsWRAM, x : !sub DungeonLocationsChecked, x : JSR HudHexToDec2DigitCopy
+                    LDA.l CompassTotalsWRAM, x : !sub DungeonLocationsChecked, x
+                    SEP #$30 : JSR HudHexToDec2DigitCopy : REP #$30
                     lda $06 : jsr ConvertToDisplay2 : sta $1644, y : iny #2
                     lda $07 : jsr ConvertToDisplay2 : sta $1644, y
                 plx

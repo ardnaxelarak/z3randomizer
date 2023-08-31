@@ -319,7 +319,7 @@ DrawCompassCounts:
         CMP.w #100 : BCS .three_digits
         CMP.w #10 : BCS .two_digits
 
-        LDA.l CompassTotalsOneDigit, X : STA.w HUDTileMapBuffer+$9C
+        LDA.l CompassTotalsOneDigit, X : STA.w HUDTileMapBuffer+$9A
         PLA
 		JSR HUDHex2Digit
 		STX.w HUDTileMapBuffer+$96

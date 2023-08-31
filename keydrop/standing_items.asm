@@ -324,7 +324,7 @@ IncrementCountsForSubstitute:
 		LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
 		INC.w UpdateHUD
 	.obtained
-	SEP #$20 : PLX
+	SEP #$30 : PLX
 RTS
 
 ClearSpriteData:
