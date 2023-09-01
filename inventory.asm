@@ -103,6 +103,11 @@ RTL
 		STA FluteEquipment ; store set item
 		LDA.b #$20 : STA $012F ; menu select sound
 		BRA .captured
+	+ CMP.b #$0E : BNE + ; bugnet
+		LDA.l SpecialWeapons : CMP.b #$08 : BNE .error
+		LDA.l InventoryTracking+1 : EOR.b #$80 : STA.l InventoryTracking+1
+		LDA.b #$20 : STA.w $012F ; menu select sound
+		BRA .captured
 	+
 	CMP #$10 : BNE .error : JSL.l ProcessBottleMenu : BRA .captured : +
 	CLC
@@ -784,6 +789,8 @@ AddYMarker:
 		LDA InventoryTracking : BIT.w #$04 : BEQ .drawNormal ; make sure we have shovel
 					  AND.w #$03 : BNE .drawYBubble ; make sure we have one of the flutes
 					  BRA .drawNormal
+	+ CMP.w #$000E : BNE + ; bugnet
+		LDA.l SpecialWeapons : AND.w #$00FF : CMP.w #$0008 : BEQ .drawYBubble : BRA .drawNormal
 	+ CMP.w #$10 : BEQ .drawJarMarker
 
 	.drawNormal

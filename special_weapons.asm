@@ -466,7 +466,7 @@ CheckDetonateBomb:
 .next_ancilla
 	DEX
 	BPL .check_ancilla
-	BRA .done
+	JMP .done
 .not_bomb_mode
 	LDA.l SpecialWeapons : CMP.b #$06 : BEQ .release_bee
 	                       CMP.b #$07 : BEQ .hammer
@@ -480,6 +480,7 @@ CheckDetonateBomb:
 	RTL
 .net
 	LDA.l BugNetEquipment : BEQ .done
+	LDA.l InventoryTracking+1 : BIT.b #$80 : BNE .done
 	LDA.b $3A : ORA.b #$40 : STA.b $3A
 	LDA.b #$07 : STA.w $0304
 	JSL Link_UseBugNetLong

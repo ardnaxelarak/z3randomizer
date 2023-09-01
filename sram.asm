@@ -168,13 +168,14 @@ CurrentGenericKeys: skip 1      ; Generic small keys
 ;================================================================================
 ; Tracking & Indicators ($7EF38C - $7EF3F0)
 ;--------------------------------------------------------------------------------
-InventoryTracking: skip 2       ; b r m p n s k f  - - - - - - o q (bitfield)
+InventoryTracking: skip 2       ; 2 - - - - - o q  b r m p n s k f (bitfield)
                                 ; b = Blue Boomerang   | r = Red Boomerang  | m = Mushroom Current
                                 ; p = Magic Powder     | n = Mushroom Past  | s = Shovel
                                 ; k = Inactive Flute   | f = Active Flute   | o = Any bomb acquired
-                                ; q = Quickswap locked
-BowTracking: skip 1             ; b s p - - - - -  (bitfield)
-                                ; b = Bow | s = Silver Arrows Upgrade | p = Second Progressive Bow
+                                ; q = Quickswap locked | 2 = Item on B
+BowTracking: skip 1             ; b s p f - - - - (bitfield)
+                                ; b = Any Bow               | s = Silver Arrows Upgrade | p = Second Progressive Bow
+                                ; f = First progressive bow
                                 ; The front end writes two distinct progressive bow items. p
                                 ; indicates whether the "second" has been found independent of
                                 ; the first
