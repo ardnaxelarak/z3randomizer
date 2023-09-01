@@ -470,13 +470,20 @@ CheckDetonateBomb:
 .not_bomb_mode
 	LDA.l SpecialWeapons : CMP.b #$06 : BEQ .release_bee
 	                       CMP.b #$07 : BEQ .hammer
+	                       CMP.b #$08 : BEQ .net
 	BRA .done
 .hammer
 	LDA.l HammerEquipment : BEQ .done
 	LDA.b $3A : ORA.b #$40 : STA.b $3A
 	LDA.b #$04 : STA.w $0304
 	JSL Link_UseHammerLong
-	BRA .done
+	RTL
+.net
+	LDA.l BugNetEquipment : BEQ .done
+	LDA.b $3A : ORA.b #$40 : STA.b $3A
+	LDA.b #$07 : STA.w $0304
+	JSL Link_UseBugNetLong
+	RTL
 .release_bee
 	LDX.w $0202
 	LDA.l BeeDamageClass, X : CMP.b #$FF : BEQ .nope
@@ -603,16 +610,6 @@ SEP #$10
 PLP : PLX
 RTS
 ;--------------------------------------------------------------------------------
-NoSwingHammerB:
-LDA.l SpecialWeapons : CMP.b #$07 : BNE .normal
-LDA.l HammerEquipment : BEQ .normal
-SEC : RTL
-.normal ; what we wrote over
-INC.b $3C
-LDA.b $3C
-CMP.b #$09
-RTL
-;--------------------------------------------------------------------------------
 CheckBugNet:
 LDA.w $037A : AND.b #$10 : BEQ .done ; normal behavior if not bugnet
 LDA.l SpecialWeapons : CMP.b #$08 : BNE .return_10 ; normal behavior if not bugnet mode
@@ -629,7 +626,18 @@ RTL
 SetHammerClass:
 LDA.l SpecialWeapons : CMP.b #$08 : BNE .normal ; normal behavior if not bugnet mode
 LDA.w $037A : AND.b #$10 : BEQ .normal ; normal behavior if not bugnet
-LDA.l SpecialWeaponLevel : STA.w $0CF2
+LDA 4, S : TAX ; get sprite index off of stack
+LDA.w $0E20, X : CMP.b #$88 : BNE .not_mothula
+LDA.l SpecialWeaponLevel
+CMP #$04 : !BGE .fix_mothula
+BRA .done
+.fix_mothula
+LDA #$03
+BRA .done
+.not_mothula
+LDA.l SpecialWeaponLevel
+.done
+STA.w $0CF2
 RTL
 .normal
 LDA.w $0301

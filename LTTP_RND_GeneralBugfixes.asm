@@ -660,6 +660,9 @@ Link_ReceiveItem:
 org $079F82
 Link_UseHammer:
 
+org $07AFEE
+Link_UseBugNet:
+
 org $07A985
 SetGameModeLikeMirror:
 
