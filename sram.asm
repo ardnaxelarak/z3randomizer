@@ -177,8 +177,9 @@ InventoryTracking: skip 2       ; - - - - - - o q  b r m p n s k f (bitfield)
                                 ; p = Magic Powder     | n = Mushroom Past  | s = Shovel
                                 ; k = Inactive Flute   | f = Active Flute   | o = Any bomb acquired
                                 ; q = Quickswap locked
-BowTracking: skip 1             ; b s p - - - - -  (bitfield)
-                                ; b = Bow | s = Silver Arrows Upgrade | p = Second Progressive Bow
+BowTracking: skip 1             ; b s p f - - - -  - - - - - - - - (bitfield)
+                                ; b = Any Bow               | s = Silver Arrows Upgrade | p = Second Progressive Bow
+                                ; f = First progressive bow
                                 ; The front end writes two distinct progressive bow items. p
                                 ; indicates whether the "second" has been found independent of
                                 ; the first
@@ -255,7 +256,8 @@ MapOverlay: skip 2              ; Used to reveal dungeon prizes on the map in mo
                                 ;  | m = Misery Mire   | d = Palace of Darkness | s = Swamp Palace
                                 ;  | a = Aga Tower     | t = Desert Palace      | e = Eastern Palace
                                 ; /  h = Hyrule Castle | s = Sewer Passage
-HudFlag:                        ;
+HudFlag:                        ; - h c - - - - -
+                                ; c = show maps and compasses | h = show heart pieces
 IgnoreFaeries:                  ;
 HasGroveItem:                   ;
 GeneralFlags: skip 1            ; - - h - - i - g (bitfield)
@@ -315,12 +317,13 @@ MagicCounter: skip 2            ; Magic used by player (16-bit integer)
 HighestMail: skip 1             ; Highest mail level
 SmallKeyCounter: skip 1         ; Total Number of small keys collected (integer)
 HeartPieceCounter: skip 1       ; Total Number of heartpieces collected (integer)
-CrystalCounter: skip 1          ; Total Number of crystals collected (integer)
+skip 1                          ; Unused
 DungeonsCompleted: skip 2       ; Bitfield indicating whether a dungeon's prize has been collected.
                                 ; This has the same shape as the dungeon item bitfields.
 MapCountDisplay: skip 2         ;
+CrystalCounter: skip 2          ; Total Number of crystals collected (integer)
 BombsPlaced: skip 2             ; Total Number of bombs placed (16-bit integer)
-skip 40                         ; Unused
+skip 38                         ; Unused
 ServiceSequence:                ; See servicerequest.asm
 ServiceSequenceRx: skip 8       ; Service sequence receive
 ServiceSequenceTx: skip 8       ; Service sequence transmit
@@ -384,6 +387,7 @@ InverseChecksumWRAM: skip 2     ; Vanilla Inverse Checksum. Don't write unless c
 ; beginning at $700500
 ;--------------------------------------------------------------------------------
 base $7F6000                     ; $1000 byte buffer we place beginning at second save file
+ExtendedSaveDataWRAM:            ;
 ExtendedFileNameWRAM: skip 24    ; File name, 12 word-length characters.
 RoomPotData: skip 592            ; Table for expanded pot shuffle. One word per room.
 SpritePotData: skip 592          ; Table for expanded pot shuffle. One word per room.
@@ -408,7 +412,8 @@ BombsEquipmentSRAM: skip 31     ;
 DisplayRupeesSRAM: skip 21      ;
 CurrentArrowsSRAM: skip 21      ;
 InventoryTrackingSRAM: skip 2   ;
-BowTrackingSRAM: skip 2         ;
+BowTrackingSRAM: skip 1         ;
+SpecialWeaponLevelSRAM: skip 1  ;
 skip 53                         ;
 ProgressIndicatorSRAM: skip 1   ;
 skip 19                         ;
@@ -416,6 +421,7 @@ FileNameVanillaSRAM: skip 8     ; First four characters of file name
 FileValiditySRAM: skip 2        ;
 skip 283                        ;
 InverseChecksumSRAM: skip 2     ;
+ExtendedSaveDataSRAM:           ;
 ExtendedFileNameSRAM: skip 24   ; We read and write the file name directly from and to SRAM (24 bytes)
 skip $1AE4                      ;
 RomVersionSRAM: skip 4          ; ALTTPR ROM version. Low byte is the version, high byte writes
@@ -427,15 +433,6 @@ skip 8155                       ;
 SaveBackupSRAM:                 ; Backup copy of save ram. Game will attempt to use this if
                                 ; checksum on file select screen load fails.
 base off
-
-;================================================================================
-; Bank Definitions
-;--------------------------------------------------------------------------------
-; If these move (most likely by placing initsramtable.asm somewhere else) these
-; bank definitions need to be changed as well.
-;================================================================================
-!SRAMBank = $70
-!SRAMTableBank = $30|$80
 
 ;================================================================================
 ; Assertions
@@ -604,9 +601,9 @@ endmacro
 %assertSRAM(HighestMail, $7EF46E)
 %assertSRAM(SmallKeyCounter, $7EF46F)
 %assertSRAM(HeartPieceCounter, $7EF470)
-%assertSRAM(CrystalCounter, $7EF471)
 %assertSRAM(DungeonsCompleted, $7EF472)
 %assertSRAM(MapCountDisplay, $7EF474)
+%assertSRAM(CrystalCounter, $7EF476)
 ;--------------------------------------------------------------------------------
 %assertSRAM(ServiceSequence, $7EF4A0)
 %assertSRAM(ServiceSequenceRx, $7EF4A0)
@@ -659,6 +656,7 @@ endmacro
 %assertSRAM(GTCollectedKeys, $7EF4ED)
 %assertSRAM(FileMarker, $7EF4F0)
 ;--------------------------------------------------------------------------------
+%assertSRAM(ExtendedSaveDataWRAM, $7F6000)
 %assertSRAM(ExtendedFileNameWRAM, $7F6000)
 %assertSRAM(RoomPotData, $7F6018)
 %assertSRAM(SpritePotData, $7F6268)
@@ -677,10 +675,12 @@ endmacro
 %assertSRAM(CurrentArrowsSRAM, $700377)
 %assertSRAM(InventoryTrackingSRAM, $70038C)
 %assertSRAM(BowTrackingSRAM, $70038E)
+%assertSRAM(SpecialWeaponLevelSRAM, $70038F)
 %assertSRAM(ProgressIndicatorSRAM, $7003C5)
 %assertSRAM(FileNameVanillaSRAM, $7003D9)
 %assertSRAM(FileValiditySRAM, $7003E1)
 %assertSRAM(InverseChecksumSRAM, $7004FE)
+%assertSRAM(ExtendedSaveDataSRAM, $700500)
 %assertSRAM(ExtendedFileNameSRAM, $700500)
 %assertSRAM(RomVersionSRAM, $701FFC)
 %assertSRAM(RomNameSRAM, $702000)

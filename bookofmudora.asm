@@ -3,19 +3,21 @@
 ;--------------------------------------------------------------------------------
 LoadLibraryItemGFX:
         %GetPossiblyEncryptedItem(LibraryItem, SpriteItemValues)
-        STA.w SpriteItemType, X ; Store item type
-        JSL.l PrepDynamicTile
+        JSL.l AttemptItemSubstitution
+        JSL.l ResolveLootIDLong
+        STA.w SpriteID, X
+        JSL.l PrepDynamicTile_loot_resolved
 RTL
 ;--------------------------------------------------------------------------------
 DrawLibraryItemGFX:
         PHA
-        LDA.w SpriteItemType, X ; Retrieve stored item type
+        LDA.w SpriteID, X
         JSL.l DrawDynamicTile
         PLA
 RTL
 ;--------------------------------------------------------------------------------
 SetLibraryItem:
-        LDY.w SpriteItemType, X ; Retrieve stored item type
+        LDY.w SpriteID, X
         JSL.l ItemSet_Library ; contains thing we wrote over
 RTL
 ;--------------------------------------------------------------------------------
@@ -29,17 +31,27 @@ LoadBonkItemGFX:
 LoadBonkItemGFX_inner:
 	LDA.b #$00 : STA.l RedrawFlag
 	JSR LoadBonkItem
+        JSL.l AttemptItemSubstitution
+        JSL.l ResolveLootIDLong
+        STA.w SpriteItemType, X
+        STA.w SpriteID, X
 	JSL.l PrepDynamicTile
+        PHA : PHX
+        LDA.w SpriteID,X : TAX
+        LDA.l SpriteProperties_standing_width,X : BNE +
+                LDA.b #$00 : STA.l SpriteOAM : STA.l SpriteOAM+8
+        +
+        PLX : PLA
 RTL
 ;--------------------------------------------------------------------------------
 DrawBonkItemGFX: 
         PHA
-        LDA.l RedrawFlag : BEQ .skipInit ; skip init if already ready
+        LDA.l RedrawFlag : BEQ .skipInit
         JSL.l LoadBonkItemGFX_inner
         BRA .done ; don't draw on the init frame
         
 	.skipInit
-        JSR LoadBonkItem
+        LDA.w SpriteID,X
         JSL.l DrawDynamicTileNoShadow
 
         .done

@@ -3,8 +3,13 @@ OnPrepFileSelect:
 		LDA.b #$06 : STA.b NMISTRIPES ; thing we wrote over
 		RTL
 	+
+	PHA : PHX
+	REP #$10
 	JSL.l LoadAlphabetTilemap
-	JML.l LoadFullItemTiles
+	JSL.l LoadFullItemTiles
+	SEP #$10
+	PLX : PLA
+RTL
 ;--------------------------------------------------------------------------------
 OnDrawHud:
 	JSL.l DrawChallengeTimer ; this has to come before NewDrawHud because the timer overwrites the compass counter
@@ -17,6 +22,25 @@ JML.l ReturnFromOnDrawHud
 OnDungeonEntrance:
 	STA.l PegColor ; thing we wrote over
 	JSL MaybeFlagDungeonTotalsEntrance
+	INC.w UpdateHUD
+RTL
+;--------------------------------------------------------------------------------
+OnDungeonBossExit:
+	JSL.l StatTransitionCounter
+	LDX.w DungeonID : BMI +
+			LDA.w RoomIndex : CMP.b #$0D : BEQ .aga2
+			LDA.w RoomIndex : CMP.b #$20 : BEQ .aga
+					.set_completed
+					REP #$20
+					LDA.l DungeonItemMasks, X : ORA.l DungeonsCompleted : STA.l DungeonsCompleted
+					SEP #$20
+	+
+RTL
+	.aga2
+	CPX.b #$1A : BEQ .set_completed
+RTL
+	.aga
+	CPX.b #$08 : BEQ .set_completed
 RTL
 ;--------------------------------------------------------------------------------
 OnPlayerDead:
@@ -29,16 +53,17 @@ RTL
 ;--------------------------------------------------------------------------------
 OnDungeonExit:
 	PHA : PHP
-		SEP #$20 ; set 8-bit accumulator
-		JSL.l SQEGFix
+	SEP #$20 ; set 8-bit accumulator
+	JSL.l SQEGFix
 	PLP : PLA
 
 	STA.w DungeonID : STZ.w Map16ChangeIndex ; thing we wrote over
 
 	PHA : PHP
-		JSL.l HUD_RebuildLong
-		JSL.l FloodGateResetInner
-		JSL.l SetSilverBowMode
+	INC.w UpdateHUD
+	JSL.l HUD_RebuildLong
+	JSL.l FloodGateResetInner
+	JSL.l SetSilverBowMode
 	PLP : PLA
 RTL
 ;--------------------------------------------------------------------------------
@@ -77,25 +102,24 @@ RTL
 ;--------------------------------------------------------------------------------
 OnAga2Defeated:
 	JSL.l Dungeon_SaveRoomData_justKeys ; thing we wrote over, make sure this is first
+	LDA.b #$FF : STA.w DungeonID
 	LDA.b #$01 : STA.l Aga2Duck
 	JML.l IncrementAgahnim2Sword
 ;--------------------------------------------------------------------------------
 OnFileCreation:
-	; Copy initial SRAM state from ROM to cart SRAM
-	; If the inital SRAM table is move these addresses must be changed
 	PHB
-	LDA.w #$03D7                  ; \
-	LDX.w #$B000                  ;  | Copies from beginning of inital sram table up to file name
-	LDY.w #$0000                  ;  | (exclusively)
-	MVN !SRAMBank, !SRAMTableBank ; /
-	                              ; Skip file name and validity value
-	LDA.w #$010C                  ; \
-	LDX.w #$B3E3                  ;  | Rando-Specific Assignments & Game Stats block
-	LDY.w #$03E3                  ;  |
-	MVN !SRAMBank, !SRAMTableBank ; /
+	LDA.w #$03D7
+	LDX.w #$B000
+	LDY.w #$0000
+	MVN CartridgeSRAM>>16, InitSRAMTable>>16
+	; Skip file name and validity value
+	LDA.w #$010C
+	LDX.w #$B3E3
+	LDY.w #$03E3
+	MVN CartridgeSRAM>>16, InitSRAMTable>>16 
 	PLB
 
-	; resolve instant post-aga if standard
+	; Resolve instant post-aga if standard
 	SEP #$20
 	LDA.l InitProgressIndicator : BIT #$80 : BEQ +
 		LDA.b #$00 : STA.l ProgressIndicatorSRAM  ; set post-aga after zelda rescue
@@ -103,13 +127,13 @@ OnFileCreation:
 	+
 	REP #$20
 
-	; Set validity value and do some cleanup. Jump to checksum.
+	; Set validity value and do some cleanup. Jump to checksum done.
 	LDA.w #$55AA : STA.l FileValiditySRAM
-	JSL.l WriteNewFileChecksum
+	JSL.l WriteSaveChecksumAndBackup
 	STZ.b Scrap00
 	STZ.b Scrap01
 
-JML.l InitializeSaveFile_done
+JML.l InitializeSaveFile_checksum_done
 ;--------------------------------------------------------------------------------
 OnFileLoad:
 	REP #$10 ; set 16 bit index registers
@@ -198,6 +222,7 @@ OnOWTransition:
 	PHP
 	SEP #$20 ; set 8-bit accumulator
 	LDA.b #$FF : STA.l RNGLockIn ; clear lock-in
+	INC.w UpdateHUD
 	PLP
 RTL
 ;--------------------------------------------------------------------------------
@@ -216,23 +241,47 @@ PreItemGet:
 RTL
 ;--------------------------------------------------------------------------------
 PostItemGet:
-
 RTL
 ;--------------------------------------------------------------------------------
 PostItemAnimation:
+	PHB
 	LDA.b #$00 : STA.l BusyItem ; mark item as finished
-
 	LDA.l TextBoxDefer : BEQ +
-		STZ.w TextID : STZ.w TextID+1 ; reset decompression buffer
-		JSL.l Main_ShowTextMessage_Alt
-		LDA.b #$00 : STA.l TextBoxDefer
+			STZ.w TextID : STZ.w TextID+1 ; reset decompression buffer
+			JSL.l Main_ShowTextMessage_Alt
+			LDA.b #$00 : STA.l TextBoxDefer
 	+
-
 	LDA.w ItemReceiptMethod : CMP.b #$01 : BNE +
-		LDA.b LinkDirection : BEQ +
-			JSL.l IncrementChestTurnCounter
+			LDA.b LinkDirection : BEQ +
+					JSL.l IncrementChestTurnCounter
 	+
+	REP #$20
+	PEA.w $7E00
+	PLB : PLB
+	LDA.w TransparencyFlag : BNE .SP05
+		LDA.l PalettesCustom_off_black+$00 : STA.w PaletteBuffer+$0170 : STA.w PaletteBufferAux+$0170
+		LDA.l PalettesCustom_off_black+$02 : STA.w PaletteBuffer+$0172 : STA.w PaletteBufferAux+$0172
+		STA.w PaletteBuffer+$0174 : STA.w PaletteBufferAux+$0174
+		STA.w PaletteBuffer+$0176 : STA.w PaletteBufferAux+$0176
+		STA.w PaletteBuffer+$0178 : STA.w PaletteBufferAux+$0178
+		STA.w PaletteBuffer+$017A : STA.w PaletteBufferAux+$017A
+		STA.w PaletteBuffer+$017C : STA.w PaletteBufferAux+$017C
+		STA.w PaletteBuffer+$017E : STA.w PaletteBufferAux+$017E
+		BRA .done
+	.SP05
+	LDA.l PalettesCustom_off_black+$00 : STA.w PaletteBuffer+$01B0 : STA.w PaletteBufferAux+$01B0
+	LDA.l PalettesCustom_off_black+$02 : STA.w PaletteBuffer+$01B2 : STA.w PaletteBufferAux+$01B2
+	STA.w PaletteBuffer+$01B4 : STA.w PaletteBufferAux+$01B4
+	STA.w PaletteBuffer+$01B6 : STA.w PaletteBufferAux+$01B6
+	STA.w PaletteBuffer+$01B8 : STA.w PaletteBufferAux+$01B8
+	STA.w PaletteBuffer+$01BA : STA.w PaletteBufferAux+$01BA
+	STA.w PaletteBuffer+$01BC : STA.w PaletteBufferAux+$01BC
+	STA.w PaletteBuffer+$01BE : STA.w PaletteBufferAux+$01BE
+	.done
+	INC.b NMICGRAM
+	SEP #$20
 
 	STZ.w ItemReceiptMethod : LDA.w AncillaGet, X ; thing we wrote over to get here
+	PLB
 RTL
 ;--------------------------------------------------------------------------------

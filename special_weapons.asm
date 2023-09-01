@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------------
-!ANCILLA_DAMAGE = "$06EC84"
+!ANCILLA_DAMAGE = "$86EC84"
 ; start with X = sprite index, A = ancilla type index
 ;--------------------------------------------------------------------------------
 DamageClassCalc:
@@ -112,8 +112,8 @@ DamageClassCalc:
 	RTL
 ; end with X = sprite index, A = damage class
 ;--------------------------------------------------------------------------------
-!SPRITE_SETUP_HIT_BOX_LONG = "$0683EA"
-!UTILITY_CHECK_IF_HIT_BOXES_OVERLAP_LONG = "$0683E6"
+!SPRITE_SETUP_HIT_BOX_LONG = "$8683EA"
+!UTILITY_CHECK_IF_HIT_BOXES_OVERLAP_LONG = "$8683E6"
 ; start with X = ancilla index, Y = sprite index
 ;--------------------------------------------------------------------------------
 Utility_CheckAncillaOverlapWithSprite:
@@ -188,7 +188,7 @@ SetUpTrinexxHitbox:
 	LDA #$80 : STA $0CAA, Y
 
 	PHX
-	LDA $0E80, Y : !SUB.l $1DAF28 : AND.b #$7F : TAX
+	LDA $0E80, Y : !SUB.l $9DAF28 : AND.b #$7F : TAX
 
 	LDA $7FFC00, X : STA $0D10, Y
 	LDA $7FFC80, X : STA $0D30, Y
@@ -412,9 +412,9 @@ BombIcon:
 DrawBombOnHud:
 	PHB
 	LDA.w #$0149
-	LDX.w #$86B0
+	LDX.w #HUD_TileMap
 	LDY.w #$C700
-	MVN $7E, $21
+	MVN $A17E
 	PLB
 
 	LDA.l SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BNE .regularBombs

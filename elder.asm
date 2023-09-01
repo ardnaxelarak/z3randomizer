@@ -2,7 +2,7 @@ NewElderCode:
 {
 LDA.b OverworldIndex : CMP.b #$1B : BEQ .newCodeContinue
 ;Restore Jump we can keep the RTL so JML
-JML $05F0CD
+JML $85F0CD
 .newCodeContinue
 PHB : PHK : PLB
 LDA.b #$07 : STA.w SpriteOAMProp, X ; Palette 
@@ -42,7 +42,7 @@ RTL
     {
         REP #$20
         LDA.l GoalItemRequirement : BEQ .despawn
-        LDA.l InvincibleGanon : AND.w #$00FF : CMP.w #$0005 : BEQ .despawn
+        LDA.l GanonVulnerableMode : AND.w #$00FF : CMP.w #$0005 : BEQ .despawn
         LDA.l TurnInGoalItems : AND.w #$00FF : BNE +
             .despawn
             SEP #$20

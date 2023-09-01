@@ -114,25 +114,44 @@ FreeDungeonItemNotice:
 	+ : LDA.l FreeItemText : AND.b #$08 : BEQ + ; show message for dungeon big key
 	LDA.w ScratchBufferV : AND.b #$F0 : CMP.b #$90 : BNE + ; big key of...
 		%CopyDialog(Notice_BigKeyOf)
-		BRA .dungeon
+		JMP .dungeon
 	+ : LDA.l FreeItemText : AND.b #$01 : BEQ + ; show message for dungeon small key
 	LDA.w ScratchBufferV : AND.b #$F0 : CMP.b #$A0 : BNE + ; small key of...
 		LDA.w ScratchBufferV : CMP.b #$AF : BNE ++ : JMP .skip : ++
 		%CopyDialog(Notice_SmallKeyOf)
 		LDA.b #$01 : STA.w ScratchBufferNV ; set up a flip for small keys
 		BRA .dungeon
-	+
+	+ : LDA.l FreeItemText : AND.b #$20 : BEQ + ; show message for crystal
+	LDA.w ScratchBufferV : CMP.b #$B0 : !BLT + ;  crystal #
+                               CMP.b #$B7 : !BGE +
+		%CopyDialog(Notice_Crystal)
+		JMP .crystal
+        +
 	JMP .skip ; it's not something we are going to give a notice for
 
 	.dungeon
 	LDA.l DialogReturnPointer : DEC #2 : STA.l DialogOffsetPointer
 	LDA.w ScratchBufferV
-	AND.b #$0F ; looking at low bits only
+	AND.b #$0F
 	STA.w ScratchBufferNV+1
 	LDA.w ScratchBufferNV : BEQ +
 		LDA.w ScratchBufferNV
 		LDA.b #$0F : !SUB.w ScratchBufferNV+1 : STA.w ScratchBufferNV+1 ; flip the values for small keys
 	+
+	LDA.w ScratchBufferNV+1
+        ASL : TAX
+        REP #$20
+        LDA.l DungeonItemIDMap,X : CMP.w #$0003 : BCC .hc_sewers
+                                   CMP.w DungeonID : BNE +
+                BRA .self_notice
+                .hc_sewers
+                LDA.w DungeonID : CMP.w #$0003 : BCS +
+                        .self_notice
+                        SEP #$20
+		        %CopyDialog(Notice_Self)
+                        JMP.w .done
+        +
+        SEP #$20
 	LDA.w ScratchBufferNV+1
 	CMP.b #$00 : BNE + ; ...light world
 		%CopyDialog(Notice_LightWorld) : JMP .done
@@ -161,12 +180,34 @@ FreeDungeonItemNotice:
 	+ : CMP.b #$0C : BNE + ; ...desert palace
 		%CopyDialog(Notice_Desert) : JMP .done
 	+ : CMP.b #$0D : BNE + ; ...eastern palace
-		%CopyDialog(Notice_Eastern) : BRA .done
+		%CopyDialog(Notice_Eastern) : JMP .done
 	+ : CMP.b #$0E : BNE + ; ...hyrule castle
-		%CopyDialog(Notice_Castle) : BRA .done
+		%CopyDialog(Notice_Castle) : JMP .done
 	+ : CMP.b #$0F : BNE + ; ...sewers
 		%CopyDialog(Notice_Sewers)
 	+
+        JMP .done
+
+        .crystal
+	LDA.l DialogReturnPointer : DEC #2 : STA.l DialogOffsetPointer
+	LDA.w ScratchBufferV
+	AND.b #$0F ; looking at low bits only
+	CMP.b #$00 : BNE +
+		%CopyDialog(Notice_Six) : JMP .done
+	+ : CMP.b #$01 : BNE +
+		%CopyDialog(Notice_One) : JMP .done
+	+ : CMP.b #$02 : BNE +
+		%CopyDialog(Notice_Five) : JMP .done
+	+ : CMP.b #$03 : BNE +
+		%CopyDialog(Notice_Seven) : JMP .done
+	+ : CMP.b #$04 : BNE +
+		%CopyDialog(Notice_Two) : JMP .done
+	+ : CMP.b #$05 : BNE +
+		%CopyDialog(Notice_Four) : JMP .done
+	+ : CMP.b #$06 : BNE +
+		%CopyDialog(Notice_Three) : JMP .done
+        +
+
 	.done
 
 	STZ.w TextID : STZ.w TextID+1 ; reset decompression buffer
@@ -360,7 +401,7 @@ RTL
 
 ;---------------------------------------------------------------------------------------------------
 AgahnimAsksAboutPed:
-	LDA.l InvincibleGanon
+	LDA.l GanonVulnerableMode
 	CMP.b #$06 : BNE .vanilla
 
 	LDA.l OverworldEventDataWRAM+$80 ; check ped flag
@@ -371,7 +412,7 @@ AgahnimAsksAboutPed:
 	STA.w TextID
 
 .vanilla
-	JML $05FA8E ; Sprite_ShowMessageMinimal
+	JML $85FA8E ; Sprite_ShowMessageMinimal
 ;--------------------------------------------------------------------------------
 Main_ShowTextMessage_Alt:
 	; Are we in text mode? If so then end the routine.
@@ -422,24 +463,24 @@ Main_ShowTextMessage_Alt_already_in_text_mode:
 RTL
 
 CalculateSignIndex:
-  ; for the big 1024x1024 screens we are calculating link's effective
-  ; screen area, as though the screen was 4 different 512x512 screens.
-  ; And we do this in a way that will likely give the right value even
-  ; with major glitches.
+; for the big 1024x1024 screens we are calculating link's effective
+; screen area, as though the screen was 4 different 512x512 screens.
+; And we do this in a way that will likely give the right value even
+; with major glitches.
 
-  LDA.b OverworldIndex : ASL A : TAY ;what we wrote over
+LDA.b OverworldIndex : ASL A : TAY ;what we wrote over
 
-  LDA.w OWScreenSize : BEQ .done ; If a small map, we can skip these calculations.
+LDA.w OWScreenSize : BEQ .done ; If a small map, we can skip these calculations.
 
-  LDA.b LinkPosY+1 : AND.w #$0002 : ASL #2 : EOR.b OverworldIndex : AND.w #$0008 : BEQ +
-  	TYA : !ADD.w #$0010 : TAY  ;add 16 if we are in lower half of big screen.
-  +
+LDA.b LinkPosY+1 : AND.w #$0002 : ASL #2 : EOR.b OverworldIndex : AND.w #$0008 : BEQ +
+TYA : !ADD.w #$0010 : TAY  ;add 16 if we are in lower half of big screen.
++
 
-  LDA.b LinkPosX+1 : AND.w #$0002 : LSR : EOR.b OverworldIndex : AND.w #$0001 : BEQ +
-  TYA : INC #2 : TAY  ;add 16 if we are in lower half of big screen.
-  +
-  ; ensure even if things go horribly wrong, we don't read the sign out of bounds and crash:
-  TYA : AND.w #$00FF : TAY
+LDA.b LinkPosX+1 : AND.w #$0002 : LSR : EOR.b OverworldIndex : AND.w #$0001 : BEQ +
+TYA : INC #2 : TAY  ;add 16 if we are in lower half of big screen.
++
+; ensure even if things go horribly wrong, we don't read the sign out of bounds and crash:
+TYA : AND.w #$00FF : TAY
 
 .done
 RTL
@@ -463,7 +504,7 @@ Sprite_ShowSolicitedMessageIfPlayerFacing_Alt:
 
 	; Make sure that the sprite is facing towards the player, otherwise
 	; talking can't happen. (What sprites actually use this???)
-	LDA.l $05E1A3, X : PLX : CMP.b LinkDirection : BNE .not_facing_each_other
+	LDA.l $85E1A3, X : PLX : CMP.b LinkDirection : BNE .not_facing_each_other
 
 	PHY
 
@@ -471,10 +512,10 @@ Sprite_ShowSolicitedMessageIfPlayerFacing_Alt:
 	LDY.w TextID+1
 
 	; Check what room we're in so we know which npc we're talking to
-        LDA.b RoomIndex
-        CMP.b #$05 : BEQ .SahasrahlaDialogs
-        CMP.b #$1C : BEQ .BombShopGuyDialog
-        BRA .SayNothing
+	LDA.b RoomIndex
+	CMP.b #$05 : BEQ .SahasrahlaDialogs
+	CMP.b #$1C : BEQ .BombShopGuyDialog
+	BRA .SayNothing
 
 	.SahasrahlaDialogs
 		REP #$20 : LDA.l MapReveal_Sahasrahla : ORA.l MapOverlay : STA.l MapOverlay : SEP #$20
@@ -520,7 +561,7 @@ Sprite_ShowSolicitedMessageIfPlayerFacing_PreserveMessage:
 
 	; Make sure that the sprite is facing towards the player, otherwise
 	; talking can't happen. (What sprites actually use this???)
-	LDA.l $05E1A3, X : PLX : CMP.b LinkDirection : BNE .not_facing_each_other
+	LDA.l $85E1A3, X : PLX : CMP.b LinkDirection : BNE .not_facing_each_other
 
 	PLA : XBA : PLA
 
