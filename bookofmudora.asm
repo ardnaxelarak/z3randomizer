@@ -2,7 +2,7 @@
 ; Randomize Book of Mudora
 ;--------------------------------------------------------------------------------
 LoadLibraryItemGFX:
-		LDA.l LibraryItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
+		LDA.l LibraryItem_Player : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
         %GetPossiblyEncryptedItem(LibraryItem, SpriteItemValues)
         JSL.l AttemptItemSubstitution
         JSL.l ResolveLootIDLong
@@ -63,7 +63,7 @@ RTL
 GiveBonkItem:
 	JSR LoadBonkItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
 	JSR LoadBonkItem
-	CMP.b #$24 : BNE .notKey
+        JSR.w AbsorbKeyCheck : BCC .notKey
 	.key
 		PHY : LDY.b #$24 : JSL.l AddInventory : PLY ; do inventory processing for a small key
 		LDA.l CurrentSmallKeys : INC A : STA.l CurrentSmallKeys
@@ -99,4 +99,20 @@ LoadBonkItem_Player:
 	+
 		LDA.b #$00
 	++
+RTS
+;--------------------------------------------------------------------------------
+AbsorbKeyCheck:
+        PHA
+	CMP.b #$24 : BEQ .key
+        CMP.b #$A0 : BCC .not_key
+        CMP.b #$B0 : BCS .not_key
+                AND.b #$0F : ASL
+                CMP.w DungeonID : BNE .not_key
+                        .key
+                        PLA
+                        SEC
+                        RTS
+        .not_key
+        PLA
+        CLC
 RTS

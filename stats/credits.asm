@@ -459,10 +459,10 @@ CreditsLineBlank:
 
 %blankline()
 
-%bigcredits("MATRETHEWEY           IBAZLY")
+%bigcredits("         MATRETHEWEY        ")
 
 %blankline()
-%bigcredits("FISH_WAFFLE64        KRELBEL")
+%bigcredits("FISH_WAFFLE64         IBAZLY")
 
 %blankline()
 
