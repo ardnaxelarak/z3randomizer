@@ -2523,9 +2523,6 @@ db $B2, $28, $B3, $28, $C2, $28, $C2, $68
 org $879CE6 ; Bank07.asm@4632 (LDA #$80 : TSB $3A)
 JSL CheckDetonateBomb
 ;--------------------------------------------------------------------------------
-org $879D08 ; bank_07.asm@6068 (INC $3C : LDA $3C : CMP #$09)
-JSL NoSwingHammerB : NOP #2
-;--------------------------------------------------------------------------------
 org $1EDCF8 ; bank_1E.asm@16086 (LDX $0202 : ...)
 JSL SetBeeType
 BRA + : NOP #15 : +
@@ -2542,7 +2539,9 @@ NOP #48
 skip 11
 .bee_valid_target
 ;--------------------------------------------------------------------------------
-org $87F88C ; free rom from F877 - F88F; the starting part of this is used in quadrant glitch fix in overworld fork, however.
+org $87F888 ; free rom from F877 - F88F; the starting part of this is used in quadrant glitch fix in overworld fork, however.
+Link_UseBugNetLong:
+JSR Link_UseBugNet : RTL
 Link_UseHammerLong:
 JSR Link_UseHammer : RTL
 warnpc $87F890

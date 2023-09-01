@@ -141,6 +141,7 @@ RoomTag_GetHeartForPrize_spawn_prize                       = $81C731
 RoomTag_GetHeartForPrize_delete_tag                        = $81C749
 Chicken_SpawnAvengerChicken                                = $86A7DB
 Link_UseHammer                                             = $879F82
+Link_UseBugNet                                             = $87AFEE
 Link_PerformOpenChest_no_replacement                       = $87B59F
 Sprite_EA_HeartContainer_main                              = $85EF47
 Ancilla_ExecuteAll                                         = $88832B
