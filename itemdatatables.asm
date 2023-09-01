@@ -347,7 +347,7 @@ endmacro
 %ReceiptProps($D1, -4, 0, $47, $F36A, $FF, skip, skip) ; D1 - Apples
 %ReceiptProps($D2, -4, 0, $47, $F36A, $FF, fairy, skip) ; D2 - Fairy
 %ReceiptProps($D3, -4, 0, $47, $F36A, $FF, chicken, skip) ; D3 - Chicken
-%ReceiptProps($D4, -4, 4, $3B, $F373, $80, skip, skip) ; D4 - Big Magic
+%ReceiptProps($D4, -4, 4, $3B, $F373, $80, refill_magic, skip) ; D4 - Big Magic
 %ReceiptProps($D5, -4, 0, $02, $F376, $05, skip, skip) ; D5 - 5 Arrows
 %ReceiptProps($D6, -4, 0, $49, $F36A, $FF, skip, skip) ; D6 - 
 %ReceiptProps($D7, -4, 0, $49, $F36A, $FF, skip, skip) ; D7 - 

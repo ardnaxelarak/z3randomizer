@@ -677,6 +677,9 @@ ItemBehavior:
         .done
         RTS
 
+        .refill_magic
+        SEP #$30 : LDA.b #$80 : STA.l MagicFiller : RTS
+
         .bee_trap
         SEP #$30
         LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI + ; DashBeeHive_SpawnBee

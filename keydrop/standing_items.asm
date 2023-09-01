@@ -502,10 +502,10 @@ db $36, $DB ; RED RUPEE ($36)
 db $42, $D8 ; HEART ($42)
 db $44, $E2 ; ARROW REFILL 10 ($44)
 db $45, $DF ; SMALL MAGIC DECANTER ($45)
-db $B2, $E3 ; FAERIE ($B2)
-db $B3, $0B ; CUCCO ($B3)
-db $B4, $E0 ; LARGE MAGIC DECANTER ($B4)
-db $B5, $E1 ; ARROW REFILL 5  (x??)
+db $D2, $E3 ; FAERIE ($D2)
+db $D3, $0B ; CUCCO ($D3)
+db $D4, $E0 ; LARGE MAGIC DECANTER ($D4)
+db $D5, $E1 ; ARROW REFILL 5  (x$D5)
 
 
 IncrementCountForMinor:
