@@ -18,6 +18,11 @@ StoreBombCount:
 		PLA : LDA.b #$01 : RTL
 	.finite
 		PLA : STA.l BombsEquipment
+		BNE .done
+		LDA.l ItemOnB : CMP #$04 : BNE .done
+		LDA.b #$00 : STA.l ItemOnB
+.done
+LDA.l BombsEquipment
 RTL
 SearchForEquippedItem:
 	LDA.l InfiniteBombs : BEQ +

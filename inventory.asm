@@ -7,7 +7,8 @@
 ;--------------------------------------------------------------------------------
 ProcessMenuButtons:
 	LDA.b Joy1A_New : BIT.b #$40 : BNE .y_pressed ; check for P1 Y-button
-			  BIT.b #$20 : BNE .sel_pressed ; check for P1 Select button
+	                  BIT.b #$20 : BNE .sel_pressed ; check for P1 Select button
+	                  BIT.b #$80 : BNE .b_pressed ; check for P1 B-button
 	LDA.b Joy1A_All : BIT.b #$20 : BNE .sel_held
 	.sel_unheld
 		LDA.l HudFlag : AND.b #$60 : BEQ +
@@ -29,6 +30,25 @@ RTL
 	STA.l HudFlag
 	JSL.l MaybePlaySelectSFX
 	JSL.l ResetEquipment
+RTL
+	.b_pressed
+	PHX
+	LDA.l AllowedItemOnB : BEQ .b_error
+	CMP.b #$FF : BEQ .skip_allow_check
+	CMP.w ItemCursor : BNE .b_error
+	.skip_allow_check
+	LDA.w ItemCursor : TAX
+	LDA.l ValidItemOnB, X : BNE .b_error
+	TXA : CMP.l ItemOnB : BNE .set_b
+	LDA.b #$00
+	.set_b
+	STA.l ItemOnB
+	BRA .b_done
+	.b_error
+	LDA.b #$3C : STA.w SFX2 ; error sound
+	.b_done
+	PLX
+	SEC
 RTL
 	.y_pressed ; Note: used as entry point by quickswap code. Must preserve X. 
 	LDA.b #$10 : STA.w MenuBlink
@@ -82,11 +102,6 @@ RTL
 		LDA.b #$01 ; set shovel
 		.fluteSuccess
 		STA.l FluteEquipment ; store set item
-		LDA.b #$20 : STA.w SFX3 ; menu select sound
-		BRA .captured
-	+ CMP.b #$0E : BNE + ; bugnet
-		LDA.l SpecialWeapons : CMP.b #$08 : BNE .error
-		LDA.l InventoryTracking+1 : EOR.b #$80 : STA.l InventoryTracking+1
 		LDA.b #$20 : STA.w SFX3 ; menu select sound
 		BRA .captured
 	+
@@ -397,8 +412,6 @@ AddYMarker:
 		LDA.l InventoryTracking : BIT.w #$04 : BEQ .drawNormal ; make sure we have shovel
 					  AND.w #$03 : BNE .drawYBubble ; make sure we have one of the flutes
 					  BRA .drawNormal
-	+ CMP.w #$000E : BNE + ; bugnet
-		LDA.l SpecialWeapons : AND.w #$00FF : CMP.w #$0008 : BEQ .drawYBubble : BRA .drawNormal
 	+ CMP.w #$10 : BEQ .drawJarMarker
 
 	.drawNormal

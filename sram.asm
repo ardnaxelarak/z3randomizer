@@ -188,7 +188,8 @@ ItemLimitCounts: skip 16        ; Keeps track of limited non-progressive items s
                                 ; See: ItemSubstitutionRules in tables.asm
                                 ; Right now this is only used for three items but extra space is
                                 ; reserved
-skip 37                         ; Unused
+skip 36                         ; Unused
+ItemOnB: skip 1                 ; same table as $0202; $01 = arrows .. $14 = mirror
 ProgressIndicator: skip 1       ; $00 = Pre-Uncle | $01 = Post-Uncle item | $02 = Zelda Rescued
                                 ; $03 = Agahnim 1 defeated
                                 ; $04 and above don't do anything. $00-$02 used in standard mode
