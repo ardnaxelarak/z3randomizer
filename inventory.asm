@@ -30,9 +30,10 @@
 ProcessMenuButtons:
 	;LDA #$FD : STA InventoryTracking ; DEBUG MODE
 	;LDA $F6 : BIT #$20 : BNE .l_pressed ; check for P1 L-button
-	LDA $F4 : BIT #$40 : BNE .y_pressed ; check for P1 Y-button
-			  BIT #$20 : BNE .sel_pressed ; check for P1 Select button
-	LDA $F0 : BIT #$20 : BNE .sel_held
+	LDA.b $F4 : BIT.b #$40 : BNE .y_pressed ; check for P1 Y-button
+	            BIT.b #$20 : BNE .sel_pressed ; check for P1 Select button
+	            BIT.b #$80 : BNE .b_pressed ; check for P1 B-button
+	LDA.b $F0 : BIT.b #$20 : BNE .sel_held
 	.sel_unheld
 		LDA HudFlag : AND #$20 : BEQ +
 		LDA HudFlag : AND #$DF : STA HudFlag ; select is released, unset hud flag
@@ -48,6 +49,25 @@ RTL
 	LDA HudFlag : ORA #$20 : STA HudFlag ; set hud flag
 	LDA.b #$20 : STA $012F ; menu select sound
 	JSL.l ResetEquipment
+RTL
+	.b_pressed
+	PHX
+	LDA.l AllowedItemOnB : BEQ .b_error
+	CMP.b #$FF : BEQ .skip_allow_check
+	CMP.w $0202 : BNE .b_error
+	.skip_allow_check
+	LDA.w $0202 : TAX
+	LDA.l ValidItemOnB, X : BNE .b_error
+	TXA : CMP.l ItemOnB : BNE .set_b
+	LDA.b #$00
+	.set_b
+	STA.l ItemOnB
+	BRA .b_done
+	.b_error
+	LDA.b #$3C : STA.w $012E ; error sound
+	.b_done
+	PLX
+	SEC
 RTL
 	.y_pressed ; Note: used as entry point by quickswap code. Must preserve X. 
 	LDA.b #$10 : STA $0207
@@ -102,11 +122,6 @@ RTL
 		.fluteSuccess
 		STA FluteEquipment ; store set item
 		LDA.b #$20 : STA $012F ; menu select sound
-		BRA .captured
-	+ CMP.b #$0E : BNE + ; bugnet
-		LDA.l SpecialWeapons : CMP.b #$08 : BNE .error
-		LDA.l InventoryTracking+1 : EOR.b #$80 : STA.l InventoryTracking+1
-		LDA.b #$20 : STA.w $012F ; menu select sound
 		BRA .captured
 	+
 	CMP #$10 : BNE .error : JSL.l ProcessBottleMenu : BRA .captured : +
@@ -789,8 +804,6 @@ AddYMarker:
 		LDA InventoryTracking : BIT.w #$04 : BEQ .drawNormal ; make sure we have shovel
 					  AND.w #$03 : BNE .drawYBubble ; make sure we have one of the flutes
 					  BRA .drawNormal
-	+ CMP.w #$000E : BNE + ; bugnet
-		LDA.l SpecialWeapons : AND.w #$00FF : CMP.w #$0008 : BEQ .drawYBubble : BRA .drawNormal
 	+ CMP.w #$10 : BEQ .drawJarMarker
 
 	.drawNormal

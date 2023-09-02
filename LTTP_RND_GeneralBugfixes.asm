@@ -230,6 +230,7 @@ warnpc $A58000
 org $A28000 ; contrib area
 incsrc contrib.asm
 incsrc special_weapons.asm
+incsrc item_on_b.asm
 incsrc variable_ganon_vulnerability.asm
 warnpc $A38000
 

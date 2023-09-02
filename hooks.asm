@@ -2932,10 +2932,6 @@ org $0DE4BF ; equipment.asm@1247 (LDA $7EF343 : AND.w #$00FF : BEQ .gotNoBombs :
 JSL DrawBombInMenu
 BRA + : NOP #13 : +
 ;--------------------------------------------------------------------------------
-org $0DE5A0 ; bank_0D@15415 (LDA $7EF34D : AND.w #$00FF : STA.b $02 : ...)
-JSL DrawBugNetInMenu
-BRA + : NOP #8 : +
-;--------------------------------------------------------------------------------
 org $0DFB6A ; headsup_display@727 (CPX #$0004 : BNE .bombsNotEquipped : LDA #$0001)
 JSL DrawBombInYBox
 BRA + : NOP #2 : +
@@ -2969,14 +2965,7 @@ db $B2, $24, $B3, $24, $C2, $24, $C2, $64
 db $B2, $28, $B3, $28, $C2, $28, $C2, $68
 db $B2, $28, $B3, $28, $C2, $28, $C2, $68
 
-; bugnet icon with B
-; $0DFCB1
-db $40, $3C, $41, $3C, $42, $28, $3F, $3D
-
 warnpc $0DFC51+197 ; we only filled in 197 NOPs so don't overwrite past that
-;--------------------------------------------------------------------------------
-org $079CE6 ; Bank07.asm@4632 (LDA #$80 : TSB $3A)
-JSL CheckDetonateBomb
 ;--------------------------------------------------------------------------------
 org $1EDCF8 ; bank_1E.asm@16086 (LDX $0202 : ...)
 JSL SetBeeType
@@ -2994,11 +2983,12 @@ NOP #48
 skip 11
 .bee_valid_target
 ;--------------------------------------------------------------------------------
-org $07F888 ; free rom from F877 - F88F; the starting part of this is used in quadrant glitch fix in overworld fork, however.
-Link_UseBugNetLong:
-JSR Link_UseBugNet : RTL
-Link_UseHammerLong:
-JSR Link_UseHammer : RTL
+org $07F889 ; free rom from F877 - F88F; the starting part of this is used in quadrant glitch fix in overworld fork, however.
+Link_UseItemLong:
+PER .done-1
+JMP.w ($0000)
+.done
+RTL
 warnpc $07F890
 ;--------------------------------------------------------------------------------
 org $06F2DC ; bank_06.asm@22763 (LDA.w $037A : AND.b #$10)
@@ -3037,6 +3027,18 @@ NOP
 ;--------------------------------------------------------------------------------
 org $06ED70 ; Bank06.asm@4842 (LDA $06ED39, X : STA $0CF2)
 JSL StoreSwordDamage
+
+;================================================================================
+; Item-On-B
+;--------------------------------------------------------------------------------
+org $0DEB3C
+JSL DrawBIndicator : BRA + : NOP #3 : +
+;--------------------------------------------------------------------------------
+org $079CE6 ; Bank07.asm@4632 (LDA #$80 : TSB $3A : ...)
+JSL UseItem
+BCC + : RTS : +
+JSR $9C56
+NOP #1
 ;--------------------------------------------------------------------------------
 
 ;================================================================================

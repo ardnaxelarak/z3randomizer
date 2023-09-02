@@ -378,23 +378,6 @@ DrawBombInMenu:
 .done
 	RTL
 ;--------------------------------------------------------------------------------
-DrawBugNetInMenu:
-	LDA.l BugNetEquipment : AND.w #$00FF : BEQ .noNet
-	LDA.l SpecialWeapons : AND.w #$00FF : CMP.w #$0008 : BNE .normal
-	LDA.l InventoryTracking : AND.w #$8000 : BNE .normal
-	LDA.w #$0000 : STA $02
-	LDA.w #$FCB1 : STA $04
-	BRA .done
-.normal
-	LDA.w #$0001 : STA $02
-	LDA.w #$F751 : STA $04
-	BRA .done
-.noNet
-	LDA.w #$0000 : STA $02
-	LDA.w #$F751 : STA $04
-.done
-	RTL
-;--------------------------------------------------------------------------------
 DrawSwordInMenu:
 	LDA SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BEQ .specialSword
 	                                    CMP.w #$0003 : BEQ .specialSword
@@ -471,7 +454,9 @@ BeeDamageClass:
 	db $FF, $01, $01, $FF, $FF
 ;--------------------------------------------------------------------------------
 CheckDetonateBomb:
-	LDA.l SpecialWeapons : CMP.b #$01 : BNE .not_bomb_mode
+	LDA.l SpecialWeapons : CMP.b #$01 : BEQ .detonate_bombs
+	                       CMP.b #$06 : BEQ .release_bee
+	CLC : RTL
 .detonate_bombs
 	LDX.b #09
 .check_ancilla
@@ -484,24 +469,6 @@ CheckDetonateBomb:
 	DEX
 	BPL .check_ancilla
 	JMP .done
-.not_bomb_mode
-	LDA.l SpecialWeapons : CMP.b #$06 : BEQ .release_bee
-	                       CMP.b #$07 : BEQ .hammer
-	                       CMP.b #$08 : BEQ .net
-	BRA .done
-.hammer
-	LDA.l HammerEquipment : BEQ .done
-	LDA.b $3A : ORA.b #$40 : STA.b $3A
-	LDA.b #$04 : STA.w $0304
-	JSL Link_UseHammerLong
-	RTL
-.net
-	LDA.l BugNetEquipment : BEQ .done
-	LDA.l InventoryTracking+1 : BIT.b #$80 : BNE .done
-	LDA.b $3A : ORA.b #$40 : STA.b $3A
-	LDA.b #$07 : STA.w $0304
-	JSL Link_UseBugNetLong
-	RTL
 .release_bee
 	LDX.w $0202
 	LDA.l BeeDamageClass, X : CMP.b #$FF : BEQ .nope
@@ -525,9 +492,7 @@ CheckDetonateBomb:
 	ORA.w $0CF8
 	STA.w $012E
 .done
-	; what we wrote over
-	LDA.b #$80
-	TSB.b $3A
+	SEC
 	RTL
 ;--------------------------------------------------------------------------------
 SetBeeType:
