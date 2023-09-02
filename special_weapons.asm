@@ -378,6 +378,23 @@ DrawBombInMenu:
 .done
 	RTL
 ;--------------------------------------------------------------------------------
+DrawBugNetInMenu:
+	LDA.l BugNetEquipment : AND.w #$00FF : BEQ .noNet
+	LDA.l SpecialWeapons : AND.w #$00FF : CMP.w #$0008 : BNE .normal
+	LDA.l InventoryTracking : AND.w #$8000 : BNE .normal
+	LDA.w #$0000 : STA $02
+	LDA.w #$FCB1 : STA $04
+	BRA .done
+.normal
+	LDA.w #$0001 : STA $02
+	LDA.w #$F751 : STA $04
+	BRA .done
+.noNet
+	LDA.w #$0000 : STA $02
+	LDA.w #$F751 : STA $04
+.done
+	RTL
+;--------------------------------------------------------------------------------
 DrawSwordInMenu:
 	LDA SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BEQ .specialSword
 	                                    CMP.w #$0003 : BEQ .specialSword

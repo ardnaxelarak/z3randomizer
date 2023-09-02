@@ -34,6 +34,7 @@ QuickSwap:
 	CPX.b #$01 : BEQ + ; bow
 	CPX.b #$05 : BEQ + ; powder
 	CPX.b #$0D : BEQ + ; flute
+	CPX.b #$0E : BEQ + ; bug net
 	CPX.b #$10 : BEQ + ; bottle
 	BRA .store
 	+ STX.w ItemCursor : JSL ProcessMenuButtons_y_pressed

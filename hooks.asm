@@ -2487,6 +2487,10 @@ org $8DE4BF ; equipment.asm@1247 (LDA $7EF343 : AND.w #$00FF : BEQ .gotNoBombs :
 JSL DrawBombInMenu
 BRA + : NOP #13 : +
 ;--------------------------------------------------------------------------------
+org $8DE5A0 ; bank_0D@15415 (LDA $7EF34D : AND.w #$00FF : STA.b $02 : ...)
+JSL DrawBugNetInMenu
+BRA + : NOP #8 : +
+;--------------------------------------------------------------------------------
 org $8DFB6A ; headsup_display@727 (CPX #$0004 : BNE .bombsNotEquipped : LDA #$0001)
 JSL DrawBombInYBox
 BRA + : NOP #2 : +
@@ -2503,7 +2507,7 @@ org $889EF8 ; ancilla_bomb@1438 (LDA.w #$04 : STA $0B)
 JSL SetBombSpriteColor
 ;--------------------------------------------------------------------------------
 ; bomb icons with numbers
-org $8DFC51 ; is this being used? I hope not! let's find out if anything breaks!
+org $8DFC51 ; we freed this up earlier in hooks; probably shouldn't use it but *shrug*
 db $F5, $20, $F5, $20, $F5, $20, $F5, $20
 db $B2, $3C, $B3, $3C, $C2, $3C, $17, $3C
 db $B2, $2C, $B3, $2C, $C2, $2C, $18, $2C
@@ -2512,13 +2516,23 @@ db $B2, $28, $B3, $28, $C2, $28, $1A, $28
 db $B2, $28, $B3, $28, $C2, $28, $1B, $28
 
 ; bomb icons without numbers
-org $8DFC81
+; $8DFC81
 db $F5, $20, $F5, $20, $F5, $20, $F5, $20
 db $B2, $3C, $B3, $3C, $C2, $3C, $C2, $7C
 db $B2, $2C, $B3, $2C, $C2, $2C, $C2, $6C
 db $B2, $24, $B3, $24, $C2, $24, $C2, $64
 db $B2, $28, $B3, $28, $C2, $28, $C2, $68
 db $B2, $28, $B3, $28, $C2, $28, $C2, $68
+
+; bugnet icon with B
+; $8DFCB1
+db $40, $3C, $41, $3C, $82, $2C, $83, $3C
+
+warnpc $8DFC51+197 ; we only filled in 197 NOPs so don't overwrite past that
+;--------------------------------------------------------------------------------
+org $0DF759
+; db $40, $3C, $41, $3C, $42, $28, $3E, $1C
+
 ;--------------------------------------------------------------------------------
 org $879CE6 ; Bank07.asm@4632 (LDA #$80 : TSB $3A)
 JSL CheckDetonateBomb
