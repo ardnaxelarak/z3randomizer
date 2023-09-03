@@ -15,8 +15,8 @@ def join_values(value1, value2)
   return (value1 & 0x0F) << 4 | (value2 & 0x0F)
 end
 
-File.open("damage_table.bin") do |input|
-  File.open("damage_table_pseudo_sword.bin", "w") do |output|
+File.open("data/damage_table.bin") do |input|
+  File.open("data/damage_table_pseudo_sword.bin", "w") do |output|
     i_enum = input.each_byte
     (0...0xD7).each do |sprite|
       values = []

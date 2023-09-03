@@ -247,12 +247,12 @@ warnpc $B1E501
 
 org $B1E800
 Damage_Table_Bombs:
-incbin damage_table_sword_bombs.bin
+incbin "data/damage_table_sword_bombs.bin"
 warnpc $B1F000
 
 org $B1F000
 Damage_Table_Pseudo:
-incbin damage_table_pseudo_sword.bin
+incbin "data/damage_table_pseudo_sword.bin"
 warnpc $B1F800
 
 org $B38000
@@ -275,23 +275,23 @@ if !FEATURE_NEW_TEXT
 	incbin "data/newfont.bin"
 	NewFontInverted:
 	incbin "data/newfont_inverted.bin"
-        SmallCharacters:
-        incbin "data/smallchars.2bpp"
-        org $8CD7DF
-        incsrc data/playernamecharmap.asm
-        org $8CE73D
-        incbin data/playernamestripes_1.bin
-        org $8CE911
-        incbin data/playernamestripes_2.bin
-        incsrc data/kanjireplacements.asm ; Overwrites text gfx data and masks in bank $8E
+	SmallCharacters:
+	incbin "data/smallchars.2bpp"
+	org $8CD7DF
+	incsrc data/playernamecharmap.asm
+	org $8CE73D
+	incbin data/playernamestripes_1.bin
+	org $8CE911
+	incbin data/playernamestripes_2.bin
+	incsrc data/kanjireplacements.asm ; Overwrites text gfx data and masks in bank $8E
 endif
 
 org $B28000
 Extra_Text_Table:
 if !FEATURE_NEW_TEXT
-    incsrc itemtext_lower.asm
+	incsrc itemtext_lower.asm
 else
-    incsrc itemtext.asm
+	incsrc itemtext.asm
 endif
 
 incsrc externalhooks.asm

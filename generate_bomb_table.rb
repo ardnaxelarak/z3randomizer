@@ -22,19 +22,19 @@ def process_values(sprite, values)
   if ret[10] == 4 # powder
     ret[10] = 0
   end
-  if ret[11] > 0 && ![0xA1, 0xA3, 0xCD].include?(sprite) # fire rod
+  if ret[11] > 0 && ![0x23, 0xA1, 0xA3, 0xCD].include?(sprite) # fire rod
     ret[11] = 0
   end
   if ret[12] != 3 && sprite != 0xCC # ice rod
     ret[12] = 0
   end
-  if ret[13] > 0 && ![0xA3, 0xA1].include?(sprite) # bombos
+  if ret[13] > 0 && ![0x23, 0xA1, 0xA3, 0xD1].include?(sprite) # bombos
     ret[13] = 0
   end
-  if ret[14] != 1 # ether
+  if ret[14] != 1 && ![0xD1].include?(sprite) # ether
     ret[14] = 0
   end
-  if [1, 2].include?(ret[15]) # quake
+  if [1, 2].include?(ret[15]) && ![0xD1].include?(sprite) # quake
     ret[15] = 0
   end
   if sprite == 0x53 and ret[2] == 3
@@ -51,8 +51,8 @@ def join_values(value1, value2)
   return (value1 & 0x0F) << 4 | (value2 & 0x0F)
 end
 
-File.open("damage_table.bin") do |input|
-  File.open("damage_table_sword_bombs.bin", "w") do |output|
+File.open("data/damage_table.bin") do |input|
+  File.open("data/damage_table_sword_bombs.bin", "w") do |output|
     i_enum = input.each_byte
     (0...0xD7).each do |sprite|
       values = []
