@@ -25,7 +25,7 @@ DrawBIndicator:
 	LDA.l ItemOnB : AND.w #$00FF : BEQ .done
 	DEC : ASL : TAX
 	LDA.l ItemMenuLocations, X : TAX
-	LDA.w #$3D3F
+	LDA.w #$3D3B
 	STA.w $0042, X
 
 .done ; what we wrote over
