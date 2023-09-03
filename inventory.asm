@@ -51,14 +51,8 @@ RTL
 	JSL.l ResetEquipment
 RTL
 	.b_pressed
-	PHX
-	LDA.l AllowedItemOnB : BEQ .b_error
-	CMP.b #$FF : BEQ .skip_allow_check
-	CMP.w $0202 : BNE .b_error
-	.skip_allow_check
-	LDA.w $0202 : TAX
-	LDA.l ValidItemOnB, X : BNE .b_error
-	TXA : CMP.l ItemOnB : BNE .set_b
+	JSR CanPressB : BCC .b_error
+	LDA.w ItemCursor : CMP.l ItemOnB : BNE .set_b
 	LDA.b #$00
 	.set_b
 	STA.l ItemOnB
@@ -66,7 +60,6 @@ RTL
 	.b_error
 	LDA.b #$3C : STA.w $012E ; error sound
 	.b_done
-	PLX
 	SEC
 RTL
 	.y_pressed ; Note: used as entry point by quickswap code. Must preserve X. 
@@ -135,6 +128,27 @@ RTL
 	SEC
 RTL
 ;--------------------------------------------------------------------------------
+CanPressB:
+	PHY : PHP : SEP #$30
+	LDA.l AllowedItemOnB : BEQ .no
+	CMP.b #$FF : BEQ .skip_allow_check
+	CMP.w ItemCursor : BNE .no
+	.skip_allow_check
+	PHX
+	LDA.w ItemCursor : TAX
+	LDA.l ValidItemOnB, X : BNE .plx_and_no
+	PLX
+	PLP : PLY
+	SEC
+	RTS
+	.plx_and_no
+	PLX
+	.no
+	PLP : PLY
+	CLC
+	RTS
+;--------------------------------------------------------------------------------
+
 
 ;--------------------------------------------------------------------------------
 ;ProcessBottleMenu:
@@ -807,6 +821,7 @@ AddYMarker:
 	+ CMP.w #$10 : BEQ .drawJarMarker
 
 	.drawNormal
+	JSR CanPressB : BCS .drawBBubble
 	LDA.w #$7C60
 	BRA .drawTile
 
@@ -815,12 +830,20 @@ AddYMarker:
 	LDA $0207 : AND.w #$0020 : BNE .drawXBubble
 
 	.drawYBubble
+	JSR CanPressB : BCC .drawY
+	LDA.w MenuBlink : AND.w #$0020 : BNE .drawBBubble
+	.drawY
 	LDA.w #$3D4F
 	BRA .drawTile
 
 	.drawXBubble
 	JSR MakeCircleBlue
 	LDA.w #$2D3E
+	BRA .drawTile
+
+	.drawBBubble
+	JSR MakeCircleRed
+	LDA.w #$293F
 
 	.drawTile
 	STA $FFC4, Y
@@ -848,6 +871,24 @@ MakeCircleBlue:
 	LDA $FFC4, Y : AND.w #$EFFF : STA $FFC4, Y
 	LDA $0084, Y : AND.w #$EFFF : STA $0084, Y
 	LDA $007E, Y : AND.w #$EFFF : STA $007E, Y
+RTS
+MakeCircleRed:
+	LDA.w $FFC0, Y : AND.w #$EBFF : STA.w $FFC0, Y
+	LDA.w $FFC2, Y : AND.w #$EBFF : STA.w $FFC2, Y
+ 
+	LDA.w $FFFE, Y : AND.w #$EBFF : STA.w $FFFE, Y
+	LDA.w $0004, Y : AND.w #$EBFF : STA.w $0004, Y
+
+	LDA.w $003E, Y : AND.w #$EBFF : STA.w $003E, Y
+	LDA.w $0044, Y : AND.w #$EBFF : STA.w $0044, Y
+
+	LDA.w $0080, Y : AND.w #$EBFF : STA.w $0080, Y
+	LDA.w $0082, Y : AND.w #$EBFF : STA.w $0082, Y
+
+	LDA.w $FFBE, Y : AND.w #$EBFF : STA.w $FFBE, Y
+	LDA.w $FFC4, Y : AND.w #$EBFF : STA.w $FFC4, Y
+	LDA.w $0084, Y : AND.w #$EBFF : STA.w $0084, Y
+	LDA.w $007E, Y : AND.w #$EBFF : STA.w $007E, Y
 RTS
 ;--------------------------------------------------------------------------------
 

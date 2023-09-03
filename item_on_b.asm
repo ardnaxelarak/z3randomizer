@@ -25,7 +25,7 @@ DrawBIndicator:
 	LDA.l ItemOnB : AND.w #$00FF : BEQ .done
 	DEC : ASL : TAX
 	LDA.l ItemMenuLocations, X : TAX
-	LDA.w #$3D3F
+	LDA.w #$3D3B
 	STA.w $0042, X
 
 .done ; what we wrote over
@@ -75,7 +75,7 @@ UseItem:
 	.not_somaria
 	LDA.l ValidItemOnB, X : BNE .normal
 	LDA.b $3A : ORA.b #$40 : STA.b $3A
-	LDA.l $8DFA35, X : STA.w $0304
+	LDA.l $0DFA35, X : STA.w $0304
 	CPX.b #$06 : BEQ .fire_rod
 	CPX.b #$07 : BNE .not_rod
 	.ice_rod
