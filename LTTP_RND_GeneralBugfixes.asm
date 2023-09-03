@@ -334,24 +334,24 @@ BossMapIconGFX:
 incbin bossicons.4bpp
 
 if !FEATURE_NEW_TEXT
-    org $339C00
-    NewFont:
-    incbin newfont.bin
-    NewFontInverted:
-    incbin newfont_inverted.bin
+	org $339C00
+	NewFont:
+	incbin newfont.bin
+	NewFontInverted:
+	incbin newfont_inverted.bin
 
-    org $0CD7DF
-    incbin text_unscramble1.bin
-    org $0CE4D5
-    incbin text_unscramble2.bin
+	org $0CD7DF
+	incbin text_unscramble1.bin
+	org $0CE4D5
+	incbin text_unscramble2.bin
 endif
 
 org $328000
 Extra_Text_Table:
 if !FEATURE_NEW_TEXT
-    incsrc itemtext_lower.asm
+	incsrc itemtext_lower.asm
 else
-    incsrc itemtext.asm
+	incsrc itemtext.asm
 endif
 warnpc $32E000
 
