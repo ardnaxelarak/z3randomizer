@@ -23,6 +23,7 @@ DamageClassCalc:
 	                     CMP #$03 : BEQ .cane_immune
 	                     CMP #$04 : BEQ .special_cane
 	                     CMP #$05 : BEQ .special_cane
+	                     CMP #$08 : BEQ .cane_immune
 	BRA .normal
 .blue_cane
 	PHA
@@ -30,6 +31,7 @@ DamageClassCalc:
 	                     CMP #$03 : BEQ .special_cane
 	                     CMP #$04 : BEQ .cane_immune
 	                     CMP #$05 : BEQ .special_cane
+	                     CMP #$08 : BEQ .cane_immune
 	BRA .normal
 .cane_immune
 	LDA $0E20, X : CMP.b #$1E : BEQ .normal ; crystal switch
@@ -281,6 +283,7 @@ Utility_CheckImpervious:
 	                     CMP #$04 : BEQ +
 	                     CMP #$05 : BEQ +
 	                     CMP #$06 : BEQ .check_sidenexx
+	                     CMP #$08 : BEQ +
 	BRA .normal
 +
 	LDA $0301 : AND.b #$0A : BNE .impervious ; impervious to hammer
@@ -298,6 +301,7 @@ Utility_CheckImpervious:
 	                     CMP #$03 : BEQ +
 	                     CMP #$04 : BEQ +
 	                     CMP #$05 : BEQ +
+	                     CMP #$08 : BEQ +
 	BRA .not_impervious
 +
 	LDA $0E20, X : CMP.b #$1E : BEQ .not_impervious ; crystal switch
@@ -313,6 +317,7 @@ Utility_CheckImpervious:
 	                     CMP #$03 : BEQ +
 	                     CMP #$04 : BEQ +
 	                     CMP #$05 : BEQ +
+	                     CMP #$08 : BEQ +
 	BRA .not_impervious
 +
 	LDA $0CF2 : CMP #$06 : !BLT .impervious ; swords are ineffective
@@ -322,6 +327,7 @@ Utility_CheckImpervious:
 	                     CMP #$03 : BEQ +
 	                     CMP #$04 : BEQ +
 	                     CMP #$05 : BEQ +
+	                     CMP #$08 : BEQ +
 	BRA .not_impervious
 +
 	LDA $0CF2 : CMP #$06 : !BGE .impervious ; non-swords are ineffective
@@ -377,6 +383,7 @@ DrawSwordInMenu:
 	                                    CMP.w #$0003 : BEQ .specialSword
 	                                    CMP.w #$0004 : BEQ .specialSword
 	                                    CMP.w #$0005 : BEQ .specialSword
+	                                    CMP.w #$0008 : BEQ .specialSword
 	LDA SwordEquipment : AND.w #$00FF : CMP.w #$00FF : BEQ .noSword
 .hasSword
 	STA $02
@@ -462,7 +469,9 @@ CheckDetonateBomb:
 	BRA .done
 .not_bomb_mode
 	LDA.l SpecialWeapons : CMP.b #$06 : BEQ .release_bee
-	                       CMP.b #$07 : BNE .done
+	                       CMP.b #$07 : BEQ .hammer
+	BRA .done
+.hammer
 	LDA.l HammerEquipment : BEQ .done
 	LDA.b $3A : ORA.b #$40 : STA.b $3A
 	LDA.b #$04 : STA.w $0304
@@ -603,3 +612,31 @@ INC.b $3C
 LDA.b $3C
 CMP.b #$09
 RTL
+;--------------------------------------------------------------------------------
+CheckBugNet:
+LDA.w $037A : AND.b #$10 : BEQ .done ; normal behavior if not bugnet
+LDA.l SpecialWeapons : CMP.b #$08 : BNE .return_10 ; normal behavior if not bugnet mode
+.bugnet_mode
+LDA.w $0E20, X : CMP.b #$E3 : BEQ .return_10 ; normal behavior if fairy
+                 CMP.b #$79 : BEQ .return_10 ; normal behavior if bee
+                 CMP.b #$B2 : BEQ .return_10 ; normal behavior if bee
+LDA.b #$00 : BRA .done
+.return_10
+LDA.b #$10
+.done
+RTL
+;--------------------------------------------------------------------------------
+SetHammerClass:
+LDA.l SpecialWeapons : CMP.b #$08 : BNE .normal ; normal behavior if not bugnet mode
+LDA.w $037A : AND.b #$10 : BEQ .normal ; normal behavior if not bugnet
+LDA.l SpecialWeaponLevel : STA.w $0CF2
+RTL
+.normal
+LDA.w $0301
+AND.b #$0A
+BEQ .not_hammer
+LDA.b #$03
+STA.w $0CF2
+.not_hammer
+RTL
+;--------------------------------------------------------------------------------

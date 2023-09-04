@@ -65,6 +65,7 @@ LookupDamageLevel:
 	                     CMP #$03 : BEQ .bomb_table
 	                     CMP #$04 : BEQ .bomb_table
 	                     CMP #$05 : BEQ .bomb_table
+	                     CMP #$08 : BEQ .bomb_table
 		%LookupDamageSubclass(Damage_Table) : RTL
 	.bomb_table
 		%LookupDamageSubclass(Damage_Table_Bombs) : RTL
@@ -135,6 +136,7 @@ CheckTabletSword:
 	                       CMP #$04 : BEQ .check_special
 	                       CMP #$05 : BEQ .check_special
 	                       CMP #$06 : BEQ .allow
+	                       CMP #$08 : BEQ .check_special
 	BRA .normal
 	.allow
 		LDA.b #$02 : RTL
@@ -148,8 +150,10 @@ GetSwordLevelForEvilBarrier:
 	LDA.l AllowHammerEvilBarrierWithFighterSword : BEQ +
 	LDA #$FF : RTL
 	+
-	LDA SwordEquipment
-RTL
+	LDA.l SpecialWeapons : CMP.b #$08 : BEQ +
+	LDA.l SwordEquipment : RTL
+	+
+	LDA.l SpecialWeaponLevel : RTL
 ;================================================================================
 CheckGanonHammerDamage:
 	LDA.l HammerableGanon : BEQ +

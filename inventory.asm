@@ -548,27 +548,25 @@ AddInventory:
 	  CPY.b #$90 : !BGE +
 		JSL MaybeFlagCompassTotalPickup
 		JSR .incrementCompass
-		JMP .done
+		BRA .done
 	+ CPY.b #$90 : !BLT + ; Items $90 - $9F - Free Big Keys
 	  CPY.b #$A0 : !BGE +
 		JSR .incrementBigKey
-		JMP .done
+		BRA .done
 	+ CPY.b #$A0 : !BLT + ; Items $A0 - $AF - Free Small Keys
 	  CPY.b #$B0 : !BGE +
 		JSR .incrementKey
-		JMP .done
-	+ CPY.b #$B6 : BNE + ; Item $B6 - Bomb Upgrade
+		BRA .done
+	+ CPY.b #$C0 : BEQ .special_weapon ; Item $C0 - Bomb Upgrade
+	  CPY.b #$C1 : BEQ .special_weapon ; Item $C1 - Cane Upgrade
+	  CPY.b #$C2 : BEQ .special_weapon ; Item $C2 - Bug Net Upgrade
+	BRA .done
+	.special_weapon
 		JSR .stampSword ; update "first bomb" timestamp
 		LDA.l SpecialWeaponLevel ; get current bomb level
 		CMP #$05 : !BGE ++ ; check if already maxed
 		INC : STA.l SpecialWeaponLevel
-		++ JMP .done
-	+ CPY.b #$B7 : BNE + ; Item $B7 - Cane Upgrade
-		JSR .stampSword ; update "first cane" timestamp
-		LDA.l SpecialWeaponLevel ; get current cane level
-		CMP #$05 : !BGE ++ ; check if already maxed
-		INC : STA.l SpecialWeaponLevel
-		++ JMP .done
+		++ BRA .done
 	+
 	.done
 	PLP : PLX : PLA
@@ -711,6 +709,7 @@ RTL
 	                     CMP #$03 : BEQ +
 	                     CMP #$04 : BEQ +
 	                     CMP #$05 : BEQ +
+	                     CMP #$08 : BEQ +
 	LDA SwordEquipment : BRA ++
 	+ : LDA SpecialWeaponLevel
 	++

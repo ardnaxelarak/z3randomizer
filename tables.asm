@@ -121,6 +121,7 @@ db #$00
 ; $05 = Canes-Only mode
 ; $06 = Bee mode
 ; $07 = Hammer on B (for use with swordless)
+; $05 = Bugnet mode
 ;--------------------------------------------------------------------------------
 org $308030 ; PC 0x180030
 EnableSRAMTrace:
@@ -1442,8 +1443,9 @@ db $04
 ;B3 - Chicken
 ;B4 - Big Magic
 ;B5 - 5 Arrows
-;B6 - Progressive Bomb
-;B7 - Progressive Cane
+;C0 - Progressive Bomb
+;C1 - Progressive Cane
+;C2 - Progressive Bug Net
 ;================================================================================
 ;;Residual Portal
 ;org $0283E0 ; PC 0x103E0 (Bank02.asm:816) (BNE)

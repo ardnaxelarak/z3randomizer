@@ -45,8 +45,9 @@
 ; #$B3 - Chicken
 ; #$B4 - Big Magic
 ; #$B5 - Good Bee
-; #$B6 - Progressive Bomb
-; #$B7 - Progressive Cane
+; #$C0 - Progressive Bomb
+; #$C1 - Progressive Cane
+; #$C2 - Progressive Bug Net
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
 ;--------------------------------------------------------------------------------
@@ -465,10 +466,10 @@ AddReceivedItemExpandedGetItem:
 		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
 		JSL GoldBee_SpawnSelf_SetProperties
 		BRA .done
-	+ CMP.b #$B6 : BNE + ; Bomb Upgrade
+	+ CMP.b #$C0 : BNE + ; Bomb Upgrade
 		LDA #$01 : STA InfiniteBombsModifier ; infinite bombs
-		JMP .done
-	+ : CMP.b #$B7 : BNE + ; Cane Upgrade
+		BRA .done
+	+ CMP.b #$C1 : BNE + ; Cane Upgrade
 		LDA.l SpecialWeapons : CMP #$03 : BEQ .blue_cane
 		                       CMP #$04 : BEQ .red_cane
 			BRA .done
@@ -478,6 +479,9 @@ AddReceivedItemExpandedGetItem:
 		.red_cane
 			LDA #$01 : STA SomariaEquipment
 			BRA .done
+	+ CMP.b #$C2 : BNE + ; Bug Net Upgrade
+		LDA.l #$01 : STA BugNetEquipment
+		BRA .done
 	+
 	.done
 	PLX
@@ -673,10 +677,11 @@ AddReceivedItemExpanded:
 	db -4 ; Chicken
 	db -4 ; Big Magic
 	db -4 ; Good Bee
+	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4 ; Bomb Upgrade
 	db -4 ; Cane Upgrade
-	db -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
-	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
+	db -4 ; Bug Net Upgrade
+	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 	db -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
 
@@ -721,10 +726,11 @@ AddReceivedItemExpanded:
 	db  0 ; Chicken
 	db  4 ; Big Magic
 	db  0 ; Good Bee
+	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0 ; Bomb Upgrade
 	db  4 ; Cane Upgrade
-	db  0, 0, 0, 0, 0, 0, 0, 0 ; Unused
-	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
+	db  0 ; Bug Net Upgrade
+	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 
@@ -774,10 +780,11 @@ AddReceivedItemExpanded:
 	db $47 ; Chicken
 	db $3B ; Big Magic
 	db $47 ; Good Bee
+	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $13 ; Bomb Upgrade
 	db $07 ; Cane Upgrade
-	db $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
-	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
+	db $27 ; Bug Net Upgrade
+	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 
@@ -821,10 +828,11 @@ AddReceivedItemExpanded:
 	db $02 ; Chicken
 	db $00 ; Big Magic
 	db $02 ; Good Bee
+	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02 ; Bomb Upgrade
 	db $00 ; Cane Upgrade
-	db $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
-	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
+	db $02 ; Bug Net Upgrade
+	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
@@ -869,10 +877,11 @@ AddReceivedItemExpanded:
 	db  1 ; Chicken
 	db  4 ; Big Magic
 	db  1 ; Good Bee
+	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  5 ; Bomb Upgrade
 	db  5 ; Cane Upgrade
-	db  4, 4, 4, 4, 4, 4, 4, 4 ; Unused
-	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
+	db  1 ; Bug Net Upgrade
+	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
@@ -918,10 +927,11 @@ AddReceivedItemExpanded:
 	dw $F36A ; Chicken
 	dw $F373 ; Big Magic
 	dw $F36A ; Good Bee
+	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F38F ; Bomb Upgrade
 	dw $F38F ; Cane Upgrade
-	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
-	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
+	dw $F38F ; Bug Net Upgrade
+	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
@@ -969,10 +979,11 @@ AddReceivedItemExpanded:
 	db $FF ; Chicken
 	db $80 ; Big Magic
 	db $FF ; Good Bee
+	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF ; Bomb Upgrade
 	db $FF ; Cane Upgrade
-	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
-	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
+	db $FF ; Bug Net Upgrade
+	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
@@ -1062,10 +1073,11 @@ Link_ReceiveItemAlternatesExpanded:
 	db -1 ; Chicken
 	db -1 ; Big Magic
 	db -1 ; Good Bee
+	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1 ; Bomb Upgrade
 	db -1 ; Cane Upgrade
-	db -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
-	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
+	db -1 ; Bug Net Upgrade
+	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
 	db -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
@@ -1354,7 +1366,7 @@ MaybeFlagCompassTotalEntrance:
 RTL
 ;--------------------------------------------------------------------------------
 LoadReceivedItemExpandedProperties:
-CPX.b #$B6 : BEQ .bomb_upgrade
+CPX.b #$C0 : BEQ .bomb_upgrade
 	LDA.l AddReceivedItemExpanded_properties, X ; load from table
 	RTL
 .bomb_upgrade
