@@ -114,14 +114,17 @@ db #$00 ; #$00 = Default behavior (silver arrows)
 org $30802F ; PC 0x18002F
 SpecialWeapons:
 db #$00
+; s - - -  m m m m (bitfield)
+; s - only swords damage can hurt enemies
+; m - special weapon mode
 ; $00 = Off (default)
-; $01 = Bomb-Only mode
+; $01 = Bomb mode
 ; $02 = Pseudosword
-; $03 = Byrna-Only mode
-; $04 = Somaria-Only mode
-; $05 = Canes-Only mode
+; $03 = Byrna mode
+; $04 = Somaria mode
+; $05 = Canes mode
 ; $06 = Bee mode
-; $07 = Hammer on B (for use with swordless)
+; $07 = Unused
 ; $08 = Bugnet mode
 ;--------------------------------------------------------------------------------
 org $308030 ; PC 0x180030

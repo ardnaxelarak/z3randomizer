@@ -308,7 +308,7 @@ DrawPlayerFileShared:
 	%fs_drawBottle(EquipmentSRAM+$1F,9,23)
 
 	; Sword
-	LDA.l SpecialWeapons : AND.w #$00FF : CMP #$0001 : BEQ .bombSword
+	LDA.l SpecialWeapons : AND.w #$007F : CMP #$0001 : BEQ .bombSword
 	LDA.l EquipmentSRAM+$19 : AND.w #$00FF : BNE +
 		%fs_drawItemGray(3,26,FileSelectItems_fighters_sword)
 		JMP ++
@@ -650,7 +650,7 @@ FileSelectDrawHudBar:
 	LDA.b Scrap06 : AND.w #$00FF : !ADD.w #$0250+!FS_COLOR_BW : %fs_draw8x8(1,11)
 	LDA.b Scrap07 : AND.w #$00FF : !ADD.w #$0250+!FS_COLOR_BW : %fs_draw8x8(1,12)
 
-	LDA.l SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BEQ .colorBombs
+	LDA.l SpecialWeapons : AND.w #$007F : CMP.w #$0001 : BEQ .colorBombs
 	LDA.w #$02CB|!FS_COLOR_BLUE : %fs_draw16x8(0,14)
 	LDA.l BombsEquipmentSRAM : AND.w #$00FF
 	JSL.l HUDHex2Digit_Long

@@ -80,14 +80,14 @@ GetItemDamageValue:
 	CPX.b #$3C : BEQ .hookshot
 	CPX.b #$3D : BEQ .hookshot
 
-	LDA.l SpecialWeapons : CMP #$02 : BNE .normal
-	TXA : AND #$78 : CMP #$28 : BNE .normal
-	LDA $0DB8F1, X : BEQ .noDamage
-	LDA #$01
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$02 : BNE .normal
+	TXA : AND.b #$78 : CMP.b #$28 : BNE .normal
+	LDA.l $8DB8F1, X : BEQ .noDamage
+	LDA.b #$01
 RTL
 
 	.normal
-	LDA.l $0DB8F1, X ; what we wrote over
+	LDA.l $8DB8F1, X ; what we wrote over
 RTL
 	.boomerang
 		LDA.l StunItemAction : AND.b #$01 : BNE .normal

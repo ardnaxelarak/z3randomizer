@@ -16,7 +16,7 @@ NewDrawHud:
 ;================================================================================
 NewHUD_DrawBombs:
 	LDA.l InfiniteBombs : BNE .infinite
-	LDA.l SpecialWeapons : CMP #$01 : BNE .normal
+	LDA.l SpecialWeapons : AND.b #$7F : CMP #$01 : BNE .normal
 	LDA.l SpecialWeaponLevel : BEQ .no_bombs
 
 .infinite

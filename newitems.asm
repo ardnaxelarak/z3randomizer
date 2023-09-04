@@ -664,20 +664,20 @@ ItemBehavior:
 
 	.prog_weapon
 	LDA.l SpecialWeaponLevel : INC : STA.l SpecialWeaponLevel
-	LDA.l SpecialWeapons : CMP #$01 : BEQ ..bombs
-	                       CMP #$03 : BEQ ..byrna
-	                       CMP #$04 : BEQ ..somaria
-	                       CMP #$08 : BEQ ..bug_net
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$01 : BEQ ..bombs
+	                                    CMP.b #$03 : BEQ ..byrna
+	                                    CMP.b #$04 : BEQ ..somaria
+	                                    CMP.b #$08 : BEQ ..bug_net
 	RTS
 	..bombs
-		LDA #$01 : STA.l InfiniteBombs : RTS
+		LDA.b #$01 : STA.l InfiniteBombs : RTS
 		INC.w UpdateHUD
 	..byrna
-		LDA #$01 : STA.l ByrnaEquipment : RTS
+		LDA.b #$01 : STA.l ByrnaEquipment : RTS
 	..somaria
-		LDA #$01 : STA.l SomariaEquipment : RTS
+		LDA.b #$01 : STA.l SomariaEquipment : RTS
 	..bug_net
-		LDA #$01 : STA.l BugNetEquipment : RTS
+		LDA.b #$01 : STA.l BugNetEquipment : RTS
 
 ResolveReceipt:
 	PHA : PHX

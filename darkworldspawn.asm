@@ -144,7 +144,7 @@ SetEscapeAssist:
 		LDA.l EscapeAssist : BIT.b #$01 : BEQ + : LDA.b #$00 : STA.l InfiniteArrows : +
 	++
 
-	LDA.l SpecialWeapons : CMP #$01 : BNE +
+	LDA.l SpecialWeapons : AND.b #$7F : CMP #$01 : BNE +
 	LDA.l SpecialWeaponLevel : BEQ +
 	LDA #$01 : STA InfiniteBombs
 	+

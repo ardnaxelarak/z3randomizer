@@ -315,11 +315,11 @@ IncrementBossSword:
 	LDA.l StatsLocked : BNE .done
 
 .start
-	LDA.l SpecialWeapons : CMP.b #$01 : BEQ .check_special_weapon
-	                       CMP.b #$03 : BEQ .check_special_weapon
-	                       CMP.b #$04 : BEQ .check_special_weapon
-	                       CMP.b #$05 : BEQ .check_special_weapon
-	                       CMP.b #$08 : BEQ .check_special_weapon
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$01 : BEQ .check_special_weapon
+	                                    CMP.b #$03 : BEQ .check_special_weapon
+	                                    CMP.b #$04 : BEQ .check_special_weapon
+	                                    CMP.b #$05 : BEQ .check_special_weapon
+	                                    CMP.b #$08 : BEQ .check_special_weapon
 
 .check_sword
 	LDA.l SwordEquipment : CMP.b #$FF : BNE +

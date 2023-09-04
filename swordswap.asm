@@ -32,12 +32,8 @@ LookupDamageLevel:
 		LDA.l StalfosBombDamage
 		RTL
 	+
-	LDA SpecialWeapons : CMP #$01 : BEQ .bomb_table
-	                     CMP #$02 : BEQ .pseudo_table
-	                     CMP #$03 : BEQ .bomb_table
-	                     CMP #$04 : BEQ .bomb_table
-	                     CMP #$05 : BEQ .bomb_table
-	                     CMP #$08 : BEQ .bomb_table
+	LDA SpecialWeapons : AND.b #$7F : CMP.b #$02 : BEQ .pseudo_table
+	LDA SpecialWeapons : AND.b #$80 : BNE .bomb_table
 		%LookupDamageSubclass(Damage_Table) : RTL
 	.bomb_table
 		%LookupDamageSubclass(Damage_Table_Bombs) : RTL
@@ -97,12 +93,12 @@ CheckTabletSword:
 	LDA.l AllowHammerTablets : BEQ +
 	LDA.l HammerEquipment : BNE .allow ; check for hammer
 	+
-	LDA.l SpecialWeapons : CMP.b #$01 : BEQ .check_special
-	                       CMP.b #$03 : BEQ .check_special
-	                       CMP.b #$04 : BEQ .check_special
-	                       CMP.b #$05 : BEQ .check_special
-	                       CMP.b #$06 : BEQ .allow
-	                       CMP.b #$08 : BEQ .check_special
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$01 : BEQ .check_special
+	                                    CMP.b #$03 : BEQ .check_special
+	                                    CMP.b #$04 : BEQ .check_special
+	                                    CMP.b #$05 : BEQ .check_special
+	                                    CMP.b #$06 : BEQ .allow
+	                                    CMP.b #$08 : BEQ .check_special
 	BRA .normal
 	.allow
 		LDA.b #$02 : RTL
@@ -116,7 +112,7 @@ GetSwordLevelForEvilBarrier:
 	LDA.l AllowHammerEvilBarrierWithFighterSword : BEQ +
 	LDA.b #$FF : RTL
 	+
-	LDA.l SpecialWeapons : CMP.b #$08 : BEQ +
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$08 : BEQ +
 	LDA.l SwordEquipment : RTL
 	+
 	LDA.l SpecialWeaponLevel : RTL
