@@ -118,8 +118,8 @@ ProcessEventItems:
 RTS
 ;--------------------------------------------------------------------------------
 AddReceivedItemExpanded:
-        JSR.w ResolveReceipt
-        PHB : PHK
+	JSR.w ResolveReceipt
+	PHB : PHK
 JML AddReceivedItem+2
 
 AddReceivedItemExpandedGetItem:
@@ -662,22 +662,22 @@ ItemBehavior:
 	.done
 	RTS
 
-		.prog_weapon
-		LDA.l SpecialWeaponLevel : INC : STA.l SpecialWeaponLevel
-		LDA.l SpecialWeapons : CMP #$01 : BEQ ..bombs
-		                       CMP #$03 : BEQ ..byrna
-		                       CMP #$04 : BEQ ..somaria
-		                       CMP #$08 : BEQ ..bug_net
-		RTS
-		..bombs
-			LDA #$01 : STA.l InfiniteBombs : RTS
-			INC.w UpdateHUD
-		..byrna
-			LDA #$01 : STA.l ByrnaEquipment : RTS
-		..somaria
-			LDA #$01 : STA.l SomariaEquipment : RTS
-		..bug_net
-			LDA #$01 : STA.l BugNetEquipment : RTS
+	.prog_weapon
+	LDA.l SpecialWeaponLevel : INC : STA.l SpecialWeaponLevel
+	LDA.l SpecialWeapons : CMP #$01 : BEQ ..bombs
+	                       CMP #$03 : BEQ ..byrna
+	                       CMP #$04 : BEQ ..somaria
+	                       CMP #$08 : BEQ ..bug_net
+	RTS
+	..bombs
+		LDA #$01 : STA.l InfiniteBombs : RTS
+		INC.w UpdateHUD
+	..byrna
+		LDA #$01 : STA.l ByrnaEquipment : RTS
+	..somaria
+		LDA #$01 : STA.l SomariaEquipment : RTS
+	..bug_net
+		LDA #$01 : STA.l BugNetEquipment : RTS
 
 ResolveReceipt:
 	PHA : PHX
