@@ -1012,6 +1012,13 @@ LDA.w AddReceivedItemExpanded_item_target_addr+1, X
 org $09861F ; 4861F - ancilla_init.asm:724 (LDA .item_values, Y)
 LDA.w AddReceivedItemExpanded_item_values, Y
 
+org $098627 ; 48627 - ancilla_init.asm:731 (LDA .item_target_addr+0, X)
+LDA.w AddReceivedItemExpanded_item_target_addr+0, X
+org $09862C ; 4862C - ancilla_init.asm:722 (LDA .item_target_addr+1, X)
+LDA.w AddReceivedItemExpanded_item_target_addr+1, X
+org $098635 ; 48635 - ancilla_init.asm:727 (LDA .item_values, Y)
+LDA.w AddReceivedItemExpanded_item_values, Y
+
 org $0986AA ; 486AA - ancilla_init.asm:848 (LDA .item_masks, X)
 LDA.w AddReceivedItemExpanded_item_masks, X
 

@@ -82,7 +82,7 @@ GetItemDamageValue:
 
 	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$02 : BNE .normal
 	TXA : AND.b #$78 : CMP.b #$28 : BNE .normal
-	LDA.l $8DB8F1, X : BEQ .noDamage
+	LDA.l $0DB8F1, X : BEQ .noDamage
 	LDA.b #$01
 RTL
 
