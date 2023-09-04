@@ -93,3 +93,12 @@ OverridePaletteHeader:
 		iny : rtl
 	+ rep #$20 : iny : lda [$0D], Y ; what we wrote over
 rtl
+
+Sprite_ConditionalPrepOAMCoord:
+    LDA.w $0E20,X : CMP.b #$62 : BNE .notMasterSword
+    LDA.w $0D90,X : BNE .specialCutscene
+    .notMasterSword
+        JML Sprite_PrepOAMCoordLong ; what we wrote over
+    .specialCutscene
+    SEC ; this prevents MasterSword sprite from drawing if it is a special cutscene
+RTL

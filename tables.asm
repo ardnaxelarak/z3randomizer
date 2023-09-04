@@ -1510,8 +1510,9 @@ dw #9999 ; Rupee Limit
 ; $2F8000 - $2F83FF - RNG Block
 ;================================================================================
 ; $7EC025 - $7EC034 - Item OAM Table
+; $7EC035 - $7EC044 - Dynamic Item OAM Table
 ;================================================================================
-; $7F5000 - Redraw Flag
+; $7F5000 - FREE (Old Global Redraw Flag)
 ; $7F5001 - Flipper Softlock Possible
 ; $7F5002 - L/R Rotate
 ; $7F5003 - HexToDec 1st Digit

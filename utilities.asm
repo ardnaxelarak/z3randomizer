@@ -155,11 +155,11 @@ RTL
 
 	;Bx
 	db $2C ; Bee Trap
-	db $4A ; Apples
-	db $4A ; Fairy
-	db $4A ; Chicken
+	db $4D ; Apples
+	db $4C ; Fairy
+	db $4B ; Chicken
 	db $3B ; Big Magic
-	db $02 ; 5 Arrows
+	db $4A ; Good Bee
 	db $13 ; Bomb Upgrade
 	db $07 ; Cane Upgrade
 	db $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -302,11 +302,11 @@ RTL
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Big Key
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Small Key
 	db $04 ; Bee Trap
-	db $08 ; Apples
+	db $02 ; Apples
 	db $08 ; Fairy
-	db $08 ; Chicken
+	db $02 ; Chicken
 	db $08 ; Big Magic
-	db $04 ; 5 Arrows
+	db $04 ; Good Bee
 	db $F7 ; Bomb Upgrade
 	db $0A ; Cane Upgrade
 	db $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
@@ -377,7 +377,7 @@ IsNarrowSprite:
 	LDX.b #$00 ; set index counter to 0
 	;----
 	-
-	CPX.b #$2A : !BGE .false ; finish if we've done the whole list
+	CPX.b #(.smallSprites_end-.smallSprites) : !BGE .false ; finish if we've done the whole list
 	CMP.l .smallSprites, X : BNE + ; skip to next if we don't match
 	;--
 	SEC ; set true state
@@ -400,7 +400,8 @@ RTL
 	db $15, $18, $24, $2A, $34, $35, $36, $42
 	db $43, $45, $59, $A0, $A1, $A2, $A3, $A4
 	db $A5, $A6, $A7, $A8, $A9, $AA, $AB, $AC
-	db $AD, $AE, $AF, $B4, $B7, $FF, $FF, $FF
+	db $AD, $AE, $AF, $B4, $B5, $B7
+	.smallSprites_end
 }
 ;--------------------------------------------------------------------------------
 
@@ -424,9 +425,10 @@ PrepDynamicTile:
 	+
 	TXA
 	JSR.w LoadDynamicTileOAMTable
-	JSL.l GetSpriteID ; convert loot id to sprite id
-	JSL.l GetAnimatedSpriteTile_variable
-	LDA.b #$00 : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
+	CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS + : BRA ++ ; if rupees, don't draw to OAM
+		+ JSL.l GetSpriteID ; convert loot id to sprite id
+		JSL.l GetAnimatedSpriteTile_variable
+	++ LDA.b #$00 : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	PLY : PLX : PLA
 RTL
 ;--------------------------------------------------------------------------------
@@ -435,8 +437,6 @@ RTL
 ; LoadDynamicTileOAMTable
 ; in:	A - Loot ID
 ;-------------------------------------------------------------------------------- 20/847B
-!SPRITE_OAM = "$7EC025"
-;--------------------------------------------------------------------------------
 LoadDynamicTileOAMTable:
 	PHA : PHP
 
@@ -446,7 +446,11 @@ LoadDynamicTileOAMTable:
 		               STA.l !SPRITE_OAM+2
 		LDA.w #$0200 : STA.l !SPRITE_OAM+6
 		SEP #$20 ; set 8-bit accumulator
-		LDA.b #$24 : STA.l !SPRITE_OAM+4
+		LDA $01,s
+		CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS + ; if rupees, use animated gfx already in OAM
+			LDA.b #$0B : BRA ++
+		+ LDA.b #$24
+		++ STA.l !SPRITE_OAM+4
 
 	LDA $01,s
 
@@ -458,11 +462,16 @@ LoadDynamicTileOAMTable:
 	BRA .done
 
 	.narrow
-	REP #$20 ; set 16-bit accumulator
+	LDA $02,s
+	CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS + ; if rupees, use animated gfx already in OAM
+		REP #$20
+		LDA.w #$1B00 : BRA ++
+	+ REP #$20
+	LDA.w #$3400
+	++ STA.l !SPRITE_OAM+11
 	LDA.w #$0000 : STA.l !SPRITE_OAM+7
 	               STA.l !SPRITE_OAM+14
 	LDA.w #$0800 : STA.l !SPRITE_OAM+9
-	LDA.w #$3400 : STA.l !SPRITE_OAM+11
 
 	.done
 	PLP : PLA
@@ -476,7 +485,6 @@ RTS
 ;--------------------------------------------------------------------------------
 ; This wastes two OAM slots if you don't want a shadow - fix later - I wrote "fix later" over a year ago and it's still not fixed (Aug 6, 2017) - lol (May 25th, 2019)
 ;-------------------------------------------------------------------------------- 2084B8
-!SPRITE_OAM = "$7EC025"
 !SKIP_EOR = "$7F5008"
 ;--------------------------------------------------------------------------------
 DrawDynamicTile:

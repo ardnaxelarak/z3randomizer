@@ -1,25 +1,23 @@
 ;================================================================================
 ; Randomize Catfish
 ;--------------------------------------------------------------------------------
-!HEART_REDRAW = "$7F5000"
 LoadCatfishItemGFX:
 	LDA.l CatfishItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
-    LDA.l $1DE185 ; location randomizer writes catfish item to
-	JML PrepDynamicTile
+	LDA.l $1DE185 ; location randomizer writes catfish item to
+	JML RequestSlottedTile
 ;--------------------------------------------------------------------------------
 DrawThrownItem:
 	LDA $8A : CMP.b #$81 : BNE .catfish
 	
 	.zora
-	LDA.b #$01 : STA !HEART_REDRAW
-    LDA.l $1DE1C3 ; location randomizer writes zora item to
+	LDA.l $1DE1C3 ; location randomizer writes zora item to
 	BRA .draw
 	
 	.catfish
-    LDA.l $1DE185 ; location randomizer writes catfish item to
+	LDA.l $1DE185 ; location randomizer writes catfish item to
 	
 	.draw
-	JML DrawDynamicTile
+	JML DrawSlottedTile
 ;--------------------------------------------------------------------------------
 MarkThrownItem:
 	PHA
@@ -27,12 +25,12 @@ MarkThrownItem:
 	LDA $8A : CMP.b #$81 : BNE .catfish
 
 	.zora
-    JSL.l ItemSet_ZoraKing
+	JSL.l ItemSet_ZoraKing
 	LDA ZoraItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
 	BRA .done
 
 	.catfish
-    JSL.l ItemSet_Catfish
+	JSL.l ItemSet_Catfish
 	LDA CatfishItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
 
 	.done

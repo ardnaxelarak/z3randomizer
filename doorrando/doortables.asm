@@ -694,3 +694,5 @@ SanctuaryDarkWorld:
 dw $ffff
 OldManDarkWorld:
 dw $ffff
+OldManRetrievalWorld:
+dw $0000

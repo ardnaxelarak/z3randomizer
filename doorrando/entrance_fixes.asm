@@ -12,8 +12,16 @@
 ;  2) Draw over what vanilla just drew
 ;  3) Hijack the door tile type routine
 ;     and replace the vanilla value with that of solid collision
+
+; For door dection free RAM at $19EE-$19FF has been co-opted to door each drawn doors position and type bytes
+; 19EE is for the "current" door for the IdentifyBlockedEntrance routine
+; The array at 19F0 is for the collision routine to retrieve that information as it is no longer
+; available by that point
 ;===================================================================================================
 pushpc
+
+org $01B0E6
+	JSL StoreDoorInfo
 
 org $01892F
 DoorDrawJankMove:
@@ -30,9 +38,17 @@ warnpc $018939
 org $01BF43
 	JSL AdjustEscapeDoorCollision
 
+org $01C132  ; ADC.w #$0040 : TAX : LDA.b $00
+	JSL AdjustEscapeDoorCollision_LowEntrance : NOP #2
+
 pullpc
 
 ;===================================================================================================
+StoreDoorInfo:
+	STA.w $1980,X
+    LDA.b $00 : STA.w $19F0,X
+    TXA
+RTL
 
 PrepDoorDraw:
 	; first off, we need this routine to return to our jank hook
@@ -43,6 +59,8 @@ PrepDoorDraw:
 	; Much easier to just tell you to look at $01890D in the disassembly
 	; and you should understand the vanilla program flow we need to reject
 	PEA.w DoorDrawJankMove_return-1
+	LDA.b $00
+	STA.w $19EE ; for current routine
 
 	; copy vanilla code (but fast rom)
 	LDA.l $8186F0,X
@@ -103,6 +121,9 @@ AdjustEscapeDoorGraphics:
 	ORA.w #$4000 ; horizontally flip
 	STA.l $7E2000+$104,X
 
+	JSR IdentifySwampEntrance
+	BCS .fix_swamp_entrance_alternate
+
 	; the state of the A, X, and Y registers is irrelevant when we exit
 	; they're all subsequently loaded with new values
 	RTL
@@ -133,28 +154,17 @@ AdjustEscapeDoorGraphics:
 	STA.l $7E2000+$102,X
 	ORA.w #$4000 ; horizontally flip
 	STA.l $7E2000+$104,X
+	RTL
 
 .fix_swamp_entrance
 	LDY.w $0460 ; get door index
 	LDX.w $19A0-2,Y ; get tilemap index
 
-	; row 0
-	LDA.w #$9DfC
-	STA.l $7E2000+$000,X
-	STA.l $7E2000+$002,X
-	STA.l $7E2000+$004,X
-	STA.l $7E2000+$006,X
-
-	; row 1
+	; row 1 - outer section
 	LDA.w #$0908
 	STA.l $7E2000+$080,X
 	ORA.w #$4000 ; horizontally flip
 	STA.l $7E2000+$086,X
-
-	LDA.w #$14E8
-	STA.l $7E2000+$082,X
-	ORA.w #$4000 ; horizontally flip
-	STA.l $7E2000+$084,X
 
 	; row 2
 	LDA.w #$0918
@@ -166,6 +176,20 @@ AdjustEscapeDoorGraphics:
 	STA.l $7E2000+$102,X
 	ORA.w #$4000 ; horizontally flip
 	STA.l $7E2000+$104,X
+
+.fix_swamp_entrance_alternate
+	; row 0
+	LDA.w #$9DFC
+	STA.l $7E2000+$000,X
+	STA.l $7E2000+$002,X
+	STA.l $7E2000+$004,X
+	STA.l $7E2000+$006,X
+
+	; row 1 - mid section
+	LDA.w #$14E8
+	STA.l $7E2000+$082,X
+	ORA.w #$4000 ; horizontally flip
+	STA.l $7E2000+$084,X
 
 	; row 3
 	LDA.w #$A82C
@@ -210,15 +234,15 @@ BlockedEntrance:
 AdjustEscapeDoorCollision:
 	LSR ; vanilla shift
 
+AdjustEscapeDoorCollisionShared:
 	; save our parameters
 	; but one or both of these may not be necessary depending on how you detect these doors
 	; all that matters is that after identifying blockage, we have:
 	;   Y is the same as what we entered with
 	;   X has A>>1, for whatever A entered with
 	PHA
-	LDA.w $1980, Y  ; grab door info (type)
-	AND.w #$00FF
-	STA.b $0A       ; store in temporary variable
+	LDA.w $19F0, Y  ; grab door info (type, position)
+	STA.w $19EE     ; store in temporary variable
 	JSR IdentifyBlockedEntrance
 
 	PLX ; this is a TAX in vanilla, just have X pull A instead
@@ -235,11 +259,14 @@ AdjustEscapeDoorCollision:
 
 	RTL
 
+AdjustEscapeDoorCollision_LowEntrance:
+	ADC.w #$0040 ; vanilla add
+	JMP AdjustEscapeDoorCollisionShared
+
 ;===================================================================================================
 
 ; Enter with:
-;	$0A containing the door information: position and type bytes
-;       which should be from $1980, Y or [$B7], Y depending on where in the door process we are
+;	$19EE containing the door information: position and type bytes
 ; Exit with:
 ;   carry clear - leave door alone
 ;   carry set   - block door
@@ -262,9 +289,8 @@ IdentifyBlockedEntrance:
 	- INX #2
 	LDA.l RemoveRainDoorsRoom, X : CMP.w #$FFFF : BEQ .leave_alone
 	CMP $A0 : BNE -
-	LDA.b $0A
-	CMP.w #$000A : BCC .continue
-	CMP.w #$0014 : BCS .continue
+	LDA.l RainDoorMatch, X
+	CMP.w $19EE : BNE .leave_alone
 	BRA .block_door
 	.continue
 	BRA -

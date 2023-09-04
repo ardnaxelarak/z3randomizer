@@ -49,28 +49,27 @@ HeartContainerGet:
 
 	BRA HeartPieceGet_skipLoad
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
 DrawHeartPieceGFX:
 	PHP
 	JSL.l Sprite_IsOnscreen : BCC .offscreen
 	
 	PHA : PHY
-	LDA !REDRAW : BEQ .skipInit ; skip init if already ready
-	JSL.l HeartPieceSpritePrep
-	JMP .done ; don't draw on the init frame
+	LDA.w !SPRITE_REDRAW, X : BEQ .skipInit ; skip init if already ready
+		JSL.l HeartPieceSpritePrep
+		LDA.w !SPRITE_REDRAW, X : CMP.b #$02 : BEQ .skipInit
+		BRA .done ; don't draw on the init frame
 	
 	.skipInit
 	LDA $0E80, X ; Retrieve stored item type
-
+	
 	.skipLoad
-	
-	JSL.l DrawDynamicTile
-	
-	CMP #$03 : BNE +
-		PHA : LDA $0E60, X : ORA.b #$20 : STA $0E60, X : PLA
-	+
-
-	JSL.l Sprite_DrawShadowLong
+	JSL DrawSlottedTile : BCS .done
+		; draw shadow
+		CMP #$03 : BNE +
+			INC.b $00 : INC.b $00 : INC.b $00 : INC.b $00 ; move narrow sprite shadow over 4 pixels
+			PHA : LDA $0E60, X : ORA.b #$20 : STA $0E60, X : PLA
+		+
+		JSL.l Sprite_DrawShadowLong
 	
 	.done
 	PLY : PLA
@@ -78,20 +77,17 @@ DrawHeartPieceGFX:
 	PLP
 RTL
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
 DrawHeartContainerGFX:
 	PHP
 	JSL.l Sprite_IsOnscreen : BCC DrawHeartPieceGFX_offscreen
 	
 	PHA : PHY
-	LDA !REDRAW : BEQ .skipInit ; skip init if already ready
-	JSL.l HeartContainerSpritePrep
-	BRA DrawHeartPieceGFX_done ; don't draw on the init frame
+	LDA.w !SPRITE_REDRAW, X : BEQ .skipInit ; skip init if already ready
+		JSL.l HeartContainerSpritePrep
+		BRA DrawHeartPieceGFX_done ; don't draw on the init frame
 	
 	.skipInit
-	LDA $0E80, X ; Retrieve stored item type
-
-	BRA DrawHeartPieceGFX_skipLoad
+	BRA DrawHeartPieceGFX_skipInit
 ;--------------------------------------------------------------------------------
 HeartContainerSound:
 	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +
@@ -129,12 +125,18 @@ RTL
 RTL
 ;--------------------------------------------------------------------------------
 HeartUpgradeSpawnDecision: ; this should return #$00 to make the hp spawn
-	LDA !FORCE_HEART_SPAWN : BEQ .normal_behavior
+	LDA !FORCE_HEART_SPAWN : BEQ .bonk_prize_check
 	
 	DEC : STA !FORCE_HEART_SPAWN
 	LDA #$00
 RTL
-	
+	.bonk_prize_check
+	PHX
+		LDA 2,S : TAX : LDA.w $0ED0, X : BEQ .normal_behavior-1
+	PLX
+	LDA.b #$00
+RTL
+	PLX
 	.normal_behavior
 	LDA OverworldEventDataWRAM, X
 RTL
@@ -154,34 +156,28 @@ RTL
 	LDA OverworldEventDataWRAM, X : ORA.b #$40 : STA OverworldEventDataWRAM, X
 RTL
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
 HeartPieceSpritePrep:
 	PHA
 	
 	LDA ServerRequestMode : BEQ + :  : +
 	
-	LDA #$01 : STA !REDRAW
-	LDA $5D : CMP #$14 : BEQ .skip ; skip if we're mid-mirror
-
-	LDA #$00 : STA !REDRAW
+	LDA.b #$01 : STA.w !SPRITE_REDRAW, X
 	JSL.l HeartPieceGetPlayer : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	JSL.l LoadHeartPieceRoomValue ; load item type
 	STA $0E80, X ; Store item type
-	JSL.l PrepDynamicTile
+	JSL.l RequestSlottedTile
 	
 	.skip
 	PLA
 RTL
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
 HeartContainerSpritePrep:
 	PHA
 	
-	LDA #$00 : STA !REDRAW
 	JSL.l HeartPieceGetPlayer : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	JSL.l LoadHeartContainerRoomValue ; load item type
 	STA $0E80, X ; Store item type
-	JSL.l PrepDynamicTile
+	JSL.l RequestSlottedTile
 	
 	PLA
 RTL
@@ -196,7 +192,8 @@ LoadHeartPieceRoomValue:
 	.done
 RTL
 ;--------------------------------------------------------------------------------
-!REDRAW = "$7F5000"
+!DynamicDropGFXSlotCount_UW = (FreeUWGraphics_end-FreeUWGraphics)>>1
+!DynamicDropGFXSlotCount_OW = (FreeOWGraphics_end-FreeOWGraphics)>>1
 HPItemReset:
 	PHA
 	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE .skip
@@ -206,7 +203,14 @@ HPItemReset:
 	.skip
 	PLA
 	.done
-	PHA : LDA #$01 : STA !REDRAW : PLA
+	PHA : PHY
+		LDY.b #$0F
+		- LDA.w $0DD0,Y : BEQ +
+		LDA.w !SPRITE_REDRAW, Y : CMP.b #$02 : BNE +
+			; attempt redraw of any sprite using the overflow slot
+			LDA.b #$01 : STA.w !SPRITE_REDRAW, Y
+		+ DEY : BPL -
+	PLY : PLA
 RTL
 ;--------------------------------------------------------------------------------
 MaybeMarkDigSpotCollected:
@@ -221,6 +225,7 @@ MaybeMarkDigSpotCollected:
 RTL
 ;--------------------------------------------------------------------------------
 HeartPieceSpawnDelayFix:
+	JSL Sprite_DrawRippleIfInWater
 	; Fix the delay when spawning a HeartPiece sprite
 	JSL.l Sprite_CheckIfPlayerPreoccupied : BCS + ; what we moved from $05F037
 	JSL.l Sprite_CheckDamageToPlayerSameLayerLong : RTL ; what we wrote over
@@ -266,6 +271,9 @@ LoadIndoorValue:
 		++
 			%GetPossiblyEncryptedItem(HeartPiece_Graveyard_Warp, HeartPieceIndoorValues)
 			JMP .done
+	+ CMP.w #288 : BNE +
+		LDA.l OWBonkPrizeTable[42].loot
+		JMP .done
 	+ CMP.w #294 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Mire_Warp, HeartPieceIndoorValues)
 		JMP .done
@@ -639,6 +647,9 @@ HeartPieceGetPlayer:
 		++
 			LDA HeartPiece_Graveyard_Warp_Player
 			BRL .done
+	+ CMP.w #288 : BNE +
+		LDA.l OWBonkPrizeTable[$2A].mw_player
+		BRL .done
 	+ CMP.w #294 : BNE +
 		LDA HeartPiece_Mire_Warp_Player
 		BRL .done
@@ -663,21 +674,21 @@ HeartPieceGetPlayer:
 			LDA EtherItem_Player
 			BRL .done
 	+ CMP.w #$05 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$01].mw_player
 			BRL .done
 		++
 			LDA HeartPiece_Mountain_Warp_Player
 			BRL .done
 	+ CMP.w #$0A : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$02].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$03].mw_player
 			BRL .done
 	+ CMP.w #$10 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$04].mw_player
 			BRL .done
 		++
@@ -690,28 +701,28 @@ HeartPieceGetPlayer:
 		LDA.l OWBonkPrizeTable[$07].mw_player
 		BRL .done
 	+ CMP.w #$13 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$08].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$09].mw_player
 			BRL .done
 	+ CMP.w #$15 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$0A].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$0B].mw_player
 			BRL .done
 	+ CMP.w #$18 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$0C].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$0D].mw_player
 			BRL .done
 	+ CMP.w #$1A : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$0E].mw_player
 			BRL .done
 		++
@@ -730,7 +741,7 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Maze_Player
 		BRL .done
 	+ CMP.w #$2A : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$14].mw_player
 			BRL .done
 		++ CMP.w #$0008 : BNE ++
@@ -743,7 +754,7 @@ HeartPieceGetPlayer:
 		LDA.l OWBonkPrizeTable[$16].mw_player
 		BRL .done
 	+ CMP.w #$2E : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$17].mw_player
 			BRL .done
 		++
@@ -757,7 +768,7 @@ HeartPieceGetPlayer:
 			LDA BombosItem_Player
 			BRL .done
 	+ CMP.w #$32 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$19].mw_player
 			BRL .done
 		++
@@ -770,7 +781,7 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Swamp_Player
 		BRL .done
 	+ CMP.w #$42 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1B].mw_player
 			BRL .done
 		++
@@ -780,14 +791,14 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Cliffside_Player
 		BRL .done
 	+ CMP.w #$51 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1C].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$1D].mw_player
 			BRL .done
 	+ CMP.w #$54 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1E].mw_player
 			BRL .done
 		++ CMP.w #$0008 : BNE ++
@@ -797,7 +808,7 @@ HeartPieceGetPlayer:
 			LDA.l OWBonkPrizeTable[$20].mw_player
 			BRL .done
 	+ CMP.w #$55 : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$21].mw_player
 			BRL .done
 		++
@@ -807,7 +818,7 @@ HeartPieceGetPlayer:
 		LDA.l OWBonkPrizeTable[$23].mw_player
 		BRL .done
 	+ CMP.w #$5B : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$24].mw_player
 			BRL .done
 		++
@@ -820,7 +831,7 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Digging_Player
 		BRL .done
 	+ CMP.w #$6E : BNE +
-		LDA.w $0ED0,X : CMP.w #$0010 : BNE ++
+		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$26].mw_player
 			BRL .done
 		++ CMP.w #$0008 : BNE ++
@@ -844,3 +855,37 @@ HeartPieceGetPlayer:
 	PLY
 RTL
 }
+;--------------------------------------------------------------------------------
+HeartPieceSetRedraw:
+	PHY
+		LDY.b #$0F
+		.next
+		LDA.w $0DD0,Y : BEQ ++
+			LDA.w $0E20,Y : CMP.b #$EB : BEQ + ; heart piece
+			CMP.b #$E4 : BEQ + ; enemy key drop
+			CMP.b #$3B : BEQ + ; bonk item (book/key)
+			CMP.b #$E5 : BEQ + ; enemy big key drop
+			CMP.b #$E7 : BEQ + ; mushroom item
+			CMP.b #$E9 : BEQ + ; powder item
+			BRA ++
+				+ LDA.b #$01 : STA.w !SPRITE_REDRAW,Y
+		++ DEY : BPL .next
+	PLY
+RTL
+HeartPieceGetRedraw:
+	PHY
+		LDY.b #$0F
+		.next
+		LDA.w $0DD0,Y : BEQ ++
+			LDA.w $0E20,Y : CMP.b #$EB : BEQ + ; heart piece
+			CMP.b #$E4 : BEQ + ; enemy key drop
+			CMP.b #$3B : BEQ + ; bonk item (book/key)
+			CMP.b #$E5 : BEQ + ; enemy big key drop
+			CMP.b #$E7 : BEQ + ; mushroom item
+			CMP.b #$E9 : BEQ + ; powder item
+			BRA ++
+				+ LDA.w !SPRITE_REDRAW,Y : BEQ ++
+					PLY : SEC : RTL
+		++ DEY : BPL .next
+	PLY
+CLC : RTL

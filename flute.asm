@@ -7,11 +7,12 @@ SpawnHauntedGroveItem:
 
 	LDA.l HauntedGroveItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	%GetPossiblyEncryptedItem(HauntedGroveItem, HeartPieceOutdoorValues)
-	JSL.l PrepDynamicTile
-	
+
 	LDA.b #$EB
 	STA $7FFE00
 	JSL Sprite_SpawnDynamically
+
+	LDA.b #$01 : STA.w !SPRITE_REDRAW, Y
 
 	LDX.b #$00
 	LDA $2F : CMP.b #$04 : BEQ + : INX : +

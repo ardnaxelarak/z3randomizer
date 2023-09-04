@@ -9,6 +9,10 @@ org $829C25
 org $89C2BB
 	JSL ClearSpriteData
 
+; underworld -> overworld transition
+org $8282D1
+	JSL ClearSpriteData2
+
 org $89C327
 	JSL LoadSpriteData
 
@@ -71,6 +75,8 @@ org $868283
 Sprite_SpawnSecret_NotRandomBush:
 org $86828A
 Sprite_SpawnSecret_SpriteSpawnDynamically:
+org $8682A5
+Sprite_SpawnSecret_SetCoords:
 org $86d23a
 Sprite_DrawAbsorbable:
 org $9eff81
@@ -254,6 +260,12 @@ SaveMajorItemDrop:
 		LDA.w #$0018 : BRA .substitute
 	+ CPY.w #$0031 : BNE + ; 10 pack bombs
 		LDA.w #$0019 : BRA .substitute
+	+ CPY.w #$00B1 : BNE +  ; Apples
+		LDA.w #$001A : BRA .substitute
+	+ CPY.w #$00B0 : BNE +  ; Bee Trap
+		LDA.w #$001B : BRA .substitute
+	+ CPY.w #$00B5 : BNE +  ; Good Bee
+		LDA.w #$001C : BRA .substitute
 	+ STA $0B9C ; indicates we should use the key routines or a substitute
 RTL
 	.substitute
@@ -303,6 +315,7 @@ RTS
 
 ClearSpriteData:
 	STZ.b $02 : STZ.b $03 ; what we overrode
+	.shared:
 	PHX
 		LDA #$00 : LDX #$00
 		.loop
@@ -311,6 +324,10 @@ ClearSpriteData:
 			INX : CPX #$10 : BCC .loop
 	PLX
 	RTL
+
+ClearSpriteData2:
+	LDA.b #$82 : STA.b $99
+	JMP ClearSpriteData_shared
 
 ; Runs during sprite load of the room
 LoadSpriteData:
@@ -353,7 +370,7 @@ RevealSpriteDrop:
 	LDY.w $0CBA, X : BEQ .no_forced_drop
 		RTL
 	.no_forced_drop
-	PLA : PLA ; remove the JSL reswamturn lower 16 bits
+	PLA : PLA ; remove the JSL return lower 16 bits
 	PEA.w $06F996-1 ; change return address to .no_forced_drop of (Sprite_DoTheDeath)
 	RTL
 
@@ -364,7 +381,7 @@ RevealSpriteDrop2:
 	LDY.w $0CBA, X : BEQ .no_forced_drop
 		RTL
 	.no_forced_drop
-	PLA : PLA ; remove the JSL reswamturn lower 16 bits
+	PLA : PLA ; remove the JSL return lower 16 bits
 	PEA.w $06E3CE-1 ; change return address to .no_forced_drop of (Sprite_DoTheDeath)
 	RTL
 
@@ -372,7 +389,7 @@ BitFieldMasks:
 dw $8000, $4000, $2000, $1000, $0800, $0400, $0200, $0100
 dw $0080, $0040, $0020, $0010, $0008, $0004, $0002, $0001
 
-; Runs during Sprite_E4_SmallKey and duning Sprite_E5_BigKey spawns
+; Runs during Sprite_E4_SmallKey and during Sprite_E5_BigKey spawns
 ShouldSpawnItem:
 	LDA $048E : CMP.b #$87 : BNE + ; check for hera basement cage
 	LDA $A8 : AND.b #$03 : CMP.b #$02 : BNE + ; we're not in that quadrant
@@ -427,53 +444,59 @@ SpriteKeyPrep:
 		LDA.w SpawnedItemMWPlayer : STA SprItemMWPlayer, X
 		LDA.w SpawnedItemFlag : STA SprItemFlags, X : BEQ +
 		LDA.l SpawnedItemID : STA $0E80, X
-		PHA
-			JSL.l GetSpritePalette : STA $0F50, X ; setup the palette
-		PLA
 		CMP #$24 : BNE ++ ;
+			JSL.l GetSpritePalette : STA.w $0F50, X ; setup the palette
 			LDA $A0 : CMP.b #$80 : BNE +
 			LDA SpawnedItemFlag : BNE +
 				LDA #$24  ; it's the big key drop?
-		++ JSL RequestStandingItemVRAMSlot
+		++ JSL RequestSlottedTile
 	+ PLA
 	RTL
 
 SpriteKeyDrawGFX:
-    JSL Sprite_DrawRippleIfInWater
-    PHA
-    LDA $0E80, X
-   	CMP.b #$24 : BNE +
-   		LDA $A0 : CMP #$80 : BNE ++
-   		LDA SpawnedItemFlag : BNE ++
-    		LDA #$24 : BRA +
-    	++ PLA
-		   PHK : PEA.w .jslrtsreturn-1
-		   PEA.w $068014 ; an rtl address - 1 in Bank06
-		   JML Sprite_DrawAbsorbable
-		   .jslrtsreturn
-		   RTL
-	+ JSL DrawPotItem
-    CMP #$03 : BNE +
-        PHA : LDA $0E60, X : ORA.b #$20 : STA $0E60, X : PLA
-    + JSL.l Sprite_DrawShadowLong
-    PLA : RTL
+	JSL Sprite_DrawRippleIfInWater
+	PHA
+	LDA.w !SPRITE_REDRAW, X : BEQ +
+		LDA $0E80, X
+		JSL RequestSlottedTile
+		LDA.w !SPRITE_REDRAW, X : CMP.b #$02 : BEQ +
+		BRA .skipDraw
+	+ LDA $0E80, X
+	CMP.b #$24 : BNE +
+		LDA $A0 : CMP #$80 : BNE ++
+		LDA SpawnedItemFlag : BNE ++
+			LDA #$24 : BRA +
+		++ PLA
+			PHK : PEA.w .jslrtsreturn-1
+			PEA.w $068014 ; an rtl address - 1 in Bank06
+			JML Sprite_DrawAbsorbable
+			.jslrtsreturn
+			RTL
+	+ JSL DrawSlottedTile : BCS .skipDraw
+		; draw shadow
+		CMP #$03 : BNE +
+			PHA : LDA $0E60, X : ORA.b #$20 : STA $0E60, X : PLA
+		+ JSL.l Sprite_DrawShadowLong
+	.skipDraw
+	PLA
+	RTL
 
 KeyGet:
-    LDA CurrentSmallKeys ; what we wrote over
-    PHA
-    	LDA.l StandingItemsOn : BNE +
-    		PLA : RTL
-    	+ LDY $0E80, X
-    	LDA SprItemIndex, X : STA SpawnedItemIndex
-    	LDA SprItemFlags, X : STA SpawnedItemFlag
-    	LDA $A0 : CMP #$87 : BNE + ;check for hera cage
-    	LDA SpawnedItemFlag : BNE + ; if it came from a pot, it's fine
-    		JSR ShouldKeyBeCountedForDungeon : BCC ++
+	LDA CurrentSmallKeys ; what we wrote over
+	PHA
+		LDA.l StandingItemsOn : BNE +
+			PLA : RTL
+		+ LDY $0E80, X
+		LDA SprItemIndex, X : STA SpawnedItemIndex
+		LDA SprItemFlags, X : STA SpawnedItemFlag
+		LDA $A0 : CMP #$87 : BNE + ;check for hera cage
+		LDA SpawnedItemFlag : BNE + ; if it came from a pot, it's fine
+			JSR ShouldKeyBeCountedForDungeon : BCC ++
 			JSL CountChestKeyLong
-    		++ PLA : RTL
-    	+ STY $00
-    	LDA SprItemMWPlayer, X : STA !MULTIWORLD_ITEM_PLAYER_ID : BNE .receive
-    	PHX
+			++ PLA : RTL
+		+ STY $00
+		LDA SprItemMWPlayer, X : STA !MULTIWORLD_ITEM_PLAYER_ID : BNE .receive
+		PHX
 			LDA $040C : CMP #$FF : BNE +
 				LDA $00 : CMP.b #$AF : BNE .skip
 				LDA CurrentGenericKeys : INC : STA CurrentGenericKeys
@@ -486,10 +509,10 @@ KeyGet:
 				++ PLX : PLA : RTL
 			+ CMP.b #$AF : beq .countIt ; universal key
 			CMP.b #$24 : beq .countIt   ; small key for this dungeon
-    	.skip PLX
-    	.receive
-    	JSL $0791b3 ; Player_HaltDashAttackLong
-    	JSL.l Link_ReceiveItem
+		.skip PLX
+		.receive
+		JSL $0791b3 ; Player_HaltDashAttackLong
+		JSL.l Link_ReceiveItem
 	PLA : DEC : RTL
 
 KeyTable:
@@ -540,7 +563,10 @@ SubstitionTable:
 	db $DB ; RED RUPEE - 0x16
 	db $E2 ; ARROW REFILL 10 - 0x17
 	db $DD ; BOMB REFILL 4 - 0x18
-    db $DE ; BOMB REFILL 8  - 0x19
+    db $DE ; BOMB REFILL 8 - 0x19
+	db $AC ; APPLES - 0x1A
+	db $79 ; BEE TRAP - 0x1B
+	db $79 ; GOOD BEE - 0x1C
 
 
 SubstituteSpriteId:
@@ -558,6 +584,22 @@ RTS
 
 CheckSprite_Spawn:
 	JSR SubstituteSpriteId
+	CPY.b #$1C : BNE + ; good bee handling
+		JSL Sprite_SpawnDynamically
+		BMI .check
+		PHX
+			TYX : JSL.l Sprite_LoadProperties
+		PLX
+		JSL.l GoldBee_SpawnSelf_SetProperties
+		PLA : PLA : PLA ; pop the return address
+		PHX : LDX.b #$03
+		JML Sprite_SpawnSecret_SetCoords
+	+ CPY.b #$1A : BCC + ; all other non-normal pot sprite spawns
+		JSL Sprite_SpawnDynamically
+		BMI .check
+		LDA.b #$10 : STA.b $0D ; lets the outside code treat this sprite like a Stal (most normal table values)
+		RTL
+	+
 	JSL Sprite_SpawnDynamically
 	BMI .check
 RTL
@@ -608,6 +650,32 @@ SetTheSceneFix:
 	JSL InitializeMirrorHDMA
 	JSL LoadCommonSprites_long
 RTL
+
+pushpc
+org $868072
+JSL SetBottleVendorKey : NOP #4
+pullpc
+SetBottleVendorKey:
+	LDA.w $0E20,Y : CMP.b #$E4 : BNE +
+		; small key from bottle vendor
+		LDA.b #$AF : STA.w $0E80,Y
+		LDA.b #$01 : STA.w !SPRITE_REDRAW, Y
+		BRA .shift
+	+ CMP.b #$DE : BEQ .return
+	CMP.b #$E2 : BEQ .return
+		; shift narrow sprite to left by 4
+		.shift
+		LDA.b $00 : CLC : ADC.b #$04 : STA.w $0D10,Y ; what we wrote over
+.return
+RTL
+
+ConditionalLoadCommonSprites_Do3To4Low:
+	LDA.b $10 : CMP.b #$01 : BEQ + ; what we wrote over
+	CMP.b #$0E : BEQ ++
+		JML LoadCommonSprites_Prep3To4Low
+	+ JML LoadCommonSprites_in_file_select
+++ LDA.b #$50 : STA.w $2117 ; skip over some DMA bytes
+JML Sound_LoadLightWorldSongBank-1 ; just some RTS in Bank 00
 
 incsrc dynamic_si_vram.asm
 

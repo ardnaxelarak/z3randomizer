@@ -44,7 +44,7 @@
 ; #$B2 - Fairy
 ; #$B3 - Chicken
 ; #$B4 - Big Magic
-; #$B5 - 5 Arrows
+; #$B5 - Good Bee
 ; #$B6 - Progressive Bomb
 ; #$B7 - Progressive Cane
 ; #$FE - Server Request (Asychronous Chest)
@@ -85,6 +85,12 @@ GetAnimatedSpriteGfxFile:
 	CMP.b #$48 : BNE +
 		LDY.b #$60 : JML GetAnimatedSpriteGfxFile_return
 	+
+    CMP.b #$4B : BNE +
+		LDY.b #$50 : JML GetAnimatedSpriteGfxFile_return
+	+
+    CMP.b #$4C : BNE +
+		LDY.b #$5E : JML GetAnimatedSpriteGfxFile_return
+	+
 
 	CMP.b #$24 : !BGE +
 		LDY.b #$5B : JML GetAnimatedSpriteGfxFile_return
@@ -124,6 +130,9 @@ dw $09F0 ; Null-Item
 dw $09C0 ; Clock
 dw $0A20 ; Triforce
 dw $0A50 ; Power Star
+dw $09F0 ; Chicken
+dw $09C0 ; Fairy ($09F0 if using uncompressed version)
+dw $0988 ; Apple
 
 GetAnimatedSpriteBufferPointer:
 	;PHB : PHK : PLB
@@ -178,7 +187,11 @@ ProcessEventItems:
 			LDA GoalCounter : INC : STA GoalCounter
 			CMP GoalItemRequirement : !BLT ++
 			LDA TurnInGoalItems : AND.w #$00FF : BNE ++
-				JSL.l ActivateGoal
+				SEP #$20 ; set 8-bit accumulator
+				LDA.b $8A : CMP.b #$80 : BNE +++
+				LDA.b $23 : BNE +++
+					JSL.l ActivateGoal
+				+++
 			++
 			SEP #$20 ; set 8-bit accumulator
 			LDX.b #$01 : BRA .done
@@ -322,7 +335,10 @@ AddReceivedItemExpandedGetItem:
 	+ CMP.b #$65 : BNE + ; Progressive Bow
 		JMP .done
 	+ CMP.b #$6A : BNE + ; Goal Collectable (Single/Triforce)
-		JSL.l ActivateGoal
+		LDA.b $8A : CMP.b #$80 : BNE ++
+		LDA.b $23 : BNE ++
+			JSL.l ActivateGoal
+		++
 		JMP .done
 	+ CMP.b #$6B : BNE + ; Goal Collectable (Multi/Power Star)
 		BRA .multi_collect
@@ -333,7 +349,11 @@ AddReceivedItemExpandedGetItem:
 		LDA.l GoalCounter : INC : STA.l GoalCounter
 		CMP.w GoalItemRequirement : !BLT ++
 		LDA.l TurnInGoalItems : AND.w #$00FF : BNE ++
+			SEP #$20 ; set 8-bit accumulator
+			LDA.b $8A : CMP.b #$80 : BNE +++
+			LDA.b $23 : BNE +++
 				JSL.l ActivateGoal
+			+++
 		++
 		SEP #$20 ; set 8-bit accumulator
 		JMP .done
@@ -427,18 +447,23 @@ AddReceivedItemExpandedGetItem:
 		LDA.b #$FF : STA.w $0B58,Y ; allows them to expire
 		++ JMP .done
 	+ CMP.b #$B3 : BNE + ; Chicken
-		LDA.b #$0B : JSL Sprite_SpawnDynamically : BMI .done
+		LDA.b #$0B : JSL Sprite_SpawnDynamically : BMI ++
 		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
 			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
 		LDA.b $20 : SEC : SBC.b #$08 : STA.w $0D00,Y
 			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 8 pixels
 		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
-		BRA .done
+		++ BRA .done
 	+ CMP.b #$B4 : BNE + ; Big Magic
 		LDA.b #$80 : STA MagicFiller ; fill magic
 		BRA .done
-	+ CMP.b #$B5 : BNE + ; 5 Arrows
-		LDA.b #$05 : STA ArrowsFiller ; add 5 arrows
+	+ CMP.b #$B5 : BNE + ; Good Bee
+		LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI .done
+		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
+			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
+		LDA $20 : STA $0D00, Y : LDA $21 : STA $0D20, Y
+		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
+		JSL GoldBee_SpawnSelf_SetProperties
 		BRA .done
 	+ CMP.b #$B6 : BNE + ; Bomb Upgrade
 		LDA #$01 : STA InfiniteBombsModifier ; infinite bombs
@@ -647,7 +672,7 @@ AddReceivedItemExpanded:
 	db -4 ; Fairy
 	db -4 ; Chicken
 	db -4 ; Big Magic
-	db -4 ; 5 Arrows
+	db -4 ; Good Bee
 	db -4 ; Bomb Upgrade
 	db -4 ; Cane Upgrade
 	db -4, -4, -4, -4, -4, -4, -4, -4 ; Unused
@@ -695,7 +720,7 @@ AddReceivedItemExpanded:
 	db  0 ; Fairy
 	db  0 ; Chicken
 	db  4 ; Big Magic
-	db  0 ; 5 Arrows
+	db  0 ; Good Bee
 	db  0 ; Bomb Upgrade
 	db  4 ; Cane Upgrade
 	db  0, 0, 0, 0, 0, 0, 0, 0 ; Unused
@@ -748,7 +773,7 @@ AddReceivedItemExpanded:
 	db $47 ; Fairy
 	db $47 ; Chicken
 	db $3B ; Big Magic
-	db $02 ; 5 Arrows
+	db $47 ; Good Bee
 	db $13 ; Bomb Upgrade
 	db $07 ; Cane Upgrade
 	db $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -795,7 +820,7 @@ AddReceivedItemExpanded:
 	db $02 ; Fairy
 	db $02 ; Chicken
 	db $00 ; Big Magic
-	db $02 ; 5 Arrows
+	db $02 ; Good Bee
 	db $02 ; Bomb Upgrade
 	db $00 ; Cane Upgrade
 	db $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
@@ -843,7 +868,7 @@ AddReceivedItemExpanded:
 	db  1 ; Fairy
 	db  1 ; Chicken
 	db  4 ; Big Magic
-	db  2 ; 5 Arrows
+	db  1 ; Good Bee
 	db  5 ; Bomb Upgrade
 	db  5 ; Cane Upgrade
 	db  4, 4, 4, 4, 4, 4, 4, 4 ; Unused
@@ -892,7 +917,7 @@ AddReceivedItemExpanded:
 	dw $F36A ; Fairy
 	dw $F36A ; Chicken
 	dw $F373 ; Big Magic
-	dw $F376 ; 5 Arrows
+	dw $F36A ; Good Bee
 	dw $F38F ; Bomb Upgrade
 	dw $F38F ; Cane Upgrade
 	dw $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A, $F36A ; Unused
@@ -943,7 +968,7 @@ AddReceivedItemExpanded:
 	db $FF ; Fairy
 	db $FF ; Chicken
 	db $80 ; Big Magic
-	db $05 ; 5 Arrows
+	db $FF ; Good Bee
 	db $FF ; Bomb Upgrade
 	db $FF ; Cane Upgrade
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF ; Unused
@@ -1036,7 +1061,7 @@ Link_ReceiveItemAlternatesExpanded:
 	db -1 ; Fairy
 	db -1 ; Chicken
 	db -1 ; Big Magic
-	db -1 ; 5 Arrows
+	db -1 ; Good Bee
 	db -1 ; Bomb Upgrade
 	db -1 ; Cane Upgrade
 	db -1, -1, -1, -1, -1, -1, -1, -1 ; Unused
@@ -1275,22 +1300,12 @@ ChestPrep:
 	SEC
 RTL
 ;--------------------------------------------------------------------------------
-UpdateInventoryLocationExpanded:
-{
-	REP #$30
-	TYA : AND #$00FF : ASL A : TAX
-
-	; Tells what inventory location to write to.
-	LDA.w AddReceivedItemExpanded_item_target_addr, X : STA $00
-
-	SEP #$30
-
-	LDA.b #$7E : STA $02
-
-	LDA.w AddReceivedItemExpanded_item_values, Y
-	JSL ItemDowngradeFix
-	RTL
-}
+Ancilla22_ItemReceipt_ContinueB:
+	CMP.b #$6A : BNE .return
+		JSL ActivateTriforceCutscene
+	.return
+	STZ.w $0C4A,X : STZ.w $0FC1 ; what we wrote over
+RTL
 ;--------------------------------------------------------------------------------
 ; Set a flag in SRAM if we pick up a compass in its own dungeon with HUD compass
 ; counts on

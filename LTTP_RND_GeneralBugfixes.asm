@@ -44,7 +44,10 @@ dw !ROM_VERSION_HIGH
 
 !MS_GOT = "$7F5031"
 
-!REDRAW = "$7F5000"
+;!REDRAW = "$7F5000"
+!SPRITE_REDRAW = "$7E0790"          ; 16 bytes
+!SPRITE_OAM = "$7EC025"             ; 16 bytes
+!SPRITE_DYNAMIC_OAM = "$7EC035"     ; 16 bytes
 !GANON_WARP_CHAIN = "$7F5032";
 
 !TILE_UPLOAD_BUFFER = "$7EA180";
@@ -97,6 +100,7 @@ function hexto555(h) = ((((h&$FF)/8)<<10)|(((h>>8&$FF)/8)<<5)|(((h>>16&$FF)/8)<<
 
 !FLAG_OW_MIXED = $04
 !FLAG_OW_CROSSED = $02
+!FLAG_OW_BONKDROP = $02
 
 incsrc hooks.asm
 incsrc treekid.asm
@@ -513,6 +517,9 @@ Attract_DecompressStoryGfx:
 org $00E529
 LoadSelectScreenGfx:
 
+org $00E784
+LoadCommonSprites_in_file_select:
+
 org $00F945
 PrepDungeonExit:
 
@@ -527,6 +534,9 @@ Module_PreDungeon:
 org $028296
     .setAmbientSfx
 
+org $828AD9
+Underworld_SetBossOrSancMusicUponEntry:
+
 org $02A0A8
 Dungeon_SaveRoomData:
 
@@ -535,6 +545,9 @@ Dungeon_SaveRoomData_justKeys:
 
 org $02A4E3
 Overworld_ActualScreenID:
+
+org $02A9F3
+OverworldHandleTransitions_change_palettes:
 
 org $02B861
 Dungeon_SaveRoomQuadrantData:
@@ -545,11 +558,17 @@ CalculateTransitionLanding:
 org $02C176
 Overworld_FinalizeEntryOntoScreen_Data:
 
+org $82C3F2
+OverworldLoadScreensPaletteSet_long:
+
 org $02D9B9
 Underworld_LoadSpawnEntrance:
 
 org $02E99D
 FluteMenu_LoadTransport:
+
+org $02FD6D
+LoadGearPalettes_link:
 
 org $02FD8A ; 17D8A - Bank0E.asm: 3732 Note: Different bank
 LoadGearPalettes_bunny:
@@ -617,6 +636,9 @@ Sprite_PrepAndDrawSingleLargeLong:
 org $06DC00
 Sprite_PrepAndDrawSingleSmallLong:
 
+org $06E41C
+Sprite_PrepOAMCoordLong:
+
 org $06EA18
 Sprite_ApplySpeedTowardsPlayerLong:
 
@@ -656,14 +678,17 @@ Ancilla_ReceiveItem:
 org $08C505
 Ancilla_ReceiveItem_objectFinished:
 
-org $08CE93
-Ancilla_BreakTowerSeal_draw_single_crystal:
+org $08CE2E
+GTCutscene_AnimateCrystals_NoRotate:
+
+org $08CEB6
+GTCutscene_DrawSingleCrystal_SkipCrystal:
 
 org $08CEC3
-Ancilla_BreakTowerSeal_stop_spawning_sparkles:
+GTCutscene_DrawSingleCrystal_SkipSparkle:
 
 org $08CF59
-BreakTowerSeal_ExecuteSparkles:
+GTCutscene_SparkleALot:
 
 org $08F710
 Ancilla_SetOam_XY_Long:
@@ -828,6 +853,9 @@ DiggingGameGuy_AttemptPrizeSpawn:
 
 org $1EDE28
 Sprite_GetEmptyBottleIndex: ; this is totally in sprite_bees.asm
+
+org $1EDE8A
+GoldBee_SpawnSelf:
 
 org $1EF4E7
 Sprite_PlayerCantPassThrough:

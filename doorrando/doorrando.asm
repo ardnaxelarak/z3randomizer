@@ -41,6 +41,11 @@ DRScroll:
 db 0
 OffsetTable:
 dw -8, 8
+org $A78010
+DRVersionInfo:
+dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
+
+org $A78020
 
 incsrc normal.asm
 incsrc scroll.asm
@@ -53,6 +58,7 @@ incsrc math.asm
 incsrc hudadditions.asm
 incsrc dr_lobby.asm
 incsrc entrance_fixes.asm
+incsrc bugfix/kholdstare_shell_collision.asm
 warnpc $A79C00
 
 incsrc doortables.asm

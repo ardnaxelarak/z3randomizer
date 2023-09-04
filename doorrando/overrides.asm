@@ -123,9 +123,18 @@ BlindZeldaDespawnFix:
 		PLA : PLA : PEA.w SpritePrep_BlindMaiden_despawn_follower-1 : RTL
 	+ PLA : PLA : PEA.w SpritePrep_BlindMaiden_kill_the_girl-1 : RTL
 
-
 BigKeyDoorCheck:
 	CPY.w #$001E : BNE + ; skip if it isn't a BK door
 	LDA.l DRFlags : AND #$0400 : BNE + ; skip if the flag is set - bk doors can be double-sided
 		 PLA : PEA.w RoomDraw_OneSidedShutters_South_onesided_shutter_or_big_key_door-1
 + LDA.w #$0000 : RTL
+
+; FixOvalFadeOutMirror:
+; 	LDA.b $10 : CMP.b #$0F : BEQ .skip_activation
+; 	LDA.l InvertedMode : BNE +
+; 		LDA.l CurrentWorld : BNE .skip_activation
+; 		RTL
+; 	+ LDA.l CurrentWorld : BEQ .skip_activation
+; 	RTL
+; 	.skip_activation
+; 	PLA : PLA : PLA : JML Sprite_6C_MirrorPortal_missing_mirror

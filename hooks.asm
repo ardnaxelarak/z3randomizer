@@ -36,6 +36,9 @@ org $00821B ; <- 21B - Bank00.asm : 329 (LDA $13 : STA $2100)
 JML.l PostNMIHookAction : NOP
 PostNMIHookReturn:
 ;--------------------------------------------------------------------------------
+org $008F6C
+JSL PostNMIUpdateBGCharHalf : NOP
+;--------------------------------------------------------------------------------
 
 ;================================================================================
 ; Anti-ZSNES Hook
@@ -499,16 +502,21 @@ JSL.l CheckEnoughCrystalsForTower
 NOP #4
 db #$90 ; BCC
 ;--------------------------------------------------------------------------------
-org $08CE0C ; <- 44E0C - ancilla_break_tower_seal.asm : 168 (BEQ #$03 : JSR BreakTowerSeal_ExecuteSparkles : LDX.b #$06)
-JML.l GetRequiredCrystalsForTower
-NOP #3
-GetRequiredCrystalsForTower_continue:
+org $08CE0C ; <- 44E0C - ancilla_break_tower_seal.asm : 168 (BEQ #$03 : JSR GTCutscene_SparkleALot : LDX.b #$06)
+JML.l GTCutscene_AnimateCrystals_Prep : NOP
+LDX.b #$05
+GTCutscene_AnimateCrystals_NextCrystal:
+JML.l GTCutscene_ConditionalAnimateCrystals
+;--------------------------------------------------------------------------------
+org $08CE93
+GTCutscene_DrawSingleCrystal:
+JML.l GTCutscene_ConditionalDrawSingleCrystal
 ;--------------------------------------------------------------------------------
 org $08CF19 ; <- 44F19 - ancilla_break_tower_seal.asm : 336 (TXA : AND.b #$07 : TAX)
-JSL.l GetRequiredCrystalsInX
+JSL.l GTCutscene_ActivateSparkle_SelectCrystal
 ;--------------------------------------------------------------------------------
 org $08CFC9 ; <- 44FC9 - ancilla_break_tower_seal.asm : 414 (RTS)
-db #$6B
+RTL
 ;--------------------------------------------------------------------------------
 
 ;================================================================================
@@ -971,6 +979,9 @@ JSL.l ChestPrep
 NOP #3
 db $90 ; !BCC .cantOpen
 ;--------------------------------------------------------------------------------
+org $008A9D
+JSL ConditionalPushBlockTransfer : NOP
+
 org $00D531 ; 5531 - Bank00.asm:3451 (LDY.b #$5D)
 JML.l GetAnimatedSpriteGfxFile
 
@@ -981,8 +992,14 @@ org $00D557 ; 5557 - Bank00.asm:3486 (LDA $00 : ADC $D469, X)
 JSL.l GetAnimatedSpriteBufferPointer
 NOP
 
+org $05FA50
+JSL Sprite_ConditionalPrepOAMCoord
+
 org $0799F7 ; 399F7 - Bank07.asm:4107 (JSL AddReceivedItem)
 JSL.l AddReceivedItemExpanded
+
+org $08C505
+JSL Ancilla22_ItemReceipt_ContinueB : NOP #2
 
 org $098605 ; 48605 - ancilla_init.asm:709 (TYA : STA $02E4 : PHX)
 JML.l Multiworld_AddReceivedItem_notCrystal
@@ -994,10 +1011,6 @@ org $098616 ; 48616 - ancilla_init.asm:721 (LDA .item_target_addr+1, X)
 LDA.w AddReceivedItemExpanded_item_target_addr+1, X
 org $09861F ; 4861F - ancilla_init.asm:724 (LDA .item_values, Y)
 LDA.w AddReceivedItemExpanded_item_values, Y
-
-org $098624 ; 48624 - ancilla_init.asm:728 (TYA : ASL A : TAX)
-JSL.l UpdateInventoryLocationExpanded
-BRA + : NOP #18 : +
 
 org $0986AA ; 486AA - ancilla_init.asm:848 (LDA .item_masks, X)
 LDA.w AddReceivedItemExpanded_item_masks, X
@@ -1058,6 +1071,10 @@ JSL HandleBombAbsorbtion
 ;org $09873F ; <- 04873F - ancilla_init.asm : 960 (ADC [$00] : STA [$00] )
 ;JSL.l AddToStock
 ;--------------------------------------------------------------------------------
+org $02EB18
+JSL PostOverworldGfxLoad
+org $18BD55
+JSL PostUnderworldMap
 
 ;================================================================================
 ; Kholdstare Shell Fix
@@ -1313,7 +1330,7 @@ NOP #5
 ;--------------------------------------------------------------------------------
 org $05EE5F ; <- 2EE5F - sprite_mushroom.asm : 30
 JSL.l LoadMushroom
-NOP
+BRA + : NOP #7 : +
 ;--------------------------------------------------------------------------------
 org $05EE78 ; <- 2EE78 - sprite_mushroom.asm : 58
 JSL.l DrawMushroom
@@ -1360,6 +1377,8 @@ org $07A303 ; 3A303 - Bank07.asm : 5622
 org $07A3A2 ; 3A3A2 - Bank07.asm : 5720 - JSL DiggingGameGuy_AttemptPrizeSpawn
 JSL.l SpawnShovelItem
 BRA _Bank07_5726
+org $1DFDAC
+JSL.l SpawnShovelGamePrize
 org $07A3AB ; 3A3AB - Bank07.asm : 5726 - LDA.b #$12 : JSR Player_DoSfx2
 _Bank07_5726:
 ;org $07A381 ; 3A381 - Bank07.asm : 5693 - ORA $035B
@@ -2315,7 +2334,7 @@ JSL.l HeartPieceSpawnDelayFix
 org $05F08A ; <- 2F08A - sprite_heart_upgrades.asm : 324 - (LDA $7EF36B : INC A : AND.b #$03 : STA $7EF36B : BNE .got_4_piecese) item determination
 JSL.l HeartPieceGet
 BCS $18 ; reinsert the near branch that appears midway through what we overrode
-NOP #22
+BRA + : NOP #20 : +
 ;--------------------------------------------------------------------------------
 org $06C0B0 ; <- 340B0 - sprite prep
 JSL.l HeartPieceSpritePrep
@@ -2523,6 +2542,10 @@ org $02ADA0 ; (LDA.b #$F1 : STA $012C)
 JSL Overworld_MosaicDarkWorldChecks : NOP
 ;--------------------------------------------------------------------------------
 org $05CC58 ; <- Bank05.asm:1307 (LDA $040A : CMP.b #$18)
+JSL PsychoSolder_MusicCheck
+NOP #1
+;
+org $06F96A
 JSL PsychoSolder_MusicCheck
 NOP #1
 ;--------------------------------------------------------------------------------
