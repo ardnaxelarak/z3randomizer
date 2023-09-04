@@ -595,14 +595,15 @@ RTS
 ;--------------------------------------------------------------------------------
 CheckBugNet:
 LDA.w $037A : AND.b #$10 : BEQ .done ; normal behavior if not bugnet
+PHP ; we want to preserve the carry bit
 LDA.l SpecialWeapons : CMP.b #$08 : BNE .return_10 ; normal behavior if not bugnet mode
 .bugnet_mode
 LDA.w $0E20, X : CMP.b #$E3 : BEQ .return_10 ; normal behavior if fairy
                  CMP.b #$79 : BEQ .return_10 ; normal behavior if bee
                  CMP.b #$B2 : BEQ .return_10 ; normal behavior if bee
-LDA.b #$00 : BRA .done
+PLP : LDA.b #$00 : RTL
 .return_10
-LDA.b #$10
+PLP : LDA.b #$10
 .done
 RTL
 ;--------------------------------------------------------------------------------

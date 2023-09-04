@@ -52,7 +52,7 @@ RTL
 RTL
 	.b_pressed
 	JSR CanPressB : BCC .b_error
-	LDA.w ItemCursor : CMP.l ItemOnB : BNE .set_b
+	LDA.w $0202 : CMP.l ItemOnB : BNE .set_b
 	LDA.b #$00
 	.set_b
 	STA.l ItemOnB
@@ -132,10 +132,10 @@ CanPressB:
 	PHY : PHP : SEP #$30
 	LDA.l AllowedItemOnB : BEQ .no
 	CMP.b #$FF : BEQ .skip_allow_check
-	CMP.w ItemCursor : BNE .no
+	CMP.w $0202 : BNE .no
 	.skip_allow_check
 	PHX
-	LDA.w ItemCursor : TAX
+	LDA.w $0202 : TAX
 	LDA.l ValidItemOnB, X : BNE .plx_and_no
 	PLX
 	PLP : PLY
@@ -831,7 +831,7 @@ AddYMarker:
 
 	.drawYBubble
 	JSR CanPressB : BCC .drawY
-	LDA.w MenuBlink : AND.w #$0020 : BNE .drawBBubble
+	LDA.w $0207 : AND.w #$0020 : BNE .drawBBubble
 	.drawY
 	LDA.w #$3D4F
 	BRA .drawTile
