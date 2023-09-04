@@ -171,7 +171,7 @@ SetEscapeAssist:
 		BIT.b #$10 : BEQ + : STA InfiniteArrowsModifier : +
 	++
 
-	LDA.l SpecialWeapons : CMP #$01 : BNE +
+	LDA.l SpecialWeapons : AND.b #$7F : CMP #$01 : BNE +
 	LDA.l SpecialWeaponLevel : BEQ +
 	LDA #$01 : STA InfiniteBombsModifier
 	+

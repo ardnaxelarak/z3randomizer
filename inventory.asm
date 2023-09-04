@@ -739,11 +739,11 @@ RTS
 RTL
 
 .incrementBossSword
-	LDA SpecialWeapons : CMP #$01 : BEQ +
-	                     CMP #$03 : BEQ +
-	                     CMP #$04 : BEQ +
-	                     CMP #$05 : BEQ +
-	                     CMP #$08 : BEQ +
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$01 : BEQ +
+	                                    CMP.b #$03 : BEQ +
+	                                    CMP.b #$04 : BEQ +
+	                                    CMP.b #$05 : BEQ +
+	                                    CMP.b #$08 : BEQ +
 	LDA SwordEquipment : BRA ++
 	+ : LDA SpecialWeaponLevel
 	++

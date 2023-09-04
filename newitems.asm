@@ -470,8 +470,8 @@ AddReceivedItemExpandedGetItem:
 		LDA #$01 : STA InfiniteBombsModifier ; infinite bombs
 		BRA .done
 	+ CMP.b #$C1 : BNE + ; Cane Upgrade
-		LDA.l SpecialWeapons : CMP #$03 : BEQ .blue_cane
-		                       CMP #$04 : BEQ .red_cane
+		LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$03 : BEQ .blue_cane
+		                                    CMP.b #$04 : BEQ .red_cane
 			BRA .done
 		.blue_cane
 			LDA #$01 : STA ByrnaEquipment

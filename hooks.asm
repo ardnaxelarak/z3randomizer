@@ -2912,10 +2912,6 @@ org $0882E8 ; Bank08.asm@456 (LDA $0DB0, Y : CMP.b #$03)
 JSL Utility_CheckHelmasaurKingCollision
 NOP
 ;--------------------------------------------------------------------------------
-org $1E838C ; sprite_helmasaur_king.asm@522 (LDA $0301 : AND.b #$0A)
-JSL Utility_CheckHammerHelmasaurKingMask
-NOP
-;--------------------------------------------------------------------------------
 org $06ED94 ; Bank06.asm@4866 (LDA $0E60, X : AND.b #$40)
 JSL Utility_CheckImpervious
 NOP

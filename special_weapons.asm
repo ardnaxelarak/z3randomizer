@@ -10,7 +10,7 @@ DamageClassCalc:
 	JSL Ganon_CheckAncillaVulnerability
 	RTL
 +
-	LDA SpecialWeapons : CMP #$06 : BEQ .cane_immune ; only crystal switches in bee mode
+	LDA SpecialWeapons : AND.b #$7F : CMP #$06 : BEQ .cane_immune ; only crystal switches in bee mode
 	PLA
 	CMP #$01 : BEQ .red_cane
 	CMP #$2C : BEQ .red_cane
@@ -19,19 +19,15 @@ DamageClassCalc:
 	BRA .not_cane_or_beam
 .red_cane
 	PHA
-	LDA SpecialWeapons : CMP #$01 : BEQ .cane_immune
-	                     CMP #$03 : BEQ .cane_immune
-	                     CMP #$04 : BEQ .special_cane
-	                     CMP #$05 : BEQ .special_cane
-	                     CMP #$08 : BEQ .cane_immune
+	LDA SpecialWeapons : AND.b #$7F : CMP.b #$04 : BEQ .special_cane
+	                                  CMP.b #$05 : BEQ .special_cane
+	LDA SpecialWeapons : AND.b #$80 : BNE .cane_immune
 	BRA .normal
 .blue_cane
 	PHA
-	LDA SpecialWeapons : CMP #$01 : BEQ .cane_immune
-	                     CMP #$03 : BEQ .special_cane
-	                     CMP #$04 : BEQ .cane_immune
-	                     CMP #$05 : BEQ .special_cane
-	                     CMP #$08 : BEQ .cane_immune
+	LDA SpecialWeapons : AND.b #$7F : CMP.b #$03 : BEQ .special_cane
+	                                  CMP.b #$05 : BEQ .special_cane
+	LDA SpecialWeapons : AND.b #$80 : BNE .cane_immune
 	BRA .normal
 .cane_immune
 	LDA $0E20, X : CMP.b #$1E : BEQ .normal ; crystal switch
@@ -47,7 +43,7 @@ DamageClassCalc:
 	RTL
 .beam
 	PHA
-	LDA SpecialWeapons : CMP #$02 : BNE .normal
+	LDA SpecialWeapons : AND.b #$7F : CMP.b #$02 : BNE .normal
 	PLA
 	LDA #$05
 	RTL
@@ -55,7 +51,7 @@ DamageClassCalc:
 	PLA
 .not_cane_or_beam
 	CMP #$07 : BNE .no_change
-	LDA SpecialWeapons : CMP #$01 : BNE .normal_bombs
+	LDA SpecialWeapons : AND.b #$7F : CMP #$01 : BNE .normal_bombs
 	LDA SpecialWeaponLevel : BEQ .normal_bombs
 	LDA $0E20, X : CMP.b #$D6 : BEQ .unstunned_ganon
 	CMP.b #$D7 : BEQ .stunned_ganon
@@ -105,7 +101,7 @@ DamageClassCalc:
 	RTL
 .actual_silver_arrows
 	LDA $0E20, X : CMP.b #$D7 : BNE +
-	LDA SpecialWeapons : CMP #$01 : BEQ .normal_arrows
+	LDA SpecialWeapons : AND.b #$7F : CMP #$01 : BEQ .normal_arrows
 	LDA #$20 : STA $0F10, X
 	+
 	LDA #$09
@@ -127,21 +123,21 @@ Utility_CheckAncillaOverlapWithSprite:
 	JSL !UTILITY_CHECK_IF_HIT_BOXES_OVERLAP_LONG
 	RTL
 .giant_moldorm
-	LDA $0E10, Y : BNE .ignore_collision ; Moldy can have little a I-Frames, as a treat
-	LDA.l SpecialWeapons : CMP #$01 : BNE ++
-	LDA $0C4A, X : CMP #$07 : BEQ .check_collision_moldorm
+	LDA.w $0E10, Y : BNE .ignore_collision ; Moldy can have little a I-Frames, as a treat
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$01 : BNE ++
+	LDA.w $0C4A, X : CMP.b #$07 : BEQ .check_collision_moldorm
 	BRA .ignore_collision ; don't collide with non-bombs
-++ : LDA.l SpecialWeapons : CMP #$03 : BNE ++
-	LDA $0C4A, X : CMP #$31 : BEQ .check_collision_moldorm
+++ : CMP.b #$03 : BNE ++
+	LDA.w $0C4A, X : CMP.b #$31 : BEQ .check_collision_moldorm
 	BRA .ignore_collision ; don't collide with non-byrna
-++ : LDA.l SpecialWeapons : CMP #$04 : BNE ++
-	LDA $0C4A, X : CMP #$01 : BEQ .check_collision_moldorm
-	               CMP #$2C : BEQ .check_collision_moldorm
+++ : CMP.b #$04 : BNE ++
+	LDA.w $0C4A, X : CMP.b #$01 : BEQ .check_collision_moldorm
+	                 CMP.b #$2C : BEQ .check_collision_moldorm
 	BRA .ignore_collision ; don't collide with non-somaria
-++ : LDA.l SpecialWeapons : CMP #$05 : BNE .ignore_collision
-	LDA $0C4A, X : CMP #$01 : BEQ .check_collision_moldorm
-	               CMP #$2C : BEQ .check_collision_moldorm
-	               CMP #$31 : BEQ .check_collision_moldorm
+++ : CMP.b #$05 : BNE .ignore_collision
+	LDA.w $0C4A, X : CMP.b #$01 : BEQ .check_collision_moldorm
+	                 CMP.b #$2C : BEQ .check_collision_moldorm
+	                 CMP.b #$31 : BEQ .check_collision_moldorm
 	BRA .ignore_collision ; don't collide with non-canes
 
 .check_collision_moldorm
@@ -154,20 +150,20 @@ Utility_CheckAncillaOverlapWithSprite:
 	RTL
 
 .trinexx
-	LDA.l SpecialWeapons : CMP #$01 : BNE ++
-	LDA $0C4A, X : CMP #$07 : BEQ .check_collision_trinexx
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$01 : BNE ++
+	LDA.w $0C4A, X : CMP.b #$07 : BEQ .check_collision_trinexx
 	BRA .ignore_collision ; don't collide with non-bombs
-++ : LDA.l SpecialWeapons : CMP #$03 : BNE ++
-	LDA $0C4A, X : CMP #$31 : BEQ .check_collision_trinexx
+++ : CMP.b #$03 : BNE ++
+	LDA.w $0C4A, X : CMP.b #$31 : BEQ .check_collision_trinexx
 	JMP .ignore_collision ; don't collide with non-byrna
-++ : LDA.l SpecialWeapons : CMP #$04 : BNE ++
-	LDA $0C4A, X : CMP #$01 : BEQ .check_collision_trinexx
-	               CMP #$2C : BEQ .check_collision_trinexx
+++ : CMP.b #$04 : BNE ++
+	LDA.w $0C4A, X : CMP.b #$01 : BEQ .check_collision_trinexx
+	                 CMP.b #$2C : BEQ .check_collision_trinexx
 	JMP .ignore_collision ; don't collide with non-somaria
-++ : LDA.l SpecialWeapons : CMP #$05 : BNE .ignore_collision
-	LDA $0C4A, X : CMP #$01 : BEQ .check_collision_trinexx
-	               CMP #$2C : BEQ .check_collision_trinexx
-	               CMP #$31 : BEQ .check_collision_trinexx
+++ : CMP #$05 : BNE .ignore_collision
+	LDA.w $0C4A, X : CMP.b #$01 : BEQ .check_collision_trinexx
+	                 CMP.b #$2C : BEQ .check_collision_trinexx
+	                 CMP.b #$31 : BEQ .check_collision_trinexx
 	JMP .ignore_collision ; don't collide with non-canes
 
 .check_collision_trinexx
@@ -244,46 +240,34 @@ SetUpMoldormHitbox:
 ;--------------------------------------------------------------------------------
 ; start with X = ancilla index, Y = sprite index
 Utility_CheckHelmasaurKingCollision:
-	LDA.l SpecialWeapons : CMP #$01 : BNE ++
-	LDA $0C4A, X : CMP #$07 : BEQ .collide
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$01 : BNE ++
+	LDA.w $0C4A, X : CMP.b #$07 : BEQ .collide
 	BRA .normal ; normal behavior with non-bombs
-++ : LDA.l SpecialWeapons : CMP #$03 : BNE ++
-	LDA $0C4A, X : CMP #$31 : BEQ .collide
+++ : CMP.b #$03 : BNE ++
+	LDA.w $0C4A, X : CMP.b #$31 : BEQ .collide
 	BRA .normal ; normal behavior with non-byrna
-++ : LDA.l SpecialWeapons : CMP #$04 : BNE ++
-	LDA $0C4A, X : CMP #$01 : BEQ .collide
-	               CMP #$2C : BEQ .collide
+++ : CMP.b #$04 : BNE ++
+	LDA.w $0C4A, X : CMP.b #$01 : BEQ .collide
+	                 CMP.b #$2C : BEQ .collide
 	BRA .normal ; normal behavior with non-somaria
-++ : LDA.l SpecialWeapons : CMP #$05 : BNE .normal
-	LDA $0C4A, X : CMP #$01 : BEQ .collide
-	               CMP #$2C : BEQ .collide
-	               CMP #$31 : BEQ .collide
+++ : CMP.b #$05 : BNE .normal
+	LDA.w $0C4A, X : CMP.b #$01 : BEQ .collide
+	                 CMP.b #$2C : BEQ .collide
+	                 CMP.b #$31 : BEQ .collide
 	BRA .normal ; normal behavior with non-canes
 .collide
 	CLC
 	RTL
 .normal
-	LDA $0DB0, Y : CMP.b #$03
+	LDA.w $0DB0, Y : CMP.b #$03
 	RTL
 ; returns carry set if there is collision immunity
-;--------------------------------------------------------------------------------
-Utility_CheckHammerHelmasaurKingMask:
-	LDA.l SpecialWeapons : CMP #$01 : BEQ .no_effect
-	LDA $0301 : AND #$0A
-	RTL
-.no_effect
-	LDA #$00
-	RTL
 ;--------------------------------------------------------------------------------
 Utility_CheckImpervious:
 	LDA $0E20, X : CMP.b #$CB : BNE .normal
 .trinexx
-	LDA SpecialWeapons : CMP #$01 : BEQ +
-	                     CMP #$03 : BEQ +
-	                     CMP #$04 : BEQ +
-	                     CMP #$05 : BEQ +
-	                     CMP #$06 : BEQ .check_sidenexx
-	                     CMP #$08 : BEQ +
+	LDA SpecialWeapons : AND.b #$7F : CMP.b #$06 : BEQ .check_sidenexx
+	LDA SpecialWeapons : AND.b #$80 : BNE +
 	BRA .normal
 +
 	LDA $0301 : AND.b #$0A : BNE .impervious ; impervious to hammer
@@ -297,13 +281,7 @@ Utility_CheckImpervious:
 	LDA $0E20, X : CMP.b #$CC : BEQ .sidenexx : CMP.b #$CD : BEQ .sidenexx
 	LDA $0301 : AND.b #$0A : BEQ .not_impervious ; normal behavior if not hammer
 	JSL Ganon_CheckHammerVulnerability : BCS .not_impervious
-	LDA SpecialWeapons : CMP #$01 : BEQ +
-	                     CMP #$03 : BEQ +
-	                     CMP #$04 : BEQ +
-	                     CMP #$05 : BEQ +
-	                     CMP #$08 : BEQ +
-	BRA .not_impervious
-+
+	LDA SpecialWeapons : AND.b #$80 : BEQ .not_impervious
 	LDA $0E20, X : CMP.b #$1E : BEQ .not_impervious ; crystal switch
 	CMP.b #$40 : BEQ .not_impervious ; aga barrier
 	BRA .impervious
@@ -313,23 +291,11 @@ Utility_CheckImpervious:
 	LDA #$01 : RTL
 .sidenexx
 	LDA $0CAA, X : AND.b #$04 : BEQ .vulnerable
-	LDA SpecialWeapons : CMP #$01 : BEQ +
-	                     CMP #$03 : BEQ +
-	                     CMP #$04 : BEQ +
-	                     CMP #$05 : BEQ +
-	                     CMP #$08 : BEQ +
-	BRA .not_impervious
-+
+	LDA.l SpecialWeapons : AND.b #$80 : BEQ .not_impervious
 	LDA $0CF2 : CMP #$06 : !BLT .impervious ; swords are ineffective
 	BRA .not_impervious
 .vulnerable
-	LDA SpecialWeapons : CMP #$01 : BEQ +
-	                     CMP #$03 : BEQ +
-	                     CMP #$04 : BEQ +
-	                     CMP #$05 : BEQ +
-	                     CMP #$08 : BEQ +
-	BRA .not_impervious
-+
+	LDA.l SpecialWeapons : AND.b #$80 : BEQ .not_impervious
 	LDA $0CF2 : CMP #$06 : !BGE .impervious ; non-swords are ineffective
 	BRA .not_impervious
 ; returns nonzero A if impervious
@@ -338,11 +304,11 @@ Utility_CheckImpervious:
 ; start with X = sprite index
 ;--------------------------------------------------------------------------------
 AllowBombingMoldorm:
-	LDA SpecialWeapons : CMP #$01 : BEQ .no_disable_projectiles
-	                     CMP #$03 : BEQ .no_disable_projectiles
-	                     CMP #$04 : BEQ .no_disable_projectiles
-	                     CMP #$05 : BEQ .no_disable_projectiles
-	                     CMP #$06 : BEQ .no_disable_projectiles
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$01 : BEQ .no_disable_projectiles
+	                                    CMP.b #$03 : BEQ .no_disable_projectiles
+	                                    CMP.b #$04 : BEQ .no_disable_projectiles
+	                                    CMP.b #$05 : BEQ .no_disable_projectiles
+	                                    CMP.b #$06 : BEQ .no_disable_projectiles
 	INC $0BA0, X
 .no_disable_projectiles
 	JSL !SPRITE_INITIALIZED_SEGMENTED
@@ -352,11 +318,11 @@ AllowBombingBarrier:
 	; what we wrote over
 	LDA $0D00, X : !SUB.b #$0C : STA $0D00, X
 	LDA $0E20, X : CMP #$40 : BNE .disable_projectiles
-	LDA SpecialWeapons : CMP #$01 : BEQ .no_disable_projectiles
-	                     CMP #$03 : BEQ .no_disable_projectiles
-	                     CMP #$04 : BEQ .no_disable_projectiles
-	                     CMP #$05 : BEQ .no_disable_projectiles
-	                     CMP #$06 : BEQ .no_disable_projectiles
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$01 : BEQ .no_disable_projectiles
+	                                    CMP.b #$03 : BEQ .no_disable_projectiles
+	                                    CMP.b #$04 : BEQ .no_disable_projectiles
+	                                    CMP.b #$05 : BEQ .no_disable_projectiles
+	                                    CMP.b #$06 : BEQ .no_disable_projectiles
 .disable_projectiles
 	INC $0BA0, X
 .no_disable_projectiles
@@ -364,7 +330,7 @@ AllowBombingBarrier:
 ;--------------------------------------------------------------------------------
 DrawBombInMenu:
 	JSL LoadBombCount16 : AND.w #$00FF : BEQ .noBombs
-	LDA SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BNE .vanillaBombs
+	LDA SpecialWeapons : AND.w #$007F : CMP.w #$0001 : BNE .vanillaBombs
 	LDA.l SpecialWeaponLevel : AND.w #$00FF : BEQ .noBombs : STA $02
 	LDA.w #$FC81 : STA $04
 	BRA .done
@@ -379,7 +345,7 @@ DrawBombInMenu:
 	RTL
 ;--------------------------------------------------------------------------------
 DrawSwordInMenu:
-	LDA SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BEQ .specialSword
+	LDA SpecialWeapons : AND.w #$007F : CMP.w #$0001 : BEQ .specialSword
 	                                    CMP.w #$0003 : BEQ .specialSword
 	                                    CMP.w #$0004 : BEQ .specialSword
 	                                    CMP.w #$0005 : BEQ .specialSword
@@ -400,7 +366,7 @@ DrawSwordInMenu:
 ;--------------------------------------------------------------------------------
 DrawBombInYBox:
 	CPX.w #$0004 : BNE .done
-	LDA SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BNE .vanilla
+	LDA SpecialWeapons : AND.w #$007F : CMP.w #$0001 : BNE .vanilla
 	LDA SpecialWeaponLevel : AND.w #$00FF : CLC : ADC.w #$00BD : BRA .done
 .vanilla
 	LDA.w #$0001
@@ -417,7 +383,7 @@ DrawBombOnHud:
 	MVN $7E, $21
 	PLB
 
-	LDA.l SpecialWeapons : AND.w #$00FF : CMP.w #$0001 : BNE .regularBombs
+	LDA.l SpecialWeapons : AND.w #$007F : CMP.w #$0001 : BNE .regularBombs
 	LDA.l SpecialWeaponLevel : AND.w #$00FF : ASL #2 : TAX
 	LDA.l BombIcon, X : STA.l $7EC71A
 	LDA.l BombIcon+2, X : STA.l $7EC71C
@@ -427,7 +393,7 @@ DrawBombOnHud:
 BombSpriteColor:
 	db $04, $08, $04, $02, $0A, $0A
 SetBombSpriteColor:
-	LDA.l SpecialWeapons : CMP.b #$01 : BNE .normal
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$01 : BNE .normal
 	PHX
 	LDA.l SpecialWeaponLevel
 	TAX
@@ -440,7 +406,7 @@ SetBombSpriteColor:
 	RTL
 ;--------------------------------------------------------------------------------
 StoreSwordDamage:
-	LDA.l SpecialWeapons : CMP #$02 : BEQ +
+	LDA.l SpecialWeapons : AND.b #$7F : CMP #$02 : BEQ +
 	LDA.l $06ED39, X : RTL
 	+
 	LDA #$05
@@ -454,8 +420,8 @@ BeeDamageClass:
 	db $FF, $01, $01, $FF, $FF
 ;--------------------------------------------------------------------------------
 CheckDetonateBomb:
-	LDA.l SpecialWeapons : CMP.b #$01 : BEQ .detonate_bombs
-	                       CMP.b #$06 : BEQ .release_bee
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$01 : BEQ .detonate_bombs
+	                                    CMP.b #$06 : BEQ .release_bee
 	CLC : RTL
 .detonate_bombs
 	LDX.b #09
@@ -496,7 +462,7 @@ CheckDetonateBomb:
 	RTL
 ;--------------------------------------------------------------------------------
 SetBeeType:
-	LDA.l SpecialWeapons : CMP.b #$06 : BEQ .bee_mode
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$06 : BEQ .bee_mode
 	LDX.w $0202
 .check_bee_type
 	LDA.l $7EF33F, X
@@ -516,7 +482,7 @@ SetBeeType:
 	BRA .regular_bee
 ;--------------------------------------------------------------------------------
 ArrghusBoing:
-	LDA.l SpecialWeapons : CMP.b #$06 : BNE .done
+	LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$06 : BNE .done
 	LDA.w $0F60, X : AND.b #$BF : STA.w $0F60, X
 .done
 	; what we wrote over
@@ -536,7 +502,7 @@ LDA.w $0F00,Y
 BNE .unsuitable_target
 
 ; in bee-mode skip targets that the bee can't hurt
-LDA.l SpecialWeapons : CMP.b #$06 : BNE +
+LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$06 : BNE +
 JSR BeeCheckDamage
 CMP.b #$00 : BEQ .unsuitable_target
 +
@@ -551,7 +517,7 @@ BNE .unsuitable_target
 LDA.w $0F60,Y
 AND.b #$40
 BEQ +
-LDA.l SpecialWeapons : CMP.b #$06 : BNE .unsuitable_target
+LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$06 : BNE .unsuitable_target
 ; in bee mode, allow targetting anti-fairies, bunny beams, and keese
 LDA.w $0E20,Y
 CMP.b #$15 : BEQ + ; anti-fairy
@@ -596,7 +562,7 @@ RTS
 CheckBugNet:
 LDA.w $037A : AND.b #$10 : BEQ .done ; normal behavior if not bugnet
 PHP ; we want to preserve the carry bit
-LDA.l SpecialWeapons : CMP.b #$08 : BNE .return_10 ; normal behavior if not bugnet mode
+LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$08 : BNE .return_10 ; normal behavior if not bugnet mode
 .bugnet_mode
 LDA.w $0E20, X : CMP.b #$E3 : BEQ .return_10 ; normal behavior if fairy
                  CMP.b #$79 : BEQ .return_10 ; normal behavior if bee
@@ -608,7 +574,7 @@ PLP : LDA.b #$10
 RTL
 ;--------------------------------------------------------------------------------
 SetHammerClass:
-LDA.l SpecialWeapons : CMP.b #$08 : BNE .normal ; normal behavior if not bugnet mode
+LDA.l SpecialWeapons : AND.b #$7F : CMP.b #$08 : BNE .normal ; normal behavior if not bugnet mode
 LDA.w $037A : AND.b #$10 : BEQ .normal ; normal behavior if not bugnet
 LDA 4, S : TAX ; get sprite index off of stack
 LDA.w $0E20, X : CMP.b #$88 : BNE .not_mothula

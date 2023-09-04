@@ -7,7 +7,7 @@ NewDrawHud:
 
 	LDA InfiniteBombsModifier : BNE .infinite_bombs
 	.finite_bombs
-		LDA.l SpecialWeapons : CMP #$01 : BNE .normal
+		LDA.l SpecialWeapons : AND.b #$7F : CMP #$01 : BNE .normal
 		LDA.l SpecialWeaponLevel : BEQ .no_bombs
 	.normal
 		LDA.l BombsEquipment ; bombs
