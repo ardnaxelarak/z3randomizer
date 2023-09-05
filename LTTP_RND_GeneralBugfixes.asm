@@ -77,7 +77,7 @@ dw !ROM_VERSION_HIGH
 function hexto555(h) = ((((h&$FF)/8)<<10)|(((h>>8&$FF)/8)<<5)|(((h>>16&$FF)/8)<<0))
 
 ; Feature flags, run asar with -DFEATURE_X=1 to enable
-!FEATURE_NEW_TEXT ?= 0
+!FEATURE_NEW_TEXT ?= 1
 
 ;================================================================================
 
