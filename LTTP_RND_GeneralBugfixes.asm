@@ -49,8 +49,7 @@ dw !ROM_VERSION_HIGH
 
 function hexto555(h) = ((((h&$FF)/8)<<10)|(((h>>8&$FF)/8)<<5)|(((h>>16&$FF)/8)<<0))
 
-; Feature flags, run asar with -DFEATURE_X=0 to disable
-!FEATURE_NEW_TEXT ?= 1
+; Feature flags, run asar with -DFEATURE_X=1 to enable
 
 ;================================================================================
 
@@ -160,9 +159,7 @@ incsrc special_weapons.asm
 incsrc variable_ganon_vulnerability.asm
 incsrc item_on_b.asm
 incsrc hextodec.asm
-if !FEATURE_NEW_TEXT
-	incsrc textrenderer.asm
-endif
+incsrc textrenderer.asm
 warnpc $A58000
 
 org $A28000
@@ -269,30 +266,24 @@ org $B39600
 BossMapIconGFX:
 incbin "data/bossicons.4bpp"
 
-if !FEATURE_NEW_TEXT
-	org $B39C00
-	NewFont:
-	incbin "data/newfont.bin"
-	NewFontInverted:
-	incbin "data/newfont_inverted.bin"
-	SmallCharacters:
-	incbin "data/smallchars.2bpp"
-	org $8CD7DF
-	incsrc data/playernamecharmap.asm
-	org $8CE73D
-	incbin data/playernamestripes_1.bin
-	org $8CE911
-	incbin data/playernamestripes_2.bin
-	incsrc data/kanjireplacements.asm ; Overwrites text gfx data and masks in bank $8E
-endif
+org $B39C00
+NewFont:
+incbin "data/newfont.bin"
+NewFontInverted:
+incbin "data/newfont_inverted.bin"
+SmallCharacters:
+incbin "data/smallchars.2bpp"
+org $8CD7DF
+incsrc data/playernamecharmap.asm
+org $8CE73D
+incbin data/playernamestripes_1.bin
+org $8CE911
+incbin data/playernamestripes_2.bin
+incsrc data/kanjireplacements.asm ; Overwrites text gfx data and masks in bank $8E
 
 org $B28000
 Extra_Text_Table:
-if !FEATURE_NEW_TEXT
-	incsrc itemtext_lower.asm
-else
-	incsrc itemtext.asm
-endif
+incsrc itemtext.asm
 
 incsrc externalhooks.asm
 ;================================================================================
