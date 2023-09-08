@@ -214,34 +214,14 @@ ItemBehavior:
         JSR .increment_sword
         RTS
 
-        .fighter_shield
-        SEP #$10
-        LDA.w ShopPurchaseFlag : BNE ..shop_shield
-                -
-                LDX.b #$01
-                JSR .increment_shield
-                RTS
-        ..shop_shield
-        LDA.l InventoryTable_properties,X : BIT.b #$02 : BNE -
-        RTS
-
+		.fighter_shield
         .red_shield
-        SEP #$10
-        LDA.w ShopPurchaseFlag : BNE ..shop_shield
-                -
-                LDX.b #$02
-                JSR .increment_shield
-                RTS
-        ..shop_shield
-        LDA.l InventoryTable_properties,X : BIT.b #$02 : BNE -
-        RTS
-
         .mirror_shield
         SEP #$10
-        LDX.b #$03
-        JSR .increment_shield
-        REP #$10
-        RTS
+        LDA.l ProgressiveFlag : BEQ +
+		   LDA.l HighestShield : INC : TAX
+		   JSR .increment_shield
+        + RTS
 
         .blue_mail
         SEP #$10
@@ -273,8 +253,8 @@ ItemBehavior:
 
         .prog_shield
         SEP #$10
-        LDA.l ShieldEquipment : INC : TAX
-        JSR .increment_shield
+        LDA.l HighestShield : INC : TAX
+		JSR .increment_shield
         REP #$10
         RTS
 
@@ -793,6 +773,7 @@ ResolveLootID:
         .shields
         SEP #$20
         LDA !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE ++
+        LDA.b #$01 : STA.l ProgressiveFlag
         LDA.l HighestShield
         CMP.l ProgressiveShieldLimit : BCC +
                 LDA.l ProgressiveShieldReplacement
@@ -1095,6 +1076,7 @@ RTS
 ;--------------------------------------------------------------------------------
 AttemptItemSubstitution:
         PHX : PHA
+        LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .exit
         LDX.b #$00
         -
                 LDA.l ItemSubstitutionRules, X
@@ -1159,7 +1141,7 @@ MaybeFlagCompassTotalPickup:
 RTL
 
 MaybeFlagMapTotalPickup:
-        LDA.l MapHUDMode : AND.b #$0F : BEQ .done
+;        LDA.l MapHUDMode : AND.b #$0F : BEQ .done
         LDA.w DungeonID : BMI .done
                 LDA.w ItemReceiptID : CMP.b #$33 : BEQ .set_flag
                         REP #$20
@@ -1181,7 +1163,7 @@ MaybeFlagDungeonTotalsEntrance:
                 LDA.l CompassMode : AND.w #$000F : BEQ .maps ; Skip if we're not showing compass counts
                         JSR.w FlagCompassCount
                 .maps
-                LDA.l MapHUDMode : AND.w #$000F : BEQ .done
+;                LDA.l MapHUDMode : AND.w #$000F : BEQ .done
                         LDX.w DungeonID
                         JSR.w FlagMapCount
         .done

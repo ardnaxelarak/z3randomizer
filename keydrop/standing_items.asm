@@ -228,7 +228,7 @@ RevealPotItem:
 				++ LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X
 				; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 			+ REP #$10
-			LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
+			LDA.l TotalItemCounter : INC : STA.l TotalItemCounter ; Increment Item Total
 			INC.w UpdateHUD
 		.obtained
 	PLY : PLX
@@ -279,7 +279,7 @@ SaveMajorItemDrop:
 		LDA.w #$0018 : BRA .substitute
 	+ CPY.w #$0031 : BNE + ; 10 pack bombs
 		LDA.w #$0019 : BRA .substitute
-	+ STA $0B9C ; indicates we should use the key routines or a substitute
+	+ STA.w $0B9C ; indicates we should use the key routines or a substitute
 RTL
 	.substitute
 	PHA
@@ -321,7 +321,7 @@ IncrementCountsForSubstitute:
 			++ LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 		+
-		LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
+		LDA.l TotalItemCounter : INC : STA.l TotalItemCounter ; Increment Item Total
 		INC.w UpdateHUD
 	.obtained
 	SEP #$30 : PLX
@@ -521,8 +521,8 @@ IncrementCountForMinor:
 				INX #2 ; treat sewers as HC
 			++ LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
-		+ REP #$10
-		LDA TotalItemCounter : INC : STA TotalItemCounter ; Increment Item Total
+		+
+		LDA.l TotalItemCounter : INC : STA.l TotalItemCounter ; Increment Item Total
 		INC.w UpdateHUD
 	.obtained
 	SEP #$30 : PLX
@@ -647,7 +647,7 @@ KeyGet:
 			LDA $00 : CMP.l KeyTable, X : BNE +
 				.countIt
 				LDA.l StandingItemCounterMask : AND SpawnedItemFlag : BEQ ++
-					JSL.l AddInventory : JSL CountChestKeyLong
+					JSL.l AddInventory
 				++ PLX : PLA : RTL
 			+ CMP.b #$AF : beq .countIt ; universal key
 			CMP.b #$24 : beq .countIt   ; small key for this dungeon

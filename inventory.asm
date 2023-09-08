@@ -163,21 +163,21 @@ AddInventory:
                         JSR.w IncrementYAItems
                         		.totalCount
                         		LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .done
-                                REP #$20
+                                REP #$30
                                 LDA.l TotalItemCounter : INC : TAY
-                                LDA.l BootsEquipment : BNE +
+                                LDA.l BootsEquipment : AND.w #$00FF : BNE +
                                         TYA : STA.l PreBootsLocations
                                 +
-                                LDA.l MirrorEquipment : BNE +
+                                LDA.l MirrorEquipment : AND.w #$00FF : BNE +
                                         TYA : STA.l PreMirrorLocations
                                 +
-                                LDA.l FluteEquipment : BNE +
+                                LDA.l FluteEquipment : AND.w #$00FF : BNE +
                                         TYA : STA.l PreFluteLocations
                                 +
                                 TYA
                                 STA.l TotalItemCounter
-        .done
-        SEP #$30
+	.done
+    SEP #$30
 	PLB : PLP : PLY : PLX : PLA
 RTL
 
@@ -229,7 +229,7 @@ DungeonIncrement:
 	        +
                 CMP.b #$00 : BNE +
                 	INC #2
-                TAX : REP #$20 : LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X : SEP #$20
+                + TAX : REP #$20 : LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X : SEP #$20
 	        CPX.b #$0D : BNE +
                         LDA.l BigKeyField : BIT.b #$04 : BNE ++
                                 LDA.l PreGTBKLocations : INC : STA.l PreGTBKLocations

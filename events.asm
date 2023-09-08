@@ -249,7 +249,7 @@ PreItemGet:
 RTL
 ;--------------------------------------------------------------------------------
 PostItemGet:
-        STZ.w ShopPurchaseFlag
+        STZ.w ProgressiveFlag
         LDA.w ItemReceiptMethod : CMP.b #$01 : BEQ +
                 LDX.w CurrentSpriteSlot
                 STZ.w SpriteMetaData,X

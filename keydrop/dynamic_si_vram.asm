@@ -55,7 +55,10 @@ FreeUWGraphics:
 ;===================================================================================================
 
 DrawPotItem:
-	PHX : TAX
+	PHX
+	JSL.l AttemptItemSubstitution
+	JSL.l ResolveLootIDLong
+	TAX
 	LDA.l SpriteProperties_standing_width,X : BEQ .narrow
 
 	.full

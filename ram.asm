@@ -188,7 +188,7 @@ RaceGameFlag = $7E021B            ;
                                   ;
 MessageJunk = $7E0223             ; Zeroed but never used (?)
                                   ;
-ShopPurchaseFlag = $7E0224        ; $01 = Shop purchase item receipt.
+ProgressiveFlag = $7E0224         ; unused
 ;CoolScratch = $7E0224            ; 0x5C bytes of free ram
 ItemStackPtr = $7E0226            ; Pointer into Item GFX and VRAM target queues. Word length.
                                   ; If not zero, pointer should always be left pointing at the
