@@ -23,7 +23,7 @@ JML.l ReturnFromOnDrawHud
 OnDungeonEntrance:
 	STA.l PegColor ; thing we wrote over
         JSL MaybeFlagDungeonTotalsEntrance
-        INC.w UpdateHUD
+        INC.w UpdateHUDFlag
 RTL
 ;--------------------------------------------------------------------------------
 OnDungeonBossExit:
@@ -47,7 +47,7 @@ OnDungeonExit:
         STA.w DungeonID : STZ.w Map16ChangeIndex ; thing we wrote over
 
         PHA : PHP
-        INC.w UpdateHUD
+        INC.w UpdateHUDFlag
         JSL.l HUD_RebuildLong
         JSL.l FloodGateResetInner
         JSL.l SetSilverBowMode
@@ -230,7 +230,7 @@ OnOWTransition:
         PHP
         SEP #$20 ; set 8-bit accumulator
         LDA.b #$FF : STA.l RNGLockIn ; clear lock-in
-        INC.w UpdateHUD
+        INC.w UpdateHUDFlag
         PLP
 RTL
 ;--------------------------------------------------------------------------------

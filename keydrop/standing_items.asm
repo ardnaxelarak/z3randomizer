@@ -229,7 +229,7 @@ RevealPotItem:
 				; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 			+ REP #$10
 			LDA.l TotalItemCounter : INC : STA.l TotalItemCounter ; Increment Item Total
-			INC.w UpdateHUD
+			INC.w UpdateHUDFlag
 		.obtained
 	PLY : PLX
 
@@ -322,7 +322,7 @@ IncrementCountsForSubstitute:
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 		+
 		LDA.l TotalItemCounter : INC : STA.l TotalItemCounter ; Increment Item Total
-		INC.w UpdateHUD
+		INC.w UpdateHUDFlag
 	.obtained
 	SEP #$30 : PLX
 RTS
@@ -523,7 +523,7 @@ IncrementCountForMinor:
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 		+
 		LDA.l TotalItemCounter : INC : STA.l TotalItemCounter ; Increment Item Total
-		INC.w UpdateHUD
+		INC.w UpdateHUDFlag
 	.obtained
 	SEP #$30 : PLX
 RTS
