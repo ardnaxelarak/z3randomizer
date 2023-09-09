@@ -54,9 +54,9 @@ FlagAgahnimDoor:
 ;--------------------------------------------------------------------------------
 LockAgahnimDoorsCore:
 	LDA.b LinkPosX : CMP.w #1992 : !BLT + ; door too far left, skip
-	                 CMP.w #2088 : !BGE + ; door too rat right, skip
+			  CMP.w #2088 : !BGE + ; door too rat right, skip
 	LDA.b LinkPosY : CMP.w #1720 : !BGE + ; door too low, skip
-	LDA.w #$0001
+		LDA.w #$0001
 RTS
 	+
 	LDA.w #$0000
@@ -81,7 +81,7 @@ AllowStartFromSingleEntranceCave:
 	PHA
 		TAX
 		LDA.l StartingAreaExitOffset, X
-		AND.w #$00FF
+                AND.w #$00FF
 
 		BNE +
 			JMP .done
@@ -126,7 +126,7 @@ AllowStartFromSingleEntranceCave:
 		LDA.l StartingEntrance : TAX
 		LDA.l StartingAreaOverworldDoor, X : STA.l PreviousOverworldDoor ;Load overworld door
 		REP #$20 ; reset 16-bit accumulator
-		JSL.l CacheDoorFrameData
+                JSL.l CacheDoorFrameData
 
 		.done
 	PLA
@@ -155,7 +155,7 @@ JML.l AllowStartFromExitReturn
 	STZ.b SubSubModule
 	STZ.w DeathReloadFlag
 	STZ.w RespawnFlag
-        INC.w UpdateHUD
+        INC.w UpdateHUDFlag
 
 	JSL Equipment_SearchForEquippedItemLong
 	JSL HUD_RebuildLong2

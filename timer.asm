@@ -180,7 +180,7 @@ CheckOHKO:
 				RTS
 		.change
 		STA.l OHKOCached
-		INC.w UpdateHUD
+        INC.w UpdateHUDFlag
 		REP #$20
 		SEC
 RTS

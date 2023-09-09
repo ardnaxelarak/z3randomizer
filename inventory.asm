@@ -193,15 +193,15 @@ AddInventory:
 		JSR.w IncrementByOne
 		JSR.w StampItem
 		JSR.w IncrementYAItems
-			REP #$20
+                                REP #$30
 			LDA.l TotalItemCounter : INC : TAY
-			LDA.l BootsEquipment : BNE +
+                                LDA.l BootsEquipment : AND.w #$00FF : BNE +
 				TYA : STA.l PreBootsLocations
 			+
-			LDA.l MirrorEquipment : BNE +
+                                LDA.l MirrorEquipment : AND.w #$00FF : BNE +
 				TYA : STA.l PreMirrorLocations
 			+
-			LDA.l FluteEquipment : BNE +
+                                LDA.l FluteEquipment : AND.w #$00FF : BNE +
 				TYA : STA.l PreFluteLocations
 			+
 			TYA
@@ -409,7 +409,7 @@ Link_ReceiveItem_HUDRefresh:
 	+
 
 	JSL.l HUD_RefreshIconLong ; thing we wrote over
-	INC.w UpdateHUD
+        INC.w UpdateHUDFlag
 	JSL.l PostItemGet
 RTL
 ;--------------------------------------------------------------------------------
@@ -424,7 +424,7 @@ HandleBombAbsorbtion:
 		LDA.b #$04 : STA.w ItemCursor ; set selected item to bombs
 		LDA.b #$01 : STA.w CurrentYItem ; set selected item to bombs
 		JSL.l HUD_RebuildLong
-		INC.w UpdateHUD
+                INC.w UpdateHUDFlag
 	+
 RTL
 ;--------------------------------------------------------------------------------
