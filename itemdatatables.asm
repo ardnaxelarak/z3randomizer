@@ -85,11 +85,12 @@
 ; InventoryTable
 ;------------------------------------------------------------------------------
 ; .properties [0x01] - $A2C000 (0x114000 PC)
-;             • - - - - - - - -  p k w o a y s t
+;             • v - - - - - - -  p k w o a y s t
 ;             t = Count for total item counter | s = Count for total in shops
 ;             y = Y item                       | a = A item
 ;             o = Bomb item                    | w = Bow item
 ;             k = Chest Key                    | p = Crystal prize behavior (sparkle, etc) if set
+;             v = use vram location specified in item receipts gfx
 ; .stamp      [0x02] - $A2C200 (0x114200 PC)
 ;             • Pointer to address in bank $7E. Stamps 32-bit frame time if stats not locked.
 ; .stat       [0x02] - $A2C400 (0x114400 PC)
@@ -900,10 +901,10 @@ endmacro
 %InventoryItem($CE, $0001, $0000, $0000) ; CE -
 %InventoryItem($CF, $0001, $0000, $0000) ; CF -
 %InventoryItem($D0, $0001, $0000, $0000) ; D0 - Bee trap
-%InventoryItem($D1, $0001, $0000, $0000) ; D1 - Apples
-%InventoryItem($D2, $0001, $0000, $0000) ; D2 - Fairy
+%InventoryItem($D1, $8001, $0000, $0000) ; D1 - Apples
+%InventoryItem($D2, $8001, $0000, $0000) ; D2 - Fairy
 %InventoryItem($D3, $0001, $0000, $0000) ; D3 - Chicken
-%InventoryItem($D4, $0001, $0000, $0000) ; D4 - Big Magic
+%InventoryItem($D4, $8001, $0000, $0000) ; D4 - Big Magic
 %InventoryItem($D5, $0001, $0000, $0000) ; D5 - 5 Arrows
 %InventoryItem($D6, $0001, $0000, $0000) ; D6 -
 %InventoryItem($D7, $0001, $0000, $0000) ; D7 -
@@ -1481,3 +1482,269 @@ StandingItemGraphicsOffsets:
 	dw $0                                  ; FD -
 	dw $0                                  ; FE - Server request (async)
 	dw $0                                  ; FF -
+
+; high byte is ignore currently for narrow sprites, can't use stuff in OAM2 yet
+; may mess with palette as well
+VRAMAddressOffset:
+	dw $0024                               ; 00 - Fighter Sword and Shield
+	dw $0024                               ; 01 - Master Sword
+	dw $0024                               ; 02 - Tempered Sword
+	dw $0024                               ; 03 - Butter Sword
+	dw $0024                               ; 04 - Fighter Shield
+	dw $0024                               ; 05 - Fire Shield
+	dw $0024                               ; 06 - Mirror Shield
+	dw $0024                               ; 07 - Fire Rod
+	dw $0024                               ; 08 - Ice Rod
+	dw $0024                               ; 09 - Hammer
+	dw $0024                               ; 0A - Hookshot
+	dw $0024                               ; 0B - Bow
+	dw $0024                               ; 0C - Boomerang
+	dw $0024                               ; 0D - Powder
+	dw $0024                               ; 0E - Bottle Refill (bee)
+	dw $0024                               ; 0F - Bombos
+	dw $0024                               ; 10 - Ether
+	dw $0024                               ; 11 - Quake
+	dw $0024                               ; 12 - Lamp
+	dw $0024                               ; 13 - Shovel
+	dw $0024                               ; 14 - Flute
+	dw $0024                               ; 15 - Somaria
+	dw $0024                               ; 16 - Bottle
+	dw $0024                               ; 17 - Heartpiece
+	dw $0024                               ; 18 - Byrna
+	dw $0024                               ; 19 - Cape
+	dw $0024                               ; 1A - Mirror
+	dw $0024                               ; 1B - Glove
+	dw $0024                               ; 1C - Mitts
+	dw $0024                               ; 1D - Book
+	dw $0024                               ; 1E - Flippers
+	dw $0024                               ; 1F - Pearl
+	dw $0024                               ; 20 - Crystal
+	dw $0024                               ; 21 - Net
+	dw $0024                               ; 22 - Blue Mail
+	dw $0024                               ; 23 - Red Mail
+	dw $0024                               ; 24 - Small Key
+	dw $0024                               ; 25 - Compbutt
+	dw $0024                               ; 26 - Heart Container from 4/4
+	dw $0024                               ; 27 - Bomb
+	dw $0024                               ; 28 - 3 bombs
+	dw $0024                               ; 29 - Mushroom
+	dw $0024                               ; 2A - Red boomerang
+	dw $0024                               ; 2B - Full bottle (red)
+	dw $0024                               ; 2C - Full bottle (green)
+	dw $0024                               ; 2D - Full bottle (blue)
+	dw $0024                               ; 2E - Potion refill (red)
+	dw $0024                               ; 2F - Potion refill (green)
+	dw $0024                               ; 30 - Potion refill (blue)
+	dw $0024                               ; 31 - 10 bombs
+	dw $0024                               ; 32 - Big key
+	dw $0024                               ; 33 - Map
+	dw $0024                               ; 34 - 1 rupee
+	dw $0024                               ; 35 - 5 rupees
+	dw $0024                               ; 36 - 20 rupees
+	dw $0024                               ; 37 - Green pendant
+	dw $0024                               ; 38 - Blue pendant
+	dw $0024                               ; 39 - Red pendant
+	dw $0024                               ; 3A - Tossed bow
+	dw $0024                               ; 3B - Silvers
+	dw $0024                               ; 3C - Full bottle (bee)
+	dw $0024                               ; 3D - Full bottle (fairy)
+	dw $0024                               ; 3E - Boss heart
+	dw $0024                               ; 3F - Sanc heart
+	dw $0024                               ; 40 - 100 rupees
+	dw $0024                               ; 41 - 50 rupees
+	dw $0024                               ; 42 - Heart
+	dw $0024                               ; 43 - Arrow
+	dw $0024                               ; 44 - 10 arrows
+	dw $0024                               ; 45 - Small magic
+	dw $0024                               ; 46 - 300 rupees
+	dw $0024                               ; 47 - 20 rupees green
+	dw $0024                               ; 48 - Full bottle (good bee)
+	dw $0024                               ; 49 - Tossed fighter sword
+	dw $0024                               ; 4A - Active Flute
+	dw $0024                               ; 4B - Boots
+
+	; Rando items
+	dw $0024                               ; 4C - Bomb capacity (50)
+	dw $0024                               ; 4D - Arrow capacity (70)
+	dw $0024                               ; 4E - 1/2 magic
+	dw $0024                               ; 4F - 1/4 magic
+	dw $0024                               ; 50 - Safe master sword
+	dw $0024                               ; 51 - Bomb capacity (+5)
+	dw $0024                               ; 52 - Bomb capacity (+10)
+	dw $0024                               ; 53 - Arrow capacity (+5)
+	dw $0024                               ; 54 - Arrow capacity (+10)
+	dw $0024                               ; 55 - Programmable item 1
+	dw $0024                               ; 56 - Programmable item 2
+	dw $0024                               ; 57 - Programmable item 3
+	dw $0024                               ; 58 - Upgrade-only silver arrows
+	dw $0024                               ; 59 - Rupoor
+	dw $0024                               ; 5A - Nothing
+	dw $0024                               ; 5B - Red clock
+	dw $0024                               ; 5C - Blue clock
+	dw $0024                               ; 5D - Green clock
+	dw $0024                               ; 5E - Progressive sword
+	dw $0024                               ; 5F - Progressive shield
+	dw $0024                               ; 60 - Progressive armor
+	dw $0024                               ; 61 - Progressive glove
+	dw $0024                               ; 62 - RNG pool item (single)
+	dw $0024                               ; 63 - RNG pool item (multi)
+	dw $0024                               ; 64 - Progressive bow
+	dw $0024                               ; 65 - Progressive bow
+	dw $0024                               ; 66 -
+	dw $0024                               ; 67 -
+	dw $0024                               ; 68 -
+	dw $0024                               ; 69 -
+	dw $0024                               ; 6A - Triforce
+	dw $0024                               ; 6B - Power star
+	dw $0024                               ; 6C - Triforce Piece
+	dw $0024                               ; 6D - Server request item
+	dw $0024                               ; 6E - Server request item (dungeon drop)
+	dw $0024                               ; 6F -
+
+	dw $0024                               ; 70 - Map of Light World
+	dw $0024                               ; 71 - Map of Dark World
+	dw $0024                               ; 72 - Map of Ganon's Tower
+	dw $0024                               ; 73 - Map of Turtle Rock
+	dw $0024                               ; 74 - Map of Thieves' Town
+	dw $0024                               ; 75 - Map of Tower of Hera
+	dw $0024                               ; 76 - Map of Ice Palace
+	dw $0024                               ; 77 - Map of Skull Woods
+	dw $0024                               ; 78 - Map of Misery Mire
+	dw $0024                               ; 79 - Map of Dark Palace
+	dw $0024                               ; 7A - Map of Swamp Palace
+	dw $0024                               ; 7B - Map of Agahnim's Tower
+	dw $0024                               ; 7C - Map of Desert Palace
+	dw $0024                               ; 7D - Map of Eastern Palace
+	dw $0024                               ; 7E - Map of Hyrule Castle
+	dw $0024                               ; 7F - Map of Sewers
+
+	dw $0024                               ; 80 - Compass of Light World
+	dw $0024                               ; 81 - Compass of Dark World
+	dw $0024                               ; 82 - Compass of Ganon's Tower
+	dw $0024                               ; 83 - Compass of Turtle Rock
+	dw $0024                               ; 84 - Compass of Thieves' Town
+	dw $0024                               ; 85 - Compass of Tower of Hera
+	dw $0024                               ; 86 - Compass of Ice Palace
+	dw $0024                               ; 87 - Compass of Skull Woods
+	dw $0024                               ; 88 - Compass of Misery Mire
+	dw $0024                               ; 89 - Compass of Dark Palace
+	dw $0024                               ; 8A - Compass of Swamp Palace
+	dw $0024                               ; 8B - Compass of Agahnim's Tower
+	dw $0024                               ; 8C - Compass of Desert Palace
+	dw $0024                               ; 8D - Compass of Eastern Palace
+	dw $0024                               ; 8E - Compass of Hyrule Castle
+	dw $0024                               ; 8F - Compass of Sewers
+	dw $0024                               ; 90 - Skull key
+	dw $0024                               ; 91 - Reserved
+
+	dw $0024                               ; 92 - Big key of Ganon's Tower
+	dw $0024                               ; 93 - Big key of Turtle Rock
+	dw $0024                               ; 94 - Big key of Thieves' Town
+	dw $0024                               ; 95 - Big key of Tower of Hera
+	dw $0024                               ; 96 - Big key of Ice Palace
+	dw $0024                               ; 97 - Big key of Skull Woods
+	dw $0024                               ; 98 - Big key of Misery Mire
+	dw $0024                               ; 99 - Big key of Dark Palace
+	dw $0024                               ; 9A - Big key of Swamp Palace
+	dw $0024                               ; 9B - Big key of Agahnim's Tower
+	dw $0024                               ; 9C - Big key of Desert Palace
+	dw $0024                               ; 9D - Big key of Eastern Palace
+	dw $0024                               ; 9E - Big key of Hyrule Castle
+	dw $0024                               ; 9F - Big key of Sewers
+
+	dw $0024                               ; A0 - Small key of Sewers
+	dw $0024                               ; A1 - Small key of Hyrule Castle
+	dw $0024                               ; A2 - Small key of Eastern Palace
+	dw $0024                               ; A3 - Small key of Desert Palace
+	dw $0024                               ; A4 - Small key of Agahnim's Tower
+	dw $0024                               ; A5 - Small key of Swamp Palace
+	dw $0024                               ; A6 - Small key of Dark Palace
+	dw $0024                               ; A7 - Small key of Misery Mire
+	dw $0024                               ; A8 - Small key of Skull Woods
+	dw $0024                               ; A9 - Small key of Ice Palace
+	dw $0024                               ; AA - Small key of Tower of Hera
+	dw $0024                               ; AB - Small key of Thieves' Town
+	dw $0024                               ; AC - Small key of Turtle Rock
+	dw $0024                               ; AD - Small key of Ganon's Tower
+	dw $0024                               ; AE - Reserved
+	dw $0024                               ; AF - Generic small key
+	dw $0024                               ; B0 - Crystal 6
+	dw $0024                               ; B1 - Crystal 1
+	dw $0024                               ; B2 - Crystal 5
+	dw $0024                               ; B3 - Crystal 7
+	dw $0024                               ; B4 - Crystal 2
+	dw $0024                               ; B5 - Crystal 4
+	dw $0024                               ; B6 - Crystal 3
+	dw $0024                               ; B7 - Reserved
+	dw $0024                               ; B8 -
+	dw $0024                               ; B9 -
+	dw $0024                               ; BA -
+	dw $0024                               ; BB -
+	dw $0024                               ; BC -
+	dw $0024                               ; BD -
+	dw $0024                               ; BE -
+	dw $0024                               ; BF -
+	dw $0024                               ; C0 -
+	dw $0024                               ; C1 -
+	dw $0024                               ; C2 -
+	dw $0024                               ; C3 -
+	dw $0024                               ; C4 -
+	dw $0024                               ; C5 -
+	dw $0024                               ; C6 -
+	dw $0024                               ; C7 -
+	dw $0024                               ; C8 -
+	dw $0024                               ; C9 -
+	dw $0024                               ; CA -
+	dw $0024                               ; CB -
+	dw $0024                               ; CC -
+	dw $0024                               ; CD -
+	dw $0024                               ; CE -
+	dw $0024                               ; CF -
+	dw $0024                               ; D0 - Bee trap
+	dw $00E5                               ; D1 - Apples
+	dw $00EA                               ; D2 - Fairy
+	dw $0024                               ; D3 - Chicken
+	dw $0062                               ; D4 - Big Magic
+	dw $0024                               ; D5 - 5 Arrows
+	dw $0024                               ; D6 -
+	dw $0024                               ; D7 -
+	dw $0024                               ; D8 -
+	dw $0024                               ; D9 -
+	dw $0024                               ; DA -
+	dw $0024                               ; DB -
+	dw $0024                               ; DC -
+	dw $0024                               ; DD -
+	dw $0024                               ; DE -
+	dw $0024                               ; DF -
+	dw $0024                               ; E0 -
+	dw $0024                               ; E1 -
+	dw $0024                               ; E2 -
+	dw $0024                               ; E3 -
+	dw $0024                               ; E4 -
+	dw $0024                               ; E5 -
+	dw $0024                               ; E6 -
+	dw $0024                               ; E7 -
+	dw $0024                               ; E8 -
+	dw $0024                               ; E9 -
+	dw $0024                               ; EA -
+	dw $0024                               ; EB -
+	dw $0024                               ; EC -
+	dw $0024                               ; ED -
+	dw $0024                               ; EE -
+	dw $0024                               ; EF -
+	dw $0024                               ; F0 -
+	dw $0024                               ; F1 -
+	dw $0024                               ; F2 -
+	dw $0024                               ; F3 -
+	dw $0024                               ; F4 -
+	dw $0024                               ; F5 -
+	dw $0024                               ; F6 -
+	dw $0024                               ; F7 -
+	dw $0024                               ; F8 -
+	dw $0024                               ; F9 -
+	dw $0024                               ; FA -
+	dw $0024                               ; FB -
+	dw $0024                               ; FC -
+	dw $0024                               ; FD -
+	dw $0024                               ; FE - Server request (async)
+	dw $0024                               ; FF -

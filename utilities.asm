@@ -81,11 +81,17 @@ RTL
 ;-------------------------------------------------------------------------------- 20/847B
 LoadDynamicTileOAMTable:
         PHP
-        REP #$20
+        REP #$30
         LDA.w #$0000 : STA.l SpriteOAM : STA.l SpriteOAM+2
         LDA.w #$0200 : STA.l SpriteOAM+6
-        SEP #$20
-        LDA.b #$24 : STA.l SpriteOAM+4
+        LDA.w SpriteID,X : AND.w #$00FF
+        LDY.w #$0024
+        PHX : ASL : TAX
+        LDA.l InventoryTable_properties, X : BIT.w #$8000 : BEQ +
+        	LDA.l VRAMAddressOffset, X : TAY
+        + TYA : STA.l SpriteOAM+4
+        PLX
+        SEP #$30
 
         LDA.w SpriteID,X
         JSL.l GetSpritePalette_resolved
@@ -99,7 +105,7 @@ LoadDynamicTileOAMTable:
         LDA.w #$0400 : STA.l SpriteOAM+7 : STA.l SpriteOAM+14
         LDA.w #$0000 : STA.l SpriteOAM+14
         LDA.w #$0800 : STA.l SpriteOAM+9
-        LDA.w #$3400 : STA.l SpriteOAM+11
+        TYA : XBA : AND.w #$FF00 : ADC.w #$1000 : STA.l SpriteOAM+11
 
         SEP #$20
         LDA.b #$04 : STA.l SpriteOAM
