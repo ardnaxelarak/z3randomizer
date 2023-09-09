@@ -19,6 +19,7 @@ RequestStandingItemVRAMSlot:
 	; unsure about substitution rules here, because they aren't skipped properly for MW yet
 	JSL AttemptItemSubstitution
 	JSL ResolveLootIDLong
+	JSL ResolveBeeTrapLong
 	REP #$30
 	ASL : TAX
 	LDA.l StandingItemGraphicsOffsets,X
@@ -59,7 +60,9 @@ DrawPotItem:
 	JSL.l AttemptItemSubstitution
 	JSL.l ResolveLootIDLong
 	TAX
-	LDA.l SpriteProperties_standing_width,X : BEQ .narrow
+	LDA.l BeeTrapDisguise : BEQ +
+		TAX
+	+ LDA.l SpriteProperties_standing_width,X : BEQ .narrow
 
 	.full
 	PLX

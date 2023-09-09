@@ -63,16 +63,35 @@ PrepDynamicTile:
 	.notRemote
 	JSR.w ResolveLootID
         -
+	JSR ResolveBeeTrap
 	JSR.w LoadDynamicTileOAMTable
 	JSL TransferItemReceiptToBuffer_using_ReceiptID
         SEP #$30
     LDA.b #$00 : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID  ; clear player id
 	PLB : PLY : PLX
 RTL
-        .loot_resolved  ; todo: figure out if this entry point is needed by multiworld
+        .loot_resolved
 	PHX : PHY : PHB
         BRA -
 ;--------------------------------------------------------------------------------
+; ResolveBeeTrap
+; In: A - Loot ID
+; Out: A - Resolved Loot ID
+;--------------------------------------------------------------------------------
+ResolveBeeTrap:
+	PHA
+		LDA.b #$00 : STA.l BeeTrapDisguise ; clear it
+	PLA
+	CMP.b #$D0 : BNE +
+		JSL.l GetRandomInt : AND.b #$3F
+		BNE ++ : LDA.b #$49 : ++ CMP.b #$26 : BNE ++ : LDA.b #$6A : ++
+		STA.l BeeTrapDisguise
++ RTS
+
+ResolveBeeTrapLong:
+	JSR ResolveBeeTrap
+RTL
+
 
 ;--------------------------------------------------------------------------------
 ; LoadDynamicTileOAMTable
@@ -84,8 +103,9 @@ LoadDynamicTileOAMTable:
         REP #$30
         LDA.w #$0000 : STA.l SpriteOAM : STA.l SpriteOAM+2
         LDA.w #$0200 : STA.l SpriteOAM+6
-        LDA.w SpriteID,X : AND.w #$00FF
-        LDY.w #$0024
+        LDA.l BeeTrapDisguise : AND.w #$00FF : BNE +
+        	LDA.w SpriteID,X : AND.w #$00FF
+        + LDY.w #$0024
         PHX : ASL : TAX
         LDA.l InventoryTable_properties, X : BIT.w #$8000 : BEQ +
         	LDA.l VRAMAddressOffset, X : TAY
@@ -93,8 +113,9 @@ LoadDynamicTileOAMTable:
         PLX
         SEP #$30
 
-        LDA.w SpriteID,X
-        JSL.l GetSpritePalette_resolved
+		LDA.l BeeTrapDisguise : BNE +
+			LDA.w SpriteID,X
+        + JSL.l GetSpritePalette_resolved
         STA.l SpriteOAM+5 : STA.l SpriteOAM+13
         PHX
         LDA.l SpriteProperties_standing_width,X : BEQ .narrow
@@ -126,7 +147,9 @@ DrawDynamicTile:
 		JSR PrepDrawRemoteItemSprite
         PHX
         TAX
-        LDA.l SpriteProperties_standing_width,X : BEQ .narrow
+        LDA.l BeeTrapDisguise : BEQ +
+        	TAX
+        + LDA.l SpriteProperties_standing_width,X : BEQ .narrow
 
         .full
         PLX

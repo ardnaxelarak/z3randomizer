@@ -545,7 +545,7 @@ PowderFlag: skip 1                 ; Flag for powder junk
 ShopPriceColumn: skip 3            ; Stores coordinates for drawing prices in shops
 ShopInventoryPlayer: skip 3        ; Multiworld id for player inventory
 ShopInventoryDisguise: skip 3      ; Bee trap is disguised as another item in shop
-skip 1                             ; Unused
+BeeTrapDisguise: skip 1            ; Unused
 skip 2                             ; Reserved for OneMind
 OneMindId: skip 1                  ; Current OneMind player
 OneMindTimerRAM: skip 2            ; Frame counter for OneMind
@@ -961,6 +961,7 @@ endmacro
 %assertRAM(ShopPriceColumn, $7F5066)
 %assertRAM(ShopInventoryPlayer, $7F5069)
 %assertRAM(ShopInventoryDisguise, $7F506C)
+%assertRAM(BeeTrapDisguise, $7F506F)
 %assertRAM(OneMindId, $7F5072)
 %assertRAM(OneMindTimerRAM, $7F5073)
 %assertRAM(ClockStatus, $7F507E)
