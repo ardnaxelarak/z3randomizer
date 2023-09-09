@@ -168,23 +168,23 @@ CurrentGenericKeys: skip 1      ; Generic small keys
 ;================================================================================
 ; Tracking & Indicators ($7EF38C - $7EF3F0)
 ;--------------------------------------------------------------------------------
-InventoryTracking: skip 2       ; 2 - - - - - o q  b r m p n s k f (bitfield)
+InventoryTracking: skip 2       ; - - - - - - o q  b r m p n s k f (bitfield)
                                 ; b = Blue Boomerang   | r = Red Boomerang  | m = Mushroom Current
                                 ; p = Magic Powder     | n = Mushroom Past  | s = Shovel
                                 ; k = Inactive Flute   | f = Active Flute   | o = Any bomb acquired
-                                ; q = Quickswap locked | 2 = Item on B
-BowTracking: skip 1             ; b s p f - - - - (bitfield)
+                                ; q = Quickswap locked
+BowTracking: skip 2             ; - - - - - - - -  b s p f - - - - (bitfield)
                                 ; b = Any Bow               | s = Silver Arrows Upgrade | p = Second Progressive Bow
                                 ; f = First progressive bow
                                 ; The front end writes two distinct progressive bow items. p
                                 ; indicates whether the "second" has been found independent of
                                 ; the first
-SpecialWeaponLevel: skip 1      ; Keeps track of level of weapon in bomb-only and cane-only modes
 ItemLimitCounts: skip 16        ; Keeps track of limited non-progressive items such as lamp.
                                 ; See: ItemSubstitutionRules in tables.asm
                                 ; Right now this is only used for three items but extra space is
                                 ; reserved
-skip 36                         ; Unused
+skip 35                         ; Unused
+SpecialWeaponLevel: skip 1      ; Keeps track of level of weapon in item modes
 ItemOnB: skip 1                 ; same table as $0202; $01 = arrows .. $14 = mirror
 ProgressIndicator: skip 1       ; $00 = Pre-Uncle | $01 = Post-Uncle item | $02 = Zelda Rescued
                                 ; $03 = Agahnim 1 defeated
@@ -551,7 +551,7 @@ endmacro
 ;--------------------------------------------------------------------------------
 %assertSRAM(InventoryTracking, $7EF38C)
 %assertSRAM(BowTracking, $7EF38E)
-%assertSRAM(SpecialWeaponLevel, $7EF38F)
+%assertSRAM(SpecialWeaponLevel, $7EF3C3)
 %assertSRAM(ItemLimitCounts, $7EF390)
 ;--------------------------------------------------------------------------------
 %assertSRAM(GameCounter, $7EF3FF)
