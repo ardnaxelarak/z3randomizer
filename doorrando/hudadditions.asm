@@ -61,8 +61,9 @@ DRHUD_BossIndicator:
 
 DRHUD_EnemyDropIndicator:
 	REP #$30
+	LDA.l DRFlags : BIT #$0800 : BEQ +
 	LDA.w !EnemyDropIndicator : STA.w !IndicatorAddress
-	SEP #$20
+	+ SEP #$20
 	LDA.w $040C : CMP.b #$1B : BCS DRHUD_Finished
 	SEP #$10 : TAX : REP #$10
 
