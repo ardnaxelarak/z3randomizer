@@ -22,6 +22,9 @@ org $86F976
 org $86E3C4
 	JSL RevealSpriteDrop2 : NOP
 
+org $86F933
+	 JSL PikitOverride
+
 org $86926e ; <- 3126e - sprite_prep.asm : 2664 (LDA $0B9B : STA $0CBA, X)
 	JSL SpriteKeyPrep : NOP #2
 
@@ -405,6 +408,17 @@ LoadSpriteData:
 			DEY
 			.common
 			DEY : LDA.b [$00], Y : STA.l SprItemReceipt, X
+			STA.b Scrap0E
+			LDA.l SprItemMWPlayer, X : BNE +  ; skip if multiworld
+				PHX
+ 					LDX.b #$00 ; see if the item should be replaced by an absorbable
+                	- CPX.b #$1A : BCS .done
+                		LDA.l MinorForcedDrops, X
+                		CMP.b Scrap0E : BEQ ++
+                			INX #2 : BRA -
+                		++ PLX : LDA.l SprItemFlags, X : ORA.b #$80 : STA.l SprItemFlags, X : PHX
+                .done PLX
+			+
 		INY : INY
 		PLA
 		PLA : PLA ; remove the JSL return lower 16 bits
@@ -419,21 +433,11 @@ RevealSpriteDrop:
 	JMP DoNormalDrop
 
 CheckIfDropValid:
-	REP #$30 : PHX ; save it for later
-	TXA : ASL : TAX : LDA.l BitFieldMasks, X : STA.b $00  ; stores the bitmask for the specific drop
-	; check sram, if gotten, run normal
-	LDA.b $A0 : ASL : TAX : LDA.l SpriteDropData, X : PLX ; restore X in case we're done
-	BIT.b $00 : BNE DoNormalDrop ; zero indicates the item has not been obtained
-	PHX  ; save it for later
-	LDX.b $A0 : LDA.l UWSpecialFlagIndex, X : AND.w #$00FF
-	CMP.w #$00FF : BEQ + ; $FF indicates the EnemyItemFlags are sufficient
-		JSR FetchBitmaskForSpecialCase
-		BRA .test
-	+ TXA : ASL : TAX : LDA.l UWEnemyItemFlags, X
-	.test PLX : BIT.b $00 : BEQ DoNormalDrop ; zero indicates the enemy doesn't drop
-	SEP #$30
+	LDA.l SprItemFlags, X : BIT #$80 : BNE .do_the_drop  ; it's a minor item
+	JSR CheckIfDropsInThisLocation : BCC DoNormalDrop
+	.do_the_drop
 	;This section sets up the drop
-		LDA #$02 : STA.l SpawnedItemFlag
+		LDA.b #$02 : STA.l SpawnedItemFlag
 		STX.w SpawnedItemIndex
 		LDA.l SprItemReceipt, X : STA SpawnedItemID
 		LDA.l SprItemMWPlayer, X : STA SpawnedItemMWPlayer
@@ -449,7 +453,7 @@ CheckIfDropValid:
 			LDA.l MinorForcedDrops, X
 			CMP.b $00 : BNE +
 				INX : LDA.l MinorForcedDrops, X : STA.b $00
-				PLX : PLA : PLA : PEA.w $06F9D7-1 ; change call stack for PrepareEnemyDrop
+				PLX : PLA : PLA : PEA.w PrepareEnemyDrop-1 ; change call stack for PrepareEnemyDrop
 				JSR IncrementCountForMinor
 				LDA.b $00 : RTL
 			+ INX #2 : BRA -
@@ -472,9 +476,43 @@ RevealSpriteDrop2:
 	LDY.w $0CBA, X : BEQ .no_forced_drop
 		RTL
 	.no_forced_drop
-	PLA : PLA ; remove the JSL reswamturn lower 16 bits
+	PLA : PLA ; remove the JSL return lower 16 bits
 	PEA.w $06E3CE-1 ; change return address to .no_forced_drop of (Sprite_DoTheDeath)
 	RTL
+
+PikitOverride:
+	CMP.b #$AA : BNE .no_pikit_drop
+	LDY.w $0E90,X : BEQ .no_pikit_drop
+	CPY.b #$04 : BEQ .normal_pikit
+	LDA.l SprDropsItem, X : BEQ .normal_pikit
+	JSR CheckIfDropsInThisLocation : BCC .normal_pikit
+.no_pikit_drop
+	PLA : PLA : PEA.w Sprite_DoTheDeath_NotAPikitDrop-1
+RTL
+.normal_pikit
+	PLA : PLA : PEA.w Sprite_DoTheDeath_PikitDrop-1
+RTL
+
+; output - carry clear if the enemy doesn't drop, set if it does
+CheckIfDropsInThisLocation:
+	REP #$30 : PHX ; save it for later
+	TXA : ASL : TAX : LDA.l BitFieldMasks, X : STA.b $00  ; stores the bitmask for the specific drop
+	; check sram, if gotten, run normal
+	LDA.b $A0 : ASL : TAX : LDA.l SpriteDropData, X : PLX ; restore X in case we're done
+	BIT.b $00 : BNE .normal_drop ; zero indicates the item has not been obtained
+	PHX  ; save it for later
+	LDX.b $A0 : LDA.l UWSpecialFlagIndex, X : AND.w #$00FF
+	CMP.w #$00FF : BEQ + ; $FF indicates the EnemyItemFlags are sufficient
+		JSR FetchBitmaskForSpecialCase
+		BRA .test
+	+ TXA : ASL : TAX : LDA.l UWEnemyItemFlags, X
+	.test PLX : BIT.b $00 : BEQ .normal_drop ; zero indicates the enemy doesn't drop
+	.valid
+	SEP #$30 : SEC
+RTS
+	.normal_drop
+	SEP #$30 : CLC
+RTS
 
 ; input - A the index from UWSpecialFlagIndex
 ; uses X for loop, $02 for comparing first byte to dungeon
@@ -547,7 +585,7 @@ ShouldSpawnItem:
 		PHX
 			TAX : LDA.l BitFieldMasks, X : STA $00
 		PLX ; restore X again
-		LDA.w SprItemFlags, X : AND #$00FF : CMP #$0001 : BEQ +
+		LDA.w SprItemFlags, X : BIT.w #$0001 : BEQ +
 			TYX : LDA.l SpriteDropData, X : BIT $00 : BEQ .notObtained
 			BRA .obtained
 		+ TYX : LDA.l RoomPotData, X : BIT $00 : BEQ .notObtained
