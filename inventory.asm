@@ -147,8 +147,8 @@ AddInventory:
 	PHA : PHX : PHY : PHP : PHB
         PHK : PLB
         LDA.b #$7E : STA.b Scrap0D
-	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .countDungeonChecks
 	LDA.l StatsLocked : BNE .done
+	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .countDungeonChecks
                 REP #$30
                 TYA : AND.w #$00FF : ASL : TAX
                 SEP #$20
@@ -216,6 +216,7 @@ RTS
 
 DungeonIncrement:
 ; In: X - Receipt ID << 1
+   REP #$10
    PHX
    LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .done
         LDA.w InventoryTable_properties,X : BIT.b #$40 : BEQ +

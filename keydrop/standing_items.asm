@@ -585,7 +585,7 @@ ShouldSpawnItem:
 		PHX
 			TAX : LDA.l BitFieldMasks, X : STA $00
 		PLX ; restore X again
-		LDA.w SprItemFlags, X : BIT.w #$0001 : BEQ +
+		LDA.w SprItemFlags, X : BIT.w #$0001 : BNE +
 			TYX : LDA.l SpriteDropData, X : BIT $00 : BEQ .notObtained
 			BRA .obtained
 		+ TYX : LDA.l RoomPotData, X : BIT $00 : BEQ .notObtained
@@ -597,7 +597,7 @@ ShouldSpawnItem:
 	RTL
 
 MarkSRAMForItem:
-	LDA $048E : CMP.b #$87 : BNE + ; check for hera basement cage
+	LDA.b RoomIndex : CMP.b #$87 : BNE + ; check for hera basement cage
 		CPX #$0A : BNE +  ; the hera basement key is always sprite 0x0A
 			LDA $A8 : AND.b #$03 : CMP.b #$02 : BNE +
 				LDA.w $0403 : ORA.w KeyRoomFlagMasks, Y : RTL
