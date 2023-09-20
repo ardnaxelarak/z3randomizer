@@ -2660,6 +2660,10 @@ org $82E297 ; LDA.w #$0002 : STA.b $2F
 JSL WalkUpOnOverworld
 NOP
 
+org $82E36F
+JSL CheckStairsAdjustment
+NOP
+
 org $82D7D2 ; BEQ .face_up
 NOP #2 ; this fixes Link's direction after mirroring and falling after entering through back of tavern
 

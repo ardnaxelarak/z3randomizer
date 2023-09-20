@@ -75,3 +75,16 @@ WalkUpOnOverworld:
 	.normal
 	LDA #$0002 : STA $2F ; what we overwrote
 RTL
+
+;--------------------------------------------------------------------------------
+; CheckStairsAdjustment
+;--------------------------------------------------------------------------------
+CheckStairsAdjustment:
+	LDA.b $A0
+	CMP.w #$0124 ; vanilla check, rooms $0124 to $0127 have a lower exit position (currently ER ignores the entrance location)
+	BCC .done
+	LDA.w #$FFFF-1
+	CMP.w $0696 ; tavern back ($0696 == #$FFFF) should always have carry cleared
+.done
+RTL
+; if carry cleared, shift position up
