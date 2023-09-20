@@ -282,6 +282,7 @@ Underworld_DoorDown_Entry:
 ;--------------------------------------------------------------------------------
 ; Check if the boss in ToH has been defeated (16-bit accumulator)
 CheckHeraBossDefeated:
-    LDA.l RoomDataWRAM[$07].l : AND.w #$FF00
-    RTL
+LDA RoomDataWRAM[$07].high : AND.w #$00FF : BEQ +
+    SEC : RTL
++ CLC : RTL
 ;--------------------------------------------------------------------------------
