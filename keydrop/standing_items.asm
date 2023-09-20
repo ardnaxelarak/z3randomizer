@@ -554,6 +554,7 @@ IncrementCountForMinor:
 		ORA $0A : STA SpriteDropData, X
 		SEP #$10
 		JSR SetupEnemyDropIndicator
+		REP #$20
 		LDX.w $040C : CPX.b #$FF : BEQ +
 			CPX.b #$00 : BNE ++
 				INX #2 ; treat sewers as HC
@@ -644,7 +645,8 @@ SpriteKeyPrep:
 SpriteKeyDrawGFX:
     JSL Sprite_DrawRippleIfInWater
     PHA
-    LDA $0E80, X
+    LDA.l SprItemMWPlayer, X : STA.w !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    LDA.w $0E80, X
    	CMP.b #$24 : BNE +
    		LDA $A0 : CMP #$80 : BNE ++
    		LDA SpawnedItemFlag : BNE ++

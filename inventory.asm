@@ -218,10 +218,10 @@ DungeonIncrement:
 ; In: X - Receipt ID << 1
    REP #$10
    PHX
+   LDA.w InventoryTable_properties,X : BIT.b #$40 : BEQ +
+   		JSL.l CountChestKeyLong
+   +
    LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .done
-        LDA.w InventoryTable_properties,X : BIT.b #$40 : BEQ +
-                JSL.l CountChestKeyLong
-        +
 	SEP #$10
 	LDA.b IndoorsFlag : BEQ .done
         LDA.w DungeonID : BMI .done

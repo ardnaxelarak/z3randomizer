@@ -747,9 +747,9 @@ endmacro
 %InventoryItem($34, $0001, $0000, $0000) ; 34 - 1 rupee
 %InventoryItem($35, $0001, $0000, $0000) ; 35 - 5 rupees
 %InventoryItem($36, $0001, $0000, $0000) ; 36 - 20 rupees
-%InventoryItem($37, $0001, $0000, $0000) ; 37 - Green pendant
-%InventoryItem($38, $0001, $0000, $0000) ; 38 - Red pendant
-%InventoryItem($39, $0001, $0000, $0000) ; 39 - Blue pendant
+%InventoryItem($37, $0000, $0000, $0000) ; 37 - Green pendant
+%InventoryItem($38, $0000, $0000, $0000) ; 38 - Red pendant
+%InventoryItem($39, $0000, $0000, $0000) ; 39 - Blue pendant
 %InventoryItem($3A, $00A5, $0000, $0000) ; 3A - Bow And Arrows
 %InventoryItem($3B, $00A5, $0000, $0000) ; 3B - Silver Bow
 %InventoryItem($3C, $0085, $0000, $0000) ; 3C - Full bottle (bee)
@@ -868,13 +868,13 @@ endmacro
 %InventoryItem($AD, $0041, $0000, SmallKeyCounter) ; AD - Small key of Ganon's Tower
 %InventoryItem($AE, $0001, $0000, $0000) ; AE - Reserved
 %InventoryItem($AF, $0001, $0000, SmallKeyCounter) ; AF - Generic small key
-%InventoryItem($B0, $0081, $0000, $0000) ; B0 - Crystal 6
-%InventoryItem($B1, $0081, $0000, $0000) ; B1 - Crystal 1
-%InventoryItem($B2, $0081, $0000, $0000) ; B2 - Crystal 5
-%InventoryItem($B3, $0081, $0000, $0000) ; B3 - Crystal 7
-%InventoryItem($B4, $0081, $0000, $0000) ; B4 - Crystal 2
-%InventoryItem($B5, $0081, $0000, $0000) ; B5 - Crystal 4
-%InventoryItem($B6, $0081, $0000, $0000) ; B6 - Crystal 3
+%InventoryItem($B0, $0080, $0000, $0000) ; B0 - Crystal 6
+%InventoryItem($B1, $0080, $0000, $0000) ; B1 - Crystal 1
+%InventoryItem($B2, $0080, $0000, $0000) ; B2 - Crystal 5
+%InventoryItem($B3, $0080, $0000, $0000) ; B3 - Crystal 7
+%InventoryItem($B4, $0080, $0000, $0000) ; B4 - Crystal 2
+%InventoryItem($B5, $0080, $0000, $0000) ; B5 - Crystal 4
+%InventoryItem($B6, $0080, $0000, $0000) ; B6 - Crystal 3
 %InventoryItem($B7, $0000, $0000, $0000) ; B7 - Reserved
 %InventoryItem($B8, $0001, $0000, $0000) ; B8 -
 %InventoryItem($B9, $0001, $0000, $0000) ; B9 -
