@@ -480,7 +480,7 @@ AddReceivedItemExpandedGetItem:
 			LDA #$01 : STA SomariaEquipment
 			BRA .done
 	+ CMP.b #$C2 : BNE + ; Bug Net Upgrade
-		LDA.l #$01 : STA BugNetEquipment
+		LDA.b #$01 : STA BugNetEquipment
 		BRA .done
 	+
 	.done
