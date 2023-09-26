@@ -361,7 +361,7 @@ SetupEnemyDropIndicator:
 	; compass checks
 	; does compass for dungeon exist?
 	LSR : TAX : LDA.l ExistsTransfer, X : TAX : LDA.l CompassExists, X : BEQ .skipCompassChecks
-	; doe we have the compass
+	; do we have the compass
 	; todo: sewers?
 	LDA.l CompassField : LDX.w $040C : AND.l DungeonMask, X : BEQ .done
 
@@ -519,13 +519,15 @@ RTS
 ; output - A the correct bitmask
 FetchBitmaskForSpecialCase:
 	ASL : TAX
-	LDA.w $040C : BNE +   ; could check if we are in a cave here and branch to different function?
+	LDA.w $040C : BNE +   ;  here and branch to different function?
 		INC #2 ; move sewers to HC
+	+ CMP.w #$00FF : BNE +  ; check if we are in a cave
+		LDA.l PreviousOverworldDoor : AND.w #$00FF ; use this instead of dungeon id
 	+ STA.b $02
 	- LDA.l UWSpecialFlag, X : AND.w #$00FF
 	CMP.w #$00FF : BNE +  ; if the value is FF we are done, use 0 as bitmask
 		LDA.w #$0000 : RTS
-	+  CMP.b $02 : BNE +  ; if the value matches the dungeon, use next 2 bytes as bitmasl
+	+  CMP.b $02 : BNE +  ; if the value matches the dungeon, use next 2 bytes as bitmask
 		INX : LDA.l UWSpecialFlag, X : RTS
 	+ INX #3 : BRA - ; else move to the next row
 

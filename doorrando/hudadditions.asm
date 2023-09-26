@@ -24,10 +24,11 @@ DrHudOverride:
 
 DRHUD_DrawItemCounter:
 	; hides total for mystery seeds
+	LDA.l ItemCounterHUD : BEQ DRHUD_DrawIndicators
 	LDA.l DRFlags+1 : LSR : BCC DRHUD_DrawIndicators
 	REP #$30
-	LDY.w #!HyphenTile : STA.w HUDGoalIndicator+$0A : STA.w HUDGoalIndicator+$0C
-                       STA.w HUDGoalIndicator+$0E : STA.w HUDGoalIndicator+$10
+	LDY.w #!HyphenTile : STY.w HUDGoalIndicator+$0A : STY.w HUDGoalIndicator+$0C
+                       STY.w HUDGoalIndicator+$0E : STY.w HUDGoalIndicator+$10
     SEP #$30
 
 DRHUD_DrawIndicators:
