@@ -2139,6 +2139,9 @@ PHB : JSL.l DarkWorldSaveFix
 org $028046 ; <- 10046 - Bank02.asm : 217 (JSL EnableForceBlank) (Start of Module_LoadFile)
 JSL.l OnFileLoad
 ;--------------------------------------------------------------------------------
+org $0280A2
+JSL GetCurrentWorldForLoad
+;--------------------------------------------------------------------------------
 org $09F520 ; <- 4F520 - module_death.asm : 401 (LDA $7EF3C5 : CMP.b #$03 : BCS BRANCH_THETA)
 JSL.l OnPlayerDead
 JSL.l IncrementDeathCounter

@@ -110,6 +110,15 @@ FakeWorldFix:
 	+
 RTL
 ;--------------------------------------------------------------------------------
+GetCurrentWorldForLoad:
+LDA FollowerIndicator : CMP #$04 : BNE .default
+	LDA InvertedMode : BEQ +
+		LDA #$40
+	+ RTL 
+.default
+LDA CurrentWorld
+RTL 
+;--------------------------------------------------------------------------------
 MasterSwordFollowerClear:
 	LDA FollowerIndicator
 	CMP #$0E : BNE .exit ; clear master sword follower
