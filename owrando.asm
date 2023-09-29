@@ -56,16 +56,11 @@ Link_ResetSwimmingState:
 
 
 ; mirror hooks
-org $02FBAB
-JSL OWMirrorSpriteRestore : NOP
 org $05AF75
 Sprite_6C_MirrorPortal:
-jsl OWPreserveMirrorSprite : nop #2 ; LDA $7EF3CA : BNE $05AFDF
+jsl OWMirrorSpriteDisable ; LDA $7EF3CA
 org $05AFDF
 Sprite_6C_MirrorPortal_missing_mirror:
-JML OWMirrorSpriteDelete : NOP ; STZ $0DD0,X : BRA $05AFF1
-org $0ABFBF
-JSL OWMirrorSpriteOnMap : BRA + : NOP #6 : +
 
 ; whirlpool shuffle cross world change
 org $02b3bd
@@ -257,64 +252,28 @@ OWDestroyItemSprites:
     DEX : BPL .nextSprite
     PLX : RTL
 }
-OWMirrorSpriteOnMap:
+OWMirrorSpriteDisable:
 {
-    lda.w $1ac0,x : bit.b #$f0 : beq .continue
-        lda.b #$00 : rtl
-    .continue
-    ora.w $1ab0,x
-    ora.w $1ad0,x
-    ora.w $1ae0,x
-    rtl
-}
-OWPreserveMirrorSprite:
-{
-    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla ; if OW Crossed, skip world check and continue
-        lda.b $10 : cmp.b #$0f : beq .vanilla ; if performing mirror superbunny
-            rtl
+    LDA.b $10 : CMP.b #$0F : BEQ +  ; avoid rare freeze during mirror superbunny
+	    RTL
+	+ PLA : PLA : PLA : JML Sprite_6C_MirrorPortal_missing_mirror
+    
+    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla
+        stz.w $0FC6 ; enable drawing portal
+        lda.l InvertedMode : beq +
+            lda.l CurrentWorld : eor.b #$40
+            bra ++
+        + lda.l CurrentWorld : ++ beq .return
+            lda.b #$03 : sta.w $0FC6 ; skips drawing portal
+            stz.w $0DD0,x ; disables collision
+
+        .return
+        lda.l InvertedMode : beq +
+            lda.b #$40
+        + rtl
     
     .vanilla
-    lda.l InvertedMode : beq +
-        lda.l CurrentWorld : beq .deleteMirror
-        rtl
-    + lda.l CurrentWorld : bne .deleteMirror
-        rtl
-
-    .deleteMirror
-    lda.b $10 : cmp.b #$0f : bne +
-        jsr.w OWMirrorSpriteMove ; if performing mirror superbunny
-    + pla : pla : pla : jml Sprite_6C_MirrorPortal_missing_mirror
-}
-OWMirrorSpriteMove:
-{
-    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq +
-        lda.w $1acf : ora.b #$40 : sta.w $1acf
-    + rts
-}
-OWMirrorSpriteBonk:
-{
-    jsr.w OWMirrorSpriteMove
-    lda.b #$2c : jml SetGameModeLikeMirror ; what we wrote over
-}
-OWMirrorSpriteDelete:
-{
-    stz.w $0dd0,x ; what we wrote over
-    jsr.w OWMirrorSpriteMove
-    jml Sprite_6C_MirrorPortal_dont_do_warp
-}
-OWMirrorSpriteRestore:
-{
-    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .return
-        lda.l InvertedMode : beq +
-            lda.l CurrentWorld : beq .return
-            bra .restorePortal
-        + lda.l CurrentWorld : bne .return
-        
-    .restorePortal
-    lda.w $1acf : and.b #$0f : sta.w $1acf
-    
-    .return
-    rep #$30 : lda.w $04AC ; what we wrote over
+    lda.l CurrentWorld ; what we wrote over
     rtl
 }
 OWLightWorldOrCrossed:

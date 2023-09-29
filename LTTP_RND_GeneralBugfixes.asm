@@ -575,9 +575,6 @@ Overworld_CheckForSpecialOverworldTrigger_Direction:
 org $05A51D
 Sprite_SpawnFallingItem:
 
-org $05AFF1
-Sprite_6C_MirrorPortal_dont_do_warp:
-
 org $05DF6C ; 02DF6C - Bank05.asm : 2445
 Sprite_DrawMultiple:
 
