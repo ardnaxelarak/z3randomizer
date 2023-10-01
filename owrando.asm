@@ -56,9 +56,13 @@ Link_ResetSwimmingState:
 
 
 ; mirror hooks
+org $0283DC ; override world check when spawning mirror portal sprite in Crossed OWR
+jsl.l OWLightWorldOrCrossed
 org $05AF75
 Sprite_6C_MirrorPortal:
 jsl OWMirrorSpriteDisable ; LDA $7EF3CA
+org $05AF88
+jsl OWMirrorSpriteSkipDraw : NOP ; LDA.w $0FC6 : CMP.b #$03
 org $05AFDF
 Sprite_6C_MirrorPortal_missing_mirror:
 org $0ABFB6
@@ -96,10 +100,6 @@ jsl OWOldManSpeed
 ; Dark Bonk Rocks Rain Sequence Guards (allowing Tile Swap on Dark Bonk Rocks)
 ;org $09c957 ; <- 4c957
 ;dw #$cb5f ; matches value on Central Bonk Rocks screen
-
-; override world check when spawning mirror portal sprite in Crossed OWR
-org $0283dc
-jsl.l OWLightWorldOrCrossed
 
 ; override world check when viewing overworld (incl. title screen portion)
 org $0aba6c  ; < ? - Bank0a.asm:474 ()
@@ -263,20 +263,11 @@ OWMirrorSpriteOnMap:
 }
 OWMirrorSpriteDisable:
 {
-    LDA.b $10 : CMP.b #$0F : BEQ +  ; avoid rare freeze during mirror superbunny
-	    RTL
-	+ PLA : PLA : PLA : JML Sprite_6C_MirrorPortal_missing_mirror
+    LDA.b $10 : CMP.b #$0F : BNE +  ; avoid rare freeze during mirror superbunny
+	    PLA : PLA : PLA : JML Sprite_6C_MirrorPortal_missing_mirror
+	+ 
     
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla
-        stz.w $0FC6 ; enable drawing portal
-        lda.l InvertedMode : beq +
-            lda.l CurrentWorld : eor.b #$40
-            bra ++
-        + lda.l CurrentWorld : ++ beq .return
-            lda.b #$03 : sta.w $0FC6 ; skips drawing portal
-            stz.w $0DD0,x ; disables collision
-
-        .return
         lda.l InvertedMode : beq +
             lda.b #$40
         + rtl
@@ -284,6 +275,20 @@ OWMirrorSpriteDisable:
     .vanilla
     lda.l CurrentWorld ; what we wrote over
     rtl
+}
+OWMirrorSpriteSkipDraw:
+{
+    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla
+        lda.l InvertedMode : beq +
+            lda.l CurrentWorld : eor.b #$40
+            bra ++
+        + lda.l CurrentWorld : ++ beq .vanilla
+            stz.w $0D90,x ; disables collision
+            sec : rtl
+    
+    .vanilla
+    LDA.w $0FC6 : CMP.b #$03 ; what we wrote over
+    RTL
 }
 OWLightWorldOrCrossed:
 {
