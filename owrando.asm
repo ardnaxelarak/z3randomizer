@@ -61,6 +61,8 @@ Sprite_6C_MirrorPortal:
 jsl OWMirrorSpriteDisable ; LDA $7EF3CA
 org $05AFDF
 Sprite_6C_MirrorPortal_missing_mirror:
+org $0ABFB6
+jsl OWMirrorSpriteOnMap : NOP ; LDA.w $008A : CMP.b #$40
 
 ; whirlpool shuffle cross world change
 org $02b3bd
@@ -251,6 +253,13 @@ OWDestroyItemSprites:
     .continue
     DEX : BPL .nextSprite
     PLX : RTL
+}
+
+OWMirrorSpriteOnMap:
+{
+    JSL OWWorldCheck
+    CMP.b #$40 ; part of what we wrote over
+    RTL
 }
 OWMirrorSpriteDisable:
 {
