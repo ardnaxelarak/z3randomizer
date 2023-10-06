@@ -124,15 +124,7 @@ boss_move:
 
         .loop_middle ; move sprites
         LDA $0E20, X
-        CMP #$E3 : BNE + ;is it a fairy?? if not check next
-            BRA .no_change
-        +
-        CMP #$D1 : BNE + ;is it a bunny changer
-            BRA .no_change
-        +
-        CMP #$C5 : BNE + ;is it a medusa head
-            BRA .no_change
-        +
+        JSR ShouldMoveSprite : BCC .no_change
         LDA $0D10, X : !ADD #$68 : STA $0D10, X
         LDA $0D00, X : !ADD #$68 : STA $0D00, X
 
@@ -158,15 +150,7 @@ boss_move:
 
         .loop_top_right ; move sprites
         LDA $0E20, X
-        CMP #$E3 : BNE + ;is it a fairy?? if not check next
-            BRA .no_change2
-        +
-        CMP #$D1 : BNE + ;is it a bunny changer
-            BRA .no_change2
-        +
-        CMP #$C5 : BNE + ;is it a medusa head
-            BRA .no_change2
-        +
+        JSR ShouldMoveSprite : BCC .no_change2
         LDA $0D20, X : !ADD #$00 : STA $0D20, X
         LDA $0D30, X : !ADD #$01 : STA $0D30, X
 
@@ -192,15 +176,7 @@ boss_move:
 
         .loop_bottom_right ; move sprites
         LDA $0E20, X
-        CMP #$E3 : BNE + ;is it a fairy?? if not check next
-            BRA .no_change3
-        +
-        CMP #$D1 : BNE + ;is it a bunny changer
-            BRA .no_change3
-        +
-        CMP #$C5 : BNE + ;is it a medusa head
-            BRA .no_change3
-        +
+        JSR ShouldMoveSprite : BCC .no_change3
         LDA $0D20, X : !ADD #$01 : STA $0D20, X
         LDA $0D30, X : !ADD #$01 : STA $0D30, X
 
@@ -226,15 +202,7 @@ boss_move:
 
         .loop_bottom_left ; move sprites
         LDA $0E20, X
-        CMP #$E3 : BNE + ;is it a fairy?? if not check next
-            BRA .no_change4
-        +
-        CMP #$D1 : BNE + ;is it a bunny changer
-            BRA .no_change4
-        +
-        CMP #$C5 : BNE + ;is it a medusa head
-            BRA .no_change4
-        +
+        JSR ShouldMoveSprite : BCC .no_change4
         LDA $0D20, X : !ADD #$01 : STA $0D20, X
         LDA $0D30, X : !ADD #$00 : STA $0D30, X
 
@@ -258,6 +226,23 @@ boss_move:
 .return
     RTL
 }
+
+; A - sprite id from E20, X
+; X - sprite index - should be preserved
+; sets or clears carry flag, set if sprite should be moved
+ShouldMoveSprite:
+	PHX
+	LDX #$FF
+	- INX : CPX.b #$0F : BCS .done
+	CMP.l BossIds, X : BNE -
+; match found, move it
+	PLX : SEC : RTS
+.done ; don't move it
+	PLX : CLC : RTS
+
+BossIds:
+db $53, $54, $09, $92, $8c, $8d, $88, $ce
+db $a2, $a3, $a4, $bd, $cb, $cc, $cd, $ff
 
 ;================================================================================
 ; Fix the gibdo key drop in skull woods before the boss room - USELESS CODE
