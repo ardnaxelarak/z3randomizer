@@ -213,3 +213,10 @@ CheckHeraBossDefeated:
 LDA RoomDataWRAM[$07].high : AND.w #$00FF : BEQ +
     SEC : RTL
 + CLC : RTL
+
+FallingMusicFadeOut:
+    CMP.w #$0017 ; what we wrote over
+    BNE .return
+        LDA.w $0130 : AND.w #$00FF : CMP.b #$15 ; if boss music is playing, then fade out
+.return
+    RTL
