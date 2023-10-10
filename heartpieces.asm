@@ -125,10 +125,9 @@ RTL
 RTL
 ;--------------------------------------------------------------------------------
 HeartUpgradeSpawnDecision: ; this should return #$00 to make the hp spawn
-	LDA !FORCE_HEART_SPAWN : BEQ .bonk_prize_check
+	LDA.l !FORCE_HEART_SPAWN : BEQ .bonk_prize_check
 	
-	DEC : STA !FORCE_HEART_SPAWN
-	LDA #$00
+	LDA.b #$00 : STA.l !FORCE_HEART_SPAWN
 RTL
 	.bonk_prize_check
 	PHX
@@ -138,19 +137,21 @@ RTL
 RTL
 	PLX
 	.normal_behavior
-	LDA OverworldEventDataWRAM, X
+	LDA.l OverworldEventDataWRAM, X
 RTL
 ;--------------------------------------------------------------------------------
 SaveHeartCollectedStatus:
 	LDA !SKIP_HEART_SAVE : BEQ .save_flag
 	
-	DEC : STA !SKIP_HEART_SAVE
+	LDA #$00 : STA !SKIP_HEART_SAVE
 RTL
 	
 	.save_flag
 	LDA 4,S : TAY : LDA $0ED0,Y : BEQ .normal_behavior
-		PHA : LDA OverworldEventDataWRAM, X : ORA 1,S : STA OverworldEventDataWRAM, X
-		PLA : RTL
+	PHA
+		LDA OverworldEventDataWRAM, X : ORA 1,S : STA OverworldEventDataWRAM, X
+	PLA
+RTL
 
 	.normal_behavior
 	LDA OverworldEventDataWRAM, X : ORA.b #$40 : STA OverworldEventDataWRAM, X
