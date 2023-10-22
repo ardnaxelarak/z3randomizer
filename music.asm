@@ -217,6 +217,6 @@ LDA RoomDataWRAM[$07].high : AND.w #$00FF : BEQ +
 FallingMusicFadeOut:
     CMP.w #$0017 ; what we wrote over
     BNE .return
-        LDA.w $0130 : AND.w #$00FF : CMP.b #$15 ; if boss music is playing, then fade out
+        LDA.w $0130 : AND.w #$00FF : CMP.w #$0015 ; if boss music is playing, then fade out
 .return
     RTL
