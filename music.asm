@@ -110,7 +110,7 @@ Overworld_DetermineMusic:
             LDX.b #$05 ; lost woods theme
             BRA .bunny
     
-    + LDA $8A : CMP.b #$40 : BNE +
+    + CMP.b #$40 : BNE .bunny
         LDX #$0F    ; dark woods theme
         BRA .bunny
 

@@ -269,7 +269,7 @@ CheckMusicLoadRequest:
                     LDA ProgressIndicator : CMP.b #03 : BNE .no_change ; aga1 killed
                         BRA -
 .darkwoods
-            LDA.b #15 : PHA
+            PHA
                 LDX $8A : LDA.l OWTileWorldAssoc,X : BEQ +
                     PLA : BRA .darkworld
                 + PLA : BRA .lightworld
