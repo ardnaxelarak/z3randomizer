@@ -244,9 +244,10 @@ CheckMusicLoadRequest:
             CMP.b #16 : BEQ .castle
             CMP.b #17 : BEQ .dungeon
             CMP.b #22 : BEQ .dungeon
-            CMP.b #21 : BNE .check_fallback
+            CMP.b #21 : BEQ .boss
+                JMP .check_fallback
 
-;.boss
+.boss
             LDA $040C : LSR : !ADD.b #45
             BRA .check_fallback-3
 .no_change
@@ -277,7 +278,13 @@ CheckMusicLoadRequest:
             LDA $040C
             CMP.b #$08 : BNE .check_fallback  ; Hyrule Castle 2
 .dungeon
-            LDA $040C : LSR : !ADD.b #33 : STA !REG_MUSIC_CONTROL_REQUEST
+            LDA $040C : CMP.b #$1A : BNE +
+                PHA : LDA.l DRMode : BEQ ++
+                    LDA.w BigKeyField : AND.b #$04 : BEQ ++
+                        ; if door rando and entering GT with BK
+                        PLA : LDA.b #59 : BRA .check_fallback-3
+                ++ PLA
+            + LSR : !ADD.b #33 : STA !REG_MUSIC_CONTROL_REQUEST
 
 .check_fallback
             LDX !REG_MUSIC_CONTROL_REQUEST
