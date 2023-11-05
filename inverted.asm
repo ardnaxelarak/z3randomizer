@@ -151,7 +151,9 @@ GanonTowerAnimation:
         STZ $011B
         STZ $011C
         STZ $011D
-		LDA.b #$02 : STA $012C
+		PHX
+			JSL Overworld_DetermineMusic : STX !REG_MUSIC_CONTROL_REQUEST
+		PLX
         LDA.b #$09 : STA $012D
 		RTL
 	.done
