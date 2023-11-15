@@ -378,7 +378,7 @@ SpiralStairsPreCheck:
 SpiralStairsPostCheck:
     LDA.l DRMode : BEQ + ; if door rando enabled
         LDA.b $A2 : CMP.w #$0007 : BNE .done
-        LDX.b #$16 : STX.w MusicControlRequest
+        LDA.l Music_Hera : TAX : STX.w MusicControlRequest
         BRA .done
     + LDA.b RoomIndex
     CMP.w #$000C : BNE +

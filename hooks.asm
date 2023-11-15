@@ -1723,6 +1723,9 @@ JSL CheckHeraBossDefeated : BNE + : NOP
 LDX.b #$F1 : STX.w MusicControlRequest
 +
 ;================================================================================
+org $828D6E
+JSL FallingMusicFadeOut : BRA + : NOP #2 : +
+;================================================================================
 org $829090 ; <- 11090 - Bank02.asm:3099 (LDA $7EF374 : LSR A : BCS BRANCH_GAMMA)
 JSL CheckHeraBossDefeated : BNE + : NOP
 STX.w MusicControlRequest ; DON'T MOVE THIS FORWARD OR MADNESS AWAITS
