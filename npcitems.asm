@@ -185,6 +185,7 @@ RTL
 ; Randomize Zora King
 ;--------------------------------------------------------------------------------
 LoadZoraKingItemGFX:
+		LDA.l ZoraItem_Player : : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
         LDA.l $9DE1C3 ; location randomizer writes zora item to
         JSL.l AttemptItemSubstitution
         JSL.l ResolveLootIDLong

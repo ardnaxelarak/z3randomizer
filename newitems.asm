@@ -1076,7 +1076,7 @@ RTS
 ;--------------------------------------------------------------------------------
 AttemptItemSubstitution:
         PHX : PHA
-        LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .exit
+        LDA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .exit
         LDX.b #$00
         -
                 LDA.l ItemSubstitutionRules, X
