@@ -59,5 +59,5 @@ JSL new_kholdstare_code ; Write new gfx in the vram
 ; Draw trinexx shell
 ;--------------------------------------------------------------------------------
 org $1DAD67 ; sprite_trinexx.asm (62) : LDA.b #$03 : STA $0DC0, X
-JSL new_trinexx_code
+JSL new_trinexx_code : NOP
 ;--------------------------------------------------------------------------------
