@@ -161,15 +161,22 @@ jsl.l OWWorldCheck16 : nop
 org $02b16e  ; AND #$3F : ORA 7EF3CA
 and #$7f : eor #$40 : nop #2
 
+org $09C3C4
+jsl.l OWBonkDropPrepSprite : nop #2
+org $09C801
+jsl.l OWBonkDropPrepSprite : nop #2
+org $06D052
+jsl.l OWBonkDropSparkle
 org $06AD49
 jsl.l OWBonkDropsOverworld : nop
-org $1EDE6F
+org $1EDE6A
+jsl.l OWBonkDropSparkle : BNE GoldBee_Dormant_exit
 jsl.l OWBonkDropsUnderworld : bra +
 GoldBee_SpawnSelf_SetProperties:
 phb : lda.b #$1E : pha : plb ; switch to bank 1E
     jsr GoldBee_SpawnSelf+12
 plb : rtl
-nop #3
+nop #2
 +
 
 ;Code
@@ -406,6 +413,65 @@ LoadMapDarkOrMixed:
     dw 0,0,0,0,0,0
     dw $0800+$01F0 ; bottom left
     dw $0400+$0210 ; bottom right
+}
+
+OWBonkDropPrepSprite:
+{
+    LDA.b $1B : BEQ +
+        LDA.w $0FB5 ; what we wrote over
+        PHA
+        BRA .continue
+    +
+    STZ.w $0F20,X : STZ.w $0E30,X ; what we wrote over
+    PHA
+
+    .continue
+    LDA.l OWFlags+1 : AND.b #!FLAG_OW_BONKDROP : BEQ .return
+        + LDA.w $0E20,X : CMP.b #$D9 : BNE +
+            LDA.b #$03 : STA.w $0F20,X
+            BRA .prep
+        + CMP.b #$B2 : BEQ .prep
+        PLA : RTL
+    
+    .prep
+    STZ.w !SPRITE_REDRAW,X
+    PHB : PHK : PLB : PHY
+        TXY : JSR OWBonkDropLookup : BCC .done
+            ; found match ; X = rec + 1
+            INX : LDA.w OWBonkPrizeData,X : PHA
+            JSR OWBonkDropCollected : PLA : BCC .done
+                TYX : LDA.b #$01 : STA.w !SPRITE_REDRAW,X
+    .done
+    TYX : PLY : PLB
+    
+    .return
+    PLA : RTL
+}
+
+OWBonkDropSparkle:
+{
+    LDA.l OWFlags+1 : AND.b #!FLAG_OW_BONKDROP : BEQ .nosparkle
+    LDA.w $0E90,X : BEQ .nosparkle
+    LDA.w !SPRITE_REDRAW,X : BNE .nosparkle
+        JSL Sprite_SpawnSparkleGarnish
+        ; move sparkle down 1 tile
+        PHX : TYX : PLY
+        LDA.l $7FF81E,X : CLC : ADC.b #$10 : STA.l $7FF81E,X
+        LDA.l $7FF85A,X : ADC.b #$00 : STA.l $7FF85A,X
+        PHY : TXY : PLX
+
+    .nosparkle
+    LDA $0E20,X : CMP.b #$D9 : BEQ .greenrupee
+    CMP.b #$B2 : BEQ .goodbee
+    RTL
+
+    .goodbee
+    LDA $0E90,X ; what we wrote over
+    RTL
+
+    .greenrupee
+    JSL Sprite_DrawRippleIfInWater ; what we wrote over
+    RTL
 }
 
 OWBonkDropsUnderworld:

@@ -572,6 +572,9 @@ Overworld_MemorizeMap16Change:
 org $04E879
 Overworld_CheckForSpecialOverworldTrigger_Direction:
 
+org $058008
+Sprite_SpawnSparkleGarnish:
+
 org $05A51D
 Sprite_SpawnFallingItem:
 
@@ -834,6 +837,9 @@ DiggingGameGuy_AttemptPrizeSpawn:
 
 org $1EDE28
 Sprite_GetEmptyBottleIndex: ; this is totally in sprite_bees.asm
+
+org $1EDE89
+GoldBee_Dormant_exit:
 
 org $1EDE8A
 GoldBee_SpawnSelf:
