@@ -174,7 +174,6 @@ incsrc msu.asm
 incsrc dungeonmap.asm
 incsrc hextodec.asm
 incsrc multiworld.asm
-incsrc terrorpin.asm
 incsrc textrenderer.asm
 warnpc $A58000
 

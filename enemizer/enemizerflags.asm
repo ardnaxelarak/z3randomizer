@@ -12,8 +12,7 @@ db #$00 ;408103 : 200103 ; Randomize Sprites.
 db #$00 ;408104 : 200104 ; make Agahnim balls deflect back
 .enable_mimic_override
 db #$00 ;408105 : 200105 ; toggle mimic code between new and old
-.enable_terrorpin_ai_fix
-db #$00 ;408106 : 200106 ; toggle to turn on terrorpin ai "fix"
+; free byte ;408106 : 200106
 .center_boss_drops
 db #$00 ;368107
 .killable_theives_id  ; must be set to C4 to make thieves killable...

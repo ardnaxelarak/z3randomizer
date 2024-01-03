@@ -2721,10 +2721,6 @@ org $B0EE30 ; PC 0x18636C
 RemoteItems:
 db #$00 ; $00 = off; $01 = on (default: off)
 
-org $B0EE31 ; PC 0x18637D
-Enable_TerrorPin_AI_Fix:
-db #$00
-
 ;Shop slot count as check
 org $B0EE40 ;
 EnableShopItemCount:
