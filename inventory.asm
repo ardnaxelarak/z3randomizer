@@ -195,6 +195,7 @@ ShopCheck:
                 CMP.w #271 : BEQ .nocount ; villiage of outcasts shop, lumberjack shop, lake hylia shop, dark world magic shop
                 CMP.w #272 : BEQ .nocount ; red shield shop
                 CMP.w #284 : BEQ .nocount ; bomb shop
+                CMP.w #265 : BEQ .nocount ; potion shop - powder is flagged as "ShopEnableCount" in CollectPowder
                 ; these room contain pots so you must check the quadrant as well for pottery lottery
                 CMP.w #287 : BNE + : LDA.b $A9 : CMP.w #$0201 : BEQ .nocount ; kakariko shop
                 	LDA.b RoomIndex
@@ -651,19 +652,18 @@ RTL
 ; CollectPowder:
 ;--------------------------------------------------------------------------------
 CollectPowder:
-        LDY.w SpriteID, X ; Retrieve stored item type
-        BNE +
-	        ; if for any reason the item value is 0 reload it, just in case
-	        %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues) : TAY
-        +
-        PHA
-			LDA WitchItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
-			LDA.b #$01 : STA.l ShopEnableCount
-		PLA
-        STZ.w ItemReceiptMethod ; item from NPC
-        JSL.l Link_ReceiveItem
-        PHA : LDA.b #$00 : STA.l ShopEnableCount : STA.l PowderFlag : PLA
-        JSL.l ItemSet_Powder
+  LDY.w SpriteID, X ; Retrieve stored item type
+  BNE +
+	; if for any reason the item value is 0 reload it, just in case
+	  %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues) : TAY
+  + PHA
+    LDA WitchItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
+    LDA.b #$01 : STA.l ShopEnableCount
+  PLA
+  STZ.w ItemReceiptMethod ; item from NPC
+  JSL.l Link_ReceiveItem
+  PHA : LDA.b #$00 : STA.l ShopEnableCount : STA.l PowderFlag : PLA
+  JSL.l ItemSet_Powder
 RTL
 ;--------------------------------------------------------------------------------
 
