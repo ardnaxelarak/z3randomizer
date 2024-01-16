@@ -2,7 +2,8 @@ pushpc
 
 org $9EC147
 JSL NewKodongoCollision
-NOP #$05
+JMP.w .continue : NOP #2
+.continue
 
 org $9EC152
 Kodongo_SetDirection:

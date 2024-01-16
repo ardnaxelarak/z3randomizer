@@ -4105,6 +4105,7 @@ org $0EEDE0 : db $8E
 org $0EEE1E : db $80
 org $0EEE5C : db $80
 org $0EEE60 : db $80
+org $0EEE94 : db $9C
 org $0EEF84 : db $80
 org $0EEFF3 : db $80
 org $0EF0FE : db $80
@@ -6587,5 +6588,9 @@ org $1F877C : db $9F
 org $1F877C : db $9F
 org $1F877F : db $9F
 org $1F877F : db $9F
+
+;===================================================================================================
+; Super secret text performance - skip decompress routine
+org $0EEE58 : db $08
 
 ;===================================================================================================
