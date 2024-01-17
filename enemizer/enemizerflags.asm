@@ -13,6 +13,7 @@ db #$00 ;408104 : 200104 ; make Agahnim balls deflect back
 .enable_mimic_override
 db #$00 ;408105 : 200105 ; toggle mimic code between new and old
 ; free byte ;408106 : 200106
+db #$00
 .center_boss_drops
 db #$00 ;368107
 .killable_theives_id  ; must be set to C4 to make thieves killable...
