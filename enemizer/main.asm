@@ -17,7 +17,10 @@ lorom
 !RANDOM_SPRITE_FLAG = "$368103"
 !AGAHNIM_FUN_BALLS = "$368104"
 !ENABLE_MIMIC_OVERRIDE = "$368105"
-!ENABLE_TERRORPIN_AI_FIX = "$368106"
+; free byte
+!CENTER_BOSS_DROP_FLAG = "$368107"
+!KILLABLE_THIEVES_ID = "$368108"
+!ENEMY_FALLING_STAY_ALIVE = "$368109"
 
 ; Enemizer reserved memory
 ; $7F50B0 - $7F50BF - Downstream Reserved (Enemizer)
@@ -26,10 +29,37 @@ lorom
 ;================================================================================
 
 incsrc hooks.asm
+incsrc DMA.asm
 
-org $B78000 ; the original org is 368000, but I'm putting this here for migration purposes, and I think B6 is the same bank but fastrom
+org $B68000 ; the original org is 368000 and B6 is the same bank but fastrom
 EnemizerTablesStart:
-;none migrated yet
+incsrc enemizer_info_table.asm ; B68000-B680FF
+incsrc enemizerflags.asm  ; B68100-B6811F
+incsrc bushes_table.asm   ; B68120-B6373
 
 EnemizerCodeStart:
+incsrc bushes.asm
+incsrc NMI.asm
+incsrc special_action.asm
+incsrc bosses_moved.asm
+incsrc damage.asm
+incsrc bossdrop.asm
+incsrc moldorm.asm
+incsrc kodongo_fixes.asm
+incsrc mimic_fixes.asm
+; vitreous key fix for boss shuffle - uses FixPrizeOnTheEyes flag
+
+incsrc overworld_sprites.asm
+incsrc underworld_sprites.asm
+
 incsrc blindboss.asm
+incsrc falling_death.asm
+
+incsrc shell_gfx.asm
+warnpc $B6FFFF ;if we hit this we need to split stuff by bank
+
+org $0684BD
+Sprite_Get16BitCoords_long:
+
+org $1EC6FA ;F46FA
+SpritePrep_Eyegore:

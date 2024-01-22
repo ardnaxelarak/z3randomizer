@@ -1,73 +1,98 @@
+!BlankTile = $207F
+!SlashTile = $2830
+!HyphenTile = $2405
+!PTile = $296C
+!CTile = $295F
+!RedSquare = $345E
+!BlueSquare = $2C5E
+
+!DungeonMask = $8098C0
+!EnemyDropIndicator = $7E072A
+!IndicatorAddress = $7EC790 ; used for both boss nearness and enemy drops
+!CurrentDungeonIndicator = $7EC702
+
+!KeysObtained = $7EC7A2
+!KeysSlash = $7EC7A4
+!KeysTotal = $7EC7A6
+
 DrHudOverride:
-{
-	jsl.l NewDrawHud
-	jsr HudAdditions
-	rtl
-}
+	PHB
+	SEP #$30
+	LDA.b #$7E
+	PHA
+	PLB
 
-HudAdditions:
-{
-    SEP #$10
-    LDA.l DRFlags : AND #$0008 : BNE + : JMP .end_item_count : +
-		LDA.l TotalItemCounter : PHA : CMP #1000 : !BLT +
-			JSL HexToDec4Digit_fast
-			LDX.b $04 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS ; draw 1000's digit
-			BRA .skip
-        + JSL HexToDec_fast
-        .skip
-        LDA #$207F : STA !GOAL_DRAW_ADDRESS+2 : STA !GOAL_DRAW_ADDRESS+4
-		PLA : PHA : CMP.w #100 : !BLT +
-			LDX.b $05 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+2 ; draw 100's digit
-		+ PLA : CMP.w #10 : !BLT +
-		 	LDX.b $06 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+4 ; draw 10's digit
-		+ LDX.b $07 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+6 ; draw 1's digit
-		LDA.w #$2830 : STA !GOAL_DRAW_ADDRESS+8 ; draw slash
-		LDA.l DRFlags : AND #$0100 : BNE +
-        	LDA.l MultiClientFlagsWRAM+1 : CMP #1000 : !BLT .three_digit_goal
-				JSL HexToDec4Digit_fast
-				LDX.b $04 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+10 ; draw 1000's digit
-				LDX.b $05 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+12 ; draw 100's digit
-				LDX.b $06 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+14 ; draw 10's digit
-				LDX.b $07 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+16 ; draw 1's digit
-				BRA .end_item_count
-			.three_digit_goal
-			JSL HexToDec_fast
-			LDX.b $05 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+10 ; draw 100's digit
-			LDX.b $06 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+12 ; draw 10's digit
-			LDX.b $07 : TXA : ORA.w #$2490 : STA !GOAL_DRAW_ADDRESS+14 ; draw 1's digit
-			BRA .end_item_count
-		+ LDA.w #$2405 : STA !GOAL_DRAW_ADDRESS+10 : STA !GOAL_DRAW_ADDRESS+12
-		                 STA !GOAL_DRAW_ADDRESS+14 : STA !GOAL_DRAW_ADDRESS+16
-    .end_item_count
+DRHUD_DrawItemCounter:
+	; hides total for mystery seeds
+	LDA.l ItemCounterHUD : BEQ DRHUD_DrawIndicators
+	LDA.l DRFlags+1 : LSR : BCC DRHUD_DrawIndicators
+	REP #$30
+	LDY.w #!HyphenTile : STY.w HUDGoalIndicator+$0A : STY.w HUDGoalIndicator+$0C
+                       STY.w HUDGoalIndicator+$0E : STY.w HUDGoalIndicator+$10
+    SEP #$30
 
-	LDX $1B : BNE + : RTS : + ; Skip if outdoors
-	ldx $040c : cpx #$ff : bne + : rts : + ; Skip if not in dungeon
-	lda.l DRMode : bne + : rts : + ; Skip if not door rando
-        phb : phk : plb
-        lda CompassField : and.l $0098c0, x : beq +
-            lda.w CompassBossIndicator, x : and #$00ff : cmp $a0 : bne +
-                lda $1a : and #$0010 : beq +
-                    lda #$345e : sta $7ec790 : bra .next
-        + lda #$207f : sta $7ec790
-    .next lda.w DRMode : and #$0002 : bne + : plb : rts : +
-            lda CurrentHealth : and #$00ff : beq +
-                lda.w DungeonReminderTable, x : bra .reminder
-            + lda #$207f
-            .reminder sta $7ec702
-            + lda.w DRFlags : and #$0004 : beq .restore
-            lda MapField : and.l $0098c0, x : beq .restore
-                txa : lsr : tax
+DRHUD_DrawIndicators:
+	LDA.b $1B : BNE .continue
+	JMP DRHUD_Finished
+.continue
+	LDA.b $1A : AND.b #$10 : BEQ DRHUD_EnemyDropIndicator
 
-				lda.l GenericKeys : and #$00ff : bne +
-                	lda DungeonCollectedKeys, x : jsr ConvertToDisplay : sta $7ec7a2
-                	lda #$2830 : sta $7ec7a4
-                +
-                lda.w ChestKeys, x : jsr ConvertToDisplay : sta $7ec7a6
-                ; todo 4b0 no longer in use
+DRHUD_BossIndicator:
+	LDA.l DRMode : BNE .continue
+.early_exit
+	REP #$10
+	LDY.w #!BlankTile : STY.w !IndicatorAddress
+	JMP DRHUD_Finished
+.continue
+	LDA.w $040C : CMP.b #$1B : BCS .early_exit
 
-    .restore
-    plb : rts
-}
+	SEP #$10 ; clears the high byte of X and prevents it from getting B register
+	TAX
+
+	REP #$30
+	LDY.w #!BlankTile
+	LDA.w CompassField : AND.l DungeonMask, x
+	SEP #$20
+	BEQ .draw_indicator
+    LDA.l CompassBossIndicator, x : CMP.b $A0 : BNE .draw_indicator
+    LDY.w #!RedSquare
+.draw_indicator
+    STY.w !IndicatorAddress
+	BRA DRHUD_DrawCurrentDungeonIndicator
+
+DRHUD_EnemyDropIndicator:
+	REP #$30
+	LDA.l DRFlags : BIT #$0800 : BEQ +
+	LDA.w !EnemyDropIndicator : STA.w !IndicatorAddress
+	+ SEP #$20
+	LDA.w $040C : CMP.b #$1B : BCS DRHUD_Finished
+	SEP #$10 : TAX : REP #$10
+
+DRHUD_DrawCurrentDungeonIndicator: ; mX
+    LDA.l DRMode : BIT.b #$02 : BEQ DRHUD_Finished
+    LDY.w #!BlankTile
+    LDA.w CurrentHealth : BEQ .draw_indicator
+
+    REP #$20 : LDA.l DungeonReminderTable,X : TAY
+    SEP #$20
+.draw_indicator
+	STY.w !CurrentDungeonIndicator
+
+DRHUD_DrawKeyCounter:
+    LDA.l DRFlags : AND.b #$04 : BEQ DRHUD_Finished
+    REP #$20
+    LDA.w MapField : AND.l DungeonMask, X : BEQ DRHUD_Finished
+	TXA : LSR : TAX
+	LDA.l GenericKeys : AND.w #$00FF : BNE .total_only
+	LDA.l DungeonCollectedKeys, X : JSR ConvertToDisplay : STA.w !KeysObtained
+	LDA #!SlashTile : STA.w !KeysSlash
+.total_only
+	LDA.l ChestKeys, x : JSR ConvertToDisplay : STA.w !KeysTotal
+
+DRHUD_Finished:
+    PLB : RTL
+
+;===================================================================================================
 
 ;column distance for BK/Smalls
 HudOffsets:
@@ -162,10 +187,8 @@ DrHudDungeonItemsAdditions:
 				tya : !add #$003c : tay
 			+ lda CompassField : and.l $0098c0, x : beq + ; must have compass
                 phx ; total chest counts
-                    txa : lsr : tax
-                    sep #$30
-                    lda.l TotalLocations, x : !sub DungeonLocationsChecked, x : JSR HudHexToDec2DigitCopy
-                    rep #$30
+                    LDA.l CompassTotalsWRAM, x : !sub DungeonLocationsChecked, x
+                    SEP #$30 : JSR HudHexToDec2DigitCopy : REP #$30
                     lda $06 : jsr ConvertToDisplay2 : sta $1644, y : iny #2
                     lda $07 : jsr ConvertToDisplay2 : sta $1644, y
                 plx
@@ -229,44 +252,7 @@ ConvertToDisplay2:
     ++ lda #$2827 : rts ; 0/O for 0 or placeholder digit ;2483
 
 CountAbsorbedKeys:
-    jsl IncrementSmallKeysNoPrimary : phx
-    lda $040c : cmp #$ff : beq +
-        lsr : tax
-        lda DungeonAbsorbedKeys, x : inc : sta DungeonAbsorbedKeys, x
-    + plx : rtl
-
-;================================================================================
-; 16-bit A, 8-bit X
-; in:	A(b) - Byte to Convert
-; out:	$04 - $07 (high - low)
-;================================================================================
-HudHexToDec4DigitCopy:
-    LDY.b #$90
-    -
-        CMP.w #1000 : !BLT +
-        INY
-        SBC.w #1000 : BRA -
-    +
-    STY $04 : LDY #$90 ; Store 1000s digit & reset Y
-    -
-        CMP.w #100 : !BLT +
-        INY
-        SBC.w #100 : BRA -
-    +
-    STY $05 : LDY #$90 ; Store 100s digit & reset Y
-    -
-        CMP.w #10 : !BLT +
-        INY
-        SBC.w #10 : BRA -
-    +
-    STY $06 : LDY #$90 ; Store 10s digit & reset Y
-    CMP.w #1 : !BLT +
-    -
-        INY
-        DEC : BNE -
-    +
-    STY $07 ; Store 1s digit
-RTS
+    JML IncrementSmallKeysNoPrimary
 
 ;================================================================================
 ; 8-bit registers

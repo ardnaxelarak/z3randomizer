@@ -40,9 +40,9 @@ FixShopCode:
     + rtl
 
 VitreousKeyReset:
-    lda.l DRMode : beq +
-        stz $0cba, x
-    + JML $0db818 ;restore old code
+    LDA.l FixPrizeOnTheEyes : BEQ +
+        STZ.w $0CBA, X
+    + JML $0DB818 ;restore old code - SpritePrep_LoadProperties
 
 GuruguruFix:
     lda $a0 : cmp #$df : !bge +
@@ -62,7 +62,7 @@ SuctionOverworldFix:
         stz $49
     + rtl
 
-!CutoffTable = "$27E000"
+!CutoffTable = "$A7E000"
 
 CutoffEntranceRug:
     PHA : PHX
@@ -91,14 +91,17 @@ RetrieveBunnyState:
 	STY $5D : STZ $02D8 ; what we wrote over
 	LDA $5F : BEQ +
 		STA $5D
-+ RTL
+ + JML MaybeKeepLootID
 
-; A should be how much dmg to do to Aga when leaving this function
+; A should be how much dmg to do to Aga when leaving this function, 0 if prevented
 StandardAgaDmg:
 	LDX.b #$00 ; part of what we wrote over
-	LDA.l ProgressFlags : AND #$04 : BEQ + ; zelda's not been rescued
+	LDA.l ProgressFlags : AND #$04 : BNE .enableDamage ; zelda's been rescued, no further checks needed
+	; zelda's not been rescued
+	LDA.l AllowAgaDamageBeforeZeldaRescued : BEQ + ; zelda needs to be rescued if not allowed
+		.enableDamage
 		LDA.b #$10 ; hurt him!
-	+ RTL ; A is zero if the AND results in zero and then Agahnim's invincible!
+	+	RTL
 
 StandardSaveAndQuit:
 	LDA.b #$0F : STA.b $95 ; what we wrote over
