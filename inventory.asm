@@ -477,20 +477,6 @@ FluteCallForDuck:
 	LDA.l FluteEquipment ; what we wrote over
 RTL
 ;--------------------------------------------------------------------------------
-; FluteCallForDuck:
-;--------------------------------------------------------------------------------
-; sets A to #$02 to ignore summoning the duck
-FluteCallForDuck:
-	LDA.l WarningFlags : AND.b #$20 : BNE .vanilla ; glitched modes allowed flute in rain state
-	LDA.l ProgressIndicator : CMP.b #$02 : BCS .vanilla ; must rescue Zelda first
-
-	.noDuck
-	LDA.b #$02 : RTL
-
-	.vanilla
-	LDA.l FluteEquipment ; what we wrote over
-RTL
-;--------------------------------------------------------------------------------
 
 ;--------------------------------------------------------------------------------
 ; CheckKeys:
