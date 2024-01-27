@@ -1,13 +1,13 @@
 ;===================================================================================================
 ; LEAVE THIS HERE FOR PHP WRITES
 ;===================================================================================================
-table "creditscharmapbighi.txt"
+table "data/creditscharmapbighi.txt"
 YourSpriteCreditsHi:
 db 2
 db 55
 db "                            " ; $238002
 
-table "creditscharmapbiglo.txt"
+table "data/creditscharmapbiglo.txt"
 YourSpriteCreditsLo:
 db 2
 db 55
@@ -60,7 +60,7 @@ endmacro
 ;---------------------------------------------------------------------------------------------------
 macro bigcredits(text)
 	!CLINE #= !CLINE+1
-	table "creditscharmapbighi.txt"
+	table "data/creditscharmapbighi.txt"
 
 	?line_top:
 		db (32-(?end-?text))/2
@@ -74,7 +74,7 @@ macro bigcredits(text)
 	pullpc
 
 
-	table "creditscharmapbiglo.txt"
+	table "data/creditscharmapbiglo.txt"
 	?line_bottom:
 		db (32-(?end-?text))/2
 		db 2*(?end-?text)-1
@@ -92,7 +92,7 @@ endmacro
 
 macro bigcreditsleft(text)
 	!CLINE #= !CLINE+1
-	table "creditscharmapbighi.txt"
+	table "data/creditscharmapbighi.txt"
 
 	?line_top:
 		db 2
@@ -106,7 +106,7 @@ macro bigcreditsleft(text)
 	pullpc
 
 
-	table "creditscharmapbiglo.txt"
+	table "data/creditscharmapbiglo.txt"
 	?line_bottom:
 		db 2
 		db 2*(?end-?text)-1
