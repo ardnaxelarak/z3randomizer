@@ -679,7 +679,8 @@ KeyGet:
 			JSL CountChestKeyLong
     		++ PLA : RTL
     	+ STY $00
-    	LDA SprItemMWPlayer, X : STA !MULTIWORLD_ITEM_PLAYER_ID : BNE .receive
+    	LDA SprItemMWPlayer, X : STA !MULTIWORLD_ITEM_PLAYER_ID
+			STA !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .receive
     	PHX
 			LDA $040C : CMP #$FF : BNE +
 				LDA $00 : CMP.b #$AF : BNE .skip
@@ -696,6 +697,7 @@ KeyGet:
     	.skip PLX
     	.receive
     	JSL $0791b3 ; Player_HaltDashAttackLong
+			TYA : JSL.l AttemptItemSubstitution : JSL.l ResolveLootIDLong : TAY
     	JSL.l Link_ReceiveItem
 	PLA : DEC : RTL
 

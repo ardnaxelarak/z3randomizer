@@ -692,20 +692,15 @@ ResolveReceipt:
 		PHA : PHX
         PHK : PLB
         JSL.l PreItemGet
-        LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE +
-        LDA.w ItemReceiptID
-        .get_item
+        LDA.l !MULTIWORLD_ITEM_PLAYER_ID : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+        LDA.w ItemReceiptID : STA.l !MULTIWORLD_ITEM_ID
         JSL.l AttemptItemSubstitution
         JSR.w HandleBowTracking
-        +
-        LDA.w ItemReceiptID
-        STA.l !MULTIWORLD_ITEM_ID
         JSR.w ResolveLootID
-        .have_item
         STA.w ItemReceiptID
         LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE +
-        LDA.w ItemReceiptID
-        JSR IncrementItemCounters
+                LDA.w ItemReceiptID
+                JSR IncrementItemCounters
         +
         PLX : PLA
         RTS

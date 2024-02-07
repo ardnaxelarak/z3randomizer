@@ -464,10 +464,13 @@ Shopkeeper_BuyItem:
 				LDA.l EnableShopItemCount, X : STA.l ShopEnableCount ; If so, store the permission to count the item here.
 			+++
 		PLX
-        LDA.l ShopInventory, X : TAY : JSL.l Link_ReceiveItem
+        LDA.l ShopInventory, X
+				JSL.l AttemptItemSubstitution
+        JSL.l ResolveLootIDLong
+				TAY
+				JSL.l Link_ReceiveItem
         LDA.l ShopInventory+3, X : INC : STA.l ShopInventory+3, X
         LDA.b #0 : STA.l ShopEnableCount
-
         TXA : LSR #2 : TAX
         LDA.l ShopType : BIT.b #$80 : BNE +
         		LDA ShopkeeperRefill : BNE +++
