@@ -1207,27 +1207,4 @@ dw $0000 ; Sewers
 PendantMasks:
 db $04, 01, 02
 
-NewItemsChecks:
-	CMP.b #$B2 : BNE + ; Fairy
-		LDA.b #$E3 : JSL Sprite_SpawnDynamically : BMI .done
-		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
-			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
-		LDA.b $20 : SEC : SBC.b #$10 : STA.w $0D00,Y
-			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 16 pixels
-		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
-		LDA.b #$FF : STA.w $0B58,Y ; allows them to expire
-		BRA .done
-	+ CMP.b #$B3 : BNE + ; Chicken
-		LDA.b #$0B : JSL Sprite_SpawnDynamically : BMI .done
-		LDA $22 : CLC : ADC.b #$03 : AND.b #$F8 : STA $0D10,Y
-			LDA $23 : ADC.b #$00 : STA $0D30,Y ; round X to nearest 8
-		LDA.b $20 : SEC : SBC.b #$08 : STA.w $0D00,Y
-			LDA.b $21 : SBC.b #$00 : STA.w $0D20,Y ; move up 8 pixels
-		LDA.b $EE : STA.w $0F20,Y ; spawns on same layer as link
-		BRA .done
-	+ CMP.b #$B4 : BNE .done ; Big Magic
-		LDA.b #$80 : STA MagicFiller ; fill magic
-	.done
-RTS
-
 

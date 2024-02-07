@@ -504,8 +504,10 @@ PreventEnterOnBonk_BRANCH_IX:
 ;================================================================================
 ; Crystals Mode
 ;--------------------------------------------------------------------------------
+org $899B6D
+AncillaAdd_GTCutscene_Exit:
 org $899B7F ; <- ancilla_init.asm : 4136 (LDA $7EF37A : AND.b #$7F : CMP.b #$7F)
-JSL CheckTowerOpen : BCC $899B6D
+JSL CheckTowerOpen : BCC AncillaAdd_GTCutscene_Exit
 ;--------------------------------------------------------------------------------
 org $88CE0C ; <- 44E0C - ancilla_break_tower_seal.asm : 168 (BEQ #$03 : JSR GTCutscene_SparkleALot : LDX.b #$06)
 JML.l GTCutscene_AnimateCrystals_Prep : NOP
@@ -2391,7 +2393,7 @@ org $80D17E+178 : db ExpandedTrinexx>>0
 ; Use above sheet in Hyrule castle courtyard after rain state.
 org $80DB9E ; Hyrule Castle GFX Sprite Sheet 4 on [LW1]
 db $3F
-db $80DBA2  ; Hyrule Castle GFX Sprite Sheet 4 on [RainState]
+org $80DBA2  ; Hyrule Castle GFX Sprite Sheet 4 on [RainState]
 db $3F
 org $80DC0A ; Hyrule Castle GFX Sprite Sheet 4 on [LW2]
 db $3F

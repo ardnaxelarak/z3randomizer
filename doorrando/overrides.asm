@@ -70,14 +70,14 @@ CutoffEntranceRug:
         LDA $04 : cmp #$000A : BEQ + ; only affect A & C objects
         cmp #$000C : BNE .norm
           + LDX #$0000 : LDA !CutoffTable, x
-          	- CMP.W $A0 : BEQ .check
+          	- CMP.b $A0 : BEQ .check
            	INX #2 : LDA !CutoffTable, x : CMP.w #$FFFF : BNE -
     .norm PLX : PLA : LDA $9B52, y : STA $7E2000, x ; what we wrote over
 RTL
      .check
 		  LDA $0c : CMP #$0004 : !BGE .skip
 		  LDA $0e : CMP #$0008 : !BGE .skip
-		  CMP.l #$0004 : !BLT .skip
+		  CMP.w #$0004 : !BLT .skip
       BRA .norm
 .skip PLX : PLA : RTL
 
