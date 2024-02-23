@@ -3,38 +3,35 @@ PreOverworld_LoadProperties_ChooseMusic:
     ; A: scratch space (value never used)
     ; Y: set to overworld animated tileset
     ; X: set to music track/command id
-    JSL.l FixFrogSmith ; Just a convenient spot to install this hook
+    JSL FixFrogSmith ; Just a convenient spot to install this hook
 
     LDY.b #$58 ; death mountain animated tileset.
 
-    LDA $8A : ORA #$40 ; check both light and dark world DM at the same time
+    LDA.b OverworldIndex : ORA.b #$40 ; check both light and dark world DM at the same time
     CMP.b #$43 : BEQ +
     CMP.b #$45 : BEQ +
     CMP.b #$47 : BEQ +
+        LDY.b #$5A ; Main overworld animated tileset
 
-    LDY.b #$5A ; Main overworld animated tileset
-
-    ; if we are in the light world go ahead and set chosen selection
-    ;LDA CurrentWorld : BEQ .checkInverted+4
     + JSL Overworld_DetermineMusic
 
     .lastCheck
-    LDA $0132 : CMP.b #$F2 : BNE +
-    CPX $0130 : BNE +
-        ; If the last played command ($0132) was half volume (#$F2)
-        ; and the actual song playing ($0130) is same as the one for this area (X)
+    LDA.w MusicControlQueue : CMP.b #$F2 : BNE +
+    CPX.w LastAPUCommand : BNE +
+        ; If the last played command (MusicControlQueue) was half volume (#$F2)
+        ; and the actual song playing (LastAPUCommand) is same as the one for this area (X)
         ; then play the full volume command (#F3) instead of restarting the song
         LDX.b #$F3
     +
 
-    JML.l PreOverworld_LoadProperties_SetSong
+    JML PreOverworld_LoadProperties_SetSong
 ;--------------------------------------------------------------------------------
 
 ;--------------------------------------------------------------------------------
 Overworld_FinishMirrorWarp:
     REP #$20
 
-    LDA.w #$2641 : STA $4370
+    LDA.w #$2641 : STA.w DMAP7
 
     LDX.b #$3E
 
@@ -42,33 +39,32 @@ Overworld_FinishMirrorWarp:
 
 .clear_hdma_table
 
-    STA $1B00, X : STA $1B40, X
-    STA $1B80, X : STA $1BC0, X
-    STA $1C00, X : STA $1C40, X
-    STA $1C80, X
+    STA.w IrisPtr+$0000, X : STA.w IrisPtr+$0040, X
+    STA.w IrisPtr+$0080, X : STA.w IrisPtr+$00C0, X
+    STA.w IrisPtr+$0100, X : STA.w IrisPtr+$0140, X
+    STA.w IrisPtr+$0180, X
 
     DEX #2 : BPL .clear_hdma_table
-
-    LDA.w #$0000 : STA $7EC007 : STA $7EC009
+    LDA.w #$0000 : STA.l FadeTimer : STA.l FadeDirection
 
     SEP #$20
 
-    JSL $00D7C8               ; $57C8 IN ROM
+    JSL ReloadPreviouslyLoadedSheets
 
-    LDA.b #$80 : STA $9B
+    LDA.b #$80 : STA.b HDMAENQ
 
     JSL Overworld_DetermineAmbientSFX
     JSL Overworld_DetermineMusic
 
 .done
-    STX $012C
+    STX.w MusicControlRequest
 
-    LDA $11 : STA $010C
+    LDA.b GameSubMode : STA.w GameSubModeCache
 
-    STZ $11
-    STZ $B0
-    STZ $0200
-    STZ $0710
+    STZ.b GameSubMode
+    STZ.b SubSubModule
+    STZ.w SubModuleInterface
+    STZ.w SkipOAM
 
     RTL
 ;--------------------------------------------------------------------------------
@@ -84,21 +80,21 @@ BirdTravel_LoadTargetAreaMusic:
 ;--------------------------------------------------------------------------------
 ;X to be set to music track to load
 Overworld_DetermineMusic:
-    LDA ProgressIndicator : CMP.b #$02 : !BGE +
+    LDA.l ProgressIndicator : CMP.b #$02 : !BGE +
         LDX.b #$03 ; If phase < 2, play the rain music
         BRA .done
     
-    + LDA $8A : CMP.b #$43 : BEQ .darkMountain
+    + LDA.b OverworldIndex : CMP.b #$43 : BEQ .darkMountain
     CMP.b #$45 : BEQ .darkMountain
     CMP.b #$47 : BEQ .darkMountain
 
     LDX.b #$02  ; hyrule field theme
 
-    LDA CurrentWorld : BEQ +
+    LDA.l CurrentWorld : BEQ +
         LDX.b #$09  ; default dark world theme
 
     ; Check if we're entering the village
-    + LDA $8A : CMP.b #$18 : BNE +
+    + LDA.b OverworldIndex : CMP.b #$18 : BNE +
         ; Check what phase we're in
         ; LDA ProgressIndicator : CMP.b #$03 : !BGE .bunny
             LDX.b #$07 ; Default village theme (phase <3)
@@ -106,12 +102,12 @@ Overworld_DetermineMusic:
     
     ; Check if we're entering the lost woods
     + CMP.b #$00 : BNE +
-        LDA OverworldEventDataWRAM+$80 : AND.b #$40 : BNE .bunny
+        LDA.l OverworldEventDataWRAM+$80 : AND.b #$40 : BNE .bunny
             LDX.b #$05 ; lost woods theme
             BRA .bunny
     
     + CMP.b #$40 : BNE .bunny
-        LDX #$0F    ; dark woods theme
+        LDX.b #$0F    ; dark woods theme
         BRA .bunny
 
 .darkMountain
@@ -119,9 +115,9 @@ Overworld_DetermineMusic:
 
 .bunny
     ; if not inverted and light world, or inverted and dark world, skip moon pearl check
-    LDA CurrentWorld : CLC : ROL #$03 : CMP InvertedMode : BEQ .done
-        LDA MoonPearlEquipment : BNE .done
-            LDX #$04    ; bunny theme
+    LDA.l CurrentWorld : CLC : ROL #$03 : CMP.l InvertedMode : BEQ .done
+        LDA.l MoonPearlEquipment : BNE .done
+            LDX.b #$04    ; bunny theme
 
 .done
     RTL
@@ -130,10 +126,10 @@ Overworld_DetermineMusic:
 ;--------------------------------------------------------------------------------
 ;$012D to be set to any ambient SFX for the area
 Overworld_DetermineAmbientSFX:
-    LDA ProgressIndicator : CMP.b #$02 : !BGE +
+    LDA.l ProgressIndicator : CMP.b #$02 : !BGE +
         BRA .done ; rain state sfx handled elsewhere
     
-    + LDA $8A : CMP.b #$43 : BEQ .darkMountain
+    + LDA.b OverworldIndex : CMP.b #$43 : BEQ .darkMountain
     CMP.b #$45 : BEQ .darkMountain
     CMP.b #$47 : BEQ .darkMountain
 
@@ -149,9 +145,9 @@ Overworld_DetermineAmbientSFX:
     LDA.b #$09 : BRA .setSfx ; set storm ambient SFX
 
 .setSfx
-    CMP $0131 : BEQ +
-        STA $012D
-    + STZ $012D
+    CMP.w LastSFX1 : BEQ +
+        STA.w SFX1
+    + STZ.w SFX1
 
 .done
     RTL
@@ -161,8 +157,8 @@ Overworld_DetermineAmbientSFX:
 ;0 = Is Kakariko Overworld
 ;1 = Not Kakariko Overworld
 PsychoSolder_MusicCheck:
-    LDA $040A : CMP.b #$18 : BNE .done ; thing we overwrote - check if overworld location is Kakariko
-        LDA $1B  ; Also check that we are outdoors
+    LDA.b OverworldIndex : CMP.b #$18 : BNE .done ; thing we overwrote - check if overworld location is Kakariko
+        LDA.b IndoorsFlag  ; Also check that we are outdoors
     .done
 RTL
 ;--------------------------------------------------------------------------------
@@ -173,16 +169,16 @@ RTL
 ; 
 ; On entry, A = $8A (overworld area being loaded)
 Overworld_MosaicDarkWorldChecks:
-    CMP.b #$40 : beq .checkCrystals
-    CMP.b #$42 : beq .checkCrystals
-    CMP.b #$50 : beq .checkCrystals
-    CMP.b #$51 : bne .doFade
+    CMP.b #$40 : BEQ .checkCrystals
+    CMP.b #$42 : BEQ .checkCrystals
+    CMP.b #$50 : BEQ .checkCrystals
+    CMP.b #$51 : BNE .doFade
 
 .checkCrystals
-    LDA CrystalsField : CMP.b #$7F : BEQ .done
+    LDA.l CrystalsField : CMP.b #$7F : BEQ .done
 
 .doFade
-    LDA.b #$F1 : STA $012C  ; thing we wrote over, fade out music
+    LDA.b #$F1 : STA.w MusicControlRequest  ; thing we wrote over, fade out music
 
 .done
     RTL
@@ -198,13 +194,13 @@ Underworld_DoorDown_Entry:
     LDA.l DRMode : BNE .done
 
 .vanilla ; thing we wrote over
-    LDA $A0 : CMP.w #$0012 : BNE +
+    LDA.b RoomIndex : CMP.w #$0012 : BNE +
         LDX.b #$14 ; value for Sanc music
         BRA .done
-    + LDA $A2 : CMP.w #$0012 : BNE .done
+    + LDA.b PreviousRoom : CMP.w #$0012 : BNE .done
         LDX.b #$10 ; value for Hyrule Castle music
 .done
-    LDA $A0 : RTL
+    LDA.b RoomIndex : RTL
 ;--------------------------------------------------------------------------------
 ; This is for changing to/from ToH dungeon/boss music
 ;
@@ -217,6 +213,7 @@ LDA RoomDataWRAM[$07].high : AND.w #$00FF : BEQ +
 FallingMusicFadeOut:
     CMP.w #$0017 ; what we wrote over
     BNE .return
-        LDA.w $0130 : AND.w #$00FF : CMP.w #$0015 ; if boss music is playing, then fade out
+        LDA.w LastAPUCommand : AND.w #$00FF : CMP.w #$0015 ; if boss music is playing, then fade out
 .return
     RTL
+;--------------------------------------------------------------------------------

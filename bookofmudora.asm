@@ -2,21 +2,23 @@
 ; Randomize Book of Mudora
 ;--------------------------------------------------------------------------------
 LoadLibraryItemGFX:
-	LDA.l LibraryItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    LDA.l LibraryItem_Player : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	%GetPossiblyEncryptedItem(LibraryItem, SpriteItemValues)
-	STA $0E80, X ; Store item type
-	JML RequestSlottedTile
+	JSL AttemptItemSubstitution
+	JSL ResolveLootIDLong
+	STA.w SpriteID, X
+	JML RequestStandingItemVRAMSlot
 ;--------------------------------------------------------------------------------
 DrawLibraryItemGFX:
-	PHA
-    LDA $0E80, X ; Retrieve stored item type
-	JSL.l DrawSlottedTile
-	PLA
+    PHA
+    LDA.w SpriteID, X
+    JSL DrawPotItem
+    PLA
 RTL
 ;--------------------------------------------------------------------------------
 SetLibraryItem:
-	LDY $0E80, X ; Retrieve stored item type
-	JSL.l ItemSet_Library ; contains thing we wrote over
+    LDY.w SpriteID, X
+    JSL ItemSet_Library ; contains thing we wrote over
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -25,49 +27,59 @@ RTL
 ; Randomize Bonk Keys
 ;--------------------------------------------------------------------------------
 LoadBonkItemGFX:
-	LDA.b #$08 : STA $0F50, X ; thing we wrote over
+    LDA.b #$08 : STA.w SpriteOAMProp, X ; thing we wrote over
 LoadBonkItemGFX_inner:
-	JSR LoadBonkItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
-	JSR LoadBonkItem
-	JML RequestSlottedTile
+    JSR LoadBonkItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    JSR LoadBonkItem
+    JSL AttemptItemSubstitution
+    JSL ResolveLootIDLong
+    STA.w SpriteItemType, X
+    STA.w SpriteID, X
+    JSL RequestStandingItemVRAMSlot
+    PHA : PHX
+    LDA.w SpriteID,X : TAX
+    LDA.l SpriteProperties_standing_width,X : BNE +
+        LDA.b #$00 : STA.l SpriteOAM : STA.l SpriteOAM+8
+    +
+    PLX : PLA
+RTL
 ;--------------------------------------------------------------------------------
 DrawBonkItemGFX: 
-	PHA
-	LDA.w !SPRITE_REDRAW, X : BEQ .skipInit ; skip init if already ready
-		JSL.l LoadBonkItemGFX_inner
-		LDA.w !SPRITE_REDRAW, X : CMP.b #$02 : BEQ .skipInit
-		BRA .done ; don't draw on the init frame
-	
-	.skipInit
-	JSR LoadBonkItem
-	JSL DrawSlottedTile
-	
-	.done
-	PLA
+    PHA
+    LDA.w SprRedrawFlag, X : BEQ .skipInit
+        JSL LoadBonkItemGFX_inner
+        LDA.w SprRedrawFlag, X : CMP.b #$02 : BEQ .skipInit
+        BRA .done ; don't draw on the init frame
+
+    .skipInit
+    LDA.w SpriteID,X
+    JSL DrawPotItem
+
+    .done
+    PLA
 RTL
 ;--------------------------------------------------------------------------------
 GiveBonkItem:
-	JSR LoadBonkItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
-	JSR LoadBonkItem
-	CMP #$24 : BNE .notKey
-	.key
-		PHY : LDY.b #$24 : JSL.l AddInventory : PLY ; do inventory processing for a small key
-		LDA CurrentSmallKeys : INC A : STA CurrentSmallKeys
-		LDA.b #$2F : JSL.l Sound_SetSfx3PanLong
-		JSL CountBonkItem
+    JSR LoadBonkItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
+    JSR LoadBonkItem
+    JSR AbsorbKeyCheck : BCC .notKey
+    .key
+    PHY : LDY.b #$24 : JSL AddInventory : PLY ; do inventory processing for a small key
+    LDA.l CurrentSmallKeys : INC A : STA.l CurrentSmallKeys
+    LDA.b #$2F : JSL Sound_SetSfx3PanLong
+    INC.w UpdateHUDFlag
 RTL
-	.notKey
-		PHY : TAY : JSL.l Link_ReceiveItem : PLY
-		JSL CountBonkItem
+    .notKey
+    PHY : TAY : JSL Link_ReceiveItem : PLY
 RTL
 ;--------------------------------------------------------------------------------
 LoadBonkItem:
-	LDA $A0 ; check room ID - only bonk keys in 2 rooms so we're just checking the lower byte
-	CMP #115 : BNE + ; Desert Bonk Key
-		LDA.l BonkKey_Desert
+	LDA.b RoomIndex ; check room ID - only bonk keys in 2 rooms so we're just checking the lower byte
+	CMP.b #$73 : BNE + ; Desert Bonk Key
+    	LDA.l BonkKey_Desert
 		BRA ++
-	+ : CMP #140 : BNE + ; GTower Bonk Key
-		LDA.l BonkKey_GTower
+	+ : CMP.b #$8C : BNE + ; GTower Bonk Key
+    	LDA.l BonkKey_GTower
 		BRA ++
 	+
 		LDA.b #$24 ; default to small key
@@ -75,14 +87,30 @@ LoadBonkItem:
 RTS
 ;--------------------------------------------------------------------------------
 LoadBonkItem_Player:
-	LDA $A0 ; check room ID - only bonk keys in 2 rooms so we're just checking the lower byte
-	CMP #115 : BNE + ; Desert Bonk Key
-		LDA.l BonkKey_Desert_Player
-		BRA ++
-	+ : CMP #140 : BNE + ; GTower Bonk Key
-		LDA.l BonkKey_GTower_Player
-		BRA ++
-	+
-		LDA.b #$00
-	++
+    LDA.b RoomIndex ; check room ID - only bonk keys in 2 rooms so we're just checking the lower byte
+    CMP.b #$73 : BNE + ; Desert Bonk Key
+        LDA.l BonkKey_Desert_Player
+        BRA ++
+    + : CMP.b #$8C : BNE + ; GTower Bonk Key
+        LDA.l BonkKey_GTower_Player
+        BRA ++
+    +
+        LDA.b #$00
+    ++
+RTS
+;--------------------------------------------------------------------------------
+AbsorbKeyCheck:
+    PHA
+    CMP.b #$24 : BEQ .key
+    CMP.b #$A0 : BCC .not_key
+    CMP.b #$B0 : BCS .not_key
+        AND.b #$0F : ASL
+        CMP.w DungeonID : BNE .not_key
+            .key
+            PLA
+            SEC
+            RTS
+    .not_key
+    PLA
+    CLC
 RTS

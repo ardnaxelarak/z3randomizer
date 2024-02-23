@@ -1,100 +1,77 @@
-; where we shove the decompressed graphics to send to WRAM
-DynamicDropGFX = $7ECC00
-
-; this will just count from 0 to 4 to determine which slot we're using
-; we're expecting 5 items max per room, and order is irrelevant
-; we just need to keep track of where they go
-DynamicDropGFXIndex = $7E1E70
 !DynamicDropGFXSlotCount_UW = (FreeUWGraphics_end-FreeUWGraphics)>>1
 !DynamicDropGFXSlotCount_OW = (FreeOWGraphics_end-FreeOWGraphics)>>1
-
-; this will keep track of the above for each item
-SprItemGFX = $7E0780
-
-; this is the item requested and a flag (we anticipate no more than 3 requests to be active, but built to support 8)
-DynamicDropRequest = $7E1E71 ; bitfield indicating which request slot to process
-DynamicDropQueue = $7E1E72 ; 0x08 bytes, occupies 1 byte for each slot in the request queue (loot id at first, but stores GFX index)
 
 ; Come in with
 ;   A = item receipt ID
 ;   X = sprite slot
-RequestSlottedTile:
+RequestStandingItemVRAMSlot:
 	PHX : PHY
-
 	PHA
-		LDA.b #$01 : STA.w !SPRITE_REDRAW, X
+		LDA.b #$01 : STA.w SprRedrawFlag, X
 		JSL Sprite_IsOnscreen : BCC ++
 		; skip sending the request if busy with other things
-		LDA.b $11 : CMP.b #$21 : BCS ++ ; skip if OW is loading Map16 GFX ; TODO: Figure out how to allow submodule 22, check DMA status instead
-		LDA.b $5D : CMP.b #$14 : BEQ ++ ; skip if we're mid-mirror
-		LDA.b $1B : BEQ + ; OW current doesn't occupy any slots that medallion gfx do
+		LDA.b GameSubMode : CMP.b #$21 : BCS ++ ; skip if OW is loading Map16 GFX ; TODO: Figure out how to allow submodule 22, check DMA status instead
+		LDA.b LinkState : CMP.b #$14 : BEQ ++ ; skip if we're mid-mirror
+		LDA.b IndoorsFlag : BEQ + ; OW current doesn't occupy any slots that medallion gfx do
 			CMP.b #$08 : BCC + : CMP.b #$0A+1 : BCS + ; skip if we're mid-medallion
 				++ PLA : JMP .return
 		+
 
-		LDA.w $0E20, X : CMP.b #$C0 : BNE + ; if catfish
+		LDA.w SpriteTypeTable, X : CMP.b #$C0 : BNE + ; if catfish
 			TYX
 		+ CMP.b #$52 : BNE + ; if zora
 			TYX
 		+
 
-		LDA.b 1,S : JSL.l GetSpritePalette : STA.w $0F50, X ; setup the palette
+		LDA.b 1,S : PHX : JSL GetSpritePalette : PLX : STA.w SpriteOAMProp, X ; setup the palette
 	PLA
 	
 	; gfx that are already present, use that instead of a new slot
 	CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS + ; if rupees, use animated rupee OAM slot
-		LDA.b $1B : BEQ ++
+		LDA.b IndoorsFlag : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
 		+++ INC : STA.w SprItemGFX,X
 		JMP .success
 	+ CMP.b #$A0 : BCC + : CMP.b #$AF+1 : BCS + ; if key, use key OAM slot
-		LDY.b $5D : CPY.b #$19 : BCC ++ : CPY.b #$1A+1 : BCS ++ ; if getting tablet item, don't use key slot
+		LDY.b LinkState : CPY.b #$19 : BCC ++ : CPY.b #$1A+1 : BCS ++ ; if getting tablet item, don't use key slot
 			BRA +
 		++
-		LDA.b $1B : BEQ ++
+		LDA.b IndoorsFlag : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC : INC : STA.w SprItemGFX,X
+		+++ INC #2 : STA.w SprItemGFX,X
 		JMP .success
-	+ CMP.b #$B5 : BNE + ; if good bee, use bee OAM slot
-		LDA.b $1B : BEQ ++
+	+ CMP.b #$D6 : BNE + ; if good bee, use bee OAM slot
+		LDA.b IndoorsFlag : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC : INC : INC : STA.w SprItemGFX,X
+		+++ INC #3 : STA.w SprItemGFX,X
 		JMP .success
-	+ CMP.b #$B2 : BNE + ; if fairy, use fairy OAM slot
-		LDA.b $1B : BEQ ++
-			LDA.b #!DynamicDropGFXSlotCount_UW
-			BRA +++
-		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC : INC : STA.w SprItemGFX,X
-		JMP .success
-	+ CMP.b #$B1 : BNE + ; if apple, use apple OAM slot
-		LDA.b $1B : BEQ ++
-			LDA.b #!DynamicDropGFXSlotCount_UW
-			BRA +++
-		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC : INC : INC : STA.w SprItemGFX,X
-		JMP .success
-	+ CMP.b #$6A : BNE + ; if triforce, use cutscene OAM slot
-		PHA
-		LDA.b $1B : BEQ ++
+	+ CMP.b #$D2 : BNE + ; if fairy, use fairy OAM slot
+		LDA.b IndoorsFlag : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
 		+++ INC : STA.w SprItemGFX,X
-		JMP .initRequest ; don't jump to end, we need the TF GFX to draw at $E7 
+		JMP .success
+	+ CMP.b #$D1 : BNE + ; if apple, use apple OAM slot
+		LDA.b IndoorsFlag : BEQ ++
+			LDA.b #!DynamicDropGFXSlotCount_UW
+			BRA +++
+		++ LDA.b #!DynamicDropGFXSlotCount_OW
+		+++ INC #2 : STA.w SprItemGFX,X
+		JMP .success
 	+
 
 	PHA
 		LDA.w DynamicDropGFXIndex
 		INC
 		PHX
-		LDX.b $1B : BEQ +
+		LDX.b IndoorsFlag : BEQ +
 			CMP.b #!DynamicDropGFXSlotCount_UW : BCC .setIndex
 			BRA ++
 		+ CMP.b #!DynamicDropGFXSlotCount_OW : BCC .setIndex
@@ -107,11 +84,11 @@ RequestSlottedTile:
 		PHX
 			; loop thru other sprites, check if any use the same gfx slot
 			LDY.b #$0F
-			- TYA : CMP 1,S : BEQ + ; don't check self
-			LDA.w $0DD0,Y : BEQ +
-			LDA.w !SPRITE_REDRAW, Y : BNE +
+			- TYA : CMP.b 1,S : BEQ + ; don't check self
+			LDA.w SpriteAITable,Y : BEQ +
+			LDA.w SprRedrawFlag, Y : BNE +
 			LDA.w SprItemGFX,Y : CMP.w DynamicDropGFXIndex : BNE +
-			LDA.w $0E20,Y ; don't need E5 enemy big key drop and E9 powder item
+			LDA.w SpriteTypeTable,Y ; don't need E5 enemy big key drop and E9 powder item
 				CMP.b #$EB : BEQ ++ ; heart piece
 				CMP.b #$E4 : BEQ ++ ; enemy drop
 				CMP.b #$3B : BEQ ++ ; bonk item
@@ -119,8 +96,8 @@ RequestSlottedTile:
 					BRA +
 			++
 				; slot already in use, use overflow slot
-				LDA.b #$02 : STA.w !SPRITE_REDRAW, X
-				LDA.b $1B : BEQ ++
+				LDA.b #$02 : STA.w SprRedrawFlag, X
+				LDA.b IndoorsFlag : BEQ ++
 					LDA.b #!DynamicDropGFXSlotCount_UW
 					BRA +++
 				++ LDA.b #!DynamicDropGFXSlotCount_OW
@@ -129,109 +106,33 @@ RequestSlottedTile:
 			+ DEY : BPL -
 		PLX
 	
-		.initRequest
-		PHX
-			LDY.b #$00
-			LDA.w DynamicDropRequest
-			- LSR : INY : BCS -
-			CPY.b #$08 : BCC +
-				; all request slots occupied, exit without drawing
-				PLX : PLA
-				LDY.b #$FE ; indicate failure
-				BRA .return
-			+ TYX
-			LDA.b #$00 : SEC
-			- ROL : DEX : BNE -
-			DEY ; y = slot index, a = new request bit flag
-			ORA.w DynamicDropRequest
-			STA.w DynamicDropRequest
-		PLX
+	.initRequest
 	PLA
-	STA.w DynamicDropQueue,Y
 
-	; decompress graphics
-	PHX : PHY
-
-	REP #$20
-	LDA.w #DynamicDropGFX-$7E9000
-	TYX : BEQ +
-		- CLC : ADC.w #$0080 : DEX : BNE -
-	+ STA.l !TILE_UPLOAD_OFFSET_OVERRIDE
-	SEP #$20
-
-	LDA.w DynamicDropQueue,Y
-	JSL.l GetSpriteID
-	JSL.l GetAnimatedSpriteTile_variable
-
+	PHX ;: PHY
+	; unsure about substitution rules here, because they aren't skipped properly for MW yet
+	JSL AttemptItemSubstitution
+	JSL ResolveLootIDLong
+	JSL ResolveBeeTrapLong
+	REP #$30
+	ASL : TAX
+	LDA.l StandingItemGraphicsOffsets,X : LDX.w ItemStackPtr : STA.l ItemGFXStack,X
+	LDA.w DynamicDropGFXIndex : AND.w #$000F : ASL : TAX
+	LDA.b IndoorsFlag : AND.w #$00FF : BEQ +
+		LDA.l FreeUWGraphics,X : BRA ++
+		+ LDA.l FreeOWGraphics,X
+	++ LDX.w ItemStackPtr : STA.l ItemTargetStack,X
+	TXA : INC #2 : STA.w ItemStackPtr
 	SEP #$30
-	PLY : PLX
-	LDA.w DynamicDropQueue,Y : PHA ; we want A to return the loot id
-	LDA.w SprItemGFX,X : STA.w DynamicDropQueue,Y
-	PLA
+	PLX
 
 	.success
-	STZ.w !SPRITE_REDRAW, X
+	STZ.w SprRedrawFlag, X
 	.return
 	PLY : PLX
 	RTL
 
 ;===================================================================================================
-
-TransferPotGFX:
-	SEP #$10
-	REP #$20
-	LDA.w DynamicDropRequest : AND.w #$00FF
-	BEQ .no
-
-	.next
-	LDY.b #$00
-	- INY : LSR : BCC -
-
-	PHY
-		LDA.w #$0000
-		- ROL : DEY : BNE -
-	PLY
-	DEY ; y = slot index, a = request bit flag
-
-	EOR.w DynamicDropRequest : STA.w DynamicDropRequest
-
-	LDA.w DynamicDropQueue,Y
-	ASL
-	TAX
-	LDA.b $1B : AND.w #$00FF : BEQ +
-		LDA.l FreeUWGraphics,X
-		BRA ++
-	+ LDA.l FreeOWGraphics,X
-	++ STA.w $2116
-
-	; calculate bottom row now
-	CLC : ADC.w #$0200>>1 : PHA
-
-	LDX.b #$7E : STX.w $4314
-	LDA.w #DynamicDropGFX
-	CPY.b #$00 : BEQ +
-		- CLC : ADC.w #$0080 : DEY : BNE -
-	+ STA.w $4302
-
-	LDX.b #$80 : STX.w $2115
-	LDA.w #$1801 : STA.w $4300
-
-	LDA.w #$0040 : STA.w $4305
-	LDY.b #$01
-
-	STY.w $420B
-	STA.w $4305
-
-	PLA
-	STA.w $2116
-	STY.w $420B
-
-	LDA.w DynamicDropRequest : AND.w #$00FF
-	BNE .next
-
-.no
-	RTL
-
 
 FreeUWGraphics:
 	dw $8800>>1
@@ -244,7 +145,6 @@ FreeUWGraphics:
 	; add new slots above this line
 .end
 	dw $0000 ; overflow slot, intentionally blank
-	dw $9CE0>>1 ; Triforce
 	; above this line, add slots that we want to draw to specific slots
 
 FreeOWGraphics:
@@ -257,7 +157,6 @@ FreeOWGraphics:
 	; add new slots above this line
 .end
 	dw $0000 ; overflow slot, intentionally blank
-	dw $9CE0>>1 ; Triforce
 	; above this line, add slots that we want to draw to specific slots
 
 ;===================================================================================================
@@ -265,94 +164,103 @@ FreeOWGraphics:
 ;   A = item receipt ID
 ;   X = sprite slot
 ; Returns with Carry flag set if gfx drawing was skipped
-DrawSlottedTile:
+DrawPotItem:
 	PHA
 		; TODO: allow drawing if gfx are not using a VRAM slot that changes during medallion
 		LDA.b $5D : CMP.b #$08 : BCC + : CMP.b #$0A+1 : BCS + ; skip if we're mid-medallion
 			PLA : SEC : RTL
 		+
 	PLA
-	STA.b $07 ; store loot ID temporarily, will get overwritten in Sprite_DrawMultiple_quantity_preset call
-	JSL.l IsNarrowSprite : BCS .narrow
+	
+	PHX
+	JSL AttemptItemSubstitution
+	JSL ResolveLootIDLong
+	TAX
+	LDA.l BeeTrapDisguise : BEQ +
+		TAX
+	+ STA.b Scrap07 ; store loot ID temporarily, will get overwritten in Sprite_DrawMultiple_quantity_preset call
+	LDA.l SpriteProperties_standing_width,X : BEQ .narrow
 
-	; TODO: Instead of loading the whole fixed 16 bytes from DynamicOAMTile**_** into !SPRITE_DYNAMIC_OAM
+	; TODO: Instead of loading the whole fixed 16 bytes from DynamicOAMTile**_** into SpriteDynamicOAM
 	;       Do something more like how DrawDynamicTile does it
 	;       Then we won't need all the separate DynamicOAMTile**_** tables
 	.full
-	LDA.b #$01 : STA $06
-	LDA #$0C : JSL.l OAM_AllocateFromRegionC
-	LDA #$02 : PHA
+	PLX
+	LDA.b #$01 : STA.b Scrap06
+	LDA.b #$0C : JSL OAM_AllocateFromRegionC
+	LDA.b #$02 : PHA
 		REP #$20
-		LDA.b $1B : AND.w #$00FF : BEQ +
+		LDA.b IndoorsFlag : AND.w #$00FF : BEQ +
 			LDA.w #DynamicOAMTileUW_full
 			BRA .transfer
 		+ LDA.w #DynamicOAMTileOW_full
 	BRA .transfer
 
 	.narrow
-	LDA.b #$02 : STA $06
-	LDA #$10 : JSL.l OAM_AllocateFromRegionC
-	LDA #$03 : PHA
+	PLX
+	LDA.b #$02 : STA.b Scrap06
+	LDA.b #$10 : JSL OAM_AllocateFromRegionC
+	LDA.b #$03 : PHA
 		REP #$20
-		LDA.b $1B : AND.w #$00FF : BEQ +
+		LDA.b IndoorsFlag : AND.w #$00FF : BEQ +
 			LDA.w #DynamicOAMTileUW_thin
 			BRA .transfer
 		+ LDA.w #DynamicOAMTileOW_thin
     .transfer
-	STA.b $08
+	STA.b Scrap08
 	LDA.w SprItemGFX,X
 	AND.w #$00FF
 	ASL : ASL : ASL : ASL
-	ADC.b $08
-	STA.b $08
-	PHK : PLY : STY.b $0A
-	LDY #$7E : PHB : PHY : PLB
+	ADC.b Scrap08
+	STA.b Scrap08
+	PHK : PLY : STY.b Scrap0A
+	LDY.b #$7E : PHB : PHY : PLB
 
 		; transfer fixed table data into WRAM
 		LDY.b #$0E
-		- LDA.b [$08],Y : STA.w !SPRITE_DYNAMIC_OAM,Y
+		- LDA.b [$08],Y : STA.w SpriteDynamicOAM,Y
 			DEY : DEY : BPL -
 
 		LDA.w SprItemFlags, X : AND.w #$00FF : BNE .draw
-			LDA.b $06 : LSR : BCC +
+			LDA.b Scrap06 : LSR : BCC +
 				; full
 				LDA.w #$0000
-				STA.w !SPRITE_DYNAMIC_OAM : STA.w !SPRITE_DYNAMIC_OAM+2
+				STA.w SpriteDynamicOAM : STA.w SpriteDynamicOAM+2
 				BRA .draw
 			+ ; narrow
-			LDA.w $0E20, X : AND.w #$00FF : CMP.w #$003B : BEQ .draw ; bonk item
-			LDA.b $A0 : CMP.w #$0120 : BNE +
-				LDA.b $1B : BNE .draw ; good bee statue
+			LDA.w SpriteTypeTable, X : AND.w #$00FF : CMP.w #$003B : BEQ .draw ; bonk item
+			LDA.b RoomIndex : CMP.w #$0120 : BNE +
+				LDA.b IndoorsFlag : BNE .draw ; good bee statue
 			+
 			; TODO: Figure out how to target bottle vendor fish item better than this
-			LDA.b $8A : AND.w #$00FF : CMP.w #$0018 : BNE + 
-				LDA.b $1B : BEQ .draw ; bottle vendor key
+			LDA.b OverworldIndex : AND.w #$00FF : CMP.w #$0018 : BNE + 
+				LDA.b IndoorsFlag : BEQ .draw ; bottle vendor key
 			+
 				LDA.w #$0004
-				STA.w !SPRITE_DYNAMIC_OAM : STA.w !SPRITE_DYNAMIC_OAM+8
+				STA.w SpriteDynamicOAM : STA.w SpriteDynamicOAM+8
 
 		.draw
 		; special handling
-		LDY.b $07 : CPY.b #$B2 : BNE + ; fairy
-			LDA.b $1A : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
-				LDA.w !SPRITE_DYNAMIC_OAM+4 : CLC : ADC.w #$02 ; use other fairy GFX
-				STA.w !SPRITE_DYNAMIC_OAM+4
-			++ LDA.b $1A : SEC : SBC.w #$10 : AND.w #$0020 : BEQ + ; alternate every 32 frames
-				LDA.w !SPRITE_DYNAMIC_OAM+2 : SEC : SBC.w #$02 ; move fairy up 2 pixels
-				STA.w !SPRITE_DYNAMIC_OAM+2
+		LDY.b Scrap07 : CPY.b #$B2 : BNE + ; fairy
+			LDA.b FrameCounter : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
+				LDA.w SpriteDynamicOAM+4 : CLC : ADC.w #$02 ; use other fairy GFX
+				STA.w SpriteDynamicOAM+4
+			++ LDA.b FrameCounter : SEC : SBC.w #$10 : AND.w #$0020 : BEQ + ; alternate every 32 frames
+				LDA.w SpriteDynamicOAM+2 : SEC : SBC.w #$02 ; move fairy up 2 pixels
+				STA.w SpriteDynamicOAM+2
 		+ CPY.b #$B5 : BNE + ; good bee
-			LDA.b $1A : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
-				LDA.w !SPRITE_DYNAMIC_OAM+12 : SEC : SBC.w #$10 ; use other fairy GFX
-				STA.w !SPRITE_DYNAMIC_OAM+12
-			++ LDA.b $1A : SEC : SBC.w #$10 : AND.w #$0020 : BEQ + ; alternate every 32 frames
-				LDA.w !SPRITE_DYNAMIC_OAM+10 : SEC : SBC.w #$02 ; move fairy up 2 pixels
-				STA.w !SPRITE_DYNAMIC_OAM+10
+			LDA.b FrameCounter : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
+				LDA.w SpriteDynamicOAM+12 : SEC : SBC.w #$10 ; use other fairy GFX
+				STA.w SpriteDynamicOAM+12
+			++ LDA.b FrameCounter : SEC : SBC.w #$10 : AND.w #$0020 : BEQ + ; alternate every 32 frames
+				LDA.w SpriteDynamicOAM+10 : SEC : SBC.w #$02 ; move fairy up 2 pixels
+				STA.w SpriteDynamicOAM+10
 		+
 
-		LDA.w #!SPRITE_DYNAMIC_OAM : STA.b $08
+		LDA.w #SpriteDynamicOAM : STA.b Scrap08
 		SEP #$20
-		STZ.b $07
-		LDA.b #$00 : STA.l !SKIP_EOR
+		STZ.b Scrap07
+		LDA.b #$00 : STA.l SpriteSkipEOR
 		JSL Sprite_DrawMultiple_quantity_preset
 	PLB
 	
@@ -422,9 +330,6 @@ DynamicOAMTileUW_full:
 	dw -4, -1 : db $A0, $00, $20, $02 ; overflow slot
 	dd 0, 0
 
-	dw -4, -1 : db $E7, $00, $20, $02 ; triforce
-	dd 0, 0
-
 	; above this line, add slots that we want to draw to specific slots
 
 	dw -4, -1 : db $EA, $00, $20, $02 ; fairy
@@ -492,9 +397,6 @@ DynamicOAMTileOW_full:
 	dw 0, 0 : db $A0, $00, $20, $02 ; overflow slot
 	dd 0, 0
 
-	dw 0, 0 : db $E7, $00, $20, $02 ; triforce
-	dd 0, 0
-
 	; above this line, add slots that we want to draw to specific slots
 
 	dw 0, 0 : db $EA, $00, $20, $02 ; fairy
@@ -504,7 +406,7 @@ DynamicOAMTileOW_full:
 	dd 0, 0
 
 ConditionalPushBlockTransfer:
-	LDA.b $1B : BNE +
+	LDA.b IndoorsFlag : BNE +
 		LDA.b #$0F ; don't transfer push block when on the OW
 		BRA .return-3
 	+
@@ -514,7 +416,7 @@ RTL
 
 pushpc
 ; fix Arghuss/Zora splash graphics
-org $068595
+org $868595
     db $E7, $E7, $E7, $E7, $E7, $C0, $C0
 pullpc
 

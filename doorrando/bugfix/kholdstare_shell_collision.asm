@@ -13,31 +13,31 @@ pullpc
 
 CheckKholdShellCoordinates:
 
-LDA.w $0D30, X
+LDA.w SpritePosXHigh, X
 XBA
-LDA.w $0D10, X  ; full 16 bit X coordinate of sprite
+LDA.w SpritePosXLow, X  ; full 16 bit X coordinate of sprite
 
-REP #$21
+REP #$21  ; carry is guaranteed clear
 SBC.w #$0020
-CMP.b $22
+CMP.b LinkPosX
 BCS .not_colliding
 
-ADC.w #$0040
-CMP.b $22
+ADC.w #$0040  ; carry is guaranteed clear
+CMP.b LinkPosX
 BCC .not_colliding
 
 SEP #$20
-LDA.w $0D20, X
+LDA.w SpritePosYHigh, X
 XBA
-LDA.w $0D00, X  ; full 16 bit Y coordinate of sprite
+LDA.w SpritePosYLow, X  ; full 16 bit Y coordinate of sprite
 
-REP #$21
-SBC.w #$001F  ; could go to 27 and let link squeeze in at Lanmo 2 (please adjust the following one)
-CMP.b $20
+REP #$21 ; carry is guaranteed clear
+SBC.w #$001F  ; could go to 27 and still let link squeeze in
+CMP.b LinkPosY
 BCS .not_colliding
 
-ADC.w #$0037
-CMP.b $20
+ADC.w #$0037 ; carry is guaranteed clear
+CMP.b LinkPosY
 BCC .not_colliding
 
 SEP #$20  ; collision detected

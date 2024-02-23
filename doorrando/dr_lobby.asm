@@ -1,14 +1,14 @@
 CheckDarkWorldSpawn:
 PHP
-	STA $A0 : STA $048E ; what we wrote over
+	STA.b RoomIndex : STA.w RoomIndexMirror ; what we wrote over
 	JSL SetDefaultWorld
-	LDA.l LinksHouseDarkWorld : CMP.b $A0 : BEQ ++
-	LDA.l SanctuaryDarkWorld : CMP.b $A0 : BEQ ++
-	LDA.l OldManDarkWorld : CMP.b $A0 : BNE +
-		++ SEP #$20 : LDA CurrentWorld : EOR.b #$40 : STA CurrentWorld
-		LDA.l DRFlags+1 : AND #$02 : BEQ + ; skip if the flag isn't set
+	LDA.l LinksHouseDarkWorld : CMP.b RoomIndex : BEQ ++
+	LDA.l SanctuaryDarkWorld : CMP.b RoomIndex : BEQ ++
+	LDA.l OldManDarkWorld : CMP.b RoomIndex : BNE +
+		++ SEP #$20 : LDA.l CurrentWorld : EOR.b #$40 : STA.l CurrentWorld
+		LDA.l DRFlags+1 : AND.b #$02 : BEQ + ; skip if the flag isn't set
 		LDA.l MoonPearlEquipment : BNE + ; moon pearl?
-			LDA #$17 : STA $5D : INC $02E0
+			LDA #$17 : STA.b LinkState : INC.w BunnyFlag
 + PLP : RTL
 
 SetDefaultWorld:

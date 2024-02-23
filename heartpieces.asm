@@ -2,194 +2,147 @@
 ; Randomize Heart Pieces
 ;--------------------------------------------------------------------------------
 HeartPieceGet:
-	PHX : PHY
-	LDY $0E80, X ; load item value into Y register
-	BNE +
-		; if for any reason the item value is 0 reload it, just in case
-		JSL.l LoadHeartPieceRoomValue : TAY
-	+
-	JSL.l MaybeMarkDigSpotCollected
-
-	.skipLoad
-
-	JSL.l HeartPieceGetPlayer : STA !MULTIWORLD_ITEM_PLAYER_ID
-
-	STZ $02E9 ; 0 = Receiving item from an NPC or message
-
-	CPY.b #$26 : BNE .notHeart ; don't add a 1/4 heart if it's not a heart piece
-	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE .notHeart
-	LDA HeartPieceQuarter : INC A : AND.b #$03 : STA HeartPieceQuarter : BNE .unfinished_heart ; add up heart quarters
-	BRA .giveItem
-
-	.notHeart
-
-	.giveItem
-	JSL.l $0791B3 ; Player_HaltDashAttackLong
-	JSL.l Link_ReceiveItem
-	CLC ; return false
-	JMP .done ; finished
-
-	.unfinished_heart
-	SEC ; return true
-	.done
-	
+    PHX : PHY
+    JSL LoadHeartPieceRoomValue
+    JSL AttemptItemSubstitution
+    JSL ResolveLootIDLong
+    TAY
+    JSL MaybeMarkDigSpotCollected
+    .skipLoad
+    JSL HeartPieceGetPlayer : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+    CPY.b #$26 : BNE .not_heart ; don't add a 1/4 heart if it's not a heart piece
+        LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .not_heart
+        LDA.l HeartPieceQuarter : INC A : AND.b #$03 : STA.l HeartPieceQuarter
+    .not_heart
+    JSL Player_HaltDashAttackLong
+    STZ.w ItemReceiptMethod ; 0 = Receiving item from an NPC or message
+    JSL Link_ReceiveItem
     JSL MaybeUnlockTabletAnimation
-	
-	PLY : PLX
+
+    PLY : PLX
 RTL
 ;--------------------------------------------------------------------------------
 HeartContainerGet:
-	PHX : PHY
-	JSL.l AddInventory_incrementBossSwordLong
-	LDY $0E80, X ; load item value into Y register
-	BNE +
-		; if for any reason the item value is 0 reload it, just in case
-		JSL.l LoadHeartContainerRoomValue : TAY
-	+
-
-	BRA HeartPieceGet_skipLoad
+    PHX : PHY
+    JSL IncrementBossSword
+    LDY.w SpriteID, X : BNE +
+        JSL LoadHeartContainerRoomValue : TAY
+    +
+    BRA HeartPieceGet_skipLoad
 ;--------------------------------------------------------------------------------
 DrawHeartPieceGFX:
-	PHP
-	JSL.l Sprite_IsOnscreen : BCC .offscreen
-	
-	PHA : PHY
-	LDA.w !SPRITE_REDRAW, X : BEQ .skipInit ; skip init if already ready
-		JSL.l HeartPieceSpritePrep
-		LDA.w !SPRITE_REDRAW, X : CMP.b #$02 : BEQ .skipInit
-		BRA .done ; don't draw on the init frame
-	
-	.skipInit
-	LDA $0E80, X ; Retrieve stored item type
-	
-	.skipLoad
-	JSL DrawSlottedTile : BCS .done
-		; draw shadow
-		CMP #$03 : BNE +
-			INC.b $00 : INC.b $00 : INC.b $00 : INC.b $00 ; move narrow sprite shadow over 4 pixels
-			PHA : LDA $0E60, X : ORA.b #$20 : STA $0E60, X : PLA
-		+
-		JSL.l Sprite_DrawShadowLong
-	
-	.done
-	PLY : PLA
-	.offscreen
-	PLP
+    PHP
+    JSL Sprite_IsOnscreen : BCC .offscreen
+        PHA : PHY
+        LDA.w SprRedrawFlag, X : BEQ .skipInit ; skip init if already ready
+            JSL HeartPieceSpritePrep
+            LDA.w SprRedrawFlag, X : CMP.b #$02 : BEQ .skipInit
+            BRA .done ; don't draw on the init frame
+        .skipInit
+        LDA.w SpriteID, X ; Retrieve stored item type
+        .skipLoad
+        PHA : PHX
+        TAX
+        LDA.l SpriteProperties_standing_width,X : BNE +
+            PLX
+            LDA.w SpriteControl, X : ORA.b #$20 : STA.w SpriteControl, X
+            PLA
+            JSL DrawPotItem
+            LDA.b Scrap00 : CLC : ADC.b #$04 : STA.b Scrap00
+            JSL Sprite_DrawShadowLong
+            BRA .done
+        +
+        PLX
+        PLA
+        JSL DrawPotItem
+        JSL Sprite_DrawShadowLong
+        .done
+        PLY : PLA
+    .offscreen
+    PLP
 RTL
 ;--------------------------------------------------------------------------------
 DrawHeartContainerGFX:
 	PHP
-	JSL.l Sprite_IsOnscreen : BCC DrawHeartPieceGFX_offscreen
+	JSL Sprite_IsOnscreen : BCC DrawHeartPieceGFX_offscreen
 	
 	PHA : PHY
-	LDA.w !SPRITE_REDRAW, X : BEQ .skipInit ; skip init if already ready
-		JSL.l HeartContainerSpritePrep
+	LDA.w SprRedrawFlag, X : BEQ .skipInit ; skip init if already ready
+		JSL HeartContainerSpritePrep
+		LDA.w SprRedrawFlag, X : CMP.b #$02 : BEQ .skipInit
 		BRA DrawHeartPieceGFX_done ; don't draw on the init frame
 	
 	.skipInit
-	BRA DrawHeartPieceGFX_skipInit
+	LDA.w SpriteID, X ; Retrieve stored item type
+
+	BRA DrawHeartPieceGFX_skipLoad
 ;--------------------------------------------------------------------------------
 HeartContainerSound:
-	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +
-	CPY.b #$20 : BEQ + ; Skip for Crystal
-	CPY.b #$37 : BEQ + ; Skip for Pendants
-	CPY.b #$38 : BEQ +
-	CPY.b #$39 : BEQ +
-    JSL.l CheckIfBossRoom : BCC + ; Skip if not in a boss room
-	        LDA.b #$2E
-			SEC
-		RTL
+    LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE +
+    LDA.w ItemReceiptMethod : CMP.b #$03 : BEQ +
+    JSL CheckIfBossRoom : BCC + ; Skip if not in a boss room
+        LDA.b #$2E
+        SEC
+        RTL
 	+
 	CLC
 RTL
 ;--------------------------------------------------------------------------------
 NormalItemSkipSound:
-	LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
-		SEC
-		RTL
-	+
-
-	LDA $0C5E, X ; thing we wrote over
-
-	CPY.b #$20 : BEQ + ; Skip for Crystal
-	CPY.b #$37 : BEQ + ; Skip for Pendants
-	CPY.b #$38 : BEQ +
-	CPY.b #$39 : BEQ +
-	
-	PHA
-    JSL.l CheckIfBossRoom
-	PLA
+; Out: c - skip sounds if set
+    LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .skip
+    JSL CheckIfBossRoom : BCS .boss_room
+        TDC
+        CPY.b #$17 : BEQ .skip
+        CLC
 RTL
-	+
-	CLC
-RTL
-;--------------------------------------------------------------------------------
-HeartUpgradeSpawnDecision: ; this should return #$00 to make the hp spawn
-	LDA.l !FORCE_HEART_SPAWN : BEQ .bonk_prize_check
-	
-	LDA.b #$00 : STA.l !FORCE_HEART_SPAWN
-RTL
-	.bonk_prize_check
-	PHX
-		LDA.b 5,S : TAX : LDA.w $0ED0, X : BEQ .normal_behavior-1
-	PLX
-	LDA.b #$00
-RTL
-	PLX
-	.normal_behavior
-	LDA.l OverworldEventDataWRAM, X
-RTL
-;--------------------------------------------------------------------------------
-SaveHeartCollectedStatus:
-	LDA !SKIP_HEART_SAVE : BEQ .save_flag
-	
-	LDA #$00 : STA !SKIP_HEART_SAVE
-RTL
-	
-	.save_flag
-	LDA 4,S : TAY : LDA $0ED0,Y : BEQ .normal_behavior
-	PHA
-		LDA OverworldEventDataWRAM, X : ORA 1,S : STA OverworldEventDataWRAM, X
-	PLA
-RTL
-
-	.normal_behavior
-	LDA OverworldEventDataWRAM, X : ORA.b #$40 : STA OverworldEventDataWRAM, X
+    .boss_room
+    LDA.w ItemReceiptMethod : CMP.b #$03 : BEQ +
+        .skip
+        SEC
+        RTL
+    +
+    LDA.b #$20
+    .dont_skip
+    CLC
 RTL
 ;--------------------------------------------------------------------------------
 HeartPieceSpritePrep:
-	PHA
-	
-	LDA ServerRequestMode : BEQ + :  : +
-	
-	LDA.b #$01 : STA.w !SPRITE_REDRAW, X
-	JSL.l HeartPieceGetPlayer : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
-	JSL.l LoadHeartPieceRoomValue ; load item type
-	STA $0E80, X ; Store item type
-	JSL.l RequestSlottedTile
-	
-	.skip
-	PLA
+    PHA
+
+    LDA.l ServerRequestMode : BEQ + :  : +
+
+    JSL HeartPieceGetPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    JSL LoadHeartPieceRoomValue
+    JSL AttemptItemSubstitution
+    JSL ResolveLootIDLong
+    STA.w SpriteID, X
+    JSL RequestStandingItemVRAMSlot
+
+    .skip
+    PLA
 RTL
 ;--------------------------------------------------------------------------------
 HeartContainerSpritePrep:
-	PHA
-	
-	JSL.l HeartPieceGetPlayer : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
-	JSL.l LoadHeartContainerRoomValue ; load item type
-	STA $0E80, X ; Store item type
-	JSL.l RequestSlottedTile
-	
-	PLA
+    PHA
+
+    JSL HeartPieceGetPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    JSL LoadHeartContainerRoomValue ; load item type
+    JSL AttemptItemSubstitution
+    JSL ResolveLootIDLong
+    STA.w SpriteID, X
+    JSL RequestStandingItemVRAMSlot
+
+    PLA
 RTL
 ;--------------------------------------------------------------------------------
 LoadHeartPieceRoomValue:
-	LDA $1B : BEQ .outdoors ; check if we're indoors or outdoors
+	LDA.b IndoorsFlag : BEQ .outdoors ; check if we're indoors or outdoors
 	.indoors
-	JSL.l LoadIndoorValue
+	JSL LoadIndoorValue
 	JMP .done
 	.outdoors
-	JSL.l LoadOutdoorValue
+	JSL LoadOutdoorValue
 	.done
 RTL
 ;--------------------------------------------------------------------------------
@@ -197,30 +150,30 @@ RTL
 !DynamicDropGFXSlotCount_OW = (FreeOWGraphics_end-FreeOWGraphics)>>1
 HPItemReset:
 	PHA
-	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE .skip
+	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .skip
 		PLA
-		JSL $09AD58 ; GiveRupeeGift - thing we wrote over
+		JSL GiveRupeeGift ; thing we wrote over
 		BRA .done
 	.skip
 	PLA
 	.done
 	PHA : PHY
 		LDY.b #$0F
-		- LDA.w $0DD0,Y : BEQ +
-		LDA.w !SPRITE_REDRAW, Y : CMP.b #$02 : BNE +
+		- LDA.w SpriteAITable,Y : BEQ +
+		LDA.w SprRedrawFlag, Y : CMP.b #$02 : BNE +
 			; attempt redraw of any sprite using the overflow slot
-			LDA.b #$01 : STA.w !SPRITE_REDRAW, Y
+			LDA.b #$01 : STA.w SprRedrawFlag, Y
 		+ DEY : BPL -
 	PLY : PLA
 RTL
 ;--------------------------------------------------------------------------------
 MaybeMarkDigSpotCollected:
 	PHA : PHP
-		LDA $1B : BNE +
+		LDA.b IndoorsFlag : BNE +
 		REP #$20 ; set 16-bit accumulator
-		LDA $8A
+		LDA.b OverworldIndex
 		CMP.w #$2A : BNE +
-			LDA HasGroveItem : ORA.w #$0001 : STA HasGroveItem
+			LDA.l HasGroveItem : ORA.w #$0001 : STA.l HasGroveItem
 		+
 	PLP : PLA
 RTL
@@ -228,25 +181,25 @@ RTL
 HeartPieceSpawnDelayFix:
 	JSL Sprite_DrawRippleIfInWater
 	; Fix the delay when spawning a HeartPiece sprite
-	JSL.l Sprite_CheckIfPlayerPreoccupied : BCS + ; what we moved from $05F037
-	JSL.l Sprite_CheckDamageToPlayerSameLayerLong : RTL ; what we wrote over
+	JSL Sprite_CheckIfPlayerPreoccupied : BCS + ; what we moved from $05F037
+	JSL Sprite_CheckDamageToPlayerSameLayerLong : RTL ; what we wrote over
 	+ CLC : RTL
 ;--------------------------------------------------------------------------------
 macro GetPossiblyEncryptedItem(ItemLabel,TableLabel)
-	LDA IsEncrypted : BNE ?encrypted
+	LDA.l IsEncrypted : BNE ?encrypted
 		LDA.l <ItemLabel>
 		BRA ?done
 	?encrypted:
 	PHX : PHP
 		REP #$30 ; set 16-bit accumulator & index registers
-		LDA $00 : PHA : LDA $02 : PHA
+		LDA.b Scrap00 : PHA : LDA.b Scrap02 : PHA
 
-		LDA.w #<TableLabel> : STA $00
-		LDA.w #<TableLabel>>>16 : STA $02
+		LDA.w #<TableLabel> : STA.b Scrap00
+		LDA.w #<TableLabel>>>16 : STA.b Scrap02
 		LDA.w #<ItemLabel>-<TableLabel>
 		JSL RetrieveValueFromEncryptedTable
 
-		PLX : STX $02 : PLX : STX $00
+		PLX : STX.b Scrap02 : PLX : STX.b Scrap01
 	PLP : PLX
 	?done:
 endmacro
@@ -254,7 +207,7 @@ endmacro
 LoadIndoorValue:
 	PHP
 	REP #$20 ; set 16-bit accumulator
-	LDA $A0 ; these are all decimal because i got them that way
+	LDA.b RoomIndex ; these are all decimal because i got them that way
 	CMP.w #225 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Forest_Thieves, HeartPieceIndoorValues)
 		JMP .done
@@ -265,7 +218,7 @@ LoadIndoorValue:
 		%GetPossiblyEncryptedItem(HeartPiece_Spectacle_Cave, HeartPieceIndoorValues)
 		JMP .done
 	+ CMP.w #283 : BNE +
-		LDA $22 : XBA : AND.w #$0001 ; figure out where link is
+		LDA.b LinkPosX : XBA : AND.w #$0001 ; figure out where link is
 		BNE ++
 			%GetPossiblyEncryptedItem(HeartPiece_Circle_Bushes, HeartPieceIndoorValues)
 			JMP .done
@@ -282,10 +235,13 @@ LoadIndoorValue:
 		%GetPossiblyEncryptedItem(HeartPiece_Smith_Pegs, HeartPieceIndoorValues)
 		JMP .done
 	+ CMP.w #135 : BNE +
-		LDA StandingKey_Hera
+		LDA.l StandingKey_Hera
 		JMP .done
 	+
-	LDA.w #$0017 ; default to a normal hp
+        PHX
+        LDX.w CurrentSpriteSlot ; If we're on a different screen ID via glitches load the sprite
+        LDA.w SpriteID,X        ; we can see and are interacting with
+        PLX
 	.done
 	AND.w #$00FF ; the loads are words but the values are 1-byte so we need to clear the top half of the accumulator - no guarantee it was 8-bit before
 	PLP
@@ -302,33 +258,33 @@ RTL
 LoadOutdoorValue:
 	PHP
 	REP #$20 ; set 16-bit accumulator
-	LDA $8A
+	LDA.b OverworldIndex
 	CMP.w #$00 : BNE +
 		LDA.l OWBonkPrizeTable[$00].loot
 		JMP .done
 	+ CMP.w #$03 : BNE +
-		LDA $22 : CMP.w #1890 : !BLT ++
+		LDA.b LinkPosX : CMP.w #1890 : !BLT ++
 			%GetPossiblyEncryptedItem(HeartPiece_Spectacle, HeartPieceOutdoorValues)
 			JMP .done
 		++
 			%GetPossiblyEncryptedItem(EtherItem, SpriteItemValues)
 			JMP .done
 	+ CMP.w #$05 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$01].loot
 			JMP .done
 		++
 			%GetPossiblyEncryptedItem(HeartPiece_Mountain_Warp, HeartPieceOutdoorValues)
 			JMP .done
 	+ CMP.w #$0A : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$02].loot
 			JMP .done
 		++
 			LDA.l OWBonkPrizeTable[$03].loot
 			JMP .done
 	+ CMP.w #$10 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$04].loot
 			JMP .done
 		++
@@ -341,28 +297,28 @@ LoadOutdoorValue:
 		LDA.l OWBonkPrizeTable[$07].loot
 		JMP .done
 	+ CMP.w #$13 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$08].loot
 			JMP .done
 		++
 			LDA.l OWBonkPrizeTable[$09].loot
 			JMP .done
 	+ CMP.w #$15 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$0A].loot
 			JMP .done
 		++
 			LDA.l OWBonkPrizeTable[$0B].loot
 			JMP .done
 	+ CMP.w #$18 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$0C].loot
 			JMP .done
 		++
 			LDA.l OWBonkPrizeTable[$0D].loot
 			JMP .done
 	+ CMP.w #$1A : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$0E].loot
 			JMP .done
 		++
@@ -381,7 +337,7 @@ LoadOutdoorValue:
 		%GetPossiblyEncryptedItem(HeartPiece_Maze, HeartPieceOutdoorValues)
 		JMP .done
 	+ CMP.w #$2A : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$13].loot
 			JMP .done
 		++ CMP.w #$0008 : BNE ++
@@ -394,21 +350,21 @@ LoadOutdoorValue:
 		LDA.l OWBonkPrizeTable[$15].loot
 		JMP .done
 	+ CMP.w #$2E : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$16].loot
 			JMP .done
 		++
 			LDA.l OWBonkPrizeTable[$17].loot
 			JMP .done
 	+ CMP.w #$30 : BNE +
-		LDA $22 : CMP.w #512 : !BGE ++
+		LDA.b LinkPosX : CMP.w #512 : !BGE ++
 			%GetPossiblyEncryptedItem(HeartPiece_Desert, HeartPieceOutdoorValues)
 			JMP .done
 		++
 			%GetPossiblyEncryptedItem(BombosItem, SpriteItemValues)
 			JMP .done
 	+ CMP.w #$32 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$18].loot
 			JMP .done
 		++
@@ -421,7 +377,7 @@ LoadOutdoorValue:
 		%GetPossiblyEncryptedItem(HeartPiece_Swamp, HeartPieceOutdoorValues)
 		JMP .done
 	+ CMP.w #$42 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1A].loot
 			JMP .done
 		++
@@ -431,14 +387,14 @@ LoadOutdoorValue:
 		%GetPossiblyEncryptedItem(HeartPiece_Cliffside, HeartPieceOutdoorValues)
 		JMP .done
 	+ CMP.w #$51 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1B].loot
 			JMP .done
 		++
 			LDA.l OWBonkPrizeTable[$1C].loot
 			JMP .done
 	+ CMP.w #$54 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1D].loot
 			JMP .done
 		++ CMP.w #$0008 : BNE ++
@@ -448,7 +404,7 @@ LoadOutdoorValue:
 			LDA.l OWBonkPrizeTable[$1F].loot
 			JMP .done
 	+ CMP.w #$55 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$20].loot
 			JMP .done
 		++
@@ -458,7 +414,7 @@ LoadOutdoorValue:
 		LDA.l OWBonkPrizeTable[$22].loot
 		JMP .done
 	+ CMP.w #$5B : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$23].loot
 			JMP .done
 		++
@@ -471,7 +427,7 @@ LoadOutdoorValue:
 		%GetPossiblyEncryptedItem(HeartPiece_Digging, HeartPieceOutdoorValues)
 		JMP .done
 	+ CMP.w #$6E : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$25].loot
 			JMP .done
 		++ CMP.w #$0008 : BNE ++
@@ -487,7 +443,10 @@ LoadOutdoorValue:
 		%GetPossiblyEncryptedItem(HeartPiece_Zora, HeartPieceOutdoorValues)
 		JMP .done
 	+
-	LDA.w #$0017 ; default to a normal hp
+        PHX
+        LDX.w CurrentSpriteSlot ; If we're on a different screen ID via glitches load the sprite
+        LDA.w SpriteID,X        ; we can see and are interacting with.
+        PLX
 	.done
 	AND.w #$00FF ; the loads are words but the values are 1-byte so we need to clear the top half of the accumulator - no guarantee it was 8-bit before
 	PLP
@@ -509,7 +468,7 @@ LoadHeartContainerRoomValue:
 LoadBossValue:
 	PHP
 	REP #$20 ; set 16-bit accumulator
-	LDA $A0 ; these are all decimal because i got them that way
+	LDA.b RoomIndex ; these are all decimal because i got them that way
 	CMP.w #200 : BNE +
 		%GetPossiblyEncryptedItem(HeartContainer_ArmosKnights, HeartContainerBossValues)
 		JMP .done
@@ -552,7 +511,7 @@ CheckIfBossRoom:
 ; Carry set if we're in a boss room, unset otherwise.
 ;--------------------------------------------------------------------------------
 	REP #$20 ; set 16-bit accumulator
-	LDA $A0 ; these are all decimal because i got them that way
+	LDA.b RoomIndex ; these are all decimal because i got them that way
 	CMP.w #200 : BEQ .done
 	CMP.w #51 : BEQ .done
 	CMP.w #7 : BEQ .done
@@ -582,22 +541,22 @@ RTL
 ;#13 - Ganon's Tower - Agahnim II
 ;#0 - Pyramid of Power - Ganon
 ;--------------------------------------------------------------------------------
-;JSL $06DD40 ; DashKey_Draw
-;JSL $06DBF8 ; Sprite_PrepAndDrawSingleLargeLong
-;JSL $06DC00 ; Sprite_PrepAndDrawSingleSmallLong ; draw first cell correctly
-;JSL $00D51B ; GetAnimatedSpriteTile
-;JSL $00D52D ; GetAnimatedSpriteTile.variable
+;JSL $86DD40 ; DashKey_Draw
+;JSL $86DBF8 ; Sprite_PrepAndDrawSingleLargeLong
+;JSL $86DC00 ; Sprite_PrepAndDrawSingleSmallLong ; draw first cell correctly
+;JSL $80D51B ; GetAnimatedSpriteTile
+;JSL $80D52D ; GetAnimatedSpriteTile.variable
 ;================================================================================
 HeartPieceGetPlayer:
 {
 	PHY
-	LDA $1B : BNE +
+	LDA.b IndoorsFlag : BNE +
 		BRL .outdoors
 	+
 
 	PHP
 	REP #$20 ; set 16-bit accumulator
-	LDA $A0 ; these are all decimal because i got them that way
+	LDA.b RoomIndex ; these are all decimal because i got them that way
 	CMP.w #135 : BNE +
 		LDA StandingKey_Hera_Player
 		BRL .done
@@ -641,7 +600,7 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Spectacle_Cave_Player
 		BRL .done
 	+ CMP.w #283 : BNE +
-		LDA $22 : XBA : AND.w #$0001 ; figure out where link is
+		LDA.b LinkPosX : XBA : AND.w #$0001 ; figure out where link is
 		BNE ++
 			LDA HeartPiece_Circle_Bushes_Player
 			BRL .done
@@ -663,33 +622,33 @@ HeartPieceGetPlayer:
 	.outdoors
 	PHP
 	REP #$20 ; set 16-bit accumulator
-	LDA $8A
+	LDA.b OverworldIndex
 	CMP.w #$00 : BNE +
 		LDA.l OWBonkPrizeTable[$00].mw_player
 		BRL .done
 	+ CMP.w #$03 : BNE +
-		LDA $22 : CMP.w #1890 : !BLT ++
+		LDA.b LinkPosX : CMP.w #1890 : !BLT ++
 			LDA HeartPiece_Spectacle_Player
 			BRL .done
 		++
 			LDA EtherItem_Player
 			BRL .done
 	+ CMP.w #$05 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$01].mw_player
 			BRL .done
 		++
 			LDA HeartPiece_Mountain_Warp_Player
 			BRL .done
 	+ CMP.w #$0A : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$02].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$03].mw_player
 			BRL .done
 	+ CMP.w #$10 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$04].mw_player
 			BRL .done
 		++
@@ -702,28 +661,28 @@ HeartPieceGetPlayer:
 		LDA.l OWBonkPrizeTable[$07].mw_player
 		BRL .done
 	+ CMP.w #$13 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$08].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$09].mw_player
 			BRL .done
 	+ CMP.w #$15 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$0A].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$0B].mw_player
 			BRL .done
 	+ CMP.w #$18 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$0C].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$0D].mw_player
 			BRL .done
 	+ CMP.w #$1A : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$0E].mw_player
 			BRL .done
 		++
@@ -742,7 +701,7 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Maze_Player
 		BRL .done
 	+ CMP.w #$2A : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$14].mw_player
 			BRL .done
 		++ CMP.w #$0008 : BNE ++
@@ -755,21 +714,21 @@ HeartPieceGetPlayer:
 		LDA.l OWBonkPrizeTable[$16].mw_player
 		BRL .done
 	+ CMP.w #$2E : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$17].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$18].mw_player
 			BRL .done
 	+ CMP.w #$30 : BNE +
-		LDA $22 : CMP.w #512 : !BGE ++
+		LDA.b LinkPosX : CMP.w #512 : !BGE ++
 			LDA HeartPiece_Desert_Player
 			BRL .done
 		++
 			LDA BombosItem_Player
 			BRL .done
 	+ CMP.w #$32 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$19].mw_player
 			BRL .done
 		++
@@ -782,7 +741,7 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Swamp_Player
 		BRL .done
 	+ CMP.w #$42 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1B].mw_player
 			BRL .done
 		++
@@ -792,14 +751,14 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Cliffside_Player
 		BRL .done
 	+ CMP.w #$51 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1C].mw_player
 			BRL .done
 		++
 			LDA.l OWBonkPrizeTable[$1D].mw_player
 			BRL .done
 	+ CMP.w #$54 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1E].mw_player
 			BRL .done
 		++ CMP.w #$0008 : BNE ++
@@ -809,7 +768,7 @@ HeartPieceGetPlayer:
 			LDA.l OWBonkPrizeTable[$20].mw_player
 			BRL .done
 	+ CMP.w #$55 : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$21].mw_player
 			BRL .done
 		++
@@ -819,7 +778,7 @@ HeartPieceGetPlayer:
 		LDA.l OWBonkPrizeTable[$23].mw_player
 		BRL .done
 	+ CMP.w #$5B : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$24].mw_player
 			BRL .done
 		++
@@ -832,7 +791,7 @@ HeartPieceGetPlayer:
 		LDA HeartPiece_Digging_Player
 		BRL .done
 	+ CMP.w #$6E : BNE +
-		LDA.w $0ED0,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
+		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$26].mw_player
 			BRL .done
 		++ CMP.w #$0008 : BNE ++
@@ -861,15 +820,15 @@ HeartPieceSetRedraw:
 	PHY
 		LDY.b #$0F
 		.next
-		LDA.w $0DD0,Y : BEQ ++
-			LDA.w $0E20,Y : CMP.b #$EB : BEQ + ; heart piece
+		LDA.w SpriteAITable,Y : BEQ ++
+			LDA.w SpriteTypeTable,Y : CMP.b #$EB : BEQ + ; heart piece
 			CMP.b #$E4 : BEQ + ; enemy key drop
 			CMP.b #$3B : BEQ + ; bonk item (book/key)
 			CMP.b #$E5 : BEQ + ; enemy big key drop
 			CMP.b #$E7 : BEQ + ; mushroom item
 			CMP.b #$E9 : BEQ + ; powder item
 			BRA ++
-				+ LDA.b #$01 : STA.w !SPRITE_REDRAW,Y
+				+ LDA.b #$01 : STA.w SprRedrawFlag,Y
 		++ DEY : BPL .next
 	PLY
 RTL
@@ -877,15 +836,15 @@ HeartPieceGetRedraw:
 	PHY
 		LDY.b #$0F
 		.next
-		LDA.w $0DD0,Y : BEQ ++
-			LDA.w $0E20,Y : CMP.b #$EB : BEQ + ; heart piece
+		LDA.w SpriteAITable,Y : BEQ ++
+			LDA.w SpriteTypeTable,Y : CMP.b #$EB : BEQ + ; heart piece
 			CMP.b #$E4 : BEQ + ; enemy key drop
 			CMP.b #$3B : BEQ + ; bonk item (book/key)
 			CMP.b #$E5 : BEQ + ; enemy big key drop
 			CMP.b #$E7 : BEQ + ; mushroom item
 			CMP.b #$E9 : BEQ + ; powder item
 			BRA ++
-				+ LDA.w !SPRITE_REDRAW,Y : BEQ ++
+				+ LDA.w SprRedrawFlag,Y : BEQ ++
 					PLY : SEC : RTL
 		++ DEY : BPL .next
 	PLY

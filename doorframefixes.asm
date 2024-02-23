@@ -7,8 +7,8 @@
 ;--------------------------------------------------------------------------------
 StoreLastOverworldDoorID:
 	TXA : INC
-	STA $7F5099
-	LDA $1BBB73, X : STA $010E
+	STA.l PreviousOverworldDoor
+	LDA.l Overworld_Entrance_ID, X : STA.w EntranceIndex
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -16,14 +16,14 @@ RTL
 ; CacheDoorFrameData
 ;--------------------------------------------------------------------------------
 CacheDoorFrameData:
-	LDA $7F5099 : BEQ .originalBehaviour
+	LDA.l PreviousOverworldDoor : BEQ .originalBehaviour
 	DEC : ASL : TAX
-	LDA EntranceDoorFrameTable, X : STA $0696
-	LDA EntranceAltDoorFrameTable, X : STA $0698
+	LDA.l EntranceDoorFrameTable, X : STA.w TileMapEntranceDoors
+	LDA.l EntranceAltDoorFrameTable, X : STA.w TileMapTile32
 	BRA .done
 	.originalBehaviour
-		LDA $D724, X : STA $0696
-		STZ $0698
+		LDA.w $D724, X : STA.w TileMapEntranceDoors
+		STZ.w TileMapTile32
 	.done
 RTL
 ;--------------------------------------------------------------------------------
@@ -32,9 +32,9 @@ RTL
 ; WalkDownIntoTavern
 ;--------------------------------------------------------------------------------
 WalkDownIntoTavern:
-	LDA $7F5099
+	LDA.l PreviousOverworldDoor
 	; tavern door has index 0x42 (saved off value is incremented by one)
-	CMP #$43
+	CMP.b #$43
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -42,49 +42,49 @@ RTL
 ; TurnAroundOnUnderworld
 ;--------------------------------------------------------------------------------
 TurnAroundOnUnderworld:
-	LDA $26 : BEQ .done
+	LDA.b LinkPushDirection : BEQ .done
 		; turn around if ($010E == #$43) != ($7F5099 == #$43)
-		LDX #$00
-		LDA #$43 : CMP $010E : BEQ +
+		LDX.b #$00
+		LDA.b #$43 : CMP.w EntranceIndex : BEQ +
 			INX
 		+
-		CMP $7F5099 : BEQ +
+		CMP.l PreviousOverworldDoor : BEQ +
 			DEX
 		+
-		CPX #$00 : BEQ .done
-			LDA $26 : EOR #$0C : STA $26
+		CPX.b #$00 : BEQ .done
+			LDA.b LinkPushDirection : EOR.b #$0C : STA.b LinkPushDirection
 .done
-JML $0FFD65 ; what we overwrote
+JML Underworld_LoadCustomTileAttributes ; what we overwrote
 
 ;--------------------------------------------------------------------------------
 ; TurnUpOnOverworld
 ;--------------------------------------------------------------------------------
 TurnUpOnOverworld:
-	LDA.l EntranceTavernBack : CMP #$43 : BEQ .done
-		LDA #$08 : STA $26 ; only fix this glitch if exit not vanilla
+	LDA.l EntranceTavernBack : CMP.b #$43 : BEQ .done
+		LDA.b #$08 : STA.b LinkPushDirection ; only fix this glitch if exit not vanilla
 .done
-JML $07E68F ; what we overwrote
+JML Link_HandleMovingAnimation_FullLongEntry ; what we overwrote
 
 ;--------------------------------------------------------------------------------
 ; WalkUpOnOverworld
 ;--------------------------------------------------------------------------------
 WalkUpOnOverworld:
-	LDA $20 : CMP #$091B : BNE .normal ; hardcoded Y coordinate
-		STZ $2F
+	LDA.b LinkPosY : CMP.w #$091B : BNE .normal ; hardcoded Y coordinate
+		STZ.b LinkDirection
 		RTL
 	.normal
-	LDA #$0002 : STA $2F ; what we overwrote
+	LDA.w #$0002 : STA.b LinkDirection ; what we overwrote
 RTL
 
 ;--------------------------------------------------------------------------------
 ; CheckStairsAdjustment
 ;--------------------------------------------------------------------------------
 CheckStairsAdjustment:
-	LDA.b $A0
+	LDA.b RoomIndex
 	CMP.w #$0124 ; vanilla check, rooms $0124 to $0127 have a lower exit position (currently ER ignores the entrance location)
 	BCC .done
 	LDA.w #$FFFF-1
-	CMP.w $0696 ; tavern back ($0696 == #$FFFF) should always have carry cleared
+	CMP.w TileMapEntranceDoors ; tavern back ($0696 == #$FFFF) should always have carry cleared
 .done
 RTL
 ; if carry cleared, shift position up
