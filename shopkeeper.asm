@@ -425,80 +425,78 @@ Shopkeeper_SetupHitboxes:
 RTS
 
 Shopkeeper_BuyItem:
-        PHX : PHY
-        TYX
+    PHX : PHY
+    TYX
 
-        LDA.l ShopInventory, X
-        CMP.b #$0E : BEQ .refill ; Bee Refill
-        CMP.b #$2E : BEQ .refill ; Red Potion Refill
-        CMP.b #$2F : BEQ .refill ; Green Potion Refill
-        CMP.b #$30 : BEQ .refill ; Blue Potion Refill
-                BRA +
-        .refill
-        	JSL Sprite_GetEmptyBottleIndex : BMI .full_bottles
-        	LDA.b #$1 : STA.l ShopkeeperRefill ; If this is on, don't toggle bit to remove from shop
-		+
+    LDA.l ShopInventory, X
+    CMP.b #$0E : BEQ .refill ; Bee Refill
+    CMP.b #$2E : BEQ .refill ; Red Potion Refill
+    CMP.b #$2F : BEQ .refill ; Green Potion Refill
+    CMP.b #$30 : BEQ .refill ; Blue Potion Refill
+        BRA +
+    .refill
+        JSL Sprite_GetEmptyBottleIndex : BMI .full_bottles
+        LDA.b #$1 : STA.l ShopkeeperRefill ; If this is on, don't toggle bit to remove from shop
+    +
 
-                LDA.l ShopType : AND.b #$80 : BNE .buy ; don't charge if this is a take-any
-                        REP #$20 : LDA.l CurrentRupees : CMP.l ShopInventory+1, X : SEP #$20 : !BGE .buy
+        LDA.l ShopType : AND.b #$80 : BNE .buy ; don't charge if this is a take-any
+            REP #$20 : LDA.l CurrentRupees : CMP.l ShopInventory+1, X : SEP #$20 : !BGE .buy
 
-                .cant_afford
-                LDA.b #$7A
-                LDY.b #$01
-                JSL Sprite_ShowMessageUnconditional
-                LDA.b #$3C : STA.w SFX2 ; error sound
-                JMP .done
-        .full_bottles
-        LDA.b #$6B : LDY.b #$01
-        JSL Sprite_ShowMessageUnconditional
-        LDA.b #$3C : STA.w SFX2 ; error sound
-        JMP .done
-        .buy
-        LDA.l ShopType : AND.b #$80 : BNE ++ ; don't charge if this is a take-any
-                REP #$20 : LDA.l CurrentRupees : !SUB ShopInventory+1, X : STA.l CurrentRupees : SEP #$20 ; Take price away
-        ++
+        .cant_afford
+        LDA.b #$7A
+        LDY.b #$01
+        BRA .message
+    .full_bottles
+    LDA.b #$6B : LDY.b #$01
+    .message
+    JSL Sprite_ShowMessageUnconditional
+    LDA.b #$3C : STA.w SFX2 ; error sound
+    JMP .done
+    .buy
+    LDA.l ShopType : AND.b #$80 : BNE ++ ; don't charge if this is a take-any
+        REP #$20 : LDA.l CurrentRupees : !SUB ShopInventory+1, X : STA.l CurrentRupees : SEP #$20 ; Take price away
+    ++
+    PHX
+        LDA.b #0 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+        TXA : !ADD ShopSRAMIndex : TAX
+        LDA.l PurchaseCounts, X : BNE +++	;Is this the first time buying this slot?
+            LDA.l EnableShopItemCount, X : STA.l ShopEnableCount ; If so, store the permission to count the item here.
+        +++
+    PLX
+    LDA.l ShopInventory, X
+    JSL.l AttemptItemSubstitution
+    JSL.l ResolveLootIDLong
+    TAY : JSL Link_ReceiveItem
+    LDA.l ShopInventory+3, X : INC : STA.l ShopInventory+3, X
+    LDA.b #0 : STA.l ShopEnableCount
+    TXA : LSR #2 : TAX
+    LDA.l ShopType : BIT.b #$80 : BNE +
+        LDA ShopkeeperRefill : BNE +++
+            LDA.l ShopState : ORA.w Shopkeeper_ItemMasks, X : STA.l ShopState
+        +++ PHX
+        TXA : !ADD ShopSRAMIndex : TAX
+        LDA.l PurchaseCounts, X : INC : BEQ +++ : STA.l PurchaseCounts, X : +++
+        PLX
+        BRA ++
+    + ; Take-any
+    BIT.b #$20 : BNE .takeAll
+        .takeAny
+        LDA.l ShopState : ORA.b #$07 : STA.l ShopState
         PHX
-			LDA.b #0 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
-			TXA : !ADD ShopSRAMIndex : TAX
-			LDA.l PurchaseCounts, X : BNE +++	;Is this the first time buying this slot?
-				LDA.l EnableShopItemCount, X : STA.l ShopEnableCount ; If so, store the permission to count the item here.
-			+++
-		PLX
-        LDA.l ShopInventory, X
-		JSL.l AttemptItemSubstitution
-        JSL.l ResolveLootIDLong
-		TAY : JSL Link_ReceiveItem
-        LDA.l ShopInventory+3, X : INC : STA.l ShopInventory+3, X
-        LDA.b #0 : STA.l ShopEnableCount
-
-        TXA : LSR #2 : TAX
-        LDA.l ShopType : BIT.b #$80 : BNE +
-        		LDA ShopkeeperRefill : BNE +++
-                	LDA.l ShopState : ORA.w Shopkeeper_ItemMasks, X : STA.l ShopState
-                +++ PHX
-                TXA : !ADD ShopSRAMIndex : TAX
-                LDA.l PurchaseCounts, X : INC : BEQ +++ : STA.l PurchaseCounts, X : +++
-                PLX
-                BRA ++
-        + ; Take-any
-        BIT.b #$20 : BNE .takeAll
-                .takeAny
-                LDA.l ShopState : ORA.b #$07 : STA.l ShopState
-                PHX
-                	LDA.l ShopSRAMIndex : TAX : LDA.b #$01 : STA.l PurchaseCounts, X
-                	LDA.l EnableShopItemCount, X : STA.l ShopEnableCount
-				PLX
-                BRA ++
-                .takeAll
-                LDA.l ShopState : ORA.w Shopkeeper_ItemMasks, X : STA.l ShopState
-                PHX
-                	LDA.l ShopSRAMIndex : TAX : LDA.l ShopState : STA.l PurchaseCounts, X
-                	LDA.l EnableShopItemCount, X : STA.l ShopEnableCount
-                PLX
-	++
-	.done
-	LDA #$0 : STA ShopkeeperRefill
-	PLY : PLX
+            LDA.l ShopSRAMIndex : TAX : LDA.b #$01 : STA.l PurchaseCounts, X
+            LDA.l EnableShopItemCount, X : STA.l ShopEnableCount
+        PLX
+        BRA ++
+        .takeAll
+        LDA.l ShopState : ORA.w Shopkeeper_ItemMasks, X : STA.l ShopState
+        PHX
+            LDA.l ShopSRAMIndex : TAX : LDA.l ShopState : STA.l PurchaseCounts, X
+            LDA.l EnableShopItemCount, X : STA.l ShopEnableCount
+        PLX
+    ++
+    .done
+    LDA.b #$0 : STA.l ShopkeeperRefill
+    PLY : PLX
 RTS
 Shopkeeper_ItemMasks:
 db #$01, #$02, #$04, #$08
