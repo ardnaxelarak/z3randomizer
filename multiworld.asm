@@ -241,10 +241,8 @@ Multiworld_MasterSword_GrantToPlayer:
 	PLP : PLA
 
 	CPY.b #$6A : BEQ +
-		JSL Link_ReceiveItem ; thing we wrote over
-		RTL
-	+ JSL ActivateGoal
-RTL
+		JML Link_ReceiveItem ; thing we wrote over
+	+ JML ActivateGoal
 }
 
 Multiworld_AddReceivedItem_notCrystal:

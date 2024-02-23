@@ -22,7 +22,7 @@ RTL
 	.forceHeart
 	LDA.b #$33 : STA.b ScrapBufferBD+$0B ; assure the correct state if player talked to shopkeeper
 	LDA.w RoomItemsTaken : AND.b #$40 : BNE .notHeart
-	LDA ChestGameItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
+	LDA.l ChestGameItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
 	LDA.b #$07 ; give prize item
 RTL
 	.notHeart

@@ -608,7 +608,6 @@ RTL
 LoadMushroom:
 	LDA.b #$00 : STA.w SpriteGFXControl, X ; thing we wrote over
 	.justGFX
-
 	PHA
 
 	LDA.l MushroomItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
@@ -651,7 +650,7 @@ CollectPowder:
 	; if for any reason the item value is 0 reload it, just in case
 	  %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues) : TAY
   + PHA
-    LDA WitchItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
+    LDA.l WitchItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
     LDA.b #$01 : STA.l ShopEnableCount
   PLA
   STZ.w ItemReceiptMethod ; item from NPC

@@ -132,7 +132,7 @@ RTS
 ;--------------------------------------------------------------------------------
 AddReceivedItemExpanded:
 	PHA : PHX
-		LDA.l RemoteItems : BEQ + : LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
+		LDA.l RemoteItems : BEQ + : LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
 			LDA.w ItemReceiptMethod : BEQ ++ : CMP.b #$03 : BNE +++ : ++
 				; fromTextOrObject
 				LDA.w $0345 : BEQ ++ : LDA.b #$04 : ++ : STA.b LinkState ; Restore Link to his swimming state
@@ -731,20 +731,15 @@ ResolveReceipt:
         PHA : PHX
         PHK : PLB
         JSL PreItemGet
-        LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE +
-        LDA.w ItemReceiptID
-        .get_item
+        LDA.l !MULTIWORLD_ITEM_PLAYER_ID : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+        LDA.w ItemReceiptID : STA.l !MULTIWORLD_ITEM_ID
         JSL AttemptItemSubstitution
         JSR HandleBowTracking
-        +
-        LDA.w ItemReceiptID
-        STA.l !MULTIWORLD_ITEM_ID
         JSR ResolveLootID
-        .have_item
         STA.w ItemReceiptID
         LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE +
-        LDA.w ItemReceiptID
-        JSR IncrementItemCounters
+                LDA.w ItemReceiptID
+                JSR IncrementItemCounters
         +
         PLX : PLA
         RTS
@@ -811,7 +806,7 @@ ResolveLootID:
 
         .shields
         SEP #$20
-        LDA !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE ++
+        LDA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE ++
         LDA.b #$01 : STA.l ProgressiveFlag
         LDA.l HighestShield
         CMP.l ProgressiveShieldLimit : BCC +

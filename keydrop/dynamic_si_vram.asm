@@ -241,14 +241,14 @@ DrawPotItem:
 
 		.draw
 		; special handling
-		LDY.b Scrap07 : CPY.b #$B2 : BNE + ; fairy
+		LDY.b Scrap07 : CPY.b #$D2 : BNE + ; fairy
 			LDA.b FrameCounter : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
 				LDA.w SpriteDynamicOAM+4 : CLC : ADC.w #$02 ; use other fairy GFX
 				STA.w SpriteDynamicOAM+4
 			++ LDA.b FrameCounter : SEC : SBC.w #$10 : AND.w #$0020 : BEQ + ; alternate every 32 frames
 				LDA.w SpriteDynamicOAM+2 : SEC : SBC.w #$02 ; move fairy up 2 pixels
 				STA.w SpriteDynamicOAM+2
-		+ CPY.b #$B5 : BNE + ; good bee
+		+ CPY.b #$D6 : BNE + ; good bee
 			LDA.b FrameCounter : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
 				LDA.w SpriteDynamicOAM+12 : SEC : SBC.w #$10 ; use other fairy GFX
 				STA.w SpriteDynamicOAM+12

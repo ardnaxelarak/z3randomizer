@@ -540,10 +540,12 @@ db $36, $DB ; RED RUPEE ($36)
 db $42, $D8 ; HEART ($42)
 db $44, $E2 ; ARROW REFILL 10 ($44)
 db $45, $DF ; SMALL MAGIC DECANTER ($45)
+db $D1, $AC ; APPLES ($D1)
 db $D2, $E3 ; FAERIE ($D2)
 db $D3, $0B ; CUCCO ($D3)
 db $D4, $E0 ; LARGE MAGIC DECANTER ($D4)
-db $D5, $E1 ; ARROW REFILL 5  (x$D5)
+db $D5, $E1 ; ARROW REFILL 5 ($D5)
+db $D6, $79 ; GOOD BEE ($D6)
 
 
 IncrementCountForMinor:
@@ -628,7 +630,7 @@ SpriteKeyPrep:
 					BRA +
 		.continue
 		LDA.w SpawnedItemIndex : STA.w SprItemIndex, X
-		LDA.w SpawnedItemMWPlayer : STA.w SprItemMWPlayer, X : STA.w !MULTIWORLD_SPRITEITEM_PLAYER_ID
+		LDA.w SpawnedItemMWPlayer : STA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 		LDA.w SpawnedItemFlag : STA.w SprItemFlags, X : BEQ +
 		LDA.w SpawnedItemID : STA.w SpriteItemType, X
 		PHA : PHY : PHX
@@ -646,7 +648,7 @@ SpriteKeyPrep:
 SpriteKeyDrawGFX:
     JSL Sprite_DrawRippleIfInWater
     PHA
-	LDA.l SprItemMWPlayer, X : STA.w !MULTIWORLD_SPRITEITEM_PLAYER_ID
+	LDA.l SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	LDA.w SprRedrawFlag, X : BEQ +
 		LDA.w SpriteItemType, X
 		JSL RequestStandingItemVRAMSlot
@@ -685,7 +687,8 @@ KeyGet:
 			JSL CountChestKeyLong
 			++ PLA : RTL
 		+ STY.b Scrap00
-		LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .receive
+		LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+			STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .receive
 		PHX
 			LDA.w DungeonID : CMP.b #$FF : BNE +
 				LDA.b Scrap00 : CMP.b #$AF : BNE .skip
@@ -702,7 +705,7 @@ KeyGet:
 		.skip PLX
 		.receive
 		JSL Player_HaltDashAttackLong
-		TYA : JSL.l AttemptItemSubstitution : JSL.l ResolveLootIDLong : TAY
+		TYA : JSL AttemptItemSubstitution : JSL ResolveLootIDLong : TAY
 		JSL Link_ReceiveItem
 	PLA : DEC : RTL
 

@@ -67,7 +67,7 @@ PrepDynamicTile:
 	CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS + : BRA ++ ; if rupees, don't draw to OAM
 		+ JSL TransferItemReceiptToBuffer_using_ReceiptID
 			SEP #$30
-    ++ LDA.b #$00 : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID  ; clear player id
+    ++ LDA.b #$00 : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID  ; clear player id
 	PLB : PLY : PLX
 RTL
         .loot_resolved
@@ -229,7 +229,7 @@ PrepDrawRemoteItemSprite:
 			RTS
 		++
 		STA.l !MULTIWORLD_SCOUT_LOCATION
-		LDA.b #$00 : STA.b !MULTIWORLD_SPRITEITEM_PLAYER_ID
+		LDA.b #$00 : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 		LDA.b #$6B
 		RTS
 	+

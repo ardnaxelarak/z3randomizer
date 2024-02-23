@@ -84,8 +84,8 @@ HeartContainerSound:
         LDA.b #$2E
         SEC
         RTL
-	+
-	CLC
+    +
+    CLC
 RTL
 ;--------------------------------------------------------------------------------
 NormalItemSkipSound:

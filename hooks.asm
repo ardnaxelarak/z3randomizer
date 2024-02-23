@@ -2349,7 +2349,7 @@ Overworld_Entrance_BRANCH_RHO: ; branch here to continue into door
 ;================================================================================
 ; Paradox Cave Shopkeeper Fixes
 ;--------------------------------------------------------------------------------
-;org $808C19 ; Bank00.asm 1633 (LDA.b #$01 : STA MDMAEN)
+org $808C19 ; Bank00.asm 1633 (LDA.b #$01 : STA MDMAEN)
 JSL ParadoxCaveGfxFix : NOP
 ;================================================================================
 
@@ -2430,7 +2430,7 @@ org $80D17E+178 : db ExpandedTrinexx>>0
 ; Use above sheet in Hyrule castle courtyard after rain state.
 org $80DB9E ; Hyrule Castle GFX Sprite Sheet 4 on [LW1]
 db $3F
-db $80DBA2  ; Hyrule Castle GFX Sprite Sheet 4 on [RainState]
+org $80DBA2  ; Hyrule Castle GFX Sprite Sheet 4 on [RainState]
 db $3F
 org $80DC0A ; Hyrule Castle GFX Sprite Sheet 4 on [LW2]
 db $3F

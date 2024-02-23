@@ -47,6 +47,7 @@ incsrc bossdrop.asm
 incsrc moldorm.asm
 incsrc kodongo_fixes.asm
 incsrc mimic_fixes.asm
+incsrc swamola_fix.asm
 ; vitreous key fix for boss shuffle - uses FixPrizeOnTheEyes flag
 
 incsrc overworld_sprites.asm

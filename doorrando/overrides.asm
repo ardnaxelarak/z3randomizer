@@ -70,7 +70,7 @@ CutoffEntranceRug:
         CMP.w #$000C : BNE .norm
           + LDX.w #$0000 : LDA.l CutoffRooms, x
             - CMP.b RoomIndex : BEQ .check
-           	  INX #2 : LDA.l CutoffRooms, x : CMP.w #$FFFF : BNE -
+                INX #2 : LDA.l CutoffRooms, x : CMP.w #$FFFF : BNE -
     .norm
     PLX : PLA : LDA.w $9B52, Y : STA.l TileMapA, X ; what we wrote over
     RTL

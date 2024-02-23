@@ -18,7 +18,7 @@ DoDungeonMapBossIcon:
 	TAX
 
 	; get sprite pointer for room
-	LDA.l RoomData_SpritePointers,X
+	LDA.l UWSpritesPointers,X
 	STA.b Scrap00                ; pointer in $00
 	LDA.w #$0028 : STA.b Scrap02 ; set the bank to 28 for now
 	LDY.w #$0001 ; to skip the "sort"
