@@ -244,9 +244,10 @@ CheckMusicLoadRequest:
             CMP.b #16 : BEQ .castle
             CMP.b #17 : BEQ .dungeon
             CMP.b #22 : BEQ .dungeon
-            CMP.b #21 : BNE .check_fallback
+            CMP.b #21 : BEQ .boss
+                JMP .check_fallback
 
-;.boss
+.boss
             LDA $040C : LSR : !ADD.b #45
             BRA .check_fallback-3
 .no_change
@@ -269,7 +270,7 @@ CheckMusicLoadRequest:
                     LDA ProgressIndicator : CMP.b #03 : BNE .no_change ; aga1 killed
                         BRA -
 .darkwoods
-            LDA.b #15 : PHA
+            PHA
                 LDX $8A : LDA.l OWTileWorldAssoc,X : BEQ +
                     PLA : BRA .darkworld
                 + PLA : BRA .lightworld
@@ -277,7 +278,13 @@ CheckMusicLoadRequest:
             LDA $040C
             CMP.b #$08 : BNE .check_fallback  ; Hyrule Castle 2
 .dungeon
-            LDA $040C : LSR : !ADD.b #33 : STA !REG_MUSIC_CONTROL_REQUEST
+            LDA $040C : CMP.b #$1A : BNE +
+                PHA : LDA.l DRMode : BEQ ++
+                    LDA.w BigKeyField : AND.b #$04 : BEQ ++
+                        ; if door rando and entering GT with BK
+                        PLA : LDA.b #59 : BRA .check_fallback-3
+                ++ PLA
+            + LSR : !ADD.b #33 : STA !REG_MUSIC_CONTROL_REQUEST
 
 .check_fallback
             LDX !REG_MUSIC_CONTROL_REQUEST
@@ -416,7 +423,7 @@ SpiralStairsPreCheck:
 SpiralStairsPostCheck:
     LDA.l DRMode : BEQ + ; if door rando enabled
         LDA.b $A2 : CMP.w #$0007 : BNE .done
-        LDX.b #$16 : STX !REG_MUSIC_CONTROL_REQUEST
+        LDA.l Music_Hera : TAX : STX !REG_MUSIC_CONTROL_REQUEST
         BRA .done
     + LDA $A0
     CMP.w #$000C : BNE +

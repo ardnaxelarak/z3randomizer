@@ -90,11 +90,11 @@ FixAga2Bunny:
     ++
 	JSL DecideIfBunny : BNE +
 		JSR MakeBunny
-		LDA.b #$04 : STA.w $012C ; play bunny music
-		BRA .done
 	+
-	LDA.b #$09 : STA.w $012C ; what we wrote over
 	.done
+	PHX
+		JSL Overworld_DetermineMusic : STX !REG_MUSIC_CONTROL_REQUEST
+	PLX
 RTL
 ;--------------------------------------------------------------------------------
 

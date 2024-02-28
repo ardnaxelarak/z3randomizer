@@ -13,6 +13,9 @@ PHP
 
 SetDefaultWorld:
 PHP : SEP #$20
+LDA.l FollowerIndicator : CMP #$04 : BNE .default
+	LDA.l OldManRetrievalWorld : BRA +
+.default
 LDA.l InvertedMode : BEQ +
 	LDA.b #$40
 + STA CurrentWorld

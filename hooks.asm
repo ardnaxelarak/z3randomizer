@@ -1964,6 +1964,9 @@ NOP #8
 org $028B8F ; <- 10B8F - Bank02.asm:2236 (LDA $7EF374 : LSR A)
 JSL CheckHeraBossDefeated : NOP
 ;================================================================================
+org $028D6E
+JSL FallingMusicFadeOut : BRA + : NOP #2 : +
+;================================================================================
 org $029090 ; <- 11090 - Bank02.asm:3099 (LDA $7EF374 : LSR A)
 JSL CheckHeraBossDefeated : NOP
 ;================================================================================
@@ -2135,6 +2138,9 @@ PHB : JSL.l DarkWorldSaveFix
 ;--------------------------------------------------------------------------------
 org $028046 ; <- 10046 - Bank02.asm : 217 (JSL EnableForceBlank) (Start of Module_LoadFile)
 JSL.l OnFileLoad
+;--------------------------------------------------------------------------------
+org $0280A2
+JSL GetCurrentWorldForLoad
 ;--------------------------------------------------------------------------------
 org $09F520 ; <- 4F520 - module_death.asm : 401 (LDA $7EF3C5 : CMP.b #$03 : BCS BRANCH_THETA)
 JSL.l OnPlayerDead
@@ -2434,7 +2440,6 @@ JML MirrorBonk
 MirrorBonk_NormalReturn:
 org $07A9D1 ; <- 3A9D1 - Bank07.asm:6649 (BRANCH_GAMMA:)
 MirrorBonk_BranchGamma:
-JML OWMirrorSpriteBonk
 ;================================================================================
 
 ;================================================================================
@@ -3119,6 +3124,10 @@ JSL TurnUpOnOverworld
 
 org $02E297 ; LDA.w #$0002 : STA.b $2F
 JSL WalkUpOnOverworld
+NOP
+
+org $02E36F
+JSL CheckStairsAdjustment
 NOP
 
 org $02D7D2 ; BEQ .face_up
