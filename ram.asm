@@ -203,7 +203,7 @@ ProgressiveFlag = $7E0224         ; unused
 ItemStackPtr = $7E0226            ; Pointer into Item GFX and VRAM target queues. Word length.
                                   ; If not zero, pointer should always be left pointing at the
                                   ; next available slot in the stack during the frame.
-SpriteID = $7E0230                ; 0x10 bytes. Receipt ID for main loop sprite we're handling.
+SprSourceItemId = $7E0230         ; 0x10 bytes. Receipt ID without item substitutions.
 SpriteMetaData = $7E0240          ; 0x10 bytes. Sprite metadata. Used for prog bow tracking.
 AncillaVelocityZ = $7E0294        ; 0x0A bytes
 AncillaZCoord = $7E029E           ; 0x0A bytes
@@ -325,12 +325,14 @@ SprItemReceipt = $7E0740          ; Array for item id for each sprite 0x16
 SprItemIndex = $7E0750            ; Array for item index (see code)
 SprItemMWPlayer = $7E0760         ; Player id for each sprite drop 0x16
 SprItemFlags = $7E0770            ; Array 0x16 (used for both pots and drops) (combine with SprDropsItem?)
-SprItemGFX = $7E0780              ; this will keep track of the DynamicDropGFXIndex for each item
+SprItemGFXSlot = $7E0780          ; this will keep track of the DynamicDropGFXIndex for each item
 SprRedrawFlag = $7E0790           ; this is a flag indicating the gfx for a sprite should be reloaded and redrawn
                                   ;
 DynamicDropGFXIndex = $7E07F0     ; this will just count from 0 to 6 to determine which slot we're using
                                   ; we're expecting 5 items max per room, and order is irrelevant
                                   ; we just need to keep track of where they go
+DynamicDropGFXSlots = $7E07F1     ; Assume future use of this up to $0E bytes, these will store
+                                  ; which item gfx is currently occupying each slot
 OAMBuffer = $7E0800               ; Main OAM buffer sent to OAM. $200 bytes.
 OAMBuffer2 = $7E0A00              ;
                                   ;
@@ -407,7 +409,7 @@ SpriteOAMProperties = $7E0E40     ; h m w o o o o o | h = Harmless       | m = m
 SpriteHitPoints = $7E0E50         ; Set from $0DB173
 SpriteControl = $7E0E60           ; n i o s p p p t | n = Death animation? | i = Immune to attack/collion?
                                   ; o = Shadow      | p = OAM prop palette | t = OAM prop name table
-SpriteItemType = $7E0E80          ; Sprite Item Type. Also used for jump table local. $10 bytes.
+SpriteJumpIndex = $7E0E80         ; Sprite Item Type. Also used for jump table local. $10 bytes.
                                   ;
 SpriteDirectionTable = $7E0EB0    ; Sprite direction. $10 bytes.
                                   ;
@@ -428,6 +430,7 @@ CurrentSpriteSlot = $7E0FA0       ; Holds the current sprite/ancilla's index
                                   ;
 FreezeSprites = $7E0FC1           ; "Seems to freeze sprites"
                                   ;
+GfxChrHalfSlotVerify = $7E0FC6    ; Mirrors $0AAA, set to >= $03 when VRAM has temp graphics loaded
 PrizePackIndexes = $7E0FC7        ; $07 bytes. One for each prize pack.
                                   ;
 SpriteCoordCacheX = $7E0FD8       ;
@@ -810,6 +813,7 @@ endmacro
 %assertRAM(MenuBlink, $7E0207)
 %assertRAM(RaceGameFlag, $7E021B)
 %assertRAM(MessageJunk, $7E0223)
+%assertRAM(SprSourceItemId, $7E0230)
 %assertRAM(ItemReceiptID, $7E02D8)
 %assertRAM(ItemReceiptPose, $7E02DA)
 %assertRAM(BunnyFlag, $7E02E0)
@@ -880,9 +884,10 @@ endmacro
 %assertRAM(SprItemIndex, $7E0750)
 %assertRAM(SprItemMWPlayer, $7E0760)
 %assertRAM(SprItemFlags, $7E0770)
-%assertRAM(SprItemGFX, $7E0780)
+%assertRAM(SprItemGFXSlot, $7E0780)
 %assertRAM(SprRedrawFlag, $7E0790)
 %assertRAM(DynamicDropGFXIndex, $7E07F0)
+%assertRAM(DynamicDropGFXSlots, $7E07F1)
 %assertRAM(OAMBuffer, $7E0800)
 %assertRAM(OAMBuffer2, $7E0A00)
 %assertRAM(TransparencyFlag, $7E0ABD)
@@ -926,7 +931,7 @@ endmacro
 %assertRAM(SpriteOAMProperties, $7E0E40)
 %assertRAM(SpriteHitPoints, $7E0E50)
 %assertRAM(SpriteControl, $7E0E60)
-%assertRAM(SpriteItemType, $7E0E80)
+%assertRAM(SpriteJumpIndex, $7E0E80)
 %assertRAM(SpriteDirectionTable, $7E0EB0)
 %assertRAM(SpriteSpawnStep, $7E0ED0)
 %assertRAM(SpriteHalt, $7E0F00)
@@ -938,6 +943,7 @@ endmacro
 %assertRAM(SpriteSubPixelZ, $7E0F90)
 %assertRAM(CurrentSpriteSlot, $7E0FA0)
 %assertRAM(FreezeSprites, $7E0FC1)
+%assertRAM(GfxChrHalfSlotVerify, $7E0FC6)
 %assertRAM(PrizePackIndexes, $7E0FC7)
 %assertRAM(SpriteCoordCacheX, $7E0FD8)
 %assertRAM(SpriteCoordCacheY, $7E0FDA)

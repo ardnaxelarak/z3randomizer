@@ -55,6 +55,7 @@ DungeonExitTransition:
 		LDA.b #$00 : STA.w UseY1 ; stop item dashing
 	+
 	LDA.b #$0F : STA.b GameMode ; stop running through the transition
+	JSL DynamicDropGFXClear
 StatTransitionCounter:
 	PHA : PHP
 		LDA.l StatsLocked : BNE +

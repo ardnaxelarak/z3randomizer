@@ -1,3 +1,6 @@
+org $89C4E3
+JSL Overworld_LoadSprites_Decision
+
 org $89C50B ; 0x4C50B
 {
     ; .loadData

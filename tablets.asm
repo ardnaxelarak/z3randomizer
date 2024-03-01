@@ -29,16 +29,15 @@ SetTabletItemFlag:
 RTS
 ;--------------------------------------------------------------------------------
 SpawnTabletItem:
+    LDA.b #$EB
+    JSL Sprite_SpawnDynamically
+
     JSL HeartPieceGetPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
     JSL LoadOutdoorValue
-    JSL AttemptItemSubstitution
-    JSL ResolveLootIDLong
-    PHA
-    LDA.b #$EB : STA.l MiniGameTime
-    JSL Sprite_SpawnDynamically
-    PLA
-    STA.w SpriteID,Y
-    LDA.b #$01 : STA.w SprRedrawFlag, Y
+    STA.w SprSourceItemId, Y
+    PHX : TYX : PLY
+        JSL RequestStandingItemVRAMSlot
+    PHY : TXY : PLX
 
     LDA.b LinkPosX   : STA.w SpritePosXLow, Y
     LDA.b LinkPosX+1 : STA.w SpritePosXHigh, Y

@@ -138,7 +138,7 @@ RTL
 ItemSet_Mushroom:
 	PHA
 		LDA.l NpcFlags+1 : ORA.b #$10 : STA.l NpcFlags+1
-		LDY.w SpriteID, X ; Retrieve stored item type
+		LDY.w SprItemReceipt, X ; Retrieve stored item type
 		BNE +
 			; if for any reason the item value is 0 reload it, just in case
 			%GetPossiblyEncryptedItem(MushroomItem, SpriteItemValues) : TAY
@@ -187,11 +187,11 @@ RTL
 LoadZoraKingItemGFX:
     LDA.l ZoraItem_Player : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
     LDA.l $1DE1C3 ; location randomizer writes zora item to
-    JSL AttemptItemSubstitution
-    JSL ResolveLootIDLong
-    STA.w SpriteID,Y
-    TYX
-    JML RequestStandingItemVRAMSlot
+    STA.w SprSourceItemId, Y
+    PHX : TYX : PLY
+        JSL RequestStandingItemVRAMSlot
+    PHY : TXY : PLX
+RTL
 ;--------------------------------------------------------------------------------
 JumpToSplashItemTarget:
 	LDA.w SpriteMovement, X
@@ -204,14 +204,14 @@ JumpToSplashItemTarget:
 LoadCatfishItemGFX:
     LDA.l CatfishItem_Player : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
     LDA.l $1DE185 ; location randomizer writes catfish item to
-    JSL AttemptItemSubstitution
-    JSL ResolveLootIDLong
-    STA.w SpriteID, Y
-    TYX
-	JML RequestStandingItemVRAMSlot
+    STA.w SprSourceItemId, Y
+    PHX : TYX : PLY
+        JSL RequestStandingItemVRAMSlot
+    PHY : TXY : PLX
+RTL
 ;--------------------------------------------------------------------------------
 DrawThrownItem:
-    LDA.w SpriteID,X
+    LDA.w SprItemReceipt,X
     JML DrawPotItem
 ;--------------------------------------------------------------------------------
 MarkThrownItem:

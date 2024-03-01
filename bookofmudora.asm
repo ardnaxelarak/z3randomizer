@@ -2,22 +2,20 @@
 ; Randomize Book of Mudora
 ;--------------------------------------------------------------------------------
 LoadLibraryItemGFX:
-    LDA.l LibraryItem_Player : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-	%GetPossiblyEncryptedItem(LibraryItem, SpriteItemValues)
-	JSL AttemptItemSubstitution
-	JSL ResolveLootIDLong
-	STA.w SpriteID, X
-	JML RequestStandingItemVRAMSlot
+    LDA.l LibraryItem_Player : STA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    %GetPossiblyEncryptedItem(LibraryItem, SpriteItemValues)
+    STA.w SprSourceItemId, X
+    JML RequestStandingItemVRAMSlot
 ;--------------------------------------------------------------------------------
 DrawLibraryItemGFX:
     PHA
-    LDA.w SpriteID, X
+    LDA.w SprItemReceipt, X
     JSL DrawPotItem
     PLA
 RTL
 ;--------------------------------------------------------------------------------
 SetLibraryItem:
-    LDY.w SpriteID, X
+    LDY.w SprItemReceipt, X
     JSL ItemSet_Library ; contains thing we wrote over
 RTL
 ;--------------------------------------------------------------------------------
@@ -29,17 +27,14 @@ RTL
 LoadBonkItemGFX:
     LDA.b #$08 : STA.w SpriteOAMProp, X ; thing we wrote over
 LoadBonkItemGFX_inner:
-    JSR LoadBonkItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    JSR LoadBonkItem_Player : STA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
     JSR LoadBonkItem
-    JSL AttemptItemSubstitution
-    JSL ResolveLootIDLong
-    STA.w SpriteItemType, X
-    STA.w SpriteID, X
+    STA.w SprSourceItemId, X
     JSL RequestStandingItemVRAMSlot
     PHA : PHX
-    LDA.w SpriteID,X : TAX
+    LDA.w SprItemReceipt,X : TAX
     LDA.l SpriteProperties_standing_width,X : BNE +
-        LDA.b #$00 : STA.l SpriteOAM : STA.l SpriteOAM+8
+        LDA.b #$00 : STA.l SpriteDynamicOAM : STA.l SpriteDynamicOAM+8
     +
     PLX : PLA
 RTL
@@ -52,7 +47,7 @@ DrawBonkItemGFX:
         BRA .done ; don't draw on the init frame
 
     .skipInit
-    LDA.w SpriteID,X
+    LDA.w SprItemReceipt,X
     JSL DrawPotItem
 
     .done
@@ -60,8 +55,8 @@ DrawBonkItemGFX:
 RTL
 ;--------------------------------------------------------------------------------
 GiveBonkItem:
-    JSR LoadBonkItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
-    JSR LoadBonkItem
+    LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+    LDA.w SprItemReceipt, X
     JSR AbsorbKeyCheck : BCC .notKey
     .key
     PHY : LDY.b #$24 : JSL AddInventory : PLY ; do inventory processing for a small key

@@ -3,15 +3,21 @@
 ;--------------------------------------------------------------------------------
 HeartPieceGet:
     PHX : PHY
-    JSL LoadHeartPieceRoomValue
-    JSL AttemptItemSubstitution
-    JSL ResolveLootIDLong
-    TAY
+    LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    LDY.w SprItemReceipt, X : BNE +
+        LDA.w SprSourceItemId, X : BNE ++
+            JSL LoadHeartPieceRoomValue
+            STA.w SprSourceItemId, X
+        ++
+        JSL AttemptItemSubstitution
+        JSL ResolveLootIDLong
+        STA.w SprItemReceipt, X
+        TAY
+    +
     JSL MaybeMarkDigSpotCollected
     .skipLoad
-    JSL HeartPieceGetPlayer : STA.l !MULTIWORLD_ITEM_PLAYER_ID
     CPY.b #$26 : BNE .not_heart ; don't add a 1/4 heart if it's not a heart piece
-        LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .not_heart
+        LDA.w SprItemMWPlayer, X : BNE .not_heart
         LDA.l HeartPieceQuarter : INC A : AND.b #$03 : STA.l HeartPieceQuarter
     .not_heart
     JSL Player_HaltDashAttackLong
@@ -25,8 +31,15 @@ RTL
 HeartContainerGet:
     PHX : PHY
     JSL IncrementBossSword
-    LDY.w SpriteID, X : BNE +
-        JSL LoadHeartContainerRoomValue : TAY
+    LDY.w SprItemReceipt, X : BNE +
+        LDA.w SprSourceItemId, X : BNE ++
+            JSL LoadHeartContainerRoomValue
+            STA.w SprSourceItemId, X
+        ++
+        JSL AttemptItemSubstitution
+        JSL ResolveLootIDLong
+        STA.w SprItemReceipt, X
+        TAY
     +
     BRA HeartPieceGet_skipLoad
 ;--------------------------------------------------------------------------------
@@ -39,7 +52,7 @@ DrawHeartPieceGFX:
             LDA.w SprRedrawFlag, X : CMP.b #$02 : BEQ .skipInit
             BRA .done ; don't draw on the init frame
         .skipInit
-        LDA.w SpriteID, X ; Retrieve stored item type
+        LDA.w SprItemReceipt, X ; Retrieve stored item type
         .skipLoad
         PHA : PHX
         TAX
@@ -73,7 +86,7 @@ DrawHeartContainerGFX:
 		BRA DrawHeartPieceGFX_done ; don't draw on the init frame
 	
 	.skipInit
-	LDA.w SpriteID, X ; Retrieve stored item type
+	LDA.w SprItemReceipt, X ; Retrieve stored item type
 
 	BRA DrawHeartPieceGFX_skipLoad
 ;--------------------------------------------------------------------------------
@@ -108,33 +121,20 @@ RTL
 RTL
 ;--------------------------------------------------------------------------------
 HeartPieceSpritePrep:
-    PHA
-
     LDA.l ServerRequestMode : BEQ + :  : +
 
-    JSL HeartPieceGetPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-    JSL LoadHeartPieceRoomValue
-    JSL AttemptItemSubstitution
-    JSL ResolveLootIDLong
-    STA.w SpriteID, X
-    JSL RequestStandingItemVRAMSlot
-
-    .skip
-    PLA
-RTL
+    JSL HeartPieceGetPlayer : STA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    LDA.w SprSourceItemId, X : BNE +
+        JSL LoadHeartPieceRoomValue
+        STA.w SprSourceItemId, X
+    + JML RequestStandingItemVRAMSlot
 ;--------------------------------------------------------------------------------
 HeartContainerSpritePrep:
-    PHA
-
-    JSL HeartPieceGetPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-    JSL LoadHeartContainerRoomValue ; load item type
-    JSL AttemptItemSubstitution
-    JSL ResolveLootIDLong
-    STA.w SpriteID, X
-    JSL RequestStandingItemVRAMSlot
-
-    PLA
-RTL
+    JSL HeartPieceGetPlayer : STA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    LDA.w SprSourceItemId, X : BNE +
+        JSL LoadHeartContainerRoomValue ; load item type
+        STA.w SprSourceItemId, X
+    + JML RequestStandingItemVRAMSlot
 ;--------------------------------------------------------------------------------
 LoadHeartPieceRoomValue:
 	LDA.b IndoorsFlag : BEQ .outdoors ; check if we're indoors or outdoors
@@ -160,8 +160,6 @@ HPItemReset:
 	PHA : PHY
 		LDY.b #$0F
 		- LDA.w SpriteAITable,Y : BEQ +
-		LDA.w SprRedrawFlag, Y : CMP.b #$02 : BNE +
-			; attempt redraw of any sprite using the overflow slot
 			LDA.b #$01 : STA.w SprRedrawFlag, Y
 		+ DEY : BPL -
 	PLY : PLA
@@ -240,7 +238,7 @@ LoadIndoorValue:
 	+
         PHX
         LDX.w CurrentSpriteSlot ; If we're on a different screen ID via glitches load the sprite
-        LDA.w SpriteID,X        ; we can see and are interacting with
+        LDA.w SprItemReceipt,X  ; we can see and are interacting with
         PLX
 	.done
 	AND.w #$00FF ; the loads are words but the values are 1-byte so we need to clear the top half of the accumulator - no guarantee it was 8-bit before
@@ -445,7 +443,7 @@ LoadOutdoorValue:
 	+
         PHX
         LDX.w CurrentSpriteSlot ; If we're on a different screen ID via glitches load the sprite
-        LDA.w SpriteID,X        ; we can see and are interacting with.
+        LDA.w SprItemReceipt,X  ; we can see and are interacting with.
         PLX
 	.done
 	AND.w #$00FF ; the loads are words but the values are 1-byte so we need to clear the top half of the accumulator - no guarantee it was 8-bit before

@@ -24,15 +24,18 @@ OnDungeonEntrance:
 	STA.l PegColor ; thing we wrote over
         JSL MaybeFlagDungeonTotalsEntrance
         INC.w UpdateHUDFlag
+        JSL DynamicDropGFXClear
 RTL
 ;--------------------------------------------------------------------------------
 OnDungeonBossExit:
         JSL StatTransitionCounter
+        JSL DynamicDropGFXClear
 RTL
 ;--------------------------------------------------------------------------------
 OnPlayerDead:
 	PHA
 		JSL SetDeathWorldChecked
+                JSL DynamicDropGFXClear
 		JSL SetSilverBowMode
 		JSL RefreshRainAmmo
 	PLA
@@ -42,6 +45,7 @@ OnDungeonExit:
         PHA : PHP
         SEP #$20 ; set 8-bit accumulator
         JSL SQEGFix
+        JSL DynamicDropGFXClear
         PLP : PLA
 
         STA.w DungeonID : STZ.w Map16ChangeIndex ; thing we wrote over
@@ -163,6 +167,7 @@ OnFileLoad:
 		LDA.l CurrentGenericKeys : STA.l CurrentSmallKeys ; copy generic keys to key counter
 	+
 
+	JSL DynamicDropGFXClear
 	JSL SetSilverBowMode
 	JSL RefreshRainAmmo
 	JSL SetEscapeAssist

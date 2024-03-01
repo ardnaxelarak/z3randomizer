@@ -561,13 +561,17 @@ RTL
 ;--------------------------------------------------------------------------------
 LoadPowder:
     JSL Sprite_SpawnDynamically ; thing we wrote over
-    LDA.l WitchItem_Player : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-    %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues)
-    JSL AttemptItemSubstitution
+    .justGFX
+    LDA.l WitchItem_Player : STA.w SprItemMWPlayer, Y : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    LDA.w SprSourceItemId, Y : BNE +
+        %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues)
+        STA.w SprSourceItemId, Y
+    + JSL AttemptItemSubstitution
     JSL ResolveLootIDLong
-    STA.w SpriteID, Y
     STA.l PowderFlag
-	LDA.b #$01 : STA.w SprRedrawFlag, Y
+    PHX : TYX : PLY
+        JSL RequestStandingItemVRAMSlot_resolved
+    PHY : TXY : PLX
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -590,13 +594,11 @@ RTL
 DrawPowder:
 	;LDA.w ItemReceiptPose : BNE .defer ; defer if link is buying a potion
 	LDA.w SprRedrawFlag, X : BEQ +
-		LDA.l WitchItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
-		LDA.w SpriteID, X ; Retrieve stored item type
-		JML RequestStandingItemVRAMSlot
+		JML LoadPowder_justGFX
 	+
 	; this fights with the shopkeep code, so had to move the powder draw there when potion shop is custom
 	; LDA.l ShopType : CMP.b #$FF : BNE .defer
-	LDA.w SpriteID, X ; Retrieve stored item type
+	LDA.w SprItemReceipt, X ; Retrieve stored item type
 	JML DrawPotItem
 	.defer
 RTL
@@ -609,15 +611,11 @@ LoadMushroom:
 	LDA.b #$00 : STA.w SpriteGFXControl, X ; thing we wrote over
 	.justGFX
 	PHA
-
-	LDA.l MushroomItem_Player : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
-	%GetPossiblyEncryptedItem(MushroomItem, SpriteItemValues)
-	JSL AttemptItemSubstitution
-	JSR ResolveLootID
-	STA.w SpriteID,X
-	JSL RequestStandingItemVRAMSlot
-
-	.skip
+		LDA.l MushroomItem_Player : STA.w SprItemMWPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+		LDA.w SprSourceItemId, X : BNE +
+			%GetPossiblyEncryptedItem(MushroomItem, SpriteItemValues)
+			STA.w SprSourceItemId, X
+		+ JSL RequestStandingItemVRAMSlot
 	PLA
 RTL
 ;--------------------------------------------------------------------------------
@@ -627,13 +625,13 @@ RTL
 ;--------------------------------------------------------------------------------
 DrawMushroom:
 	PHA : PHY
-		LDA.w SprRedrawFlag, X : BEQ .skipInit ; skip init if already ready
+		LDA.w SprRedrawFlag, X : BEQ .draw ; skip init if already ready
 			JSL LoadMushroom_justGFX
-			LDA.w SprRedrawFlag, X : CMP.b #$02 : BEQ .skipInit
+			LDA.w SprRedrawFlag, X : CMP.b #$02 : BEQ .draw
 			BRA .done ; don't draw on the init frame
 
-		.skipInit
-		LDA.w SpriteID, X ; Retrieve stored item type
+		.draw
+		LDA.w SprItemReceipt, X ; Retrieve stored item type
 		JSL DrawPotItem
 
 	.done
@@ -645,7 +643,7 @@ RTL
 ; CollectPowder:
 ;--------------------------------------------------------------------------------
 CollectPowder:
-  LDY.w SpriteID, X ; Retrieve stored item type
+  LDY.w SprItemReceipt, X ; Retrieve stored item type
   BNE +
 	; if for any reason the item value is 0 reload it, just in case
 	  %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues) : TAY

@@ -9,10 +9,6 @@ org $829C25
 org $89C2BB
 	JSL ClearSpriteData
 
-; underworld -> overworld transition
-org $8282D1
-	JSL ClearSpriteData2
-
 org $89C327
 	JSL LoadSpriteData
 
@@ -333,18 +329,15 @@ ClearSpriteData:
 	.shared:
 
 	PHX
-		LDA.b #$00 : LDX.b #$00
+		LDX.b #$0F
 		.loop
-			STA.w SprDropsItem, X :  STA.w SprItemReceipt, X : STA.w SprItemIndex, X
-			STA.w SprItemMWPlayer, X : STA.w SprItemFlags, X
-			INX : CPX.b #$10 : BCC .loop
+			STZ.w SprDropsItem, X : STZ.w SprItemIndex, X : STZ.w SprItemFlags, X
+			STZ.w SprSourceItemId, X : STZ.w SprItemReceipt, X : STZ.w SprItemMWPlayer, X
+			STZ.w SprRedrawFlag, X
+			DEX : BPL .loop
 		JSR SetupEnemyDropIndicator
 	PLX
 	RTL
-
-ClearSpriteData2:
-	LDA.b #$82 : STA.b CGWSELQ
-	JMP ClearSpriteData_shared
 
 
 ; this routine determines whether enemies still have drops or not
@@ -405,7 +398,7 @@ LoadSpriteData:
 			LDA.b #$01 : STA.w SprDropsItem, X
 			DEY
 			.common
-			DEY : LDA.b [$00], Y : STA.w SprItemReceipt, X
+			DEY : LDA.b [$00], Y : STA.w SprSourceItemId, X
 			STA.b Scrap0E
 			LDA.w SprItemMWPlayer, X : BNE +  ; skip if multiworld
 				PHX
@@ -437,7 +430,7 @@ CheckIfDropValid:
 	;This section sets up the drop
 		LDA.b #$02 : STA.w SpawnedItemFlag
 		STX.w SpawnedItemIndex
-		LDA.w SprItemReceipt, X : STA.w SpawnedItemID
+		LDA.w SprSourceItemId, X : STA.w SpawnedItemID
 		LDA.w SprItemMWPlayer, X : STA.w SpawnedItemMWPlayer
 		LDY.b #$01 ; trigger the small key routines
 		LDA.w SpawnedItemID : STA.b Scrap00 : CMP.b #$32 : BNE +
@@ -626,22 +619,14 @@ SpriteKeyPrep:
 			CPX.b #$0A : BNE .continue  ; the hera basement key is always sprite 0x0A
 				LDA.b LinkQuadrantH : ORA.b LinkQuadrantV : AND.b #$03 : CMP.b #$02 : BNE .continue
 					LDA.b #$00 : STA.w SpawnedItemFlag : STA.w SprItemFlags, X
-					LDA.b #$24 : STA.w SpriteItemType, X
+					LDA.b #$24 : STA.w SprSourceItemId, X
 					BRA +
 		.continue
 		LDA.w SpawnedItemIndex : STA.w SprItemIndex, X
 		LDA.w SpawnedItemMWPlayer : STA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 		LDA.w SpawnedItemFlag : STA.w SprItemFlags, X : BEQ +
-		LDA.w SpawnedItemID : STA.w SpriteItemType, X
-		PHA : PHY : PHX
-			JSL GetSpritePalette : PLX : STA.w SpriteOAMProp, X ; setup the palette
-		PLY : PLA
-		CMP #$24 : BNE ++ ;
-			PHX : JSL GetSpritePalette : PLX : STA.w SpriteOAMProp, X ; setup the palette
-			LDA.b RoomIndex : CMP.b #$80 : BNE +
-			LDA.w SpawnedItemFlag : BNE +
-				LDA.b #$24  ; it's the big key drop?
-		++ JSL RequestStandingItemVRAMSlot
+		LDA.w SpawnedItemID : STA.w SprSourceItemId, X
+		JSL RequestStandingItemVRAMSlot
 	+ PLA
 	RTL
 
@@ -650,11 +635,11 @@ SpriteKeyDrawGFX:
     PHA
 	LDA.l SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	LDA.w SprRedrawFlag, X : BEQ +
-		LDA.w SpriteItemType, X
+		LDA.w SprSourceItemId, X
 		JSL RequestStandingItemVRAMSlot
 		LDA.w SprRedrawFlag, X : CMP.b #$02 : BEQ +
 		BRA .skipDraw
-	+ LDA.w SpriteItemType, X
+	+ LDA.w SprItemReceipt, X
 	CMP.b #$24 : BNE +
 		LDA.b RoomIndex : CMP.b #$80 : BNE ++
 		LDA.w SpawnedItemFlag : BNE ++
@@ -678,7 +663,7 @@ KeyGet:
 	PHA
 		LDA.l StandingItemsOn : BNE +
 			PLA : RTL
-		+ LDY.w SpriteItemType, X
+		+ LDY.w SprItemReceipt, X
 		LDA.w SprItemIndex, X : STA.w SpawnedItemIndex
 		LDA.w SprItemFlags, X : STA.w SpawnedItemFlag
 		LDA.b RoomIndex : CMP.b #$87 : BNE + ;check for hera cage
@@ -725,7 +710,7 @@ ShouldKeyBeCountedForDungeon:
 
 
 BigKeyGet:
-	LDY.w SpriteItemType, X
+	LDY.w SprItemReceipt, X
 	CPY.b #$32 : BNE +
 		STZ.w ItemReceiptMethod : LDY.b #$32 ; what we wrote over
 		PHX : JSL Link_ReceiveItem : PLX ; what we wrote over
@@ -737,9 +722,7 @@ LoadProperties_PreserveCertainProps:
 	CMP.b #$E5 : BEQ +
 		JML SpritePrep_LoadProperties
 	+ LDA.w SpriteOAMProp, X : PHA
-    LDA.w SpriteItemType, X : PHA
     JSL SpritePrep_LoadProperties
-    PLA : STA.w SpriteItemType, X
     PLA : STA.w SpriteOAMProp, X
     RTL
 
@@ -852,7 +835,7 @@ pullpc
 SetBottleVendorKey:
 	LDA.w SpriteTypeTable,Y : CMP.b #$E4 : BNE +
 		; small key from bottle vendor
-		LDA.b #$AF : STA.w SpriteItemType,Y
+		LDA.b #$AF : STA.w SprSourceItemId,Y
 		LDA.b #$01 : STA.w SprRedrawFlag, Y
 		BRA .shift
 	+ CMP.b #$DE : BEQ .return

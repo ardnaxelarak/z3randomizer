@@ -245,7 +245,7 @@ ShopkepeerPotion_CallOriginal:
 	LDA.b #PotionShopkeeperJumpTable>>16 : PHA
 	LDA.b #PotionShopkeeperJumpTable>>8 : PHA
 	LDA.b #PotionShopkeeperJumpTable : PHA
-    LDA.w SpriteItemType, X
+    LDA.w SpriteJumpIndex, X
 	JML JumpTableLocal
 ;--------------------------------------------------------------------------------
 Shopkepeer_CallOriginal:
@@ -253,7 +253,7 @@ Shopkepeer_CallOriginal:
 	LDA.b #ShopkeeperJumpTable>>16 : PHA
 	LDA.b #ShopkeeperJumpTable>>8 : PHA
 	LDA.b #ShopkeeperJumpTable : PHA
-    LDA.w SpriteItemType, X
+    LDA.w SpriteJumpIndex, X
     JML JumpTableLocal
 ;--------------------------------------------------------------------------------
 
@@ -274,7 +274,7 @@ Sprite_ShopKeeperPotion:
 		+
 	PLB
 
-	LDA.w SpriteItemType, X : BNE +
+	LDA.w SpriteJumpIndex, X : BNE +
 		PHK : PEA.w .jslrtsreturn-1
 		PEA.w $85f527 ; an rtl address - 1 in Bank05
 		JML Sprite_WitchAssistant
@@ -457,7 +457,8 @@ Shopkeeper_BuyItem:
         REP #$20 : LDA.l CurrentRupees : !SUB ShopInventory+1, X : STA.l CurrentRupees : SEP #$20 ; Take price away
     ++
     PHX
-        LDA.b #0 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+        LDA.b #0 : XBA : TXA : LSR #2 : TAX
+        LDA.l ShopInventoryPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
         TXA : !ADD ShopSRAMIndex : TAX
         LDA.l PurchaseCounts, X : BNE +++	;Is this the first time buying this slot?
             LDA.l EnableShopItemCount, X : STA.l ShopEnableCount ; If so, store the permission to count the item here.

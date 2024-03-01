@@ -197,16 +197,19 @@ PostNMIUpdateBGCharHalf:
 	LDA.w VRAMTileMapIndex : CMP.b #$46 : BNE .return ; checks to see if this is the last VRAM write
 	LDA.b LinkState : CMP.b #$08 : BCC + : CMP.b #$0A+1 : BCS + ; skip if we're mid-medallion
 		RTL
-	+ JSL HeartPieceSetRedraw ; set redraw flag for items
+	+ JSL DynamicDropGFXClear
+	JSL HeartPieceSetRedraw ; set redraw flag for items
 .return
 RTL
 
 ; Force redraws of items following map checks
 PostOverworldGfxLoad:
 	INC.b GameSubMode : STZ.b INIDISPQ ; what we wrote over
+	JSL DynamicDropGFXClear
 	JSL HeartPieceSetRedraw
 RTL
 PostUnderworldMap:
+	JSL DynamicDropGFXClear
 	JSL HeartPieceSetRedraw
 	LDA.l $7EC229 ; what we wrote over
 RTL

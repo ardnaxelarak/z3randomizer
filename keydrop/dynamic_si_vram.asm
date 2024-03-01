@@ -5,6 +5,11 @@
 ;   A = item receipt ID
 ;   X = sprite slot
 RequestStandingItemVRAMSlot:
+	JSL AttemptItemSubstitution
+	JSL ResolveLootIDLong
+	.resolved
+	STA.w SprItemReceipt, X
+	JSL ResolveBeeTrapLong
 	PHX : PHY
 	PHA
 		LDA.b #$01 : STA.w SprRedrawFlag, X
@@ -13,26 +18,20 @@ RequestStandingItemVRAMSlot:
 		LDA.b GameSubMode : CMP.b #$21 : BCS ++ ; skip if OW is loading Map16 GFX ; TODO: Figure out how to allow submodule 22, check DMA status instead
 		LDA.b LinkState : CMP.b #$14 : BEQ ++ ; skip if we're mid-mirror
 		LDA.b IndoorsFlag : BEQ + ; OW current doesn't occupy any slots that medallion gfx do
-			CMP.b #$08 : BCC + : CMP.b #$0A+1 : BCS + ; skip if we're mid-medallion
+			LDA.w GfxChrHalfSlotVerify : CMP.b #$03 : BCC +
 				++ PLA : JMP .return
-		+
-
-		LDA.w SpriteTypeTable, X : CMP.b #$C0 : BNE + ; if catfish
-			TYX
-		+ CMP.b #$52 : BNE + ; if zora
-			TYX
 		+
 
 		LDA.b 1,S : PHX : JSL GetSpritePalette : PLX : STA.w SpriteOAMProp, X ; setup the palette
 	PLA
 	
-	; gfx that are already present, use that instead of a new slot
+	; gfx that are already present in vanilla, use that instead of a new slot
 	CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS + ; if rupees, use animated rupee OAM slot
 		LDA.b IndoorsFlag : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC : STA.w SprItemGFX,X
+		+++ INC : STA.w SprItemGFXSlot,X
 		JMP .success
 	+ CMP.b #$A0 : BCC + : CMP.b #$AF+1 : BCS + ; if key, use key OAM slot
 		LDY.b LinkState : CPY.b #$19 : BCC ++ : CPY.b #$1A+1 : BCS ++ ; if getting tablet item, don't use key slot
@@ -42,87 +41,103 @@ RequestStandingItemVRAMSlot:
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC #2 : STA.w SprItemGFX,X
+		+++ INC #2 : STA.w SprItemGFXSlot,X
 		JMP .success
 	+ CMP.b #$D6 : BNE + ; if good bee, use bee OAM slot
 		LDA.b IndoorsFlag : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC #3 : STA.w SprItemGFX,X
+		+++ INC #3 : STA.w SprItemGFXSlot,X
 		JMP .success
 	+ CMP.b #$D2 : BNE + ; if fairy, use fairy OAM slot
 		LDA.b IndoorsFlag : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC : STA.w SprItemGFX,X
+		+++ INC : STA.w SprItemGFXSlot,X
 		JMP .success
 	+ CMP.b #$D1 : BNE + ; if apple, use apple OAM slot
 		LDA.b IndoorsFlag : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
 			BRA +++
 		++ LDA.b #!DynamicDropGFXSlotCount_OW
-		+++ INC #2 : STA.w SprItemGFX,X
+		+++ INC #2 : STA.w SprItemGFXSlot,X
 		JMP .success
 	+
-
 	PHA
-		LDA.w DynamicDropGFXIndex
-		INC
+		; check if gfx that are already present from previous requests
+		LDY.b #$00
+		- LDA.w DynamicDropGFXSlots, Y : CMP.b 1,S : BEQ +
+			INY : CPY.b #$0F : !BLT -
+			STZ.w RandoOverworldTargetEdge ; some free ram OWR also uses
+			BRA .newSlot
+		+ TYA : STA.w SprItemGFXSlot,X
+		PLA : JMP .success
+nop #10
+		.newSlot
 		PHX
-		LDX.b IndoorsFlag : BEQ +
-			CMP.b #!DynamicDropGFXSlotCount_UW : BCC .setIndex
-			BRA ++
-		+ CMP.b #!DynamicDropGFXSlotCount_OW : BCC .setIndex
-		++ LDA.b #$00
+			LDY.b IndoorsFlag : BEQ +
+				LDA.b #!DynamicDropGFXSlotCount_UW-1
+				BRA ++
+			+ LDA.b #!DynamicDropGFXSlotCount_OW-1
+			++ STA.w DynamicDropGFXIndex
 
-		.setIndex
-		PLX
-		STA.w DynamicDropGFXIndex
-		STA.w SprItemGFX,X
-		PHX
+			.next
+			LDA.w RandoOverworldTargetEdge : BNE +
+				; on first loop, skip over gfx slots that have some item gfx loaded
+				LDY.w DynamicDropGFXIndex : LDA.w DynamicDropGFXSlots, Y : BNE .slotUsed
+
 			; loop thru other sprites, check if any use the same gfx slot
-			LDY.b #$0F
+			+ LDY.b #$0F
 			- TYA : CMP.b 1,S : BEQ + ; don't check self
 			LDA.w SpriteAITable,Y : BEQ +
 			LDA.w SprRedrawFlag, Y : BNE +
-			LDA.w SprItemGFX,Y : CMP.w DynamicDropGFXIndex : BNE +
 			LDA.w SpriteTypeTable,Y ; don't need E5 enemy big key drop and E9 powder item
 				CMP.b #$EB : BEQ ++ ; heart piece
 				CMP.b #$E4 : BEQ ++ ; enemy drop
 				CMP.b #$3B : BEQ ++ ; bonk item
 				CMP.b #$E7 : BEQ ++ ; mushroom
 					BRA +
-			++
-				; slot already in use, use overflow slot
-				LDA.b #$02 : STA.w SprRedrawFlag, X
-				LDA.b IndoorsFlag : BEQ ++
-					LDA.b #!DynamicDropGFXSlotCount_UW
-					BRA +++
-				++ LDA.b #!DynamicDropGFXSlotCount_OW
-				+++ STA.w SprItemGFX,X
-				PLX : PLA : BRA .return
+				++ LDA.w SprItemGFXSlot,Y : CMP.w DynamicDropGFXIndex : BNE +
+					; gfx slot already in use
+					.slotUsed
+					DEC.w DynamicDropGFXIndex : BMI .loopAgain : BRA .next
+				
 			+ DEY : BPL -
 		PLX
+		BRA .initRequest
+
+		.loopAgain
+		LDA.w RandoOverworldTargetEdge : BNE .overflow
+			INC : STA.w RandoOverworldTargetEdge
+			BRA .newSlot+1
 	
-	.initRequest
+		.overflow ; slot already in use, use overflow slot
+		LDA.b #$02 : STA.w SprRedrawFlag, X
+		LDA.b IndoorsFlag : BEQ ++
+			LDA.b #!DynamicDropGFXSlotCount_UW
+			BRA +++
+		++ LDA.b #!DynamicDropGFXSlotCount_OW
+		+++ STA.w SprItemGFXSlot,X
+		PLX : PLA : BRA .return
+	
+		.initRequest
+		LDA.b 1,S
+		LDY.w DynamicDropGFXIndex : STA.w DynamicDropGFXSlots, Y
+		TYA : STA.w SprItemGFXSlot, X
 	PLA
 
-	PHX ;: PHY
-	; unsure about substitution rules here, because they aren't skipped properly for MW yet
-	JSL AttemptItemSubstitution
-	JSL ResolveLootIDLong
-	JSL ResolveBeeTrapLong
+	PHX
 	REP #$30
-	ASL : TAX
-	LDA.l StandingItemGraphicsOffsets,X : LDX.w ItemStackPtr : STA.l ItemGFXStack,X
-	LDA.w DynamicDropGFXIndex : AND.w #$000F : ASL : TAX
-	LDA.b IndoorsFlag : AND.w #$00FF : BEQ +
-		LDA.l FreeUWGraphics,X : BRA ++
-		+ LDA.l FreeOWGraphics,X
-	++ LDX.w ItemStackPtr : STA.l ItemTargetStack,X
-	TXA : INC #2 : STA.w ItemStackPtr
+		ASL : TAX
+		LDA.l StandingItemGraphicsOffsets,X : LDX.w ItemStackPtr : STA.l ItemGFXStack,X
+		LDA.w DynamicDropGFXIndex : AND.w #$000F : ASL : TAX
+		LDA.b IndoorsFlag : AND.w #$00FF : BEQ +
+			LDA.l FreeUWGraphics,X : BRA ++
+			+ LDA.l FreeOWGraphics,X
+		++ LDX.w ItemStackPtr : STA.l ItemTargetStack,X
+		TXA : INC #2 : STA.w ItemStackPtr
 	SEP #$30
 	PLX
 
@@ -167,14 +182,13 @@ FreeOWGraphics:
 DrawPotItem:
 	PHA
 		; TODO: allow drawing if gfx are not using a VRAM slot that changes during medallion
-		LDA.b $5D : CMP.b #$08 : BCC + : CMP.b #$0A+1 : BCS + ; skip if we're mid-medallion
-			PLA : SEC : RTL
+		LDA.b IndoorsFlag : BEQ + ; OW current doesn't occupy any slots that medallion gfx do
+			LDA.w GfxChrHalfSlotVerify : CMP.b #$03 : BCC +
+				PLA : SEC : RTL
 		+
 	PLA
 	
 	PHX
-	JSL AttemptItemSubstitution
-	JSL ResolveLootIDLong
 	TAX
 	LDA.l BeeTrapDisguise : BEQ +
 		TAX
@@ -208,7 +222,7 @@ DrawPotItem:
 		+ LDA.w #DynamicOAMTileOW_thin
     .transfer
 	STA.b Scrap08
-	LDA.w SprItemGFX,X
+	LDA.w SprItemGFXSlot,X
 	AND.w #$00FF
 	ASL : ASL : ASL : ASL
 	ADC.b Scrap08
@@ -404,6 +418,13 @@ DynamicOAMTileOW_full:
 
 	dw 0, 0 : db $E5, $00, $20, $02 ; apple
 	dd 0, 0
+
+DynamicDropGFXClear:
+	PHA : PHX
+		LDX.b #$0E
+		- STZ.w DynamicDropGFXSlots, X : DEX : BPL -
+	PLX : PLA
+RTL
 
 ConditionalPushBlockTransfer:
 	LDA.b IndoorsFlag : BNE +

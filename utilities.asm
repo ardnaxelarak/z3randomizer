@@ -50,15 +50,15 @@ RTL
 PrepDynamicTile:
 	PHX : PHY : PHB
 	LDA.l RemoteItems : BEQ .notRemote
-		LDA.l SpriteID, X : CMP.l !MULTIWORLD_SCOUTREPLY_LOCATION : BNE ++
+		LDA.l SprItemReceipt, X : CMP.l !MULTIWORLD_SCOUTREPLY_LOCATION : BNE ++
 			LDA.l !MULTIWORLD_SCOUTREPLY_PLAYER : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 			LDA.l !MULTIWORLD_SCOUTREPLY_ITEM
-			STA.l SpriteID, X
+			STA.l SprItemReceipt, X
 			BRA .notRemote
 		++
 		STA.l !MULTIWORLD_SCOUT_LOCATION
 		LDA.b #$00 : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-		LDA.b #$6B : STA.l SpriteID, X ; make it a power star, I guess
+		LDA.b #$6B : STA.l SprItemReceipt, X ; make it a power star, I guess
 	.notRemote
 	JSR ResolveLootID
         -
@@ -95,7 +95,7 @@ RTL
 
 ;--------------------------------------------------------------------------------
 ; LoadDynamicTileOAMTable
-; in: SpriteID,X - Loot ID
+; in: SprItemReceipt,X - Loot ID
 ; out: A - Loot ID
 ;-------------------------------------------------------------------------------- 20/847B
 LoadDynamicTileOAMTable:
@@ -104,7 +104,7 @@ LoadDynamicTileOAMTable:
         LDA.w #$0000 : STA.l SpriteOAM : STA.l SpriteOAM+2
         LDA.w #$0200 : STA.l SpriteOAM+6
         LDA.l BeeTrapDisguise : AND.w #$00FF : BNE +
-        	LDA.w SpriteID,X : AND.w #$00FF
+        	LDA.w SprItemReceipt,X : AND.w #$00FF
         + LDY.w #$0024
         PHX : ASL : TAX
         LDA.l InventoryTable_properties, X : BIT.w #$8000 : BEQ +
@@ -114,7 +114,7 @@ LoadDynamicTileOAMTable:
         SEP #$30
 
 		LDA.l BeeTrapDisguise : BNE +
-			LDA.w SpriteID,X
+			LDA.w SprItemReceipt,X
         + JSL GetSpritePalette_resolved
         STA.l SpriteOAM+5 : STA.l SpriteOAM+13
         PHX
@@ -219,7 +219,7 @@ PrepDrawRemoteItemSprite:
 		CMP.l !MULTIWORLD_SCOUTREPLY_LOCATION : BNE ++
 			LDA.l !MULTIWORLD_SCOUT_LOCATION : BEQ +++
 				LDA.l !MULTIWORLD_SCOUTREPLY_LOCATION
-				STA.l SpriteID, X
+				STA.l SprItemReceipt, X
 				JSL PrepDynamicTile
 				LDA #$00
 				BRA ++

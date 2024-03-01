@@ -3,6 +3,7 @@
 ;--------------------------------------------------------------------------------
 SpawnDungeonPrize:
         PHX : PHB
+        PHA : LDA.b #$00 : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : PLA
         JSL AttemptItemSubstitution
         JSL ResolveLootIDLong
         STA.w ItemReceiptID
@@ -12,7 +13,7 @@ SpawnDungeonPrize:
         JSL AddAncillaLong
         BCS .failed_spawn
                 LDA.w ItemReceiptID
-                STA.w AncillaGet,X : STA.w SpriteID,X
+                STA.w AncillaGet,X : STA.w SprItemReceipt,X
                 JSR AddDungeonPrizeAncilla
         .failed_spawn
         PLB : PLX
@@ -61,10 +62,11 @@ RTS
 
 PrepPrizeTile:
         PHA : PHX : PHY
+        LDA.b #$00 : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
         LDA.w AncillaGet, X
         JSL AttemptItemSubstitution
         JSL ResolveLootIDLong
-        STA.w SpriteID,X
+        STA.w SprItemReceipt,X
         JSL TransferItemReceiptToBuffer_using_ReceiptID
         PLY : PLX : PLA
 RTL
