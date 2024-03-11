@@ -20,4 +20,4 @@ UploadMenuOnlyIcons:
     RTL
 
 MenuOnlyIcons:
-incbin "menuonly.2bpp"
+incbin "drfont.2bpp"
