@@ -433,9 +433,7 @@ RevealSpriteDrop:
 	JMP DoNormalDrop
 
 CheckIfDropValid:
-	LDA.l SprItemFlags, X : BIT #$80 : BNE .do_the_drop  ; it's a minor item
 	JSR CheckIfDropsInThisLocation : BCC DoNormalDrop
-	.do_the_drop
 	;This section sets up the drop
 		LDA.b #$02 : STA.l SpawnedItemFlag
 		STX.w SpawnedItemIndex
