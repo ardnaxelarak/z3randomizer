@@ -240,7 +240,7 @@ warnpc $B1A000
 
 org $B1A000
 GFX_HUD_Items:
-incbin "data/c2807_v4.gfx"
+incbin "menu/drsheetdc.2bppc"
 warnpc $B1A800
 
 org $B1A800
