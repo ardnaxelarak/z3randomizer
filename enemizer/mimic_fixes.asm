@@ -1,11 +1,12 @@
 pushpc
 
 org $8691B6
+SpritePrep_Eyegore_bounce:
 JSL SpritePrep_EyegoreNew
 
 org $868839  ; 0xEF
-dw SpritePrep_EyegoreNew
-dw SpritePrep_EyegoreNew
+dw SpritePrep_Eyegore_bounce
+dw SpritePrep_Eyegore_bounce
 
 ;org $869468 ; These need to go else where
 ;dw #$BFF7  ; SpriteModule_Active_Bank1E_bounce
