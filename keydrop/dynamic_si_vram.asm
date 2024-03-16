@@ -114,6 +114,7 @@ nop #10
 			BRA .newSlot+1
 	
 		.overflow ; slot already in use, use overflow slot
+		STZ.w RandoOverworldTargetEdge
 		LDA.b #$02 : STA.w SprRedrawFlag, X
 		LDA.b IndoorsFlag : BEQ ++
 			LDA.b #!DynamicDropGFXSlotCount_UW
