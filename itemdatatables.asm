@@ -624,7 +624,7 @@ endmacro
 %SpriteProps($CD, 2, 2, $04, $04, $0000)                                ; CD - 
 %SpriteProps($CE, 2, 2, $04, $04, $0000)                                ; CE - 
 %SpriteProps($CF, 2, 2, $04, $04, $0000)                                ; CF - 
-%SpriteProps($D0, 2, 2, $01, $01, PalettesVanilla_green_blue_guard+$0E) ; D0 - Bee Trap todo: sprite props
+%SpriteProps($D0, 2, 2, $01, $02, PalettesVanilla_green_blue_guard+$0E) ; D0 - Bee Trap
 %SpriteProps($D1, 2, 2, $01, $01, PalettesVanilla_green_blue_guard+$0E) ; D1 - Apples
 %SpriteProps($D2, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; D2 - Fairy
 %SpriteProps($D3, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; D3 - Chicken
@@ -1266,9 +1266,9 @@ StandingItemGraphicsOffsets:
 	dw BigDecompressionBuffer+$1500        ; 2B - Full bottle (red)
 	dw BigDecompressionBuffer+$1500        ; 2C - Full bottle (green)
 	dw BigDecompressionBuffer+$1500        ; 2D - Full bottle (blue)
-	dw BigDecompressionBuffer+$1500        ; 2E - Potion refill (red)
-	dw BigDecompressionBuffer+$1500        ; 2F - Potion refill (green)
-	dw BigDecompressionBuffer+$1500        ; 30 - Potion refill (blue)
+	dw $0920                               ; 2E - Potion refill (red)
+	dw $08A0                               ; 2F - Potion refill (green)
+	dw $08E0                               ; 30 - Potion refill (blue)
 	dw BigDecompressionBuffer+$1D00        ; 31 - 10 bombs
 	dw BigDecompressionBuffer+$15C0        ; 32 - Big key
 	dw BigDecompressionBuffer+$1580        ; 33 - Map
@@ -1434,7 +1434,7 @@ StandingItemGraphicsOffsets:
 	dw $0                                  ; CD -
 	dw $0                                  ; CE -
 	dw $0                                  ; CF -
-	dw BigDecompressionBuffer+$09A0        ; D0 - Bee trap
+	dw $0960                               ; D0 - Bee trap
 	dw $0                                  ; D1 - Apples
 	dw $0                                  ; D2 - Fairy
 	dw $11E0                               ; D3 - Chicken
