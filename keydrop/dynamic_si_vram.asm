@@ -182,8 +182,15 @@ FreeOWGraphics:
 ; Returns with Carry flag set if gfx drawing was skipped
 DrawPotItem:
 	PHA
+		; TODO: Figure out a better way to stop items during transitions, or figure
+		; out how to get narrow items to continue drawing narrow during transitions
+		; This has a side effect of ItemID $00 (unused in rando currently)
+		; disappearing during various submodule uses, like dialogue/trap door actions
+		CMP.b #$00 : BNE +
+			LDA.b GameSubMode : BEQ +
+				PLA : SEC : RTL
 		; TODO: allow drawing if gfx are not using a VRAM slot that changes during medallion
-		LDA.b IndoorsFlag : BEQ + ; OW current doesn't occupy any slots that medallion gfx do
+		+ LDA.b IndoorsFlag : BEQ + ; OW current doesn't occupy any slots that medallion gfx do
 			LDA.w GfxChrHalfSlotVerify : CMP.b #$03 : BCC +
 				PLA : SEC : RTL
 		+
@@ -245,11 +252,10 @@ DrawPotItem:
 			+ ; narrow
 			LDA.w SpriteTypeTable, X : AND.w #$00FF : CMP.w #$003B : BEQ .draw ; bonk item
 			LDA.b RoomIndex : CMP.w #$0120 : BNE +
-				LDA.b IndoorsFlag : BNE .draw ; good bee statue
+				LDA.b IndoorsFlag : BEQ .draw ; good bee statue
 			+
-			; TODO: Figure out how to target bottle vendor fish item better than this
-			LDA.b OverworldIndex : AND.w #$00FF : CMP.w #$0018 : BNE + 
-				LDA.b IndoorsFlag : BEQ .draw ; bottle vendor key
+			LDA.b OverworldIndex : AND.w #$00FF : CMP.w #$0018 : BNE +
+				LDA.w SpriteTypeTable, X : AND.w #$00FF : CMP.w #$00E4 : BEQ .draw ; bottle vendor key
 			+
 				LDA.w #$0004
 				STA.w SpriteDynamicOAM : STA.w SpriteDynamicOAM+8

@@ -160,12 +160,9 @@ HPItemReset:
 	.skip
 	PLA
 	.done
-	PHA : PHY
-		LDY.b #$0F
-		- LDA.w SpriteAITable,Y : BEQ +
-			LDA.b #$01 : STA.w SprRedrawFlag, Y
-		+ DEY : BPL -
-	PLY : PLA
+	PHA
+		JSL HeartPieceSetRedraw
+	PLA
 RTL
 ;--------------------------------------------------------------------------------
 MaybeMarkDigSpotCollected:
