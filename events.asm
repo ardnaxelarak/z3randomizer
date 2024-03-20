@@ -24,7 +24,9 @@ OnDungeonEntrance:
 	STA.l PegColor ; thing we wrote over
         JSL MaybeFlagDungeonTotalsEntrance
         INC.w UpdateHUDFlag
+        SEP #$30
         JSL DynamicDropGFXClear
+        REP #$30
 RTL
 ;--------------------------------------------------------------------------------
 OnDungeonBossExit:
@@ -167,7 +169,6 @@ OnFileLoad:
 		LDA.l CurrentGenericKeys : STA.l CurrentSmallKeys ; copy generic keys to key counter
 	+
 
-	JSL DynamicDropGFXClear
 	JSL SetSilverBowMode
 	JSL RefreshRainAmmo
 	JSL SetEscapeAssist
@@ -176,6 +177,7 @@ OnFileLoad:
 		JSL LoadStaticDecryptionKey
 	+
 	SEP #$10 ; restore 8 bit index registers
+	JSL DynamicDropGFXClear
 RTL
 ;--------------------------------------------------------------------------------
 OnNewFile:
