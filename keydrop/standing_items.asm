@@ -652,7 +652,14 @@ SpriteKeyDrawGFX:
 			RTL
 	+ JSL DrawPotItem : BCS .skipDraw
 		; draw shadow
-		CMP.b #$03 : BNE +
+		CMP.b #$02 : BNE +
+			PHA
+				LDA.w SpriteControl, X : AND.b #$DF : STA.w SpriteControl, X
+				REP #$20
+				LDA.b Scrap00 : SEC : SBC.w #$0004 : STA.b Scrap00
+				SEP #$20
+			PLA
+		+ CMP.b #$03 : BNE +
 			PHA : LDA.w SpriteControl, X : ORA.b #$20 : STA.w SpriteControl, X : PLA
 		+ JSL Sprite_DrawShadowLong
 	.skipDraw
