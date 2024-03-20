@@ -198,9 +198,10 @@ DrawPotItem:
 	
 	PHX
 	TAX
+	STA.b Scrap07 ; store loot ID temporarily, will get overwritten in Sprite_DrawMultiple_quantity_preset call
 	LDA.l BeeTrapDisguise : BEQ +
-		TAX
-	+ STA.b Scrap07 ; store loot ID temporarily, will get overwritten in Sprite_DrawMultiple_quantity_preset call
+		TAX : STA.b Scrap07
+	+ 
 	LDA.l SpriteProperties_standing_width,X : BEQ .narrow
 
 	; TODO: Instead of loading the whole fixed 16 bytes from DynamicOAMTile**_** into SpriteDynamicOAM
