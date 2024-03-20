@@ -624,7 +624,9 @@ SpriteKeyPrep:
 		LDA.w SpawnedItemMWPlayer : STA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 		LDA.w SpawnedItemFlag : STA.w SprItemFlags, X : BEQ +
 		LDA.w SpawnedItemID : STA.w SprSourceItemId, X
+		INC.w ItemReceiptMethod
 		JSL RequestStandingItemVRAMSlot
+		STZ.w ItemReceiptMethod
 	+ PLA
 	RTL
 
