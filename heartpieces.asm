@@ -123,6 +123,7 @@ RTL
 HeartPieceSpritePrep:
     LDA.l ServerRequestMode : BEQ + :  : +
 
+    INC.w SkipBeeTrapDisguise
     JSL HeartPieceGetPlayer : STA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
     LDA.w SprSourceItemId, X : BNE +
         JSL LoadHeartPieceRoomValue

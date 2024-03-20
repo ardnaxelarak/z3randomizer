@@ -615,6 +615,7 @@ LoadMushroom:
 	LDA.b #$00 : STA.w SpriteGFXControl, X ; thing we wrote over
 	.justGFX
 	PHA
+		INC.w SkipBeeTrapDisguise
 		LDA.l MushroomItem_Player : STA.w SprItemMWPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 		LDA.w SprSourceItemId, X : BNE +
 			%GetPossiblyEncryptedItem(MushroomItem, SpriteItemValues)

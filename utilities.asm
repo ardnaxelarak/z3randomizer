@@ -81,7 +81,10 @@ RTL
 ResolveBeeTrap:
 	PHA
 		LDA.b #$00 : STA.l BeeTrapDisguise ; clear it
-	PLA
+		LDA.w SkipBeeTrapDisguise : BEQ +
+			STZ.w SkipBeeTrapDisguise
+			PLA : RTS
+	+ PLA
 	CMP.b #$D0 : BNE +
 		JSL GetRandomInt : AND.b #$3F
 		BNE ++ : LDA.b #$49 : ++ CMP.b #$26 : BNE ++ : LDA.b #$6A : ++

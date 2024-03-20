@@ -2,6 +2,7 @@
 ; Randomize Book of Mudora
 ;--------------------------------------------------------------------------------
 LoadLibraryItemGFX:
+    INC.w SkipBeeTrapDisguise
     LDA.l LibraryItem_Player : STA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
     %GetPossiblyEncryptedItem(LibraryItem, SpriteItemValues)
     STA.w SprSourceItemId, X
@@ -27,6 +28,7 @@ RTL
 LoadBonkItemGFX:
     LDA.b #$08 : STA.w SpriteOAMProp, X ; thing we wrote over
 LoadBonkItemGFX_inner:
+    INC.w SkipBeeTrapDisguise
     JSR LoadBonkItem_Player : STA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
     JSR LoadBonkItem
     STA.w SprSourceItemId, X
