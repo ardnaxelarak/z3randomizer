@@ -594,7 +594,11 @@ RTL
 DrawPowder:
 	;LDA.w ItemReceiptPose : BNE .defer ; defer if link is buying a potion
 	LDA.w SprRedrawFlag, X : BEQ +
-		JML LoadPowder_justGFX
+		LDA.w SprSourceItemId, X
+		JSL AttemptItemSubstitution
+		JSL ResolveLootIDLong
+		STA.l PowderFlag
+		JML RequestStandingItemVRAMSlot_resolved
 	+
 	; this fights with the shopkeep code, so had to move the powder draw there when potion shop is custom
 	; LDA.l ShopType : CMP.b #$FF : BNE .defer
