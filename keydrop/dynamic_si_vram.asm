@@ -22,7 +22,8 @@ RequestStandingItemVRAMSlot:
 				++ PLA : JMP .return
 		+
 
-		LDA.b 1,S : PHX : JSL GetSpritePalette : PLX : STA.w SpriteOAMProp, X ; setup the palette
+		; setup the palette
+		LDA.b 1,S : PHX : JSL GetSpritePalette_resolved : PLX : STA.w SpriteOAMProp, X
 	PLA
 	
 	; gfx that are already present in vanilla, use that instead of a new slot
@@ -74,7 +75,7 @@ RequestStandingItemVRAMSlot:
 			BRA .newSlot
 		+ TYA : STA.w SprItemGFXSlot,X
 		PLA : JMP .success
-nop #10
+
 		.newSlot
 		PHX
 			LDY.b IndoorsFlag : BEQ +
