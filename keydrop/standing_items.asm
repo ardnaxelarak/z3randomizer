@@ -617,7 +617,7 @@ SpriteKeyPrep:
 			CPX.b #$0A : BNE .continue  ; the hera basement key is always sprite 0x0A
 				LDA.b LinkQuadrantH : ORA.b LinkQuadrantV : AND.b #$03 : CMP.b #$02 : BNE .continue
 					LDA.b #$00 : STA.w SpawnedItemFlag : STA.w SprItemFlags, X
-					LDA.b #$24 : STA.w SprSourceItemId, X
+					LDA.b #$24 : STA.w SprSourceItemId, X : STA.w SprItemReceipt, X
 					BRA +
 		.continue
 		LDA.w SpawnedItemIndex : STA.w SprItemIndex, X
