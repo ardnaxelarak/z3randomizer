@@ -196,6 +196,7 @@ DrawPotItem:
 			LDA.w GfxChrHalfSlotVerify : CMP.b #$03 : BCC +
 				PLA : SEC : RTL
 		+
+		JSR PrepItemAnimation
 	PLA
 	
 	PHX
@@ -264,23 +265,21 @@ DrawPotItem:
 				STA.w SpriteDynamicOAM : STA.w SpriteDynamicOAM+8
 
 		.draw
-		; special handling
+		; special animation handling
 		LDY.b Scrap07 : CPY.b #$D2 : BNE + ; fairy
-			LDA.b FrameCounter : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
-				LDA.w SpriteDynamicOAM+4 : CLC : ADC.w #$02 ; use other fairy GFX
-				STA.w SpriteDynamicOAM+4
-			++ LDA.b FrameCounter : SEC : SBC.w #$10 : AND.w #$0020 : BEQ + ; alternate every 32 frames
-				LDA.w SpriteDynamicOAM+2 : SEC : SBC.w #$02 ; move fairy up 2 pixels
-				STA.w SpriteDynamicOAM+2
+			LDY.w SpriteDirectionTable, X : BEQ ++ : CPY.b #$03 : BEQ ++ ; use other fairy GFX
+				LDA.w SpriteDynamicOAM+4 : CLC : ADC.w #$0002 : STA.w SpriteDynamicOAM+4
+			++ CPY.b #$02 : BCC .skipSpecial ; move fairy up 2 pixels
+				LDA.w SpriteDynamicOAM+2 : SEC : SBC.w #$0002 : STA.w SpriteDynamicOAM+2
+				BRA .skipSpecial
 		+ CPY.b #$D6 : BNE + ; good bee
-			LDA.b FrameCounter : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
-				LDA.w SpriteDynamicOAM+12 : SEC : SBC.w #$10 ; use other fairy GFX
-				STA.w SpriteDynamicOAM+12
-			++ LDA.b FrameCounter : SEC : SBC.w #$10 : AND.w #$0020 : BEQ + ; alternate every 32 frames
-				LDA.w SpriteDynamicOAM+10 : SEC : SBC.w #$02 ; move fairy up 2 pixels
-				STA.w SpriteDynamicOAM+10
+			LDY.w SpriteDirectionTable, X : BEQ ++ : CPY.b #$03 : BEQ ++ ; use other bee GFX
+				LDA.w SpriteDynamicOAM+12 : SEC : SBC.w #$0010 : STA.w SpriteDynamicOAM+12
+			++ CPY.b #$02 : BCC + ; move bee up 2 pixels
+				LDA.w SpriteDynamicOAM+10 : SEC : SBC.w #$0002 : STA.w SpriteDynamicOAM+10
 		+
 
+		.skipSpecial
 		LDA.w #SpriteDynamicOAM : STA.b Scrap08
 		SEP #$20
 		STZ.b Scrap07
@@ -444,6 +443,10 @@ ConditionalPushBlockTransfer:
 	LDA.b #$1F : STA.w $420B ; what we wrote over
 	.return
 RTL
+
+PrepItemAnimation:
+	LDA.b FrameCounter : AND.b #$30 : LSR #4 : STA.w SpriteDirectionTable, X
+RTS
 
 pushpc
 ; fix Arghuss/Zora splash graphics
