@@ -211,7 +211,10 @@ LoadCatfishItemGFX:
 RTL
 ;--------------------------------------------------------------------------------
 DrawThrownItem:
-    LDA.w SprItemReceipt,X
+    LDA.w SprRedrawFlag, X : BEQ +
+        LDA.w SprSourceItemId, X
+        JML RequestStandingItemVRAMSlot
+    + LDA.w SprItemReceipt,X
     JML DrawPotItem
 ;--------------------------------------------------------------------------------
 MarkThrownItem:
