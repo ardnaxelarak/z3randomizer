@@ -132,6 +132,7 @@ RequestStandingItemVRAMSlot:
 
 	PHX
 	REP #$30
+		AND.w #$00FF
 		ASL : TAX
 		LDA.l StandingItemGraphicsOffsets,X : LDX.w ItemStackPtr : STA.l ItemGFXStack,X
 		LDA.w DynamicDropGFXIndex : AND.w #$000F : ASL : TAX
