@@ -81,7 +81,9 @@ RTL
 ResolveBeeTrap:
 	PHA
 		LDA.b #$00 : STA.l BeeTrapDisguise ; clear it
+		LDA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .skip
 		LDA.w SkipBeeTrapDisguise : BEQ +
+			.skip
 			STZ.w SkipBeeTrapDisguise
 			PLA : RTS
 	+ PLA
