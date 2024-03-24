@@ -216,13 +216,6 @@ rts
 org $82C157
 JSL AlwaysPushThroughFDoors
 
-; Modified from OWR - will need to remove once merged
-; org $85AF75
-; Sprite_6C_MirrorPortal:
-; JSL FixOvalFadeOutMirror : NOP #2 ; LDA $7EF3CA : BNE $85AFDF
-; org $85AFDF
-; Sprite_6C_MirrorPortal_missing_mirror:
-
 org $80E766
 JML ConditionalLoadCommonSprites_Do3To4Low : NOP #2
 LoadCommonSprites_Prep3To4Low:
