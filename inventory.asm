@@ -750,7 +750,6 @@ SpawnShovelItem:
 
 		;most of this part below is copied from the digging game
 
-		STA.l MiniGameTime
 		JSL Sprite_SpawnDynamically
 
 		LDX.b #$00

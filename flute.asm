@@ -9,7 +9,6 @@ SpawnHauntedGroveItem:
 	LDA.l HauntedGroveItem_Player : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 
 	LDA.b #$EB
-	STA.l MiniGameTime
 	JSL Sprite_SpawnDynamically
 
 	LDA.b #$01 : STA.w SprRedrawFlag, Y
