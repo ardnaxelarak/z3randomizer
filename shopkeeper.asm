@@ -522,7 +522,6 @@ Setup_ShopItemCollisionHitbox:
     
         !ADD ($00), Y
         !ADD.w #$0002 ; a small negative margin
-        ; TODO: add 4 for a narrow item
         SEP #$20 ; set 8-bit accumulator
 
         ; store hitbox X

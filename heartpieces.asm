@@ -58,7 +58,12 @@ DrawHeartPieceGFX:
         TAX
         LDA.l SpriteProperties_standing_width,X : BNE +
             PLX
+            REP #$20 : LDA.b RoomIndex : CMP.w #$0120 : SEP #$20 : BNE .prepShadow
+                LDA.b IndoorsFlag : BNE .draw ; skip "shadow" change in good bee room
+            .prepShadow
             LDA.w SpriteControl, X : ORA.b #$20 : STA.w SpriteControl, X
+
+            .draw
             PLA
             JSL DrawPotItem
             REP #$21

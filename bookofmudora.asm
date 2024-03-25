@@ -33,12 +33,6 @@ LoadBonkItemGFX_inner:
     JSR LoadBonkItem
     STA.w SprSourceItemId, X
     JSL RequestStandingItemVRAMSlot
-    PHA : PHX
-    LDA.w SprItemReceipt,X : TAX
-    LDA.l SpriteProperties_standing_width,X : BNE +
-        LDA.b #$00 : STA.l SpriteDynamicOAM : STA.l SpriteDynamicOAM+8
-    +
-    PLX : PLA
 RTL
 ;--------------------------------------------------------------------------------
 DrawBonkItemGFX: 
