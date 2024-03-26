@@ -430,7 +430,7 @@ endmacro
 %SpriteProps($0B, 0, 0, $01, $01, PalettesVanilla_red_melon+$0E)        ; 0B - Bow
 %SpriteProps($0C, 0, 0, $02, $02, PalettesVanilla_blue_ice+$0E)         ; 0C - Blue Boomerang
 %SpriteProps($0D, 2, 2, $02, $02, PalettesVanilla_blue_ice+$0E)         ; 0D - Powder
-%SpriteProps($0E, 2, 2, $02, $02, PalettesVanilla_blue_ice+$0E)         ; 0E - Bottle refill (bee)
+%SpriteProps($0E, 2, 0, $02, $02, PalettesVanilla_blue_ice+$0E)         ; 0E - Bottle refill (bee)
 %SpriteProps($0F, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 0F - Bombos
 %SpriteProps($10, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 10 - Ether
 %SpriteProps($11, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 11 - Quake
@@ -1234,7 +1234,7 @@ StandingItemGraphicsOffsets:
 	dw BigDecompressionBuffer+$1C00        ; 0B - Bow
 	dw BigDecompressionBuffer+$1DE0        ; 0C - Boomerang
 	dw BigDecompressionBuffer+$1CC0        ; 0D - Powder
-	dw BigDecompressionBuffer+$09A0        ; 0E - Bottle Refill (bee)
+	dw 0                                   ; 0E - Bottle Refill (bee)
 	dw BigDecompressionBuffer+$1440        ; 0F - Bombos
 	dw BigDecompressionBuffer+$1400        ; 10 - Ether
 	dw BigDecompressionBuffer+$1480        ; 11 - Quake
@@ -1500,7 +1500,7 @@ VRAMAddressOffset:
 	dw $0024                               ; 0B - Bow
 	dw $0024                               ; 0C - Boomerang
 	dw $0024                               ; 0D - Powder
-	dw $0024                               ; 0E - Bottle Refill (bee)
+	dw $00E4                               ; 0E - Bottle Refill (bee)
 	dw $0024                               ; 0F - Bombos
 	dw $0024                               ; 10 - Ether
 	dw $0024                               ; 11 - Quake
