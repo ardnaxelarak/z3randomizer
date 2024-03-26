@@ -192,9 +192,9 @@ JML Overworld_Hole_End
 ;--------------------------------------------------------------------------------
 PreventEnterOnBonk:
 	STA.b Scrap00 ; part of what we wrote over
-	LDA.b OverworldIndex : TAX : LDA.l OWTileMapAlt, X : AND.w #$0001 : BEQ .done
+	LDX.b OverworldIndex : LDA.l OWTileMapAlt, X : AND.w #$0001 : BEQ .done
 	LDA.b LinkState : AND.w #$00FF : CMP.w #$0014 : BNE .done ;in mirror mode?
-	LDA.b OverworldIndex : TAX : LDA.l OWTileWorldAssoc, X : AND.w #$00FF : CMP.b WorldCache : BEQ .done ; Are we bonking, or doing the superbunny glitch?
+	LDA.l OWTileWorldAssoc, X : AND.w #$00FF : CMP.b WorldCache : BEQ .done ; Are we bonking, or doing the superbunny glitch?
 
 		; If in inverted, are in mirror mode, and are bonking then do not enter
 		JML PreventEnterOnBonk_BRANCH_IX
@@ -212,16 +212,15 @@ TurtleRockEntranceFix:
 RTL
 ;--------------------------------------------------------------------------------
 AnimatedEntranceFix: ;when an entrance animation tries to start
-	PHA
-	LDA.l InvertedMode : BEQ + ;If we are in inverted mode
-	LDA.l OWMode+1 : AND.b #!FLAG_OW_MIXED : BNE + ;If we are in Mixed OW shuffle mode
-	LDA.b OverworldIndex : AND.b #$40 : BNE + ;and in the light world
-		PLA
+	PHA : PHX
+	LDA.b OverworldIndex : TAX : AND.b #$40 : BNE + ; on a light world screen
+	LDA.l OWTileMapAlt, X : BNE + ; tile is flipped
+		PLX : PLA
 		STZ.w OWEntranceCutscene ; skip it.
 		LDA.b #$00
 		RTL
 	+
-	PLA
+	PLX : PLA
 	STA.w CutsceneFlag ;what we wrote over
 	STA.w FreezeSprites ;what we wrote over
 	STA.w SkipOAM ;what we wrote over
