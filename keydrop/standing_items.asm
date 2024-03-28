@@ -356,16 +356,19 @@ SetupEnemyDropIndicator:
 	REP #$20
 	LDA.w #!BlankTile : STA.w !EnemyDropIndicator
 	LDX.b $1B : BEQ .done
+	LDA.l DRFlags : BIT #$0800 : BEQ .done
+
+;	Skipping the compass checks, could make this a toggle later?
 	; do we have a flag for enemy drops on? could check it here
-	LDA.w $040C : AND.w #$00FF : CMP.w #$00FF : BEQ .skipCompassChecks
+;	LDA.w $040C : AND.w #$00FF : CMP.w #$00FF : BEQ .skipCompassChecks
 	; compass checks
 	; does compass for dungeon exist?
-	LSR : TAX : LDA.l ExistsTransfer, X : TAX : LDA.l CompassExists, X : BEQ .skipCompassChecks
+;	LSR : TAX : LDA.l ExistsTransfer, X : TAX : LDA.l CompassExists, X : BEQ .skipCompassChecks
 	; do we have the compass
-	; todo: sewers?
-	LDA.l CompassField : LDX.w $040C : AND.l DungeonMask, X : BEQ .done
+	; sewers? outstanding?
+;	LDA.l CompassField : LDX.w $040C : AND.l DungeonMask, X : BEQ .done
 
-.skipCompassChecks
+;.skipCompassChecks
 	; either we're in a cave ($040C: $FF), compass doesn't exist, or we have the compass
 	; check if there are enemy drops
 	LDA.b $02 : PHA : REP #$10 ; store 02/03 for later
