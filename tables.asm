@@ -348,7 +348,7 @@ org $B0808A ; PC 0x18008A
 BlockCastleDoorsInRain:
 db $00 ; #$00 - Normal, $01 - Block them (Used by Entrance Rando in Standard Mode)
 ;--------------------------------------------------------------------------------
-org $30808B ; PC 0x18008B
+org $B0808B ; PC 0x18008B
 AllowAgaDamageBeforeZeldaRescued:
 db #$00 ; #$00 - No damage, $01 - Damage (Used by Entrance Rando in Standard Mode)
 ;--------------------------------------------------------------------------------
@@ -358,7 +358,7 @@ org $B0808E ; PC 0x18008E
 FakeBoots:
 db $00 ; #$00 = Off (default) - #$01 = On
 ;--------------------------------------------------------------------------------
-org $30808F ; PC 0x18008F
+org $B0808F ; PC 0x18008F
 SwapAgaGanonsTower:
 db $00 ; #$00 = Off (default) - #$01 = On
 ;--------------------------------------------------------------------------------
@@ -1112,7 +1112,7 @@ db $00
 ; $30835A (0x18035A) fixes the Prize On The Eyes glitch
 ; 0x00 - don't fix
 ; this should be turned on for Door Rando and Boss Shuffle
-org $30835A
+org $B0835A
 FixPrizeOnTheEyes:
 db $00
 ;--------------------------------------------------------------------------------
