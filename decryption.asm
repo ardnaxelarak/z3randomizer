@@ -24,10 +24,10 @@ RetrieveValueFromEncryptedTable:
 			LDY.b Scrap0A : PHY : LDY.b Scrap0C : PHY : LDY.b Scrap0E : PHY
 
 				AND.w #$FFF8 : TAY
-				LDA.b [$00], Y : STA.l CryptoBuffer : INY #2
-				LDA.b [$00], Y : STA.l CryptoBuffer+2 : INY #2
-				LDA.b [$00], Y : STA.l CryptoBuffer+4 : INY #2
-				LDA.b [$00], Y : STA.l CryptoBuffer+6
+				LDA.b [Scrap00], Y : STA.l CryptoBuffer : INY #2
+				LDA.b [Scrap00], Y : STA.l CryptoBuffer+2 : INY #2
+				LDA.b [Scrap00], Y : STA.l CryptoBuffer+4 : INY #2
+				LDA.b [Scrap00], Y : STA.l CryptoBuffer+6
 
 				LDA.w #$0002 : STA.b Scrap04 ;set block size
 

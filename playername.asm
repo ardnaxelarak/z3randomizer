@@ -128,5 +128,5 @@ RTL
         TYA : CLC : ADC.b Scrap03 : TAY
         SEP #$20
         LDA.b Scrap07 : ORA.b #$80 : STA.w VMAIN
-        LDA.b #$02 : STA.w MDMAEN
-        JMP.w .check_next
+        LDA.b #$02 : STA.w DMAENABLE
+        JMP .check_next

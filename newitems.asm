@@ -98,7 +98,7 @@ ProcessEventItems:
 		CMP.b #$E0 : BNE +
 			REP #$30 ; set 16-bit accumulator & index registers
 			LDA.l RNGItem : ASL : TAX
-			LDA.l EventDataOffsets, X : !ADD #EventDataTable : STA.b Scrap00
+			LDA.l EventDataOffsets, X : !ADD.l #EventDataTable : STA.b Scrap00
 
 			SEP #$20 ; set 8-bit accumulator
 			LDA.b #$AF : STA.b Scrap02
@@ -110,7 +110,7 @@ ProcessEventItems:
 			REP #$20 ; set 16-bit accumulator
 			LDA.l GoalItemRequirement : BEQ ++
 			LDA.l GoalCounter : INC : STA.l GoalCounter
-			CMP.l GoalItemRequirement : !BLT ++
+			CMP.l GoalItemRequirement : BCC ++
 			LDA.l TurnInGoalItems : AND.w #$00FF : BNE ++
 				SEP #$20 ; set 8-bit accumulator
 				LDA.b OverworldIndex : CMP.b #$80 : BNE +++
@@ -164,9 +164,9 @@ RTL
 
 ItemBehavior:
         REP #$30
-        AND #$00FF : ASL :  TAX
+        AND.w #$00FF : ASL : TAX
         SEP #$20
-        JMP.w (ItemReceipts_behavior,X)
+        JMP (ItemReceipts_behavior,X)
 
         .skip
         RTS
@@ -279,7 +279,7 @@ ItemBehavior:
         RTS
 
         .bow
-        BIT #$40 : BNE .silversbow
+        BIT.b #$40 : BNE .silversbow
                 LDA.b #$01 : STA.l BowEquipment
         RTS
 
@@ -297,11 +297,11 @@ ItemBehavior:
         TAX
         LDA.l DungeonItemMasks,X : TAY
         ORA.l CompassField : STA.l CompassField
-        JMP.w .increment_compass
+        JMP .increment_compass
         ..hc_sewers
         LDA.w #$C000 : TAY
         ORA.l CompassField : STA.l CompassField
-        JMP.w .increment_compass
+        JMP .increment_compass
 
 
         .dungeon_bigkey
@@ -309,10 +309,10 @@ ItemBehavior:
         LDA.w DungeonID : CMP.w #$0003 : BCC ..hc_sewers
         TAX
         LDA.l DungeonItemMasks,X : ORA.l BigKeyField : STA.l BigKeyField
-        JMP.w .increment_bigkey
+        JMP .increment_bigkey
         ..hc_sewers
         LDA.w #$C000 : ORA.l BigKeyField : STA.l BigKeyField
-        JMP.w .increment_bigkey
+        JMP .increment_bigkey
 
         .dungeon_map
         REP #$20
@@ -320,11 +320,11 @@ ItemBehavior:
         TAX
         LDA.l DungeonItemMasks,X : TAY
         ORA.l MapField : STA.l MapField
-        JMP.w .increment_map
+        JMP .increment_map
         ..hc_sewers
         LDA.w #$C000 : TAY
         ORA.l MapField : STA.l MapField
-        JMP.w .increment_map
+        JMP .increment_map
 
         .bow_and_arrows
         LDA.l BowTracking : BIT.b #$40 : BEQ .no_silvers
@@ -442,7 +442,7 @@ ItemBehavior:
         RTS
 
         .rupoor
-        REP #$20 : LDA.l CurrentRupees : !SUB RupoorDeduction : STA.l CurrentRupees : SEP #$20 ; Take 1 rupee
+        REP #$20 : LDA.l CurrentRupees : !SUB.l RupoorDeduction : STA.l CurrentRupees : SEP #$20 ; Take 1 rupee
         RTS
 
         .null
@@ -508,13 +508,13 @@ ItemBehavior:
         LDA.l DungeonItemMasks,X : TAY
         ORA.l MapField : STA.l MapField
         SEP #$20
-        JMP.w .increment_map
+        JMP .increment_map
 
         .hc_map
         REP #$20
         LDA.w #$C000 : TAY
         ORA.l MapField : STA.l MapField
-        JMP.w .increment_map
+        JMP .increment_map
 
         .free_compass
         REP #$20
@@ -524,14 +524,14 @@ ItemBehavior:
         LDA.l DungeonItemMasks,X : TAY
         ORA.l CompassField : STA.l CompassField
         SEP #$20
-        JMP.w .increment_compass
+        JMP .increment_compass
 
         .hc_compass
         REP #$20
         LDA.w #$C000 : TAY
         ORA.l CompassField : STA.l CompassField
         SEP #$20
-        JMP.w .increment_compass
+        JMP .increment_compass
 
         .free_bigkey
         REP #$20
@@ -540,11 +540,11 @@ ItemBehavior:
         LDA.w DungeonItemIDMap,X : TAX
         LDA.l DungeonItemMasks,X : ORA.l BigKeyField : STA.l BigKeyField
         SEP #$20
-        JMP.w .increment_bigkey
+        JMP .increment_bigkey
 
         .hc_bigkey
         LDA.b #$C0 : ORA.l BigKeyField+1 : STA.l BigKeyField+1
-        JMP.w .increment_bigkey
+        JMP .increment_bigkey
 
         .free_smallkey
         REP #$20
@@ -762,30 +762,30 @@ ResolveLootID:
         REP #$30
         AND.w #$00FF : ASL : TAX
         TYA
-        JMP.w (ItemReceipts_resolution,X)
+        JMP (ItemReceipts_resolution,X)
         .have_item
         SEP #$30
         PLB : PLX
         RTS
 
         .skip
-        JMP.w .have_item
+        JMP .have_item
 
         .bottles
         SEP #$30
         JSR CountBottles : CMP.l BottleLimit : BCC +
         		LDA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE +
                 LDA.l BottleLimitReplacement
-                JMP.w .get_item
+                JMP .get_item
         +
         TYA
-        JMP.w .have_item
+        JMP .have_item
 
         .magic
         SEP #$20
         LDA.l MagicConsumption : TAX
         LDA.w .magic_ids,X
-        JMP.w .have_item
+        JMP .have_item
         ..ids
         db $4E, $4F, $4F
 
@@ -795,12 +795,12 @@ ResolveLootID:
         LDA.l HighestSword
         CMP.l ProgressiveSwordLimit : BCC +
                 LDA.l ProgressiveSwordReplacement
-                JMP.w .get_item
+                JMP .get_item
 			++ LDA.l SwordEquipment
         +
         TAX
         LDA.w .prog_sword_ids,X
-        JMP.w .have_item
+        JMP .have_item
         ..ids
         db $49, $50, $02, $03, $03
 
@@ -811,12 +811,12 @@ ResolveLootID:
         LDA.l HighestShield
         CMP.l ProgressiveShieldLimit : BCC +
                 LDA.l ProgressiveShieldReplacement
-                JMP.w .get_item
+                JMP .get_item
         	++ LDA.l HighestShield
         +
         TAX
         LDA.w .shields_ids,X
-        JMP.w .have_item
+        JMP .have_item
         ..ids
         db $04, $05, $06, $06
 
@@ -826,12 +826,12 @@ ResolveLootID:
         LDA.l HighestMail
         CMP.l ProgressiveArmorLimit : BCC +
                 LDA.l ProgressiveArmorReplacement
-                JMP.w .get_item
+                JMP .get_item
         +
         	++ LDA.l ArmorEquipment
         TAX
         LDA.w .armor_ids,X
-        JMP.w .have_item
+        JMP .have_item
         ..ids
         db $22, $23, $23
 
@@ -840,7 +840,7 @@ ResolveLootID:
         SEP #$20
         LDA.l GloveEquipment : TAX
         LDA.w .gloves_ids,X
-        JMP.w .have_item
+        JMP .have_item
         ..ids
         db $1B, $1C, $1C
 
@@ -851,7 +851,7 @@ ResolveLootID:
         LDA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .skipbowlimit
         LDA.l BowEquipment : INC : LSR : CMP.l ProgressiveBowLimit : BCC +
                 LDA.l ProgressiveBowReplacement
-                JMP.w .get_item
+                JMP .get_item
         +
         LDA.w ItemReceiptMethod : CMP.b #$01 : BEQ +
                 LDX.w CurrentSpriteSlot
@@ -860,14 +860,14 @@ ResolveLootID:
         .skipbowlimit
         LDA.l BowEquipment : TAX
         LDA.w ResolveLootID_bows_ids,X
-        JMP.w .get_item
+        JMP .get_item
 
         .progressive_bow_2
         SEP #$30
         LDA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .skipbowlimit_2
         LDA.l BowEquipment : INC : LSR : CMP.l ProgressiveBowLimit : BCC +
                 LDA.l ProgressiveBowReplacement
-                JMP.w .get_item
+                JMP .get_item
         +
         LDA.w ItemReceiptMethod : CMP.b #$01 : BEQ +
                 LDX.w CurrentSpriteSlot
@@ -876,7 +876,7 @@ ResolveLootID:
         +
         LDA.l BowEquipment : TAX
         LDA.w ResolveLootID_bows_ids,X
-        JMP.w .get_item
+        JMP .get_item
 
         .bows
         ..ids
@@ -884,18 +884,18 @@ ResolveLootID:
 
         .null_chest
         ; JSL ChestItemServiceRequest
-        JMP.w .have_item
+        JMP .have_item
 
         .rng_single
         JSL GetRNGItemSingle : STA.w ScratchBufferV+6
         XBA : JSR MarkRNGItemSingle
         LDA.b #$FF : STA.l RNGLockIn ; clear lock-in
-        LDA.w ScratchBufferV+6 : JMP.w .get_item
+        LDA.w ScratchBufferV+6 : JMP .get_item
 
         .rng_multi
         JSL GetRNGItemMulti : STA.w ScratchBufferV+6
         LDA.b #$FF : STA.l RNGLockIn ; clear lock-in
-        LDA.w ScratchBufferV+6 : JMP.w .get_item
+        LDA.w ScratchBufferV+6 : JMP .get_item
 
 ;--------------------------------------------------------------------------------
 DungeonItemMasks:

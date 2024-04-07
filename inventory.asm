@@ -49,10 +49,10 @@ RTL
 		PLX
 		LDA.l SilverArrowsUseRestriction : BEQ ++
 		LDA.b RoomIndex : ORA.b RoomIndex+1 : BEQ ++ ; not in ganon's room in restricted mode
-				LDA.l BowEquipment : CMP.b #$03 : !BLT .errorJump : !SUB #$02 : STA.l BowEquipment
+				LDA.l BowEquipment : CMP.b #$03 : !BLT .errorJump : !SUB.b #$02 : STA.l BowEquipment
 				BRA .errorJump2
 		++
-		LDA.l BowEquipment : !SUB #$01 : EOR.b #$02 : !ADD #$01 : STA.l BowEquipment ; swap bows
+		LDA.l BowEquipment : !SUB.b #$01 : EOR.b #$02 : !ADD.b #$01 : STA.l BowEquipment ; swap bows
 		LDA.b #$20 : STA.w SFX3 ; menu select sound
 		JMP .captured
 	+ BRA +
@@ -269,7 +269,7 @@ IncrementYAItems:
         BIT.b #$20 : BNE .bow_check
         BIT.b #$04 : BEQ .not_y
                 .y_item
-                LDA.l YAItemCounter : !ADD #$08 : STA.l YAItemCounter
+                LDA.l YAItemCounter : !ADD.b #$08 : STA.l YAItemCounter
                 BRA .done
         .not_y
         BIT.b #$08 : BEQ .done
@@ -310,7 +310,7 @@ IncrementBossSword:
                 BRA .none
         +
         ASL : TAX
-        JMP.w (.vectors,X)
+        JMP (.vectors,X)
 
         .vectors
         dw .none
@@ -359,7 +359,7 @@ IncrementFinalSword:
                         BRA IncrementBossSword_none
                 +
                 ASL : TAX
-                JMP.w (IncrementBossSword_vectors,X)
+                JMP (IncrementBossSword_vectors,X)
         .done
         SEP #$20
         PLX
@@ -473,7 +473,7 @@ FluteCallForDuck:
 	LDA.l ProgressIndicator : CMP.b #$02 : BCS .vanilla ; must rescue Zelda first
 
 	.noDuck
-	LDA.b #$02 : RTL 
+	LDA.b #$02 : RTL
 
 	.vanilla
 	LDA.l FluteEquipment ; what we wrote over

@@ -2,7 +2,7 @@ pushpc
 
 org $9EC147
 JSL NewKodongoCollision
-JMP.w .continue : NOP #2
+JMP .continue : NOP #2
 .continue
 
 org $9EC152

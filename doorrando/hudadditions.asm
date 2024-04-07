@@ -124,7 +124,7 @@ DrHudDungeonItemsAdditions:
     sta.w $1644 : sta.w $164a : sta.w $1652 : sta.w $1662 : sta.w $1684 : sta.w $16c4
     ldx.w #$0000
     - sta.w $1704, x : sta.w $170e, x : sta.w $1718, x
-    inx #2 : cpx.w #$0008 : !blt -
+    inx #2 : cpx.w #$0008 : !BLT -
 
     lda.l HudFlag : and.w #$0020 : beq + : JMP ++ : +
     lda.l HUDDungeonItems : and.w #$0007 : bne + : JMP ++ : +
@@ -136,7 +136,7 @@ DrHudDungeonItemsAdditions:
     	lda.w #$24f5 : sta.w $1724
 
         ldx.w #$0002
-        	- lda.w #$0000 : !addl RowOffsets,x : !addl ColumnOffsets, x : tay
+        	- lda.w #$0000 : !ADD.l RowOffsets,x : !ADD.l ColumnOffsets, x : tay
         	lda.l DungeonReminderTable, x : sta.w $1644, y : iny #2
         	lda.w #$24f5 : sta.w $1644, y
         	lda.l MapField : and.l DungeonMask, x : beq + ; must have map
@@ -146,7 +146,7 @@ DrHudDungeonItemsAdditions:
         	.smallKey
         	+ iny #2
 			cpx.w #$001a : bne +
-				tya : !add.w #$003c : tay
+				tya : !ADD.w #$003c : tay
         	+ stx.b Scrap00
         		txa : lsr : tax
         		lda.w #$24f5 : sta.w $1644, y
@@ -158,7 +158,7 @@ DrHudDungeonItemsAdditions:
         			lda.l MapField : and.l DungeonMask, x : beq + ; must have map
         				plx : sep #$30 : lda.l ChestKeys, x : sta.b Scrap02
         				lda.l GenericKeys : bne +++
-        					lda.b Scrap02 : !sub.l DungeonCollectedKeys, x : sta.b Scrap02
+        					lda.b Scrap02 : !SUB.l DungeonCollectedKeys, x : sta.b Scrap02
         				+++ lda.b Scrap02
         				rep #$30
         				jsr ConvertToDisplay2 : sta.w $1644, y ; small key totals
@@ -180,7 +180,7 @@ DrHudDungeonItemsAdditions:
         sta.w $160a : sta.w $1614 : sta.w $161e ; blank out sm key indicators
         ldx.w #$0002
         	- lda.w #$0000 ; start of hud area
-        	!addl RowOffsets, x : !addl ColumnOffsets, x : tay
+        	!ADD.l RowOffsets, x : !ADD.l ColumnOffsets, x : tay
         	lda.l DungeonReminderTable, x : sta.w $1644, y
         	iny #2
         	lda.w #$24f5 : sta.w $1644, y ; blank out map spot
@@ -188,10 +188,10 @@ DrHudDungeonItemsAdditions:
         		JSR MapIndicatorShort : STA.w $1644, Y
 			+ iny #2
             cpx.w #$001a : bne +
-				tya : !add.w #$003c : tay
+				tya : !ADD.w #$003c : tay
 			+ lda.l CompassField : and.l DungeonMask, x : beq + ; must have compass
                 phx ; total chest counts
-                    LDA.l CompassTotalsWRAM, x : !sub.l DungeonLocationsChecked, x
+                    LDA.l CompassTotalsWRAM, x : !SUB.l DungeonLocationsChecked, x
                     SEP #$30 : JSR HudHexToDec2DigitCopy : REP #$30
                     lda.b Scrap06 : jsr ConvertToDisplay2 : sta.w $1644, y : iny #2
                     lda.b Scrap07 : jsr ConvertToDisplay2 : sta.w $1644, y
@@ -201,7 +201,7 @@ DrHudDungeonItemsAdditions:
             .skipBlanks iny #2
             cpx.w #$001a : beq +
 				lda.w #$24f5 : sta.w $1644, y ; blank out spot
-            + inx #2 : cpx.w #$001b : !bge ++ : JMP -
+            + inx #2 : cpx.w #$001b : !BGE ++ : JMP -
     ++
     plp : ply : plx : rtl
 }
@@ -244,15 +244,15 @@ BkStatus:
     +++ lda.w #$2826 : rts ; check mark
 
 ConvertToDisplay:
-    and.w #$00ff : cmp.w #$000a : !blt +
-        !add.w #$2553 : rts
-    + !add.w #$2490 : rts
+    and.w #$00ff : cmp.w #$000a : !BLT +
+        !ADD.w #$2553 : rts
+    + !ADD.w #$2490 : rts
 
 ConvertToDisplay2:
     and.w #$00ff : beq ++
-        cmp.w #$000a : !blt +
-            !add.w #$2553 : rts ; 2580 with 258A as "A" for non transparent digits
-        + !add.w #$2816 : rts
+        cmp.w #$000a : !BLT +
+            !ADD.w #$2553 : rts ; 2580 with 258A as "A" for non transparent digits
+        + !ADD.w #$2816 : rts
     ++ lda.w #$2827 : rts ; 0/O for 0 or placeholder digit ;2483
 
 CountAbsorbedKeys:

@@ -108,7 +108,7 @@ W34SELQ = $7E0097                 ;
 WOBJSELQ = $7E0098                ;
 CGWSELQ = $7E0099                 ;
 CGADSUBQ = $7E009A                ;
-HDMAENQ = $7E009B                 ; HDMA enable flags
+HDMAENABLEQ = $7E009B             ; HDMA enable flags
                                   ;
 RoomIndex = $7E00A0               ; Underworld room index. Word length. High byte: $00 = EG1 | $01 = EG2
                                   ; Not zeroed on exit to overworld.
@@ -270,6 +270,8 @@ DungeonID = $7E040C               ; High byte mostly unused but sometimes read. 
                                   ;
 TransitionDirection = $7E0418     ; OW: 0=N 1=S 2=W 3=E  UW: 0=S 1=N 2=E 3=W
                                   ;
+TrapDoorFlag = $7E0468            ; Flag that is set when trap doors are down. 2 bytes
+                                  ;
 LayerAdjustment = $7E047A         ; Flags layer adjustments. Arms EG.
                                   ;
 RoomIndexMirror = $7E048E         ; Mirrors RoomIndex
@@ -295,6 +297,9 @@ NMIAux = $7E0632                  ; Stores long address of NMI jump. Currently o
 SpriteRoomTag = $7E0642           ; Set high by sprites triggering room tags.
                                   ;
 SomariaSwitchFlag = $7E0646       ; Set by Somaria when on a switch.
+                                  ;
+TileMapDoorPos = $7E068E          ; (Dungeon) ???? related to trap doors and if they are open ; possibly bomb doors too? Update: module 0x07.0x4 probably uses this to know whether it's a key door or big key door to open. Word length.
+DoorTimer = $7E0690               ; Timer for animating doors, like Sanc or HC overworld doors
                                   ;
 TileMapEntranceDoors = $7E0696    ; Tilemap location of entrance doors. Word length.
 TileMapTile32 = $7E0698           ; Tilemap location of new tile32 objects, such as from graves/rocks. Word length.
@@ -382,6 +387,7 @@ SpriteForceDrop = $7E0CBA         ; Forces drops on sprite death. $10 bytes.
                                   ;
 SpriteBump = $7E0CD2              ; See symbols_wram.asm. $10 bytes.
                                   ;
+BossSpecialAction = $7E0CF3       ; Indicates special action required for some bosses
 TreePullKills = $7E0CFB           ; Kills for tree pulls.
 TreePullHits = $7E0CFC            ; Hits taken for tree pulls.
                                   ;
@@ -410,7 +416,7 @@ SpriteOAMProperties = $7E0E40     ; h m w o o o o o | h = Harmless       | m = m
 SpriteHitPoints = $7E0E50         ; Set from $0DB173
 SpriteControl = $7E0E60           ; n i o s p p p t | n = Death animation? | i = Immune to attack/collion?
                                   ; o = Shadow      | p = OAM prop palette | t = OAM prop name table
-SpriteJumpIndex = $7E0E80         ; Sprite Item Type. Also used for jump table local. $10 bytes.
+SpriteJumpIndex = $7E0E80         ; Sprite jump table local. $10 bytes.
                                   ;
 SpriteDirectionTable = $7E0EB0    ; Sprite direction. $10 bytes.
                                   ;
@@ -763,7 +769,7 @@ endmacro
 %assertRAM(WOBJSELQ, $7E0098)
 %assertRAM(CGWSELQ, $7E0099)
 %assertRAM(CGADSUBQ, $7E009A)
-%assertRAM(HDMAENQ, $7E009B)
+%assertRAM(HDMAENABLEQ, $7E009B)
 %assertRAM(RoomIndex, $7E00A0)
 %assertRAM(PreviousRoom, $7E00A2)
 %assertRAM(CameraBoundH, $7E00A6)
@@ -847,6 +853,7 @@ endmacro
 %assertRAM(OverworldIndexMirror, $7E040A)
 %assertRAM(DungeonID, $7E040C)
 %assertRAM(TransitionDirection, $7E0418)
+%assertRAM(TrapDoorFlag, $7E0468)
 %assertRAM(LayerAdjustment, $7E047A)
 %assertRAM(RoomIndexMirror, $7E048E)
 %assertRAM(RespawnFlag, $7E04AA)
@@ -864,6 +871,8 @@ endmacro
 %assertRAM(NMIAux, $7E0632)
 %assertRAM(SpriteRoomTag, $7E0642)
 %assertRAM(SomariaSwitchFlag, $7E0646)
+%assertRAM(TileMapDoorPos, $7E068E)
+%assertRAM(DoorTimer, $7E0690)
 %assertRAM(TileMapEntranceDoors, $7E0696)
 %assertRAM(TileMapTile32, $7E0698)
 %assertRAM(RandoOverworldEdgeAddr, $7E06F8)
@@ -911,6 +920,7 @@ endmacro
 %assertRAM(AncillaLayer, $7E0C7C)
 %assertRAM(SpriteForceDrop, $7E0CBA)
 %assertRAM(SpriteBump, $7E0CD2)
+%assertRAM(BossSpecialAction, $7E0CF3)
 %assertRAM(TreePullKills, $7E0CFB)
 %assertRAM(TreePullHits, $7E0CFC)
 %assertRAM(SpritePosYLow, $7E0D00)

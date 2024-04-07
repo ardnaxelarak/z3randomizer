@@ -70,8 +70,6 @@ org $8681F4
 Sprite_SpawnSecret_pool_ID:
 org $868283
 Sprite_SpawnSecret_NotRandomBush:
-org $8682A5
-Sprite_SpawnSecret_SetCoords:
 org $86d23a
 Sprite_DrawAbsorbable:
 org $86D038
@@ -187,7 +185,7 @@ RevealPotItem:
 .next_pot
 	INY : INY : INY
 
-	LDA.b [$00],Y
+	LDA.b [Scrap00],Y
 	CMP.w #$FFFF : BEQ .exit
 
 	INX
@@ -232,7 +230,7 @@ RevealPotItem:
 
 LoadMultiWorldPotItem:
 	INY : INY
-	LDA.b [$00],Y : AND.w #$00FF
+	LDA.b [Scrap00],Y : AND.w #$00FF
 
 	INC.w SpawnedItemIsMultiWorld
 	PHX
@@ -251,7 +249,7 @@ RTL
 
 LoadMajorPotItem:
 	INY : INY
-	LDA.b [$00],Y : AND.w #$00FF
+	LDA.b [Scrap00],Y : AND.w #$00FF
 
 SaveMajorItemDrop:
 	; A currently holds the item receipt ID
@@ -295,7 +293,7 @@ RTL
 RTL
 
 ShouldCountNormalPot:
-	INY : INY : LDA.b [$00], Y : AND.w #$00FF : CMP.w #$0080 : BCS .clear
+	INY : INY : LDA.b [Scrap00], Y : AND.w #$00FF : CMP.w #$0080 : BCS .clear
 	LDA.l PotCountMode : BEQ .clear
 	LDA.l PotCollectionRateTable, X : BIT.b Scrap0A : BEQ .clear ; don't count if clear
 .set
@@ -388,20 +386,20 @@ RTS
 ; Runs during sprite load of the room
 LoadSpriteData:
 	INY : INY
-	LDA.b [$00], Y
+	LDA.b [Scrap00], Y
 	CMP.b #$F3 : BCC .normal
 		PHA
 			DEC.b Scrap03 ; standing items shouldn't consume a sprite slot
 			LDX.b Scrap03 ; these were changed to $03, for moved sprites
 			CMP.b #$F9 : BNE .not_multiworld
-				DEY : LDA.b [$00], Y : STA.w SprItemMWPlayer, X
+				DEY : LDA.b [Scrap00], Y : STA.w SprItemMWPlayer, X
 				LDA.b #$02 : STA.w SprDropsItem, X : BRA .common
 			.not_multiworld
 			LDA.b #$00 : STA.w SprItemMWPlayer, X
 			LDA.b #$01 : STA.w SprDropsItem, X
 			DEY
 			.common
-			DEY : LDA.b [$00], Y : STA.w SprSourceItemId, X
+			DEY : LDA.b [Scrap00], Y : STA.w SprSourceItemId, X
 			STA.b Scrap0E
 			LDA.w SprItemMWPlayer, X : BNE +  ; skip if multiworld
 				PHX
@@ -636,73 +634,73 @@ SpriteKeyPrep:
 SpriteKeyDrawGFX:
     JSL Sprite_DrawRippleIfInWater
     PHA
-	LDA.l SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-	LDA.w SprRedrawFlag, X : BEQ +
-		LDA.w SprSourceItemId, X
-		JSL RequestStandingItemVRAMSlot
-		LDA.w SprRedrawFlag, X : CMP.b #$02 : BEQ +
-		BRA .skipDraw
-	+ LDA.w SprItemReceipt, X
-	CMP.b #$24 : BNE +
-		LDA.b RoomIndex : CMP.b #$80 : BNE ++
-		LDA.w SpawnedItemFlag : BNE ++
-			LDA.b #$24 : BRA +
-		++ PLA
-			PHK : PEA.w .jslrtsreturn-1
-			PEA.w $868014 ; an rtl address - 1 in Bank06
-			JML Sprite_DrawAbsorbable
-			.jslrtsreturn
-			RTL
-	+ JSL DrawPotItem : BCS .skipDraw
-		; draw shadow
-		CMP.b #$02 : BNE +
-			PHA
-				LDA.w SpriteControl, X : AND.b #$DF : STA.w SpriteControl, X
-				REP #$20
-				LDA.b Scrap00 : SEC : SBC.w #$0004 : STA.b Scrap00
-				SEP #$20
-			PLA
-		+ CMP.b #$03 : BNE +
-			PHA : LDA.w SpriteControl, X : ORA.b #$20 : STA.w SpriteControl, X : PLA
-		+ JSL Sprite_DrawShadowLong
-	.skipDraw
-	PLA : RTL
+    LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    LDA.w SprRedrawFlag, X : BEQ +
+        LDA.w SprSourceItemId, X
+        JSL RequestStandingItemVRAMSlot
+        LDA.w SprRedrawFlag, X : CMP.b #$02 : BEQ +
+        BRA .skipDraw
+    + LDA.w SprItemReceipt, X
+    CMP.b #$24 : BNE +
+        LDA.b RoomIndex : CMP.b #$80 : BNE ++
+        LDA.w SpawnedItemFlag : BNE ++
+            LDA.b #$24 : BRA +
+        ++ PLA
+        PHK : PEA.w .jslrtsreturn-1
+        PEA.w $868014 ; an rtl address - 1 in Bank06
+        JML Sprite_DrawAbsorbable
+        .jslrtsreturn
+        RTL
+    + JSL DrawPotItem : BCS .skipDraw
+    ; draw shadow
+    CMP.b #$02 : BNE +
+        PHA
+            LDA.w SpriteControl, X : AND.b #$DF : STA.w SpriteControl, X
+            REP #$20
+            LDA.b Scrap00 : SEC : SBC.w #$0004 : STA.b Scrap00
+            SEP #$20
+        PLA
+        + CMP.b #$03 : BNE +
+            PHA : LDA.w SpriteControl, X : ORA.b #$20 : STA.w SpriteControl, X : PLA
+        + JSL Sprite_DrawShadowLong
+    .skipDraw
+    PLA : RTL
 
 KeyGet:
-	LDA.l CurrentSmallKeys ; what we wrote over
-	PHA
-		LDA.l StandingItemsOn : BNE +
-			PLA : RTL
-		+ LDY.w SprItemReceipt, X
-		LDA.w SprItemIndex, X : STA.w SpawnedItemIndex
-		LDA.w SprItemFlags, X : STA.w SpawnedItemFlag
-		LDA.b RoomIndex : CMP.b #$87 : BNE + ;check for hera cage
-		LDA.w SpawnedItemFlag : BNE + ; if it came from a pot, it's fine
-			JSR ShouldKeyBeCountedForDungeon : BCC ++
-			JSL CountChestKeyLong
-			++ PLA : RTL
-		+ STY.b Scrap00
-		LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
-			STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .receive
-		PHX
-			LDA.w DungeonID : CMP.b #$FF : BNE +
-				LDA.b Scrap00 : CMP.b #$AF : BNE .skip
-				LDA.l CurrentGenericKeys : INC : STA.l CurrentGenericKeys
-				LDA.b Scrap00 : BRA .countIt
-			+ LSR : TAX
-			LDA.b Scrap00 : CMP.l KeyTable, X : BNE +
-				.countIt
-				LDA.l StandingItemCounterMask : AND.w SpawnedItemFlag : BEQ ++
-					JSL AddInventory
-				++ PLX : PLA : RTL
-			+ CMP.b #$AF : beq .countIt ; universal key
-			CMP.b #$24 : beq .countIt   ; small key for this dungeon
-		.skip PLX
-		.receive
-		JSL Player_HaltDashAttackLong
-		TYA : JSL AttemptItemSubstitution : JSL ResolveLootIDLong : TAY
-		JSL Link_ReceiveItem
-	PLA : DEC : RTL
+    LDA.l CurrentSmallKeys ; what we wrote over
+    PHA
+        LDA.l StandingItemsOn : BNE +
+            PLA : RTL
+        + LDY.w SprItemReceipt, X
+        LDA.w SprItemIndex, X : STA.w SpawnedItemIndex
+        LDA.w SprItemFlags, X : STA.w SpawnedItemFlag
+        LDA.b RoomIndex : CMP.b #$87 : BNE + ;check for hera cage
+        LDA.w SpawnedItemFlag : BNE + ; if it came from a pot, it's fine
+            JSR ShouldKeyBeCountedForDungeon : BCC ++
+            JSL CountChestKeyLong
+            ++ PLA : RTL
+        + STY.b Scrap00
+        LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+        STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .receive
+        PHX
+            LDA.w DungeonID : CMP.b #$FF : BNE +
+                LDA.b Scrap00 : CMP.b #$AF : BNE .skip
+                LDA.l CurrentGenericKeys : INC : STA.l CurrentGenericKeys
+                LDA.b Scrap00 : BRA .countIt
+            + LSR : TAX
+            LDA.b Scrap00 : CMP.l KeyTable, X : BNE +
+                .countIt
+                LDA.l StandingItemCounterMask : AND.w SpawnedItemFlag : BEQ ++
+                    JSL AddInventory
+                ++ PLX : PLA : RTL
+            + CMP.b #$AF : beq .countIt ; universal key
+            CMP.b #$24 : beq .countIt   ; small key for this dungeon
+        .skip PLX
+        .receive
+        JSL Player_HaltDashAttackLong
+        TYA : JSL AttemptItemSubstitution : JSL ResolveLootIDLong : TAY
+        JSL Link_ReceiveItem
+    PLA : DEC : RTL
 
 KeyTable:
 db $A0, $A0, $A2, $A3, $A4, $A5, $A6, $A7, $A8, $A9, $AA, $AB, $AC, $AD
@@ -712,7 +710,7 @@ ShouldKeyBeCountedForDungeon:
 	PHX
 		LDA.w DungeonID : CMP.b #$FF : BEQ .done
 		LSR : TAX
-		TYA : cmp KeyTable, X : BNE +
+		TYA : CMP.w KeyTable, X : BNE +
 			- PLX : SEC : RTS
 		+ CMP.b #$24 : BEQ -
 	.done
@@ -791,7 +789,7 @@ CheckSprite_Spawn:
 	BMI .check
 RTL
 .check
-	LDA.b Scrap0D : CMP #$08 : BNE +
+	LDA.b Scrap0D : CMP.b #$08 : BNE +
 	LDA.w LinkDashing : BNE .error
 		LDX.b #$0F
 

@@ -54,27 +54,26 @@ GiveBonkItem:
     LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
     LDA.w SprItemReceipt, X
     JSR AbsorbKeyCheck : BCC .notKey
-    .key
-    PHY : LDY.b #$24 : JSL AddInventory : PLY ; do inventory processing for a small key
-    LDA.l CurrentSmallKeys : INC A : STA.l CurrentSmallKeys
-    LDA.b #$2F : JSL Sound_SetSfx3PanLong
-    INC.w UpdateHUDFlag
-RTL
-    .notKey
+        PHY : LDY.b #$24 : JSL AddInventory : PLY ; do inventory processing for a small key
+        LDA.l CurrentSmallKeys : INC A : STA.l CurrentSmallKeys
+        LDA.b #$2F : JSL Sound_SetSfx3PanLong
+        INC.w UpdateHUDFlag
+        RTL
+	.notKey
     PHY : TAY : JSL Link_ReceiveItem : PLY
 RTL
 ;--------------------------------------------------------------------------------
 LoadBonkItem:
-	LDA.b RoomIndex ; check room ID - only bonk keys in 2 rooms so we're just checking the lower byte
-	CMP.b #$73 : BNE + ; Desert Bonk Key
-    	LDA.l BonkKey_Desert
-		BRA ++
-	+ : CMP.b #$8C : BNE + ; GTower Bonk Key
-    	LDA.l BonkKey_GTower
-		BRA ++
-	+
-		LDA.b #$24 ; default to small key
-	++
+    LDA.b RoomIndex ; check room ID - only bonk keys in 2 rooms so we're just checking the lower byte
+    CMP.b #$73 : BNE + ; Desert Bonk Key
+        LDA.l BonkKey_Desert
+        BRA ++
+    + : CMP.b #$8C : BNE + ; GTower Bonk Key
+        LDA.l BonkKey_GTower
+        BRA ++
+    +
+    LDA.b #$24 ; default to small key
+++
 RTS
 ;--------------------------------------------------------------------------------
 LoadBonkItem_Player:
@@ -86,8 +85,8 @@ LoadBonkItem_Player:
         LDA.l BonkKey_GTower_Player
         BRA ++
     +
-        LDA.b #$00
-    ++
+    LDA.b #$00
+++
 RTS
 ;--------------------------------------------------------------------------------
 AbsorbKeyCheck:

@@ -27,7 +27,7 @@ DontUseZSNES:
 
 	LDA.b #$00
 	STA.l NMITIMEN ; disable NMI and IRQ
-	STA.l HDMAEN ; disable HDMA
+	STA.l HDMAENABLE ; disable HDMA
 
 	ROR ; A = 0x80 from carry
 	STA.l INIDISP
@@ -48,7 +48,7 @@ DontUseZSNES:
 	STA.l DAS0L
 
 	LDA.w #$0001
-	STA.l MDMAEN
+	STA.l DMAENABLE
 
 	JSR ConfigurePPUForFailureReport
 	JSR ConfigureBSODVWF
@@ -93,7 +93,7 @@ Crashed:
 
 	LDA.b #$00
 	STA.l NMITIMEN ; disable NMI and IRQ
-	STA.l HDMAEN ; disable HDMA
+	STA.l HDMAENABLE ; disable HDMA
 
 	ROR ; A = 0x80 from carry
 	STA.l INIDISP
@@ -114,7 +114,7 @@ Crashed:
 	STA.l DAS0L
 
 	LDA.w #$0001
-	STA.l MDMAEN
+	STA.l DMAENABLE
 
 ;===================================================================================================
 
@@ -312,7 +312,7 @@ DrawVWFMessage:
 	STZ.w A1B0
 
 	LDA.b #$01
-	STA.w MDMAEN
+	STA.w DMAENABLE
 
 	REP #$20
 
@@ -376,7 +376,7 @@ DrawFailureVWFChar:
 	LDY.w #$0000
 
 .next_row
-	LDA.b ($08),Y
+	LDA.b (Scrap08),Y
 	AND.w #$00FF
 	XBA
 	LDX.w VWFS
@@ -427,7 +427,7 @@ LoadBSODHexFont:
 	STA.w A1B0
 
 	LDA.b #$01
-	STA.w MDMAEN
+	STA.w DMAENABLE
 
 	REP #$30
 

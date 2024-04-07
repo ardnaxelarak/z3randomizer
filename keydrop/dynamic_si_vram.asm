@@ -329,8 +329,8 @@ DrawPotItem:
 		JSL Sprite_DrawMultiple_quantity_preset
 	PLB
 	
-	LDA.b $90 : CLC : ADC.b #$08 : STA.b $90
-	INC.b $92 : INC.b $92
+	LDA.b OAMPtr : CLC : ADC.b #$08 : STA.b OAMPtr
+	INC.b OAMPtr+2 : INC.b OAMPtr+2
 
 	PLA
 	CLC
@@ -348,7 +348,7 @@ ConditionalPushBlockTransfer:
 		LDA.b #$0F ; don't transfer push block when on the OW
 		BRA .return-3
 	+
-	LDA.b #$1F : STA.w $420B ; what we wrote over
+	LDA.b #$1F : STA.w DMAENABLE ; what we wrote over
 	.return
 RTL
 

@@ -77,12 +77,12 @@ dw 4, 0, -4, -8
 SpritePrep_ShopKeeper_PotionShop:
 	JSL SpritePrep_ShopKeeper
 	LDA.l ShopType : CMP.b #$FF : BNE +
-		JSL SpritePrep_PotionShopLong
+		JSL SpritePrep_MagicShopAssistant
 		RTL
 	+ LDX.b #$0
     PHK : PEA.w .jslrtsreturn-1
     PEA.w $85f527 ; an rtl address - 1 in Bank05
-    JML SpawnMagicPowder
+    JML MagicShopAssistant_SpawnPowder
     .jslrtsreturn
     RTL
 
@@ -132,7 +132,7 @@ SpritePrep_ShopKeeper:
             PLA : STA.l ShopInventoryPlayer, X : LDA.b #0 : STA.l ShopInventoryDisguise, X : PLX
 			PHY
 				PHX
-					LDA.b #$00 : XBA : TYA : LSR #2 : !ADD ShopSRAMIndex : TAX
+					LDA.b #0 : XBA : TYA : LSR #2 : !ADD.l ShopSRAMIndex : TAX
 					LDA.l PurchaseCounts, X : TYX : STA.l ShopInventory+3, X : TAY
 				PLX
 				
@@ -258,11 +258,11 @@ Shopkepeer_CallOriginal:
 ;--------------------------------------------------------------------------------
 
 Sprite_ShopKeeperPotion:
-	LDA.l ShopType : CMP.b #$FF : BNE + : JMP.w ShopkepeerPotion_CallOriginal : +
+	LDA.l ShopType : CMP.b #$FF : BNE + : JMP ShopkepeerPotion_CallOriginal : +
 	TXA : BEQ +
 		PHK : PEA.w .jslrtsreturn2-1
 		PEA.w $85f527 ; an rtl address - 1 in Bank05
-		JML Sprite_MagicPowderItem
+		JML Sprite_BagOfPowder
 		.jslrtsreturn2
 		RTL
 	+
@@ -277,14 +277,14 @@ Sprite_ShopKeeperPotion:
 	LDA.w SpriteJumpIndex, X : BNE +
 		PHK : PEA.w .jslrtsreturn-1
 		PEA.w $85f527 ; an rtl address - 1 in Bank05
-		JML Sprite_WitchAssistant
+		JML MagicShopAssistant_Main
 		.jslrtsreturn
 	+
 RTL
 
 Sprite_ShopKeeper:
 
-	LDA.l ShopType : CMP.b #$FF : BNE + : JMP.w Shopkepeer_CallOriginal : +
+	LDA.l ShopType : CMP.b #$FF : BNE + : JMP Shopkepeer_CallOriginal : +
 
 	PHB : PHK : PLB
 		JSL Sprite_PlayerCantPassThrough
@@ -368,7 +368,7 @@ Shopkeeper_DrawMerchant_Type1:
 	LDA.b #$01 : STA.b Scrap06 ; request 1 OAM slot
 	LDA.b #$04 : JSL OAM_AllocateFromRegionA ; request 4 bytes
 	STZ.b Scrap07
-	LDA.b FrameCounter : AND #$08 : BEQ +
+	LDA.b FrameCounter : AND.b #$08 : BEQ +
 		LDA.b #.oam_shopkeeper_f1 : STA.b Scrap08
 		LDA.b #.oam_shopkeeper_f1>>8 : STA.b Scrap09
 		BRA ++
@@ -454,12 +454,12 @@ Shopkeeper_BuyItem:
     JMP .done
     .buy
     LDA.l ShopType : AND.b #$80 : BNE ++ ; don't charge if this is a take-any
-        REP #$20 : LDA.l CurrentRupees : !SUB ShopInventory+1, X : STA.l CurrentRupees : SEP #$20 ; Take price away
+        REP #$20 : LDA.l CurrentRupees : !SUB.l ShopInventory+1, X : STA.l CurrentRupees : SEP #$20 ; Take price away
     ++
     PHX
         LDA.b #0 : XBA : TXA : LSR #2 : TAX
-        LDA.l ShopInventoryPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-        TXA : !ADD ShopSRAMIndex : TAX
+        LDA.l ShopInventoryPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+        TXA : !ADD.l ShopSRAMIndex : TAX
         LDA.l PurchaseCounts, X : BNE +++	;Is this the first time buying this slot?
             LDA.l EnableShopItemCount, X : STA.l ShopEnableCount ; If so, store the permission to count the item here.
         +++
@@ -472,10 +472,10 @@ Shopkeeper_BuyItem:
     LDA.b #0 : STA.l ShopEnableCount
     TXA : LSR #2 : TAX
     LDA.l ShopType : BIT.b #$80 : BNE +
-        LDA ShopkeeperRefill : BNE +++
+        LDA.l ShopkeeperRefill : BNE +++
             LDA.l ShopState : ORA.w Shopkeeper_ItemMasks, X : STA.l ShopState
         +++ PHX
-        TXA : !ADD ShopSRAMIndex : TAX
+        TXA : !ADD.l ShopSRAMIndex : TAX
         LDA.l PurchaseCounts, X : INC : BEQ +++ : STA.l PurchaseCounts, X : +++
         PLX
         BRA ++
@@ -496,7 +496,7 @@ Shopkeeper_BuyItem:
         PLX
     ++
     .done
-    LDA.b #$0 : STA.l ShopkeeperRefill
+    LDA.b #$00 : STA.l ShopkeeperRefill
     PLY : PLX
 RTS
 Shopkeeper_ItemMasks:
@@ -520,7 +520,7 @@ Setup_ShopItemCollisionHitbox:
         LDA.w Shopkeeper_DrawNextItem_item_offsets_idx, Y : STA.b Scrap00 ; get table from the table table
         PLY : PLA
     
-        !ADD ($00), Y
+        !ADD.b (Scrap00), Y
         !ADD.w #$0002 ; a small negative margin
         SEP #$20 ; set 8-bit accumulator
 
@@ -532,7 +532,7 @@ Setup_ShopItemCollisionHitbox:
 
         REP #$20 ; set 16-bit accumulator
         PHY : INY #2
-        !ADD ($00), Y
+        !ADD.b (Scrap00), Y
         PLY
         PHA : LDA.l ShopType : AND.w #$0080 : BEQ + ; lower by 4 for Take-any
                 PLA : !ADD.w #$0004
@@ -625,12 +625,12 @@ Shopkeeper_DrawNextItem:
 	LDA.b RoomIndex : CMP.w #$109 : BNE + : INY #6 : +
 	LDA.w .item_offsets_idx, Y : STA.b Scrap00 ; get table from the table table
 	LDA.b 1,s : ASL #2 : TAY ; set Y to the item index
-	LDA.b ($00), Y : STA.l SpriteOAM ; load X-coordinate
+	LDA.b (Scrap00), Y : STA.l SpriteOAM ; load X-coordinate
 	INY #2
 	LDA.l ShopType : AND.w #$0080 : BNE +
-		LDA.b ($00), Y : STA.l SpriteOAM+2 : BRA ++ ; load Y-coordinate
+		LDA.b (Scrap00), Y : STA.l SpriteOAM+2 : BRA ++ ; load Y-coordinate
 	+
-		LDA.b ($00), Y : !ADD.w #$0004 : STA.l SpriteOAM+2 ; load Y-coordinate
+		LDA.b (Scrap00), Y : !ADD.w #$0004 : STA.l SpriteOAM+2 ; load Y-coordinate
 	++
 	SEP #$20 ; set 8-bit accumulator
 	PLY
@@ -804,10 +804,10 @@ Shopkeeper_DrawNextPrice:
         LDA.w .price_columns_idx, Y : STA.b Scrap02 ; get table from the table table
         PLY : PHY
         TYA : ASL #2 : TAY
-        LDA.b ($00), Y : STA.b Scrap0E ; set coordinate
+        LDA.b (Scrap00), Y : STA.b Scrap0E ; set coordinate
         TYA : LSR : TAY
-        LDA.b ($02), Y : STA.l ShopPriceColumn
-        INY : LDA.b ($02), Y : STA.l ShopPriceColumn+1
+        LDA.b (Scrap02), Y : STA.l ShopPriceColumn
+        INY : LDA.b (Scrap02), Y : STA.l ShopPriceColumn+1
         PLY
         LDA.l ShopInventory+1, X : STA.b Scrap0C ; set value
 
@@ -822,9 +822,9 @@ Shopkeeper_DrawNextPrice:
 		PHX : PHA : LDA.l ShopScratch : TAX : PLA : JSL Sprite_DrawMultiple_quantity_preset : PLX
 
 		LDA.b 1,s
-		ASL #2 : !ADD OAMPtr : STA.b OAMPtr ; increment oam pointer
+		ASL #2 : !ADD.b OAMPtr : STA.b OAMPtr ; increment oam pointer
                 PLA
-                !ADD OAMPtr+2 : STA.b OAMPtr+2
+                !ADD.b OAMPtr+2 : STA.b OAMPtr+2
         .free
         PLP : PLY : PLX
         PLB

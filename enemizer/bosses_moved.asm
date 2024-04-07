@@ -57,10 +57,10 @@ boss_move:
         JSL Dungeon_ResetSprites        ; Restore the dungeon_resetsprites
         ;Close the door if !BLIND_DOOR_FLAG == 1
         LDA.l !BLIND_DOOR_FLAG : BEQ .no_blind_door
-        INC.w $0468                     ; $0468[0x02] - Flag that is set when trap doors are down.
-        STZ.w $068E                     ; $068E[0x02] - (Dungeon) ???? related to trap doors and if they are open ; possibly bomb doors too? Update: module 0x07.0x4 probably uses this to know whether it's a key door or big key door to open.
-        STZ.w $0690                     ; $0690[0x02] - (Overworld) Generally is used as an animation step indicator, only for doors that animate when they open, such as the Santuary and Hyrule Castle doors. This variable is incremented up to a value of 3, at which point a logic check kicks in and stops animating the opening of a door.
-        INC.w $0CF3                     ; $0CF3[0x01] - free ram
+        INC.w TrapDoorFlag
+        STZ.w TileMapDoorPos
+        STZ.w DoorTimer
+        INC.w BossSpecialAction
          ; ;That must be called after the room load!
     .no_blind_door
         BRL .move_to_bottom_right

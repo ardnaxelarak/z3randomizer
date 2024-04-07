@@ -260,7 +260,7 @@ LoadPasswordStripeTemplate:
 	LDA.b #Password_StripeImageTemplate_end-Password_StripeImageTemplate>>8
 	STA.w DAS0H ; set transfer size
 
-	LDA.b #$01 : STA.w MDMAEN ; begin DMA transfer
+	LDA.b #$01 : STA.w DMAENABLE ; begin DMA transfer
 
 	PLA : STA.w DAS0H : PLA : STA.w DAS0L :	PLA : STA.w A1B0 ; restore DMA parameters
 	PLA : STA.w A1T0H : PLA : STA.w A1T0L :	PLA : STA.w BBAD0 ; restore DMA parameters

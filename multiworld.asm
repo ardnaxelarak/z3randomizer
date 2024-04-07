@@ -3,26 +3,26 @@
 macro Print_Text(hdr, hdr_len, player_id)
 PHX : PHY : PHP
 	REP #$30
-	LDX #$0000
+	LDX.w #$0000
 	-
-	CPX <hdr_len> : !BGE ++
-		LDA <hdr>, X
-		STA !MULTIWORLD_HUD_CHARACTER_DATA, X
+	CPX.w <hdr_len> : !BGE ++
+		LDA.l <hdr>, X
+		STA.l !MULTIWORLD_HUD_CHARACTER_DATA, X
 		INX #2
 		BRA -
 	++
-	LDY <hdr_len>
+	LDY.w <hdr_len>
 
-	LDA <player_id>
+	LDA.l <player_id>
 	AND.w #$00FF
 	DEC
 	CMP.w #$00FF : !BGE .textdone
 	ASL #5
 	TAX
 	-
-	CPY <hdr_len>+$20 : !BGE ++
-		LDA PlayerNames, X
-		PHX : TYX : STA !MULTIWORLD_HUD_CHARACTER_DATA, X : PLX
+	CPY.w <hdr_len>+$20 : !BGE ++
+		LDA.l PlayerNames, X
+		PHX : TYX : STA.l !MULTIWORLD_HUD_CHARACTER_DATA, X : PLX
 		INX #2 : INY #2
 		BRA -
 	++
@@ -31,15 +31,15 @@ PHX : PHY : PHP
 	-
 	CPX.w #$0040 : !BGE ++
 		LDA.w #$007F
-		STA !MULTIWORLD_HUD_CHARACTER_DATA, X
+		STA.l !MULTIWORLD_HUD_CHARACTER_DATA, X
 		INX #2
 		BRA -
 	++
 
 	SEP #$20
-	LDA.b #$01 : STA !NMI_MW+1 : STA !NMI_MW
-	LDA !MULTIWORLD_HUD_DELAY
-	STA !MULTIWORLD_HUD_TIMER
+	LDA.b #$01 : STA.l !NMI_MW+1 : STA.l !NMI_MW
+	LDA.b !MULTIWORLD_HUD_DELAY
+	STA.l !MULTIWORLD_HUD_TIMER
 .textdone
 PLP : PLY : PLX
 endmacro
@@ -67,7 +67,7 @@ WriteText:
 		LDX.b #!MULTIWORLD_HUD_CHARACTER_DATA>>16 : STX.w $4344
 		LDA.w #$0040 : STA.w $4345
 		LDA.w #$1801 : STA.w $4340
-		LDX.b #$10 : STX.w $420B
+		LDX.b #$10 : STX.w DMAENABLE
 
 		PLX : STX.w $2100 ; put screen back however it was before
 		PLX : STX.w $2117 ; restore DMA parameters
@@ -87,8 +87,8 @@ RTL
 GetMultiworldItem:
 {
 	PHP
-	LDA !MULTIWORLD_ITEM : BNE +
-	LDA !MULTIWORLD_HUD_TIMER : BNE +
+	LDA.l !MULTIWORLD_ITEM : BNE +
+	LDA.l !MULTIWORLD_HUD_TIMER : BNE +
 		BRL .return
 	+
 
@@ -99,8 +99,8 @@ GetMultiworldItem:
 		BRL .return
 	+
 
-	LDA !MULTIWORLD_HUD_TIMER : BEQ .textend
-		DEC : STA !MULTIWORLD_HUD_TIMER
+	LDA.l !MULTIWORLD_HUD_TIMER : BEQ .textend
+		DEC.b #$01 : STA.l !MULTIWORLD_HUD_TIMER
 		CMP.b #$00 : BNE .textend
 			; Clear text
 			PHP : REP #$30
@@ -108,12 +108,12 @@ GetMultiworldItem:
 			-
 			CPX.w #$0040 : !BGE ++
 				LDA.w #$007F
-				STA !MULTIWORLD_HUD_CHARACTER_DATA, X
+				STA.l !MULTIWORLD_HUD_CHARACTER_DATA, X
 				INX #2
 				BRA -
 			++
 			PLP
-			LDA.b #$01 : STA !NMI_MW+1 : STA !NMI_MW
+			LDA.b #$01 : STA.l !NMI_MW+1 : STA.l !NMI_MW
 	.textend
 
 	LDA.b LinkState
@@ -123,7 +123,7 @@ GetMultiworldItem:
 		BRL .return
 	+
 
-	LDA !MULTIWORLD_ITEM : BNE +
+	LDA.l !MULTIWORLD_ITEM : BNE +
 		BRL .return
 	+
 
@@ -173,13 +173,13 @@ GetMultiworldItem:
 	STA.w ItemReceiptID ;Set Item to receive
 	TAY
 
-	LDA.b #$01 : STA !MULTIWORLD_RECEIVING_ITEM
-	LDA.b #$00 : STA !MULTIWORLD_ITEM_PLAYER_ID
+	LDA.b #$01 : STA.l !MULTIWORLD_RECEIVING_ITEM
+	LDA.b #$00 : STA.l !MULTIWORLD_ITEM_PLAYER_ID
 
 	STZ.w ItemReceiptMethod
 	JSL Player_HaltDashAttackLong
 	JSL Link_ReceiveItem
-	LDA.b #$00 : STA !MULTIWORLD_ITEM : STA !MULTIWORLD_RECEIVING_ITEM
+	LDA.b #$00 : STA.l !MULTIWORLD_ITEM : STA.l !MULTIWORLD_RECEIVING_ITEM
 
 	%Print_Text(HUD_ReceivedFrom, #$001C, !MULTIWORLD_ITEM_FROM)
 	
@@ -193,10 +193,10 @@ Multiworld_OpenKeyedObject:
 {
 	PHP
 	SEP #$20
-	LDA ChestData_Player+2, X : STA !MULTIWORLD_ITEM_PLAYER_ID
+	LDA.l ChestData_Player+2, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
 	PLP
 
-	LDA !Dungeon_ChestData+2, X ; thing we wrote over
+	LDA.l !Dungeon_ChestData+2, X ; thing we wrote over
 RTL
 }
 
@@ -204,7 +204,7 @@ Multiworld_BottleVendor_GiveBottle:
 {
 	PHA : PHP
 	SEP #$20
-	LDA BottleMerchant_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
+	LDA.l BottleMerchant_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
 	PLP : PLA
 
 	JSL Link_ReceiveItem ; thing we wrote over
@@ -215,7 +215,7 @@ Multiworld_MiddleAgedMan_ReactToSecretKeepingResponse:
 {
 	PHA : PHP
 	SEP #$20
-	LDA PurpleChest_Item_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
+	LDA.l PurpleChest_Item_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
 	PLP : PLA
 
 	JSL Link_ReceiveItem ; thing we wrote over
@@ -226,7 +226,7 @@ Multiworld_Hobo_GrantBottle:
 {
 	PHA : PHP
 	SEP #$20
-	LDA HoboItem_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
+	LDA.l HoboItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
 	PLP : PLA
 
 	JSL Link_ReceiveItem ; thing we wrote over
@@ -237,19 +237,18 @@ Multiworld_MasterSword_GrantToPlayer:
 {
 	PHA : PHP
 	SEP #$20
-	LDA PedestalSword_Player : STA !MULTIWORLD_ITEM_PLAYER_ID
+	LDA.l PedestalSword_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
 	PLP : PLA
 
-	CPY.b #$6A : BEQ +
-		JML Link_ReceiveItem ; thing we wrote over
-	+ JML ActivateGoal
+	JSL Link_ReceiveItem ; thing we wrote over
+RTL
 }
 
 Multiworld_AddReceivedItem_notCrystal:
 {
 	TYA : STA.w CutsceneFlag : PHX ; things we wrote over
 	
-	LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
+	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
 		PHY : LDY.w ItemReceiptID : JSL AddInventory : PLY
 
 		%Print_Text(HUD_SentTo, #$0010, !MULTIWORLD_ITEM_PLAYER_ID)
@@ -263,7 +262,7 @@ Multiworld_AddReceivedItem_notCrystal:
 Multiworld_Ancilla_ReceiveItem_stillInMotion:
 {
 	CMP.b #$28 : BNE + ; thing we wrote over
-	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +
+	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE +
 		JML Ancilla_ReceiveItem_stillInMotion_moveon
 	+
 	JML Ancilla_ReceiveItem_dontGiveRupees

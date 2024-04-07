@@ -86,7 +86,7 @@ CgramAuxToMain: ; ripped this from bank02 because it ended with rts
 OverridePaletteHeader:
 	lda.l DRMode : cmp.b #$02 : bne +
 	lda.l DRFlags : and.b #$20 : bne +
-	cpx.w #$01c2 : !bge +
+	cpx.w #$01c2 : !BGE +
 		rep #$20
 		txa : lsr : tax
 		lda.l PaletteTable, x

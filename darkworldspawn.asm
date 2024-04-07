@@ -41,7 +41,7 @@ SetDeathWorldChecked:
 		LDA.w DungeonID : CMP.b #$FF : BNE .dungeon
 		LDA.b RoomIndex : ORA.b RoomIndex+1 : BNE ++
 			LDA.l GanonPyramidRespawn : BNE .pyramid ; if flag is set, force respawn at pyramid on death to ganon
-	    ++
+	++
 	.outdoors
 JMP DoWorldFix
 

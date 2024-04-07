@@ -193,7 +193,7 @@ RTL
 ;--------------------------------------------------------------------------------
 ; Fix losing VRAM gfx when using quake
 PostNMIUpdateBGCharHalf:
-	STA.w MDMAEN : SEP #$10 ; what we wrote over
+	STA.w DMAENABLE : SEP #$10 ; what we wrote over
 	LDA.w VRAMTileMapIndex : CMP.b #$46 : BNE .return ; checks to see if this is the last VRAM write
 	LDA.b LinkState : CMP.b #$08 : BCC + : CMP.b #$0A+1 : BCS + ; skip if we're mid-medallion
 		RTL
@@ -259,7 +259,7 @@ ParadoxCaveGfxFix:
     CPX.w #$1E00 : BEQ .uploadLine
 
 .uploadLine
-    LDA.b #$01 : STA.w MDMAEN
+    LDA.b #$01 : STA.w DMAENABLE
 
 .skipLine
     RTL
@@ -270,7 +270,7 @@ ParadoxCaveGfxFix:
     BRA .uploadLine
 ;--------------------------------------------------------------------------------
 SetItemRiseTimer:
-        LDA.w ItemReceiptMethod : CMP #$01 : BNE .not_from_chest
+        LDA.w ItemReceiptMethod : CMP.b #$01 : BNE .not_from_chest
                 LDA.b #$38 : STA.w AncillaTimer, X
                 RTL
         .not_from_chest

@@ -129,7 +129,7 @@ NewHUD_DrawDungeonCounters:
         LDA.w UpdateHUDFlag : BEQ NewHUD_DrawPrizeIcon
         LDA.l CompassMode : ORA.l MapHUDMode : BIT.b #$03 : BEQ NewHUD_DrawPrizeIcon
         LDX.b IndoorsFlag : BNE +
-        JMP.w NewHUD_DrawMagicMeter
+        JMP NewHUD_DrawMagicMeter
         +
         SEP #$30
         ; extra hard safeties for getting dungeon ID to prevent crashes
@@ -477,7 +477,7 @@ UpdateHearts:
 	INC
 
 .add_heart
-	STA.b ($07)
+	STA.b (Scrap07)
 
 	DEY
 	DEX
@@ -513,14 +513,14 @@ UpdateHearts:
         LDA.l HUDHeartColors_index : ASL : TAX
         LDA.l HUDHeartColors_masks_game_hud,X
         ORA.w #$20A1
-	STA.b ($09)
+	STA.b (Scrap09)
         BRA .skip_partial
 
 .more_than_half
         LDA.l HUDHeartColors_index : ASL : TAX
         LDA.l HUDHeartColors_masks_game_hud,X
         ORA.w #$20A0
-	STA.b ($09)
+	STA.b (Scrap09)
 
 .skip_partial
 	SEP #$30

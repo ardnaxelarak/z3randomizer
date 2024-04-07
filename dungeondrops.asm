@@ -103,7 +103,7 @@ SetCutsceneFlag:
         PHX
         LDY.b #$01 ; wrote over
         LDA.w DungeonID : BMI .no_cutscene
-        LDA.w RoomItemsTaken : BIT #$80 : BNE .dungeon_prize
+        LDA.w RoomItemsTaken : BIT.b #$80 : BNE .dungeon_prize
                 .no_cutscene
                 SEP #$30
                 PLX
@@ -124,7 +124,7 @@ AnimatePrizeCutscene:
         LDA.w ItemReceiptMethod : CMP.b #$03 : BNE +
                 JSR CrystalOrPendantBehavior : BCC +
                         LDA.w DungeonID : BMI +
-                        LDA.w RoomItemsTaken : BIT #$80 : BEQ +
+                        LDA.w RoomItemsTaken : BIT.b #$80 : BEQ +
                                 SEC
                                 RTL
         +
@@ -141,7 +141,7 @@ PrizeDropSparkle:
 RTL
 
 HandleDropSFX:
-        LDA.w RoomItemsTaken : BIT #$80 : BEQ .no_sound
+        LDA.w RoomItemsTaken : BIT.b #$80 : BEQ .no_sound
                 JSR CrystalOrPendantBehavior : BCC .no_sound
                         SEC
                         RTL
@@ -161,7 +161,7 @@ RTL
 MaybeKeepLootID:
         PHA
         LDA.w DungeonID : BMI .no_prize
-        LDA.w RoomItemsTaken : BIT #$80 : BNE .prize
+        LDA.w RoomItemsTaken : BIT.b #$80 : BNE .prize
                 .no_prize
                 STZ.w ItemReceiptID
                 STZ.w ItemReceiptPose

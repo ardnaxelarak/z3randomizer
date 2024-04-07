@@ -33,7 +33,7 @@ RTL
 ;================================================================================
 LoadModifiedSwordLevel: ; returns short
 	LDA.l SwordModifier : BEQ +
-		!ADD SwordEquipment ; add normal sword value to modifier
+		!ADD.l SwordEquipment ; add normal sword value to modifier
 			BNE ++ : LDA.b #$01 : RTS : ++
 			CMP.b #$05 : !BLT ++ : LDA.b #$04 : RTS : ++
 		RTS
@@ -44,18 +44,18 @@ RTS
 ; ArmorEquipment - Armor Inventory
 LoadModifiedArmorLevel:
 	PHA
-		LDA.l ArmorEquipment : !ADD ArmorModifier
+		LDA.l ArmorEquipment : !ADD.l ArmorModifier
 		CMP.b #$FF : BNE + : LDA.b #$00 : +
 		CMP.b #$03 : !BLT + : LDA.b #$02 : +
 		STA.l ScratchBufferV
 	PLA
-	!ADD ScratchBufferV
+	!ADD.w ScratchBufferV
 RTL
 ;================================================================================
 ; MagicConsumption - Magic Inventory
 LoadModifiedMagicLevel:
 	LDA.l MagicModifier : BEQ +
-		!ADD MagicConsumption ; add normal magic value to modifier
+		!ADD.l MagicConsumption ; add normal magic value to modifier
 			CMP.b #$FF : BNE ++ : LDA.b #$00 : RTL : ++
 			CMP.b #$03 : !BLT ++ : LDA.b #$02 : ++
 		RTL

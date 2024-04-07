@@ -1,11 +1,5 @@
 lorom
 
-!ADD = "CLC : ADC"
-!SUB = "SEC : SBC"
-!BLT = "BCC"
-!BGE = "BCS"
-
-
 ; Custom addresses. Most are arbitrary. Feel free to make sure they're okay or moving them elsewhere within ZP
 CreditsPtr = $7C   ; 3 bytes
 Temp = $B3         ; 2 bytes
@@ -141,11 +135,11 @@ LastHexDigit:
 	BNE +
 	; Upper half
 	PLA
-	ADC #$3D40
+	ADC.w #$3D40
 	RTS
 +	; Lower half
 	PLA
-	ADC #$3D50
+	ADC.w #$3D50
 	RTS
 
 FindLine:
@@ -153,7 +147,7 @@ FindLine:
 
 -	LDA.w CreditsStats,y
 	STZ.b StatsBottom
-	CMP #$FFFF
+	CMP.w #$FFFF
 	BEQ .noLine
 
 	XBA
@@ -516,14 +510,14 @@ LoadCreditsTiles:
         LDA.b #FileSelectNewGraphics>>16 : STA.w A1B0
         LDX.w #FileSelectNewGraphics : STX.w A1T0L
         LDX.w #$0C00 : STX.w DAS0L
-        LDA.b #$01 : STA.w MDMAEN
+        LDA.b #$01 : STA.w DMAENABLE
 
         ; Small characters A-Z
         LDX.w #$7F00 : STX.w VMADDL
         LDA.b #SmallCharacters>>16 : STA.w A1B0
         LDX.w #SmallCharacters : STX.w A1T0L
         LDX.w #$0200 : STX.w DAS0L
-        LDA.b #$01 : STA.w MDMAEN
+        LDA.b #$01 : STA.w DMAENABLE
 
         SEP #$10
 RTL
@@ -540,7 +534,7 @@ LoadOverworldCreditsTiles:
         LDX.w #SmallCharacters : STX.w A1T0L
         LDX.w #$0200 : STX.w DAS0L
         LDX.w #$7F00 : STX.w VMADDL
-        LDA.b #$01 : STA.w MDMAEN
+        LDA.b #$01 : STA.w DMAENABLE
 
         SEP #$10
 RTL

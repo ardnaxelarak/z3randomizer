@@ -58,7 +58,7 @@ SpritePrep_EyegoreNew:
     .mimic
     	SBC.b #$6C : STA.w SpriteTypeTable, X : JSL SpritePrep_LoadProperties ; pretending to be $83 or $84
     	JSL SpritePrep_Eyegore_become_mimic
-;        LDA.w SpriteTypeTable, X : ADC #$6C : STA.w SpriteTypeTable, X ; set the sprite back to special mimic
+;        LDA.w SpriteTypeTable, X : ADC.b #$6C : STA.w SpriteTypeTable, X ; set the sprite back to special mimic
         ; todo? unsure about this code - seems unnecessary
 ;        LDA.w $0CAA, X : AND.b #$FB : ORA.b #$80 : STA.w $0CAA, X ; STZ.w $0CAA, X
 RTL

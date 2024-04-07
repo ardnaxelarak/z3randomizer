@@ -36,7 +36,7 @@ BlockEraseFix:
     + rtl
 
 FixShopCode:
-    cpx.w #$0300 : !bge +
+    cpx.w #$0300 : !BGE +
         sta.l RoomDataWRAM[$00].l, x
     + rtl
 
@@ -46,8 +46,8 @@ VitreousKeyReset:
     + JML SpritePrep_LoadProperties ; what we wrote over
 
 GuruguruFix:
-    lda.b RoomIndex : cmp.b #$df : !bge +
-        and.b #$0f : cmp.b #$0e : !blt +
+    lda.b RoomIndex : cmp.b #$df : !BGE +
+        and.b #$0f : cmp.b #$0e : !BLT +
             iny #2
     + rtl
 

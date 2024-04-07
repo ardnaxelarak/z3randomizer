@@ -145,40 +145,39 @@ HeartContainerSpritePrep:
     + JML RequestStandingItemVRAMSlot
 ;--------------------------------------------------------------------------------
 LoadHeartPieceRoomValue:
-	LDA.b IndoorsFlag : BEQ .outdoors ; check if we're indoors or outdoors
-	.indoors
-	JSL LoadIndoorValue
-	JMP .done
-	.outdoors
-	JSL LoadOutdoorValue
-	.done
+    LDA.b IndoorsFlag : BEQ .outdoors ; check if we're indoors or outdoors
+    .indoors
+    JSL LoadIndoorValue
+    JMP .done
+    .outdoors
+    JSL LoadOutdoorValue
+    .done
 RTL
 ;--------------------------------------------------------------------------------
 !DynamicDropGFXSlotCount_UW = (FreeUWGraphics_end-FreeUWGraphics)>>1
 !DynamicDropGFXSlotCount_OW = (FreeOWGraphics_end-FreeOWGraphics)>>1
 HPItemReset:
-	PHA
-	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .skip
-		PLA
-		JSL GiveRupeeGift ; thing we wrote over
-		BRA .done
-	.skip
-	PLA
-	.done
-	PHA
-		JSL HeartPieceSetRedraw
-	PLA
+    PHA
+    LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .skip
+        PLA
+        JSL GiveRupeeGift ; thing we wrote over
+        BRA .done
+    .skip
+    PLA
+    .done
+    PHA
+        JSL HeartPieceSetRedraw
+    PLA
 RTL
 ;--------------------------------------------------------------------------------
 MaybeMarkDigSpotCollected:
-	PHA : PHP
-		LDA.b IndoorsFlag : BNE +
-		REP #$20 ; set 16-bit accumulator
-		LDA.b OverworldIndex
-		CMP.w #$2A : BNE +
-			LDA.l HasGroveItem : ORA.w #$0001 : STA.l HasGroveItem
-		+
-	PLP : PLA
+    PHA : PHP
+        LDA.b IndoorsFlag : BNE +
+        REP #$20 ; set 16-bit accumulator
+        LDA.b OverworldIndex : CMP.w #$002A : BNE +
+            LDA.l HasGroveItem : ORA.w #$0001 : STA.l HasGroveItem
+        +
+    PLP : PLA
 RTL
 ;--------------------------------------------------------------------------------
 HeartPieceSpawnDelayFix:
@@ -189,22 +188,22 @@ HeartPieceSpawnDelayFix:
 	+ CLC : RTL
 ;--------------------------------------------------------------------------------
 macro GetPossiblyEncryptedItem(ItemLabel,TableLabel)
-	LDA.l IsEncrypted : BNE ?encrypted
-		LDA.l <ItemLabel>
-		BRA ?done
-	?encrypted:
-	PHX : PHP
-		REP #$30 ; set 16-bit accumulator & index registers
-		LDA.b Scrap00 : PHA : LDA.b Scrap02 : PHA
+    LDA.l IsEncrypted : BNE ?encrypted
+        LDA.l <ItemLabel>
+        BRA ?done
+    ?encrypted:
+    PHX : PHP
+        REP #$30 ; set 16-bit accumulator & index registers
+        LDA.b Scrap00 : PHA : LDA.b Scrap02 : PHA
 
-		LDA.w #<TableLabel> : STA.b Scrap00
-		LDA.w #<TableLabel>>>16 : STA.b Scrap02
-		LDA.w #<ItemLabel>-<TableLabel>
-		JSL RetrieveValueFromEncryptedTable
+        LDA.w #<TableLabel> : STA.b Scrap00
+        LDA.w #<TableLabel>>>16 : STA.b Scrap02
+        LDA.w #<ItemLabel>-<TableLabel>
+        JSL RetrieveValueFromEncryptedTable
 
-		PLX : STX.b Scrap02 : PLX : STX.b Scrap01
-	PLP : PLX
-	?done:
+        PLX : STX.b Scrap02 : PLX : STX.b Scrap01
+    PLP : PLX
+    ?done:
 endmacro
 
 LoadIndoorValue:
@@ -241,10 +240,10 @@ LoadIndoorValue:
 		LDA.l StandingKey_Hera
 		JMP .done
 	+
-        PHX
-        LDX.w CurrentSpriteSlot ; If we're on a different screen ID via glitches load the sprite
-        LDA.w SprItemReceipt,X  ; we can see and are interacting with
-        PLX
+	PHX
+	LDX.w CurrentSpriteSlot ; If we're on a different screen ID via glitches load the sprite
+	LDA.w SprItemReceipt,X        ; we can see and are interacting with
+	PLX
 	.done
 	AND.w #$00FF ; the loads are words but the values are 1-byte so we need to clear the top half of the accumulator - no guarantee it was 8-bit before
 	PLP
@@ -446,10 +445,10 @@ LoadOutdoorValue:
 		%GetPossiblyEncryptedItem(HeartPiece_Zora, HeartPieceOutdoorValues)
 		JMP .done
 	+
-        PHX
-        LDX.w CurrentSpriteSlot ; If we're on a different screen ID via glitches load the sprite
-        LDA.w SprItemReceipt,X  ; we can see and are interacting with.
-        PLX
+	PHX
+	LDX.w CurrentSpriteSlot ; If we're on a different screen ID via glitches load the sprite
+	LDA.w SprItemReceipt,X  ; we can see and are interacting with.
+	PLX
 	.done
 	AND.w #$00FF ; the loads are words but the values are 1-byte so we need to clear the top half of the accumulator - no guarantee it was 8-bit before
 	PLP
@@ -561,63 +560,63 @@ HeartPieceGetPlayer:
 	REP #$20 ; set 16-bit accumulator
 	LDA.b RoomIndex ; these are all decimal because i got them that way
 	CMP.w #135 : BNE +
-		LDA StandingKey_Hera_Player
+		LDA.l StandingKey_Hera_Player
 		BRL .done
 	+ CMP.w #200 : BNE +
-		LDA HeartContainer_ArmosKnights_Player
+		LDA.l HeartContainer_ArmosKnights_Player
 		BRL .done
 	+ CMP.w #51 : BNE +
-		LDA HeartContainer_Lanmolas_Player
+		LDA.l HeartContainer_Lanmolas_Player
 		BRL .done
 	+ CMP.w #7 : BNE +
-		LDA HeartContainer_Moldorm_Player
+		LDA.l HeartContainer_Moldorm_Player
 		BRL .done
 	+ CMP.w #90 : BNE +
-		LDA HeartContainer_HelmasaurKing_Player
+		LDA.l HeartContainer_HelmasaurKing_Player
 		BRL .done
 	+ CMP.w #6 : BNE +
-		LDA HeartContainer_Arrghus_Player
+		LDA.l HeartContainer_Arrghus_Player
 		BRL .done
 	+ CMP.w #41 : BNE +
-		LDA HeartContainer_Mothula_Player
+		LDA.l HeartContainer_Mothula_Player
 		BRL .done
 	+ CMP.w #172 : BNE +
-		LDA HeartContainer_Blind_Player
+		LDA.l HeartContainer_Blind_Player
 		BRL .done
 	+ CMP.w #222 : BNE +
-		LDA HeartContainer_Kholdstare_Player
+		LDA.l HeartContainer_Kholdstare_Player
 		BRL .done
 	+ CMP.w #144 : BNE +
-		LDA HeartContainer_Vitreous_Player
+		LDA.l HeartContainer_Vitreous_Player
 		BRL .done
 	+ CMP.w #164 : BNE +
-		LDA HeartContainer_Trinexx_Player
+		LDA.l HeartContainer_Trinexx_Player
 		BRL .done
 	+ CMP.w #225 : BNE +
-		LDA HeartPiece_Forest_Thieves_Player
+		LDA.l HeartPiece_Forest_Thieves_Player
 		BRL .done
 	+ CMP.w #226 : BNE +
-		LDA HeartPiece_Lumberjack_Tree_Player
+		LDA.l HeartPiece_Lumberjack_Tree_Player
 		BRL .done
 	+ CMP.w #234 : BNE +
-		LDA HeartPiece_Spectacle_Cave_Player
+		LDA.l HeartPiece_Spectacle_Cave_Player
 		BRL .done
 	+ CMP.w #283 : BNE +
 		LDA.b LinkPosX : XBA : AND.w #$0001 ; figure out where link is
 		BNE ++
-			LDA HeartPiece_Circle_Bushes_Player
+			LDA.l HeartPiece_Circle_Bushes_Player
 			BRL .done
 		++
-			LDA HeartPiece_Graveyard_Warp_Player
+			LDA.l HeartPiece_Graveyard_Warp_Player
 			BRL .done
 	+ CMP.w #288 : BNE +
 		LDA.l OWBonkPrizeTable[$2A].mw_player
 		BRL .done
 	+ CMP.w #294 : BNE +
-		LDA HeartPiece_Mire_Warp_Player
+		LDA.l HeartPiece_Mire_Warp_Player
 		BRL .done
 	+ CMP.w #295 : BNE +
-		LDA HeartPiece_Smith_Pegs_Player
+		LDA.l HeartPiece_Smith_Pegs_Player
 		BRL .done
 	LDA.w #$0000
 	BRL .done
@@ -631,17 +630,17 @@ HeartPieceGetPlayer:
 		BRL .done
 	+ CMP.w #$03 : BNE +
 		LDA.b LinkPosX : CMP.w #1890 : !BLT ++
-			LDA HeartPiece_Spectacle_Player
+			LDA.l HeartPiece_Spectacle_Player
 			BRL .done
 		++
-			LDA EtherItem_Player
+			LDA.l EtherItem_Player
 			BRL .done
 	+ CMP.w #$05 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$01].mw_player
 			BRL .done
 		++
-			LDA HeartPiece_Mountain_Warp_Player
+			LDA.l HeartPiece_Mountain_Warp_Player
 			BRL .done
 	+ CMP.w #$0A : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
@@ -701,7 +700,7 @@ HeartPieceGetPlayer:
 		LDA.l OWBonkPrizeTable[$13].mw_player
 		BRL .done
 	+ CMP.w #$28 : BNE +
-		LDA HeartPiece_Maze_Player
+		LDA.l HeartPiece_Maze_Player
 		BRL .done
 	+ CMP.w #$2A : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
@@ -711,7 +710,7 @@ HeartPieceGetPlayer:
 			LDA.l OWBonkPrizeTable[$15].mw_player
 			BRL .done
 		++
-			LDA HauntedGroveItem_Player
+			LDA.l HauntedGroveItem_Player
 			BRL .done
 	+ CMP.w #$2B : BNE +
 		LDA.l OWBonkPrizeTable[$16].mw_player
@@ -725,10 +724,10 @@ HeartPieceGetPlayer:
 			BRL .done
 	+ CMP.w #$30 : BNE +
 		LDA.b LinkPosX : CMP.w #512 : !BGE ++
-			LDA HeartPiece_Desert_Player
+			LDA.l HeartPiece_Desert_Player
 			BRL .done
 		++
-			LDA BombosItem_Player
+			LDA.l BombosItem_Player
 			BRL .done
 	+ CMP.w #$32 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
@@ -738,20 +737,20 @@ HeartPieceGetPlayer:
 			LDA.l OWBonkPrizeTable[$1A].mw_player
 			BRL .done
 	+ CMP.w #$35 : BNE +
-		LDA HeartPiece_Lake_Player
+		LDA.l HeartPiece_Lake_Player
 		BRL .done
 	+ CMP.w #$3B : BNE +
-		LDA HeartPiece_Swamp_Player
+		LDA.l HeartPiece_Swamp_Player
 		BRL .done
 	+ CMP.w #$42 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
 			LDA.l OWBonkPrizeTable[$1B].mw_player
 			BRL .done
 		++
-			LDA HeartPiece_Cliffside_Player
+			LDA.l HeartPiece_Cliffside_Player
 			BRL .done
 	+ CMP.w #$4A : BNE +
-		LDA HeartPiece_Cliffside_Player
+		LDA.l HeartPiece_Cliffside_Player
 		BRL .done
 	+ CMP.w #$51 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
@@ -785,13 +784,13 @@ HeartPieceGetPlayer:
 			LDA.l OWBonkPrizeTable[$24].mw_player
 			BRL .done
 		++
-			LDA HeartPiece_Pyramid_Player
+			LDA.l HeartPiece_Pyramid_Player
 			BRL .done
 	+ CMP.w #$5E : BNE +
 		LDA.l OWBonkPrizeTable[$25].mw_player
 		BRL .done
 	+ CMP.w #$68 : BNE +
-		LDA HeartPiece_Digging_Player
+		LDA.l HeartPiece_Digging_Player
 		BRL .done
 	+ CMP.w #$6E : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
@@ -807,7 +806,7 @@ HeartPieceGetPlayer:
 		LDA.l OWBonkPrizeTable[$29].mw_player
 		BRL .done
 	+ CMP.w #$81 : BNE +
-		LDA HeartPiece_Zora_Player
+		LDA.l HeartPiece_Zora_Player
 		BRL .done
 	+
 	LDA.w #$0000

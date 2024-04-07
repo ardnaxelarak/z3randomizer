@@ -24,15 +24,15 @@ RTL
 NMIHookAction:
 	PHA : PHX : PHY : PHD ; thing we wrote over, push stuff
 
-	LDA !NMI_MW : BEQ ++
+	LDA.l !NMI_MW : BEQ ++
 		PHP
 		SEP #$30
 
-		LDA #$00 : STA !NMI_MW
+		LDA.b #$00 : STA.l !NMI_MW
 
 		; Multiworld text
-		LDA !NMI_MW+1 : BEQ +
-			LDA #$00 : STA !NMI_MW+1
+		LDA.l !NMI_MW+1 : BEQ +
+			LDA.b #$00 : STA.l !NMI_MW+1
 			JSL WriteText
 		+
 		PLP

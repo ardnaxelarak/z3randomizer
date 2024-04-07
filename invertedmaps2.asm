@@ -1132,7 +1132,7 @@ OverworldMapChangePointers2:
 Overworld_InvertedTRPuzzle:
 {
     REP #$30
-    LDA.l OWTileMapAlt+07 : AND #$00FF : BNE .inverted
+    LDA.l OWTileMapAlt+07 : AND.w #$00FF : BNE .inverted
         LDA.w #$0212 : LDX.w #$0720 : STA.l TileMapA,X ; what we wrote over
         JSL Overworld_MemorizeMap16Change : JSL Overworld_DrawPersistentMap16+4 ; what we wrote over
         RTL

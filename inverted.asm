@@ -228,7 +228,7 @@ MirrorBonk:
     PLB : PLP : PLX
     BRA .forceBonk
         ++
-        TXA : !ADD #$0008 : CMP.w #.tableEnd-.bonkRectanglesTable : BEQ .endLoop
+        TXA : !ADD.w #$0008 : CMP.w #.tableEnd-.bonkRectanglesTable : BEQ .endLoop
         TAX
         BRA .loop
         .endbonkRectanglesTable

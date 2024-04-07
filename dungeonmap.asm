@@ -25,7 +25,7 @@ DoDungeonMapBossIcon:
 
 	; get first byte to make sure it isn't an empty room
 	SEP #$20
-	LDA.b [$00], Y
+	LDA.b [Scrap00], Y
 	CMP.b #$FF
 	BNE ++
 
@@ -34,7 +34,7 @@ DoDungeonMapBossIcon:
 
 	; check first sprite
 ++	INY #2
-	LDA.b [$00], Y
+	LDA.b [Scrap00], Y
 	SEP #$10
 
 	; match boss id
@@ -99,13 +99,13 @@ DoDungeonMapBossIcon:
 	STA.w DAS1L
 
 	LDX.b #$02
-	STX.w MDMAEN
+	STX.w DMAENABLE
 
 	STA.w DAS1L
 	LDA.w #$A260>>1
 	STA.w VMADDL
 
-	STX.w MDMAEN
+	STX.w DMAENABLE
 
 	; done
 	SEP #$30

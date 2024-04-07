@@ -42,7 +42,7 @@ DungeonHoleEntranceTransition:
 	LDA.l BowTracking : AND.b #$40 : BEQ + ; skip if we don't have silvers
 	LDA.l BowEquipment : BEQ + ; skip if we have no bow
 	CMP.b #$03 : !BGE + ; skip if the bow is already silver
-		!ADD #$02 : STA.l BowEquipment ; increase bow to silver
+		!ADD.b #$02 : STA.l BowEquipment ; increase bow to silver
 	+
 	
 	BRA StatTransitionCounter
@@ -339,19 +339,19 @@ StatsFinalPrep:
 		LDA.l ScreenTransitions : DEC : STA.l ScreenTransitions ; remove extra transition from exiting gtower via duck
 		
 		.ramPostOnly
-		LDA.l SwordBossKills : LSR #4 : !ADD SwordBossKills : STA.l BossKills
-		LDA.l SwordBossKills+1 : LSR #4 : !ADD SwordBossKills+1 : !ADD BossKills : AND.b #$0F : STA.l BossKills
+		LDA.l SwordBossKills : LSR #4 : !ADD.l SwordBossKills : STA.l BossKills
+		LDA.l SwordBossKills+1 : LSR #4 : !ADD.l SwordBossKills+1 : !ADD.l BossKills : AND.b #$0F : STA.l BossKills
 	
-		LDA.l NMIFrames : !SUB LoopFrames : STA.l LagTime
-		LDA.l NMIFrames+1 : SBC LoopFrames+1 : STA.l LagTime+1
-		LDA.l NMIFrames+2 : SBC LoopFrames+2 : STA.l LagTime+2
-		LDA.l NMIFrames+3 : SBC LoopFrames+3 : STA.l LagTime+3
+		LDA.l NMIFrames : !SUB.l LoopFrames : STA.l LagTime
+		LDA.l NMIFrames+1 : SBC.l LoopFrames+1 : STA.l LagTime+1
+		LDA.l NMIFrames+2 : SBC.l LoopFrames+2 : STA.l LagTime+2
+		LDA.l NMIFrames+3 : SBC.l LoopFrames+3 : STA.l LagTime+3
 
-		LDA.l RupeesSpent : !ADD DisplayRupees : STA.l RupeesCollected
-		LDA.l RupeesSpent+1 : ADC DisplayRupees+1 : STA.l RupeesCollected+1
+		LDA.l RupeesSpent : !ADD.l DisplayRupees : STA.l RupeesCollected
+		LDA.l RupeesSpent+1 : ADC.l DisplayRupees+1 : STA.l RupeesCollected+1
 
                 REP #$20
-		LDA.l TotalItemCounter : !SUB ChestsOpened : STA.l NonChestCounter
+		LDA.l TotalItemCounter : !SUB.l ChestsOpened : STA.l NonChestCounter
 
 		.done
 	PLP : PLX : PLA

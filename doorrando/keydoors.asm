@@ -23,11 +23,11 @@ CheckIfDoorsOpen: {
     .nextDoor
     lda.b RoomIndex : asl : tax
     lda.w KeyDoorOffset, x : beq .skipDoor
-    asl : sty.b Scrap05 : !add.b Scrap05 : tax
+    asl : sty.b Scrap05 : !ADD.b Scrap05 : tax
     lda.w PairedDoorTable, x : beq .skipDoor
     sta.b Scrap02 : and.w #$00ff : asl a : tax
     lda.b Scrap02 : and.w #$ff00 : sta.b Scrap03
-    lda RoomDataWRAM.l, X : and.w #$f000 : and.b Scrap03 : beq .skipDoor
+    lda.l RoomDataWRAM.l, X : and.w #$f000 : and.b Scrap03 : beq .skipDoor
     tyx : lda.w $068c : ora.l DungeonMask,x  : sta.w $068c
     .skipDoor
     iny #2 : cpy.b Scrap00 : bne .nextDoor

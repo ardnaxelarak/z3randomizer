@@ -476,7 +476,7 @@ JSL Overworld_InvertedTRPuzzle
 BRA + : NOP #12 : +
 
 org $84E7B9 ; <- bank0E.asm : 4237 (LDX $04C8)
-JMP.w TurtleRockTrollPegs
+JMP TurtleRockTrollPegs
 TurtleRockPegCheck:
 
 org $84E7C9
@@ -495,11 +495,11 @@ JSL GetRandomInt
 LDA.l PegProbability : BEQ .vanilla : CMP.l $7E0FA1
 REP #$20 : !BGE .succeed
 .fail
-JMP.w TurtleRockPegFail
+JMP TurtleRockPegFail
 .succeed
-JMP.w TurtleRockPegSuccess
+JMP TurtleRockPegSuccess
 .vanilla
-REP #$20 : JMP.w TurtleRockPegCheck
+REP #$20 : JMP TurtleRockPegCheck
 ;--------------------------------------------------------------------------------
 org $9BBD05 ; <- bank1B.asm : 261 (TYA : STA $00) ; hook starts at the STA
 JML PreventEnterOnBonk : NOP
@@ -831,8 +831,6 @@ db $B1, $C6, $F9, $C9, $C6, $F9 ; data insert - 2 chests, fat fairy room
 org $81E97E
 dw $0116 : db $08
 dw $0116 : db $25
-
-;--------------------------------------------------------------------------------
 ;--------------------------------------------------------------------------------
 org $9EE16E ; <- F616E - sprite_bomb_shop_entity.asm : 73
 NOP #8 ; fix bomb shop dialog for dwarfless big bomb
@@ -1130,7 +1128,7 @@ JSL ItemCheck_Library
 org $8DDF38 ; <- 6DF38 - equipment.asm : 480
 JSL ProcessMenuButtons
 BCC _equipment_497
-JMP.w _equipment_544
+JMP _equipment_544
 ResetEquipment:
 JSR RestoreNormalMenu ; (short)
 RTL
@@ -1222,30 +1220,17 @@ JSL DrawMushroom
 org $85EE97 ; <- 2EE97 - sprite_mushroom.asm : 81
 NOP #14
 ;--------------------------------------------------------------------------------
-org $86C09C ; <- - bank06.asm : 1885 (JSL SpritePrep_PotionShopLong)
+org $86C09C ; <- - bank06.asm : 1885 (JSL SpritePrep_MagicShopAssistant)
 JSL SpritePrep_ShopKeeper_PotionShop
-
-org $85F521
-SpritePrep_PotionShopLong:
-
-org $85F539
-SpawnMagicPowder:
 ;--------------------------------------------------------------------------------
 org $85F568 ; <- 2F568 - sprite_potion_shop.asm
 LDA.b #$B0 : STA.w SpritePosYLow, Y : LDA.b #$90 : STA.w SpritePosXLow, Y ; manually set position of powder item
 LDA.b #$21 : STA.w SpritePosYHigh, Y : LDA.b #$12 : STA.w SpritePosXHigh, Y
-JMP $F61D
+JMP MagicShopAssistant_SpawnObject
 ;--------------------------------------------------------------------------------
 org $85F633 ; <- 2F633 - sprite_potion_shop.asm
 JSL Sprite_ShopKeeperPotion : RTS : NOP ;; TODO: i don't remember prices being set on top of the player
 PotionShopkeeperJumpTable:
-
-org $85F893 ; <- witch behavior here
-Sprite_WitchAssistant:
-
-org $85F644 ; <- powder behavior here
-Sprite_MagicPowderItem:
-
 ;--------------------------------------------------------------------------------
 org $85EB1D ; <- 2EB1D - sprite_bottle_vendor.asm : 158
 JSL Multiworld_BottleVendor_GiveBottle
@@ -1955,7 +1940,7 @@ org $8690BD ; <- 310BD - SpritePrep_FluteBoy : 2202
 JSL ItemCheck_TreeKid2
 
 org $86AF9B ; <- 32F9B - FluteBoy_Chillin : 73 : LDA $7EF34C : CMP.b #$02 : BCS .player_has_flute
-LDA HasGroveItem : AND.b #$01
+LDA.l HasGroveItem : AND.b #$01
 db $D0 ; BNE
 
 org $86B062 ; <- 33062 - FluteAardvark_InitialStateFromFluteState : 225 : LDA $7EF34C : AND.b #$03 : !BGE #$05
@@ -2349,7 +2334,7 @@ Overworld_Entrance_BRANCH_RHO: ; branch here to continue into door
 ;================================================================================
 ; Paradox Cave Shopkeeper Fixes
 ;--------------------------------------------------------------------------------
-org $808C19 ; Bank00.asm 1633 (LDA.b #$01 : STA MDMAEN)
+org $808C19 ; Bank00.asm 1633 (LDA.b #$01 : STA DMAENABLE)
 JSL ParadoxCaveGfxFix : NOP
 ;================================================================================
 
@@ -2384,7 +2369,7 @@ JSL LoadActualGearPalettesWithGloves : RTL
 ;--------------------------------------------------------------------------------
 ; Bunny Palette/Overworld Map Bugfix
 ;--------------------------------------------------------------------------------
-org $82FDF0 ; <- 017df0 - bank0E (LDA [$00] : STA $7EC300, X : STA $7EC500, X)
+org $82FDF0 ; <- 017df0 - bank0E (LDA [Scrap00] : STA $7EC300, X : STA $7EC500, X)
 JSL LoadGearPalette_safe_for_bunny : RTS
 ;================================================================================
 
@@ -2412,15 +2397,15 @@ JSL NewElderCode
 ; Add him to Castle Map post-rain, and post aga1
 ;--------------------------------------------------------------------------------
 org $89D0A9
-db $18, $0A, $D8, $18, $0F, $43, $FF;remove heart from tree adjancent map [LW1]
-db $12, $19, $16 ;add sahasrala in castle Y, X, Sprite ID
+db $18, $0A, $D8, $18, $0F, $43, $FF ; remove heart from tree adjancent map [LW1]
+db $12, $19, $16 ; add sahasrala in castle Y, X, Sprite ID
 org $89C937
-db $B0, $D0 ;change [LW1] map 01C pointers
+db $B0, $D0 ; change [LW1] map 01C pointers
 org $89D421
-db $18, $0F, $45, $FF;remove heart from tree adjancent map [LW2]
-db $12, $19, $16 ;add sahasrala in castle Y, X, Sprite ID
+db $18, $0F, $45, $FF ; remove heart from tree adjancent map [LW2]
+db $12, $19, $16 ; add sahasrala in castle Y, X, Sprite ID
 org $89CA57
-db $25, $D4 ;change [LW2] map 01C pointers
+db $25, $D4 ; change [LW2] map 01C pointers
 ;--------------------------------------------------------------------------------
 ; Expanded trinexx sheet gfx.
 ;--------------------------------------------------------------------------------
@@ -2539,13 +2524,13 @@ org $8EE828 : JSL PreparePointer : LDA.b [CreditsPtr],Y : NOP
 org $8EE83F : LDA.b [CreditsPtr],Y : NOP
 org $8EE853
 LDA.b [CreditsPtr],Y : NOP : AND.w #$00FF : ASL A : JSL CheckFontTable
-org $8EE86D : JSL RenderCreditsStatCounter : JMP.w AfterDeathCounterOutput
+org $8EE86D : JSL RenderCreditsStatCounter : JMP AfterDeathCounterOutput
 org $82857D : JSL LoadOverworldCreditsTiles
 ;================================================================================
 ; Fast credits
 org $8EC2B1 : JSL FlagFastCredits
 org $82A096 : JSL DumbFlagForMSU
-org $8EC3AF : JSL FastCreditsScrollOW : JMP.w Credits_ScrollScene_Overworld_no_scroll
+org $8EC3AF : JSL FastCreditsScrollOW : JMP Credits_ScrollScene_Overworld_no_scroll
 org $8EC41F : JSL FastCreditsCutsceneUnderworldY
 org $8EC42C : JSL FastCreditsCutsceneUnderworldX
 org $8EC488 : JSL FastCreditsCutsceneTimer

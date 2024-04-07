@@ -10,10 +10,10 @@ NMIHookActionEnemizer:
     
     LDA.l !SHELL_DMA_FLAG : BEQ .return ; check our draw flag
     AND.b #$01 : BNE .loadKholdstare
-    LDA.l !SHELL_DMA_FLAG : AND #$02 : BNE .loadTrinexx
+    LDA.l !SHELL_DMA_FLAG : AND.b #$02 : BNE .loadTrinexx
     BRA .return ; just in case
-    ;BIT #$01 : BEQ .loadKholdstare
-    ;BIT #$02 : BEQ .loadTrinexx
+    ;BIT.b #$01 : BEQ .loadKholdstare
+    ;BIT.b #$02 : BEQ .loadTrinexx
 
 .loadKholdstare
     JSL DMAKholdstare

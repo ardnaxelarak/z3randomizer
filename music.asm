@@ -48,10 +48,8 @@ Overworld_FinishMirrorWarp:
     LDA.w #$0000 : STA.l FadeTimer : STA.l FadeDirection
 
     SEP #$20
-
     JSL ReloadPreviouslyLoadedSheets
-
-    LDA.b #$80 : STA.b HDMAENQ
+    LDA.b #$80 : STA.b HDMAENABLEQ
 
     JSL Overworld_DetermineAmbientSFX
     JSL Overworld_DetermineMusic
@@ -73,7 +71,7 @@ Overworld_FinishMirrorWarp:
 BirdTravel_LoadTargetAreaMusic:
     JSL Overworld_DetermineAmbientSFX
     JSL Overworld_DetermineMusic
-    STZ $04C8 ; Clear peg puzzle count
+    STZ.w $04C8 ; Clear peg puzzle count
     RTL
 ;--------------------------------------------------------------------------------
 
@@ -189,7 +187,7 @@ Overworld_MosaicDarkWorldChecks:
 ;
 ; On entry, A=16bit XY=8bit, A & X safe to mod, Y unknown
 Underworld_DoorDown_Entry:
-    LDX #$FF ; some junk value to be used later to determine if the below lines will change the track
+    LDX.b #$FF ; some junk value to be used later to determine if the below lines will change the track
     LDA.l ProgressIndicator : AND.w #$00FF : CMP.w #2 : !BLT .vanilla
     LDA.l DRMode : BNE .done
 
@@ -202,11 +200,11 @@ Underworld_DoorDown_Entry:
 .done
     LDA.b RoomIndex : RTL
 ;--------------------------------------------------------------------------------
-; This is for changing to/from ToH dungeon/boss music
-;
-; A=16bit XY=8bit
+
+;--------------------------------------------------------------------------------
+; Check if the boss in ToH has been defeated (16-bit accumulator)
 CheckHeraBossDefeated:
-LDA RoomDataWRAM[$07].high : AND.w #$00FF : BEQ +
+LDA.l RoomDataWRAM[$07].high : AND.w #$00FF : BEQ +
     SEC : RTL
 + CLC : RTL
 

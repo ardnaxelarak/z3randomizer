@@ -87,7 +87,7 @@ AllowStartFromSingleEntranceCave:
 		+
 		DEC
 		STA.b Scrap00
-		ASL #2 : !ADD Scrap00 : ASL #2 ; mult by 20
+		ASL #2 : !ADD.l Scrap00 : ASL #2 ; mult by 20
 		TAX
 
 		LDA.w #$0016 : STA.l EN_MAINDESQ ; Cache the main screen designation

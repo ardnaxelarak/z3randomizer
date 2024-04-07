@@ -31,18 +31,18 @@ lda.b Scrap00 : bra .loop
 .done rts
 
 MultiBy3:
-sta.b Scrap00 : asl : !add.b Scrap00
+sta.b Scrap00 : asl : !ADD.b Scrap00
 rts
 
 MultiBy5:
-sta.b Scrap00 : asl #2 : !add.b Scrap00
+sta.b Scrap00 : asl #2 : !ADD.b Scrap00
 rts
 
 ;width of divison in x: rounds toward X/2
 DivideBy2:
 sta.b Scrap00
 lsr : bcc .done
-sta.b Scrap02 : txa : lsr : cmp.b Scrap00 : !blt +
+sta.b Scrap02 : txa : lsr : cmp.b Scrap00 : !BLT +
     lda.b Scrap02 : inc : bra .done
 + lda.b Scrap02
 .done rts
@@ -51,8 +51,8 @@ DivideBy3:
 sta.b Scrap00
 ldx.w #$0000
 lda.w #$0002
-.loop cmp.b Scrap00 : !bge .store
-    inx : !add.w #$0003 : bra .loop
+.loop cmp.b Scrap00 : !BGE .store
+    inx : !ADD.w #$0003 : bra .loop
 .store txa
 rts
 
@@ -60,7 +60,7 @@ DivideBy5:
 sta.b Scrap00
 ldx.w #$0000
 lda.w #$0003
-.loop cmp.b Scrap00 : !bge .store
-    inx : !add.w #$0005 : bra .loop
+.loop cmp.b Scrap00 : !BGE .store
+    inx : !ADD.w #$0005 : bra .loop
 .store txa
 rts

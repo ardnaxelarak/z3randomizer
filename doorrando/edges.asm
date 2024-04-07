@@ -5,8 +5,8 @@ HorzEdge:
     cpy.b #$ff : beq +
         jsr DetectWestEdge : ldy.b #$02 : bra ++
     + jsr DetectEastEdge
-    ++ cmp #$ff : beq +
-        sta.b Scrap00 : asl : !add.b Scrap00 : tax
+    ++ cmp.b #$ff : beq +
+        sta.b Scrap00 : asl : !ADD.b Scrap00 : tax
         cpy.b #$ff : beq ++
             jsr LoadWestData : bra .main
         ++ jsr LoadEastData
@@ -20,7 +20,7 @@ VertEdge:
         jsr DetectNorthEdge : bra ++
     + jsr DetectSouthEdge
     ++ cmp.b #$ff : beq +
-        sta.b Scrap00 : asl : !add.b Scrap00 : tax
+        sta.b Scrap00 : asl : !ADD.b Scrap00 : tax
         cpy.b #$ff : beq ++
             jsr LoadNorthData : bra .main
         ++ jsr LoadSouthData
@@ -32,8 +32,8 @@ VertEdge:
 LoadEdgeRoomHorz:
     lda.b Scrap03 : sta.b RoomIndex
     sty.b Scrap06
-    and.b #$0f : asl a : !sub.b LinkPosX+1 : !add.b Scrap06 : sta.b Scrap02
-    ldy #$00 : jsr ShiftVariablesMainDir
+    and.b #$0f : asl a : !SUB.b LinkPosX+1 : !ADD.b Scrap06 : sta.b Scrap02
+    ldy.b #$00 : jsr ShiftVariablesMainDir
 
     lda.b Scrap04 : and.b #$80 : bne .edge
     lda.b Scrap04 : sta.b Scrap01 ; load up flags in $01
@@ -54,7 +54,7 @@ LoadEdgeRoomHorz:
 LoadEdgeRoomVert:
     lda.b Scrap03 : sta.b RoomIndex
     sty.b Scrap06
-    and.b #$f0 : lsr #3 : !sub.b LinkPosY+1 : !add.b Scrap06 : sta.b Scrap02
+    and.b #$f0 : lsr #3 : !SUB.b LinkPosY+1 : !ADD.b Scrap06 : sta.b Scrap02
 
     lda.b Scrap04 : and.b #$80 : bne .edge
     lda.b Scrap04 : sta.b Scrap01 ; load up flags in $01
@@ -99,7 +99,7 @@ MathStart:
     rts
 
 MathMid:
-    and.w #$01ff : !sub.b Scrap00 : and.w #$00ff : sta.b Scrap00
+    and.w #$01ff : !SUB.b Scrap00 : and.w #$00ff : sta.b Scrap00
     ; nothing should be bigger than $a0 at this point
 
     lda.b Scrap05 : and.w #$00f0 : lsr #4 : tax
@@ -118,7 +118,7 @@ MathMid:
 MathEnd:
      beq +
         lda.w #$0100
-    + !add.b Scrap02 : !add.b Scrap00
+    + !ADD.b Scrap02 : !ADD.b Scrap00
     sta.b Scrap04
     sep #$30
     rts
@@ -137,7 +137,7 @@ LoadNorthData:
     rts
 
 LoadSouthMidpoint:
-    and.b #$0f : sta.b Scrap00 : asl : !add.b Scrap00 : tax
+    and.b #$0f : sta.b Scrap00 : asl : !ADD.b Scrap00 : tax
     lda.w SouthEdgeInfo, x : sta.b Scrap0A ; needed now, and for nrml transition
     rts
 
@@ -153,7 +153,7 @@ LoadSouthData:
     rts
 
 LoadNorthMidpoint:
-    and.b #$0f : sta.b Scrap00 : asl : !add.b Scrap00 : tax
+    and.b #$0f : sta.b Scrap00 : asl : !ADD.b Scrap00 : tax
     lda.w NorthEdgeInfo, x : sta.b Scrap0A ; needed now, and for nrml transition
     rts
 
@@ -169,7 +169,7 @@ LoadWestData:
     rts
 
 LoadEastMidpoint:
-    and.b #$0f : sta.b Scrap00 : asl : !add.b Scrap00 : tax
+    and.b #$0f : sta.b Scrap00 : asl : !ADD.b Scrap00 : tax
     lda.w EastEdgeInfo, x : sta.b Scrap0A ; needed now, and for nrml transition
     rts
 
@@ -185,7 +185,7 @@ LoadEastData:
 
 
 LoadWestMidpoint:
-    and.b #$0f : sta.b Scrap00 : asl : !add.b Scrap00 : tax
+    and.b #$0f : sta.b Scrap00 : asl : !ADD.b Scrap00 : tax
     lda.w WestEdgeInfo, x : sta.b Scrap0A ; needed now, and for nrml transition
     rts
 
@@ -289,7 +289,7 @@ DetectEastEdge:
            ldx.b #$04 : bra .end
         ++ ldx.b #$03 : bra .end
     + cmp.b #$84 : bne +
-        ldx #$05 : bra .end
+        ldx.b #$05 : bra .end
     + cmp.b #$cb : bne +
         lda.b LinkQuadrantV : beq ++
             ldx.b #$06 : bra .end

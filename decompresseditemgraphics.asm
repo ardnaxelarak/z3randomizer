@@ -142,13 +142,13 @@ TransferItemToVRAM:
 	STA.w $2116
 
 	LDX.b #$01
-	STX.w $420B
+	STX.w DMAENABLE
 
 	ADC.w #$0100
 	STA.w $2116
 
 	INX
-	STX.w $420B
+	STX.w DMAENABLE
 
 	STZ.w ItemGFXPtr
 	STZ.w ItemGFXTarget

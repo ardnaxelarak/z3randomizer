@@ -21,7 +21,7 @@ macro LoadDialogAddress(address)
 	PHB : PHK : PLB
 		SEP #$20 ; set 8-bit accumulator
 		REP #$10 ; set 16-bit index registers
-		PEI.b ($00)
+		PEI.b (Scrap00)
 		LDA.b Scrap02 : PHA
 			STZ.w TextID : STZ.w TextID+1 ; reset decompression buffer
 			LDA.b #$01 : STA.l AltTextFlag ; set flag
@@ -44,7 +44,7 @@ endmacro
 macro CopyDialogIndirect()
 	REP #$20 : LDA.l DialogOffsetPointer : TAX : LDY.w #$0000 : SEP #$20 ; copy 2-byte offset pointer to X and set Y to 0
 	?loop:
-		LDA.b [$00], Y ; load the next character from the pointer
+		LDA.b [Scrap00], Y ; load the next character from the pointer
 		STA.l DialogBuffer, X ; write to the buffer
 		INX : INY
 	CMP.b #$7F : BNE ?loop
@@ -149,7 +149,7 @@ FreeDungeonItemNotice:
                         .self_notice
                         SEP #$20
 		        %CopyDialog(Notice_Self)
-                        JMP.w .done
+                        JMP .done
         +
         SEP #$20
 	LDA.w ScratchBufferNV+1
@@ -251,7 +251,7 @@ DialogFairyThrow:
         ORA.l BottleContentsTwo : ORA.l BottleContentsThree : ORA.l BottleContentsFour : BNE .normal
 	
 	.noInventory
-	LDA.w SpriteActivity, X : !ADD #$08 : STA.w SpriteActivity, X
+	LDA.w SpriteActivity, X : !ADD.b #$08 : STA.w SpriteActivity, X
 	LDA.b #$51
 	LDY.b #$01
 RTL

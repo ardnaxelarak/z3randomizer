@@ -23,12 +23,12 @@ macro fs_draw16x8(screenrow,screencol)
 endmacro
 macro fs_draw8x16(screenrow,screencol)
 	%fs_draw8x8(<screenrow>,<screencol>)
-	!ADD #$0010
+	!ADD.w #$0010
 	%fs_draw8x8(<screenrow>+1,<screencol>)
 endmacro
 macro fs_draw16x16(screenrow,screencol)
 	%fs_draw16x8(<screenrow>,<screencol>)
-	!ADD #$000F
+	!ADD.w #$000F
 	%fs_draw16x8(<screenrow>+1,<screencol>)
 endmacro
 
@@ -771,7 +771,7 @@ LoadFullItemTiles:
         LDA.b #FileSelectNewGraphics>>16 : STA.w A1B0
         LDX.w #FileSelectNewGraphics : STX.w A1T0L
         LDX.w #$0C00 : STX.w DAS0L
-        LDA.b #$01 : STA.w MDMAEN
+        LDA.b #$01 : STA.w DMAENABLE
 RTL
 ;--------------------------------------------------------------------------------
 ; z colon @
@@ -788,7 +788,7 @@ LoadLowerCaseLettersSymbols:
         LDX.w #NewFont+$400 : STX.w A1T0L
         LDX.w #$0400 : STX.w DAS0L
         LDX.w #$2D00 : STX.w VMADDL
-        LDA.b #$01 : STA.w MDMAEN
+        LDA.b #$01 : STA.w DMAENABLE
 
         ; : @ #
         LDA.b #NewFont>>16 : STA.w A1B0
@@ -798,9 +798,9 @@ LoadLowerCaseLettersSymbols:
         LDX.w #$0030 : STX.w DAS0L : STX.w DAS1L
 
         LDX.w #$2E50 : STX.w VMADDL
-        LDA.b #$01 : STA.w MDMAEN
+        LDA.b #$01 : STA.w DMAENABLE
         LDX.w #$2ED0 : STX.w VMADDL
-        LDA.b #$02 : STA.w MDMAEN
+        LDA.b #$02 : STA.w DMAENABLE
 RTL
 ;--------------------------------------------------------------------------------
 LoadFileSelectVanillaItems:
@@ -814,7 +814,7 @@ LoadFileSelectVanillaItems:
         LDX.w #DecompBuffer2 : STX.w A1T0L
         LDX.w #$0600 : STX.w DAS0L
         LDX.w #$2F00 : STX.w VMADDL
-        LDA.b #$01 : STA.w MDMAEN
+        LDA.b #$01 : STA.w DMAENABLE
 
         SEP #$10
 RTL

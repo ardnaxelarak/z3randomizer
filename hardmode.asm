@@ -100,7 +100,7 @@ SearchAncilla:
 	LDX.b #$00
 	.loop
 	LDA.w AncillaID, X 
-	INX : CPX #$0A : BEQ .notFound
+	INX : CPX.b #$0A : BEQ .notFound
 	CMP.b Scrap05 : BNE .loop
 		LDA.b #$01
 		BRA .return

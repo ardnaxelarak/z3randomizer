@@ -12,7 +12,7 @@ AdjustTransition:
 	    .add jsr AdjustCamAdd : ply : bra .reset
 	+ lda.b $ab : and.w #$0200 : xba : tax
 	lda.l OffsetTable,x : jsr AdjustCamAdd
-	lda.b $ab : !sub.w #$0008 : sta.b $ab
+	lda.b $ab : !SUB.w #$0008 : sta.b $ab
 	ply : bra .done
 	.reset ; clear the $ab variable so to not disturb intra-tile doors
 	stz.b $ab
@@ -22,11 +22,11 @@ AdjustTransition:
 }
 
 AdjustCamAdd:
-    !add.w $00E2,y : pha
-    and.w #$01ff : cmp.w #$0111 : !blt +
-        cmp.w #$01f8 : !bge ++
+    !ADD.w $00E2,y : pha
+    and.w #$01ff : cmp.w #$0111 : !BLT +
+        cmp.w #$01f8 : !BGE ++
             pla : and.w #$ff10 : pha : bra +
-        ++ pla : and.w #$ff00 : !add.w #$0100 : pha
+        ++ pla : and.w #$ff00 : !ADD.w #$0100 : pha
     + pla : sta.w $00E2,y : sta.w $00E0,y : rts
 
 ; expects target quad in $05 (either 0 or 1) and target pixel in $04, target room should be in $a0
@@ -45,22 +45,22 @@ ScrollY: ;change the Y offset variables
     rep #$30
     lda.b Scrap00 : pha
 
-    lda.b BG2V : and #$01ff : sta.b Scrap02
+    lda.b BG2V : and.w #$01ff : sta.b Scrap02
     lda.b Scrap04 : jsr LimitYCamera : sta.b Scrap00
     jsr CheckRoomLayoutY : bcc +
-        lda.b Scrap00 : cmp.w #$0080 : !bge ++
-            cmp.w #$0010 : !blt .cmpSrll
+        lda.b Scrap00 : cmp.w #$0080 : !BGE ++
+            cmp.w #$0010 : !BLT .cmpSrll
                 lda.w #$0010 : bra .cmpSrll
-        ++ cmp.w #$0100 : !bge .cmpSrll
+        ++ cmp.w #$0100 : !BGE .cmpSrll
             lda.w #$0100
     .cmpSrll sta.b Scrap00
 
     ; figures out scroll amt
     + lda.b Scrap00 : cmp.b Scrap02 : bne +
         lda.w #$0000 : bra .next
-    + !blt +
-        !sub.b Scrap02 : inc.b Scrap0E : bra .next
-    + lda.b Scrap02 : !sub.b Scrap00
+    + !BLT +
+        !SUB.b Scrap02 : inc.b Scrap0E : bra .next
+    + lda.b Scrap02 : !SUB.b Scrap00
 
     .next
     sta.b $ab
@@ -76,11 +76,11 @@ ScrollY: ;change the Y offset variables
     rts
 
 LimitYCamera:
-    cmp.w #$006c : !bge +
+    cmp.w #$006c : !BGE +
         lda.w #$0000 : bra .end
-    + cmp.w #$017d : !blt +
+    + cmp.w #$017d : !BLT +
         lda.w #$0110 : bra .end
-    + !sub.w #$006c
+    + !SUB.w #$006c
     .end rts
 
 CheckRoomLayoutY:
@@ -88,7 +88,7 @@ CheckRoomLayoutY:
     cmp.b #$00 : beq .lock
     cmp.b #$07 : beq .free
     cmp.b #$01 : beq .free
-    cmp.b #$04 : !bge .lock
+    cmp.b #$04 : !BGE .lock
     cmp.b #$02 : bne +
         lda.b Scrap06 : cmp.b #$ff : beq .lock
     + cmp.b #$03 : bne .free
@@ -100,26 +100,26 @@ AdjustCameraBoundsY:
     jsr CheckRoomLayoutY : bcc .free
 
     ; layouts that are camera locked (quads only)
-    lda.b Scrap04 : and.w #$00ff : cmp.w #$007d : !blt +
+    lda.b Scrap04 : and.w #$00ff : cmp.w #$007d : !BLT +
         lda.w #$0088 : bra ++
-    + cmp.w #$006d : !bge +
+    + cmp.w #$006d : !BGE +
         lda.w #$0078 : bra ++
-    + !add.w #$000b
+    + !ADD.w #$000b
 
     ; I think we no longer need the $02 variable
-    ++ sta.b Scrap02 : lda.b Scrap04 : and.w #$0100 : !add.b Scrap02 : bra .setBounds
+    ++ sta.b Scrap02 : lda.b Scrap04 : and.w #$0100 : !ADD.b Scrap02 : bra .setBounds
 
     ; layouts where the camera is free
-    .free lda.b Scrap04 : cmp.w #$006c : !bge +
+    .free lda.b Scrap04 : cmp.w #$006c : !BGE +
         lda.w #$0077 : bra .setBounds
-    + cmp.w #$017c : !blt +
+    + cmp.w #$017c : !BLT +
         lda.w #$0187 : bra .setBounds
-    + !add.w #$000b
+    + !ADD.w #$000b
     .setBounds sta.w $0618 : inc #2 : sta.w $061a
     rts
 
 LoadRoomLayout:
-    lda.b RoomIndex : asl : !add.b RoomIndex : tax
+    lda.b RoomIndex : asl : !ADD.b RoomIndex : tax
     lda.l RoomData_ObjectDataPointers+1, x : sta.b $b8
     lda.l RoomData_ObjectDataPointers, x : sta.b $b7
     sep #$30
@@ -144,7 +144,7 @@ ScrollX: ;change the X offset variables
     lda.b BG2H : and.w #$01ff : sta.b Scrap02
     lda.b Scrap04 : jsr LimitXCamera : sta.b Scrap00
     jsr CheckRoomLayoutX : bcc +
-        lda.b Scrap00 : cmp.w #$0080 : !bge ++
+        lda.b Scrap00 : cmp.w #$0080 : !BGE ++
             lda.w #$0000 : bra .cmpSrll
         ++ lda.w #$0100
     .cmpSrll sta.b Scrap00
@@ -152,18 +152,18 @@ ScrollX: ;change the X offset variables
     ;figures out scroll amt
     + lda.b Scrap00 : cmp.b Scrap02 : bne +
         lda.w #$0000 : bra .next
-    + !blt +
-        !sub.b Scrap02 : inc.b Scrap0E : bra .next
-    + lda.b Scrap02 : !sub.b Scrap00
+    + !BLT +
+        !SUB.b Scrap02 : inc.b Scrap0E : bra .next
+    + lda.b Scrap02 : !SUB.b Scrap00
 
     .next
     sta.b $ab : lda.b Scrap04
 
-    cmp.w #$0078 : !bge +
+    cmp.w #$0078 : !BGE +
         lda.w #$007f : bra ++
-    + cmp.w #$0178 : !blt +
+    + cmp.w #$0178 : !BLT +
         lda.w #$017f : bra ++
-    + !add.w #$0007
+    + !ADD.w #$0007
     ++ sta.w $061c : inc #2 : sta.w $061e
 
     pla : sta.b Scrap00
@@ -181,19 +181,19 @@ ScrollX: ;change the X offset variables
     rts
 
 LimitXCamera:
-    cmp.w #$0079 : !bge +
+    cmp.w #$0079 : !BGE +
         lda.w #$0000 : bra .end
-    + cmp.w #$0178 : !blt +
+    + cmp.w #$0178 : !BLT +
         lda.w #$0178
-    + !sub.w #$0078
+    + !SUB.w #$0078
     .end rts
 
 CheckRoomLayoutX:
     jsr LoadRoomLayout ;switches to 8-bit
-    cmp.b #$04 : !blt .lock
+    cmp.b #$04 : !BLT .lock
     cmp.b #$05 : bne +
         lda.b Scrap06 : cmp.b #$ff : beq .lock
-    + cmp #$06 : bne .free
+    + cmp.b #$06 : bne .free
         lda.b Scrap06 : cmp.b #$ff : bne .lock
     .free rep #$30 : clc : rts
     .lock rep #$30 : sec : rts
@@ -202,8 +202,8 @@ ApplyScroll:
     rep #$30
     lda.b $ab : and.w #$01ff : sta.b Scrap00
     lda.b $ab : and.w #$0200 : beq +
-        lda.w $00e2, y : !add.b Scrap00 : bra .end
-    + lda.w $00e2, y : !sub.b Scrap00
+        lda.w $00e2, y : !ADD.b Scrap00 : bra .end
+    + lda.w $00e2, y : !SUB.b Scrap00
     .end
     sta.w $00e2, y
     sta.w $00e0, y

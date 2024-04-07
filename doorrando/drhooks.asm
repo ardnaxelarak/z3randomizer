@@ -188,7 +188,7 @@ Main_ShowTextMessage:
 
 ; Conditionally disable UW music changes in Door Rando
 org $828ADB ; <- Bank02.asm:2088-2095 (LDX.b #$14 : LDA $A0 ...)
-JSL Underworld_DoorDown_Entry : CPX #$FF
+JSL Underworld_DoorDown_Entry : CPX.b #$FF
 BEQ + : db $80, $1C ; BRA $028B04
 NOP #6 : +
 
