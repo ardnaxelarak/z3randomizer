@@ -79,7 +79,7 @@ SpritePrep_ShopKeeper_PotionShop:
 	LDA.l ShopType : CMP.b #$FF : BNE +
 		JSL SpritePrep_MagicShopAssistant
 		RTL
-	+ LDX.b #$0
+	+ LDX.b #$00
     PHK : PEA.w .jslrtsreturn-1
     PEA.w $85f527 ; an rtl address - 1 in Bank05
     JML MagicShopAssistant_SpawnPowder
@@ -128,11 +128,11 @@ SpritePrep_ShopKeeper:
 			LDA.l ShopContentsTable+2, X : PHX : TYX : STA.l ShopInventory+1, X : PLX
 			LDA.l ShopContentsTable+3, X : PHX : TYX : STA.l ShopInventory+2, X : PLX
 			LDA.l ShopContentsTable+8, X : PHX : PHA : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-			LDA.b #0 : XBA : TYA : LSR #2 : TAX ; This will convert the value back to the slot number (in 8-bit accumulator mode)
-            PLA : STA.l ShopInventoryPlayer, X : LDA.b #0 : STA.l ShopInventoryDisguise, X : PLX
+			LDA.b #$00 : XBA : TYA : LSR #2 : TAX ; This will convert the value back to the slot number (in 8-bit accumulator mode)
+            PLA : STA.l ShopInventoryPlayer, X : LDA.b #$00 : STA.l ShopInventoryDisguise, X : PLX
 			PHY
 				PHX
-					LDA.b #0 : XBA : TYA : LSR #2 : !ADD.l ShopSRAMIndex : TAX
+					LDA.b #$00 : XBA : TYA : LSR #2 : !ADD.l ShopSRAMIndex : TAX
 					LDA.l PurchaseCounts, X : TYX : STA.l ShopInventory+3, X : TAY
 				PLX
 				
@@ -143,8 +143,8 @@ SpritePrep_ShopKeeper:
 					LDA.l ShopContentsTable+6, X : PHX : TYX : STA.l ShopInventory+1, X : PLX
 					LDA.l ShopContentsTable+7, X : PHX : TYX : STA.l ShopInventory+2, X : PLX
 					LDA.b #$40 : PHX : TYX : STA.l ShopInventory+3, X : PLX
-					PHX : LDA.b #0 : XBA : TYA : LSR #2 : TAX ; This will convert the value back to the slot number (in 8-bit accumulator mode)
-					LDA.b #0 : STA.l ShopInventoryPlayer, X : PLX
+					PHX : LDA.b #$00 : XBA : TYA : LSR #2 : TAX ; This will convert the value back to the slot number (in 8-bit accumulator mode)
+					LDA.b #$00 : STA.l ShopInventoryPlayer, X : PLX
 					BRA +++
 					+ : PLY : LDA.b #$40 : PHX : TYX : STA.l ShopInventory+3, X : PLX : BRA +++
 				++
@@ -156,7 +156,7 @@ SpritePrep_ShopKeeper:
 				JSL AttemptItemSubstitution
 				JSL ResolveLootIDLong
 				CMP.b #$D0 : BNE +
-					PHX : LDA.b #0 : XBA : TYA : LSR #2 : TAX ; This will convert the value back to the slot number (in 8-bit accumulator mode)
+					PHX : LDA.b #$00 : XBA : TYA : LSR #2 : TAX ; This will convert the value back to the slot number (in 8-bit accumulator mode)
 					JSL GetRandomInt : AND.b #$3F
 					BNE ++ : LDA.b #$49 : ++ : CMP.b #$26 : BNE ++ : LDA.b #$6A : ++ ; if 0 (fighter's sword + shield), set to just sword, if filled container (bugged palette), switch to triforce piece
 					STA.l ShopInventoryDisguise, X : PLX
@@ -457,7 +457,7 @@ Shopkeeper_BuyItem:
         REP #$20 : LDA.l CurrentRupees : !SUB.l ShopInventory+1, X : STA.l CurrentRupees : SEP #$20 ; Take price away
     ++
     PHX
-        LDA.b #0 : XBA : TXA : LSR #2 : TAX
+        LDA.b #$00 : XBA : TXA : LSR #2 : TAX
         LDA.l ShopInventoryPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
         TXA : !ADD.l ShopSRAMIndex : TAX
         LDA.l PurchaseCounts, X : BNE +++	;Is this the first time buying this slot?
@@ -469,7 +469,7 @@ Shopkeeper_BuyItem:
     JSL ResolveLootIDLong
     TAY : JSL Link_ReceiveItem
     LDA.l ShopInventory+3, X : INC : STA.l ShopInventory+3, X
-    LDA.b #0 : STA.l ShopEnableCount
+    LDA.b #$00 : STA.l ShopEnableCount
     TXA : LSR #2 : TAX
     LDA.l ShopType : BIT.b #$80 : BNE +
         LDA.l ShopkeeperRefill : BNE +++
@@ -522,6 +522,7 @@ Setup_ShopItemCollisionHitbox:
     
         !ADD.b (Scrap00), Y
         !ADD.w #$0002 ; a small negative margin
+        ; TODO: add 4 for a narrow item
         SEP #$20 ; set 8-bit accumulator
 
         ; store hitbox X
@@ -636,8 +637,8 @@ Shopkeeper_DrawNextItem:
 	PLY
 
 	STZ.b Scrap0E ; $0E will be used temporarily to store a non-zero value if VRAM slot is in OAM1
-	PHX : LDA.b #0 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryPlayer, X : PLX : CMP.b #$0 : BNE .no_disguise
-	PHX : LDA.b #0 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryDisguise, X : PLX : CMP.b #$0 : BNE ++
+	PHX : LDA.b #$00 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryPlayer, X : PLX : CMP.b #$00 : BNE .no_disguise
+	PHX : LDA.b #$00 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryDisguise, X : PLX : CMP.b #$00 : BNE ++
 		.no_disguise
 		CPX.b #$0C : BCC .not_powder
 	    	LDA.l PowderFlag : BRA .resolve
@@ -728,9 +729,9 @@ Shopkeeper_DrawNextItem:
 	LDA.b #$00 : STA.l SpriteOAM+6
 
 	LDA.b Scrap0D
-        PHX
-        TAX
-        LDA.l SpriteProperties_standing_width,X : BEQ .narrow
+	PHX
+	TAX
+	LDA.l SpriteProperties_standing_width,X : BEQ .narrow
 	.full
 		PLX
 		LDA.b #$02

@@ -142,9 +142,9 @@ AddReceivedItemExpanded:
 			STZ.w ItemReceiptID : STZ.w ItemReceiptID+1 : STZ.w ItemReceiptMethod
 			PHY : LDY.b #$00 : JSL AddInventory : PLY
 			PLX : PLA : RTL
-		+ PLX : PLA
-        JSR ResolveReceipt
-        PHB : PHK
+	+ PLX : PLA
+	JSR ResolveReceipt
+	PHB : PHK
 JML AddReceivedItem+2
 
 AddReceivedItemExpandedGetItem:

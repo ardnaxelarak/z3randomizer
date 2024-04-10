@@ -236,9 +236,9 @@ MirrorBonk:
     .endLoop
     PLB : PLP : PLX
 
-.normal
-;Not forcing a bonk, so the vanilla bonk detection run.
-LDA.b Scrap0C : ORA.b Scrap0E
+    .normal
+    ;Not forcing a bonk, so the vanilla bonk detection run.
+    LDA.b Scrap0C : ORA.b Scrap0E
 JML MirrorBonk_NormalReturn
 .forceBonk
 JML MirrorBonk_BranchGamma

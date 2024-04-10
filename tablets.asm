@@ -96,19 +96,19 @@ CheckTabletItem:
 ; Zero flag set = Item not collected
 ; Zero flag clear = Item  collected
 ;--------------------------------------------------------------------------------
-        JSL IsMedallion : BCS .tablet
-        PHX
-                LDA.b 5,S : TAX : LDA.w SpriteSpawnStep, X : BEQ .vanilla-1
-        PLX
-		.bonk_item
-        LDA.b #$00
+    JSL IsMedallion : BCS .tablet
+    PHX
+        LDA.b 5,S : TAX : LDA.w SpriteSpawnStep, X : BEQ .vanilla-1
+    PLX
+    .bonk_item
+    LDA.b #$00
 RTL
-                PLX
-                .vanilla
-                LDA.l OverworldEventDataWRAM, X : AND.b #$40 ; What we wrote over
-                RTL
-        .tablet
-        TDC
+    PLX
+    .vanilla
+    LDA.l OverworldEventDataWRAM, X : AND.b #$40 ; What we wrote over
+    RTL
+    .tablet
+    TDC
 RTL
 ;--------------------------------------------------------------------------------
 SaveTabletItem:
