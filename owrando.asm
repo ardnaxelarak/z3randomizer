@@ -151,8 +151,8 @@ jsl OWWorldCheck16 : nop
 org $9bed95  ; < ? - palettes.asm:748 ()
 jsl OWWorldCheck16 : nop
 
-org $82b16e  ; AND #$3F : ORA 7EF3CA
-and.b #$7f : eor.b #$40 : nop #2
+org $82B16C  ; LDA $8A : AND #$3F : ORA 7EF3CA
+JSL OWApplyWorld : BRA + : NOP #2 : +
 
 org $89C3C4
 jsl OWBonkDropPrepSprite : nop #2
@@ -224,6 +224,17 @@ OWMapWorldCheck16:
         jsl OWWorldCheck16
     .return
     rtl
+}
+OWApplyWorld:
+{
+    LDX.b OverworldIndex
+
+    .fromScreen
+    LDA.l OWTileWorldAssoc,X : CMP.l CurrentWorld : BEQ .keepWorld ; if dest screen mismatches the current world
+        TXA : EOR.b #$40 : RTL
+
+    .keepWorld
+    TXA : RTL
 }
 
 OWWhirlpoolUpdate:
@@ -757,8 +768,7 @@ OWEdgeTransition:
     .unshuffled
     LDA.l Overworld_ActualScreenID,X : ORA.l CurrentWorld ; what we wrote over
     TAX : LDA.l OWMode+1 : AND.b #!FLAG_OW_MIXED : BEQ .vanilla
-        LDA.l OWTileWorldAssoc,X : CMP.l CurrentWorld : BEQ .vanilla ; if dest screen mismatches the current world
-            TXA : EOR.b #$40 : RTL
+        JML OWApplyWorld_fromScreen
 
     .vanilla
     TXA : RTL
