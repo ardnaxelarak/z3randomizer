@@ -634,8 +634,11 @@ OWBonkDrops:
         ; sets bitmask flag, uses free RAM
         PLA : STA.w SpriteSpawnStep,Y ; S = X (row + 2)
 
+        ; sets MW player
+        PLX : INX : INX
+        LDA.w OWBonkPrizeData,X : STA.w SprItemMWPlayer,Y
         ; determines the initial spawn point of item
-        PLX : INX : INX : INX
+        INX
         LDA.w SpritePosYLow,Y : SEC : SBC.w OWBonkPrizeData,X : STA.w SpritePosYLow,Y
             LDA.w SpritePosYHigh,Y : SBC.b #$00 : STA.w SpritePosYHigh,Y
         
