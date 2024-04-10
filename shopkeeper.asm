@@ -636,21 +636,24 @@ Shopkeeper_DrawNextItem:
 	PLY
 
 	STZ.b Scrap0E ; $0E will be used temporarily to store a non-zero value if VRAM slot is in OAM1
+	PHX : LDA.b #0 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryPlayer, X : PLX : CMP.b #$0 : BNE .no_disguise
 	PHX : LDA.b #0 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryDisguise, X : PLX : CMP.b #$0 : BNE ++
+		.no_disguise
 		CPX.b #$0C : BCC .not_powder
 	    	LDA.l PowderFlag : BRA .resolve
 	    .not_powder LDA.l ShopInventory, X ; get item id
         .resolve
         JSL AttemptItemSubstitution
         JSL ResolveLootIDLong
-        STA.b Scrap0D
 	++
-	CMP.b #$2E : BNE + : JMP .potion
+	STA.b Scrap0D
+	CMP.b #$0E : BNE + : JMP .bee
+	+ CMP.b #$2E : BNE + : JMP .potion
 	+ CMP.b #$2F : BNE + : JMP .potion
 	+ CMP.b #$30 : BNE + : JMP .potion
 	+ CMP.b #$D1 : BNE + : BRA .apple
 	+ CMP.b #$D2 : BNE + : BRA .fairy
-	+ CMP.b #$D6 : BNE + : BRA .goodbee
+	+ CMP.b #$D6 : BNE + : BRA .bee
 	+ CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS +
 		BRA .rupee
 	+
@@ -663,8 +666,8 @@ Shopkeeper_DrawNextItem:
 	.fairy
 		REP #$20
 			LDA.b FrameCounter : SEC : SBC.w #$10 : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
-				LDA.l SpriteOAM++2 : SEC : SBC.w #$02 ; move fairy up 2 pixels
-				STA.l SpriteOAM++2
+				LDA.l SpriteOAM+2 : SEC : SBC.w #$02 ; move fairy up 2 pixels
+				STA.l SpriteOAM+2
 			++
 		SEP #$20
 		LDA.b FrameCounter : AND.b #$20 : BEQ ++ ; alternate every 32 frames
@@ -675,11 +678,11 @@ Shopkeeper_DrawNextItem:
 		LDA.b #$EA ; fairy is #$EA/EC because it's already there in VRAM
 		STA.b Scrap0E
 		BRA .vramLoc
-	.goodbee
+	.bee
 		REP #$20
 			LDA.b FrameCounter : SEC : SBC.w #$10 : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
-				LDA.l SpriteOAM++2 : SEC : SBC.w #$02 ; move bee up 2 pixels
-				STA.l SpriteOAM++2
+				LDA.l SpriteOAM+2 : SEC : SBC.w #$02 ; move bee up 2 pixels
+				STA.l SpriteOAM+2
 			++
 		SEP #$20
 		LDA.b FrameCounter : AND.b #$20 : BEQ ++ ; alternate every 32 frames
@@ -708,9 +711,7 @@ Shopkeeper_DrawNextItem:
 	.vramLoc
 	STA.l SpriteOAM+4
 
-	PHX : LDA.b #0 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryDisguise, X : PLX : CMP.b #$0 : BNE ++
-		LDA.b Scrap0D
-	++
+	LDA.b Scrap0D
 	PHX
 	JSL GetSpritePalette_resolved
 	PLX : CPX.b #$0C : BCC + ; if this is powder item
@@ -726,9 +727,7 @@ Shopkeeper_DrawNextItem:
 	 ++
 	LDA.b #$00 : STA.l SpriteOAM+6
 
-	PHX : LDA.b #0 : XBA : TXA : LSR #2 : TAX : LDA.l ShopInventoryDisguise, X : PLX : CMP.b #$0 : BNE ++
-		LDA.b Scrap0D
-	++
+	LDA.b Scrap0D
         PHX
         TAX
         LDA.l SpriteProperties_standing_width,X : BEQ .narrow
@@ -739,7 +738,7 @@ Shopkeeper_DrawNextItem:
 		LDA.b #$01
 		BRA ++
 	.narrow
-                PLX
+		PLX
 		LDA.b #$00
 		STA.l SpriteOAM+7
 		JSR PrepNarrowLower
