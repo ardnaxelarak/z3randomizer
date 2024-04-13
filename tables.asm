@@ -149,8 +149,8 @@ PermitSQFromBosses:
 db $00 ; #$00 = Off (default) - #$01 = On
 ;--------------------------------------------------------------------------------
 org $B08043 ; PC 0x180043
-AllowHammerEvilBarrierWithFighterSword:
-db $00 ; #$00 = Off (default) - #$01 = On
+SmithDeleteOnSave:
+db #$00 ; #$00 = Off (default) - #$01 = On (frog/smith gets deleted on S+Q)
 ;--------------------------------------------------------------------------------
 org $B08044 ; PC 0x180044
 AllowHammerTablets:
@@ -233,8 +233,8 @@ CrystalPendantFlags_2:
 ;HC special check $04
 ;--------------------------------------------------------------------------------
 org $B0805D ; PC 0x18005D
-SmithDeleteOnSave:
-db #$00 ; #$00 = Off (default) - #$01 = On (frog/smith gets deleted on S+Q)
+AllowHammerEvilBarrierWithFighterSword:
+db $00 ; #$00 = Off (default) - #$01 = On
 ;--------------------------------------------------------------------------------
 org $B0805E ; PC 0x18005E - 0x18005F (Unused)
 ;--------------------------------------------------------------------------------
