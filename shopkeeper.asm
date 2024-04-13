@@ -654,7 +654,7 @@ Shopkeeper_DrawNextItem:
 	+ CMP.b #$30 : BNE + : JMP .potion
 	+ CMP.b #$D1 : BNE + : BRA .apple
 	+ CMP.b #$D2 : BNE + : BRA .fairy
-	+ CMP.b #$D6 : BNE + : BRA .bee
+	+ CMP.b #$D6 : BNE + : BRA .goodbee
 	+ CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS +
 		BRA .rupee
 	+
@@ -679,7 +679,7 @@ Shopkeeper_DrawNextItem:
 		LDA.b #$EA ; fairy is #$EA/EC because it's already there in VRAM
 		STA.b Scrap0E
 		BRA .vramLoc
-	.bee
+	.goodbee
 		REP #$20
 			LDA.b FrameCounter : SEC : SBC.w #$10 : AND.w #$0020 : BEQ ++ ; alternate every 32 frames
 				LDA.l SpriteOAM+2 : SEC : SBC.w #$02 ; move bee up 2 pixels
@@ -691,6 +691,7 @@ Shopkeeper_DrawNextItem:
 			STA.b Scrap0E
 			BRA .vramLoc
 		++
+	.bee
 		LDA.b #$E4 ; good bee is #$E4/D4 because it's already there in VRAM
 		STA.b Scrap0E
 		BRA .vramLoc
