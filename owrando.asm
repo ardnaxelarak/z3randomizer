@@ -43,6 +43,9 @@ Overworld_LoadSpecialOverworld_RoomId:
 org $84E8B4
 Overworld_LoadSpecialOverworld:
 
+org $84E96A
+JSL OWSpecialReturnTriggerClear
+
 org $82A9DA
 JSL OWSkipPalettes
 BCC OverworldHandleTransitions_change_palettes : NOP #4
@@ -758,8 +761,8 @@ OWDetectSpecialTransition:
 OWEdgeTransition:
 {
     LDA.l OWMode : ORA.l OWMode+1 : BEQ .unshuffled
-    LDY.w RandoOverworldTargetEdge : CPY.b #$7F
-    BEQ .unshuffled
+    LDY.w RandoOverworldTargetEdge : STZ.w RandoOverworldTargetEdge
+    CPY.b #$7F : BEQ .unshuffled
         REP #$10
         LDX.w RandoOverworldEdgeAddr
         PHB : PHK : PLB
@@ -1197,6 +1200,12 @@ OWEndScrollTransition:
         RTL
     .normal
     CMP.l Overworld_FinalizeEntryOntoScreen_Data,X ; what we wrote over
+    RTL
+}
+OWSpecialReturnTriggerClear:
+{
+    STZ.b SubSubModule : STZ.b RoomIndex ; what we wrote over
+    STZ.w RandoOverworldTargetEdge
     RTL
 }
 
