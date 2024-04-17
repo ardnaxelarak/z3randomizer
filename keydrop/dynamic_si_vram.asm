@@ -357,6 +357,32 @@ PrepItemAnimation:
 	LDA.b FrameCounter : AND.b #$30 : LSR #4 : STA.w SpriteDirectionTable, X
 RTS
 
+WaitForNewVBlank:
+	LDA.b #$00 : STA.w NMITIMEN ; Disable interrupts
+	- LDA.w RDNMI : BMI - ; Wait until v-blank is over
+	- LDA.w RDNMI : BPL - ; Wait until v-blank starts
+	LDA.b #$80 : STA.w NMITIMEN
+RTL
+
+TransferCommonToVRAM:
+	PHP
+	REP #$21
+	SEP #$10
+
+	LDA.w #BigDecompressionBuffer+$2000
+	LDX.b #BigDecompressionBuffer>>16
+	STA.w $4302
+	STX.w $4304
+
+	LDX.b #$80 : STX.w $2115
+	LDA.w #$1801 : STA.w $4300
+	LDA.w #$1000 : STA.w $4305
+	LDA.w #$4800 : STA.w $2116
+	LDX.b #$01 : STX.w DMAENABLE
+
+	PLP
+RTL
+
 pushpc
 ; fix Arghuss/Zora splash graphics
 org $868595

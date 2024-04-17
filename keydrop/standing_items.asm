@@ -833,7 +833,8 @@ RTL
 SetTheSceneFix:
 	STZ.b $6C
 	JSL InitializeMirrorHDMA
-	JSL LoadCommonSprites_long
+	JSL WaitForNewVBlank
+	JSL TransferCommonToVRAM
 RTL
 
 pushpc

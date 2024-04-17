@@ -12,8 +12,6 @@
 !DMA0_SIZE_LOW_REG  = $4305 ; DMA Size Registers (Low)
 !DMA0_SIZE_HIGH_REG = $4306 ; DMA Size Registers (Low)
 
-!DMA_ENABLE_REG     = $420B ; DMA Enable Register
-
 macro DMA_VRAM(VRAM_HIGH,VRAM_LOW,SRC_BANK,SRC_HIGH,SRC_LOW,LENGTH_HIGH,LENGTH_LOW)
     PHA
         ; --- preserve DMA registers ----------------------------------------------------
@@ -57,7 +55,7 @@ macro DMA_VRAM(VRAM_HIGH,VRAM_LOW,SRC_BANK,SRC_HIGH,SRC_LOW,LENGTH_HIGH,LENGTH_L
 
         ; start DMA on channel 0
 		LDA.b #$01                        ; channel select bitmask
-		STA.w !DMA_ENABLE_REG
+		STA.w DMAENABLE
 		
 		; --- restore DMA registers -----------------------------------------------------
         PLA : STA.w !DMA0_SIZE_HIGH_REG

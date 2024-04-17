@@ -198,10 +198,12 @@ DecompressAllItemGraphics:
 
 	STA.l $4200 ; already 0 from the LDA above
 
-	LDX.b #$5D+$73 : JSR FastSpriteDecomp
-	LDX.b #$5C+$73 : JSR FastSpriteDecomp
-	LDX.b #$5B+$73 : JSR FastSpriteDecomp
-	LDX.b #$5A+$73 : JSR FastSpriteDecomp
+	LDX.b #$5D+$73 : JSR AddGfxSheetToBigBuffer
+	LDX.b #$5C+$73 : JSR AddGfxSheetToBigBuffer
+	LDX.b #$5B+$73 : JSR AddGfxSheetToBigBuffer
+	LDX.b #$5A+$73 : JSR AddGfxSheetToBigBuffer
+	LDX.b #$06+$73 : JSR AddGfxSheetToBigBuffer
+	LDX.b #$07+$73 : JSR AddGfxSheetToBigBuffer
 
 	REP #$30
 	PLX
@@ -218,6 +220,21 @@ DecompressAllItemGraphics:
 	PLP
 
 	RTL
+
+;===================================================================================================
+
+AddGfxSheetToBigBuffer:
+	SEP #$30
+
+	LDA.l GFXSheetPointers_background_bank,X : PHA : PLB
+	LDA.l GFXSheetPointers_background_high,X : XBA
+	LDA.l GFXSheetPointers_background_low,X
+
+	CPX.b #$73 : !BLT FastSpriteDecomp
+	CPX.b #$73+$0C : !BGE FastSpriteDecomp
+
+.uncompressed
+	JMP Direct3BPPConvert
 
 ;===================================================================================================
 ; I normally hate macros like this... but I don't feel like constantly rewriting this
@@ -246,12 +263,6 @@ endmacro
 ; so might as well rewrite it to be fast
 ;===================================================================================================
 FastSpriteDecomp:
-	SEP #$30
-
-	LDA.l GFXSheetPointers_background_bank,X : PHA : PLB
-	LDA.l GFXSheetPointers_background_high,X : XBA
-	LDA.l GFXSheetPointers_background_low,X
-
 	REP #$10
 
 	TAY
@@ -489,6 +500,70 @@ macro DoPlanesA(offset)
 	STA.w BigDecompressionBuffer+$10+<offset>+<offset>,X
 
 endmacro
+
+;===================================================================================================
+
+macro DoIndirectPlanesA(offset)
+	LDA.b Scrap00 : ADC.w #<offset>+<offset> : STA.b Scrap02
+	LDA.b (Scrap02),Y
+	STA.l BigDecompressionBuffer+<offset>+<offset>,X
+
+	DEC.b Scrap02
+	ORA.b (Scrap02),Y
+	AND.w #$FF00
+	STA.b Decomp3BPPScratch
+
+	LDA.b Scrap00 : ADC.w #$10+<offset> : STA.b Scrap02
+	LDA.b (Scrap02),Y
+	AND.w #$00FF
+	TSB.b Decomp3BPPScratch
+
+	XBA
+	ORA.b Decomp3BPPScratch
+	STA.l BigDecompressionBuffer+$10+<offset>+<offset>,X
+
+endmacro
+
+;===================================================================================================
+
+Direct3BPPConvert:
+	REP #$31
+	STA.b Scrap00
+
+	LDY.w #$0000
+	LDX.b DecompBufferOffset
+
+.next_3bpp_tile
+	%DoIndirectPlanesA(0) ; 8 times
+	%DoIndirectPlanesA(1)
+	%DoIndirectPlanesA(2)
+	%DoIndirectPlanesA(3)
+	%DoIndirectPlanesA(4)
+	%DoIndirectPlanesA(5)
+	%DoIndirectPlanesA(6)
+	%DoIndirectPlanesA(7)
+
+	; carry will always be clear
+	; don't worry
+	TXA
+	ADC.w #32
+	TAX
+
+	; just trust me
+	TYA
+	ADC.w #24
+	TAY
+
+	CMP.w #24*64
+	BCS .done
+
+	JMP .next_3bpp_tile
+
+.done
+	STX.b DecompBufferOffset
+	SEP #$30
+
+	RTS
 
 ;===================================================================================================
 
