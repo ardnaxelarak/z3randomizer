@@ -83,16 +83,16 @@ InvertDPad:
 	JML InvertDPadReturn
 
 	+ DEC : BNE +
-		JMP.w InvertDPad_DPadOnly
+		JMP InvertDPad_DPadOnly
 	+ DEC : BNE +
-		JMP.w InvertDPad_ButtonsOnly
+		JMP InvertDPad_ButtonsOnly
 	+ DEC : BNE +
-		JMP.w InvertDPad_Both
+		JMP InvertDPad_Both
 	+ DEC : BNE +
-		JMP.w InvertDPad_SwapSides
+		JMP InvertDPad_SwapSides
 	+ DEC : BNE +
-		JMP.w InvertDPad_DPadLROnly
-	+ JMP.w InvertDPad_DPadUDOnly
+		JMP InvertDPad_DPadLROnly
+	+ JMP InvertDPad_DPadUDOnly
 
 
 .onemind_controller_offset

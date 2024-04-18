@@ -19,7 +19,6 @@ OnFileLoadOverride:
 MirrorCheckOverride:
     lda.l DRFlags : and.b #$02 : beq ++
         lda.l MirrorEquipment : cmp.b #$01 : beq +
-    ;++ lda.b OverworldIndex : and.b #$40 ; what I wrote over
     ++ phx : ldx.b OverworldIndex : lda.l OWTileWorldAssoc,x : plx : and.b #$ff
     rtl
     + lda.l DRScroll : rtl
