@@ -132,17 +132,15 @@ HeartPieceSpritePrep:
 
     INC.w SkipBeeTrapDisguise
     JSL HeartPieceGetPlayer : STA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-    LDA.w SprSourceItemId, X : BNE +
-        JSL LoadHeartPieceRoomValue
-        STA.w SprSourceItemId, X
-    + JML RequestStandingItemVRAMSlot
+    JSL LoadHeartPieceRoomValue
+    STA.w SprSourceItemId, X
+    JML RequestStandingItemVRAMSlot
 ;--------------------------------------------------------------------------------
 HeartContainerSpritePrep:
     JSL HeartPieceGetPlayer : STA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-    LDA.w SprSourceItemId, X : BNE +
-        JSL LoadHeartContainerRoomValue ; load item type
-        STA.w SprSourceItemId, X
-    + JML RequestStandingItemVRAMSlot
+    JSL LoadHeartContainerRoomValue ; load item type
+    STA.w SprSourceItemId, X
+    JML RequestStandingItemVRAMSlot
 ;--------------------------------------------------------------------------------
 LoadHeartPieceRoomValue:
     LDA.b IndoorsFlag : BEQ .outdoors ; check if we're indoors or outdoors

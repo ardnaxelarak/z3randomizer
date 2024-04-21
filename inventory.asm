@@ -563,10 +563,9 @@ LoadPowder:
     JSL Sprite_SpawnDynamically ; thing we wrote over
     .justGFX
     LDA.l WitchItem_Player : STA.w SprItemMWPlayer, Y : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-    LDA.w SprSourceItemId, Y : BNE +
-        %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues)
-        STA.w SprSourceItemId, Y
-    + JSL AttemptItemSubstitution
+    %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues)
+    STA.w SprSourceItemId, Y
+    JSL AttemptItemSubstitution
     JSL ResolveLootIDLong
     STA.l PowderFlag
     PHX : TYX : PLY
@@ -617,10 +616,9 @@ LoadMushroom:
 	PHA
 		INC.w SkipBeeTrapDisguise
 		LDA.l MushroomItem_Player : STA.w SprItemMWPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-		LDA.w SprSourceItemId, X : BNE +
-			%GetPossiblyEncryptedItem(MushroomItem, SpriteItemValues)
-			STA.w SprSourceItemId, X
-		+ JSL RequestStandingItemVRAMSlot
+		%GetPossiblyEncryptedItem(MushroomItem, SpriteItemValues)
+		STA.w SprSourceItemId, X
+		JSL RequestStandingItemVRAMSlot
 	PLA
 RTL
 ;--------------------------------------------------------------------------------
