@@ -844,11 +844,11 @@ OverworldMapChangePointers2:
 	; GT entrance auto-opened
 	dw !OWW_Stripe|!OWW_Vertical
 	dw $235E ; start
-	dw $08D5, $08E3, $0E90, $0E96, $0E96|!OWW_STOP
+	dw $08D5, $08E3, $0E90, $0E96, $0E96, $0E94|!OWW_STOP
 
 	dw !OWW_Stripe|!OWW_Vertical
 	dw $2360 ; start
-	dw $08D6, $08E4, $0E91, $0E97, $0E97|!OWW_STOP
+	dw $08D6, $08E4, $0E91, $0E97, $0E97, $0E95|!OWW_STOP
 
 .map43_inverted
 	dw !OWW_InvertedOnly
