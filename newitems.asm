@@ -470,7 +470,10 @@ ItemBehavior:
         RTS
 
         .triforce
-        JSL ActivateGoal
+        LDA.b OverworldIndex : CMP.b #$80 : BNE +
+        LDA.b LinkPosX+1 : BNE +
+                JSL ActivateGoal
+        +
         RTS
 
         .goal_item
@@ -479,7 +482,10 @@ ItemBehavior:
         LDA.l GoalCounter : INC : STA.l GoalCounter
         CMP.w GoalItemRequirement : BCC +
         LDA.l TurnInGoalItems : AND.w #$00FF : BNE +
-                JSL ActivateGoal
+                SEP #$20 ; set 8-bit accumulator
+                LDA.b OverworldIndex : CMP.b #$80 : BNE +
+                LDA.b LinkPosX+1 : BNE +
+                        JSL ActivateGoal
         +
         SEP #$20 ; set 8-bit accumulator
         RTS

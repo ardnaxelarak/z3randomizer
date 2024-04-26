@@ -240,7 +240,10 @@ Multiworld_MasterSword_GrantToPlayer:
 	LDA.l PedestalSword_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
 	PLP : PLA
 
-	JSL Link_ReceiveItem ; thing we wrote over
+	CPY.b #$6A : BEQ +
+		JSL Link_ReceiveItem ; thing we wrote over
+		RTL
+	+ JSL ActivateGoal
 RTL
 }
 
