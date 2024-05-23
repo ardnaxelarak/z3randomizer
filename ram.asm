@@ -379,8 +379,9 @@ AncillaID = $7E0C4A               ; $0A bytes.
                                   ;
 AncillaGeneralN = $7E0C54         ; General use buffer for ancillae. $0A bytes.
                                   ;
-AncillaGet = $7E0C5E              ; Used by varius ancilla in various ways. $0F bytes.
+AncillaGet = $7E0C5E              ; Used by various ancilla in various ways. $0A bytes.
                                   ;
+AncillaDirection = $7E0C72        ; Used by various ancilla to track its direction. $0A bytes
 AncillaLayer = $7E0C7C            ;
                                   ;
 SpriteForceDrop = $7E0CBA         ; Forces drops on sprite death. $10 bytes.
@@ -917,6 +918,7 @@ endmacro
 %assertRAM(AncillaID, $7E0C4A)
 %assertRAM(AncillaGeneralN, $7E0C54)
 %assertRAM(AncillaGet, $7E0C5E)
+%assertRAM(AncillaDirection, $7E0C72)
 %assertRAM(AncillaLayer, $7E0C7C)
 %assertRAM(SpriteForceDrop, $7E0CBA)
 %assertRAM(SpriteBump, $7E0CD2)

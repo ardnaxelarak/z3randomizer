@@ -365,7 +365,7 @@ IncrementFinalSword:
         PLX
 RTL
 ;--------------------------------------------------------------------------------
-Link_ReceiveItem_HUDRefresh:
+HUDRefresh:
 	LDA.l BombsEquipment : BNE + ; skip if we have bombs
 	LDA.l BombCapacity : BEQ + ; skip if we can't have bombs
 	LDA.l BombsFiller : BEQ + ; skip if we are filling no bombs
@@ -593,6 +593,7 @@ RTL
 DrawPowder:
 	;LDA.w ItemReceiptPose : BNE .defer ; defer if link is buying a potion
 	LDA.w SprRedrawFlag, X : BEQ +
+		LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 		LDA.w SprSourceItemId, X
 		JSL AttemptItemSubstitution
 		JSL ResolveLootIDLong

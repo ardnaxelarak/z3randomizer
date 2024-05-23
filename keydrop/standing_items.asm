@@ -352,7 +352,7 @@ SetupEnemyDropIndicator:
 ;	LDA.w DungeonID : AND.w #$00FF : CMP.w #$00FF : BEQ .skipCompassChecks
 	; compass checks
 	; does compass for dungeon exist?
-;	LSR : TAX : LDA.l ExistsTransfer, X : TAX : LDA.l CompassExists, X : BEQ .skipCompassChecks
+;	LSR : TAX : LDA.l CompassExists : AND.l DungeonItemMasks,X : BEQ .skipCompassChecks
 	; do we have the compass
 	; sewers? outstanding?
 ;	LDA.l CompassField : LDX.w DungeonID : AND.l DungeonMask, X : BEQ .done

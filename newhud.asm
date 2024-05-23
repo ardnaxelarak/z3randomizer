@@ -177,14 +177,14 @@ NewHUD_DrawPrizeIcon:
 	BEQ .no_prize
 
         .prize
-	TYX
-	LDA.l CrystalPendantFlags_2,X
-        BIT.w #$0080
-        BNE .no_icon
+        TYX
+        LDA.l CrystalPendantFlags_3,X : AND.w #$00FF
+        ASL : TAX
+        LDA.l PrizeIconTiles_Transparent,X : BEQ .no_icon
+        TAY
+        BRA .draw_prize
 
-	BIT.w #$0040
-	BNE .crystal
-
+.pendant
 	LDY.w #!PTile
 	BRA .draw_prize
 
@@ -292,6 +292,20 @@ MagicMeterColorMasks:
         dw $E3FF ; orange
 
 ;================================================================================
+PrizeIconTiles_Transparent:
+dw $0000  ; no icon
+dw $2978  ; crystal 1
+dw $2979  ; crystal 2
+dw $297A  ; crystal 3
+dw $297B  ; crystal 4
+dw $297C  ; crystal 5
+dw $297D  ; crystal 6
+dw $297E  ; crystal 7
+dw $2963  ; green pendant
+dw $295E  ; blue pendant
+dw $296E  ; red pendant
+
+;================================================================================
 DrawCompassCounts:
         LDA.l CompassMode : AND.b #$0F : BNE .continue
         .early_exit
@@ -300,9 +314,9 @@ DrawCompassCounts:
 
         ; no compass needed if this bit is set
         BIT.b #$02 : BNE .draw_compass_count
-        TYX : LDA.l ExistsTransfer, X : TAX : LDA.l CompassExists, X : BEQ .draw_compass_count
         REP #$20
-        LDX.w DungeonID : LDA.w CompassField : AND.l DungeonItemMasks,X : BEQ .early_exit
+        LDX.w DungeonID : LDA.l CompassExists : AND.l DungeonItemMasks,X : BEQ .draw_compass_count
+        LDA.w CompassField : AND.l DungeonItemMasks,X : BEQ .early_exit
 
 		.draw_compass_count
 		LDX.w DungeonID
@@ -386,10 +400,6 @@ DrawMapCounts:
 .done
         SEP #$20
 RTS
-
-; maps from $040C to the odd order used in overworld map
-ExistsTransfer:
-db $0C, $0C, $00, $02, $0B, $09, $03, $07, $04, $08, $01, $06, $05, $0A
 
 ;================================================================================
 ; Exits with:

@@ -13,7 +13,8 @@ RequestStandingItemVRAMSlot:
 	PHX : PHY
 	PHA
 		LDA.b #$01 : STA.w SprRedrawFlag, X
-		JSL Sprite_IsOnscreen : BCC ++
+		LDA.l SpriteSkipEOR : BNE + ; skips on-screen check for special cases, like for prize ancilla
+		JSL Sprite_IsOnscreen : BCC ++ : +
 		; skip sending the request if busy with other things
 		LDA.b GameSubMode : CMP.b #$21 : BCS ++ ; skip if OW is loading Map16 GFX ; TODO: Figure out how to allow submodule 22, check DMA status instead
 		LDA.b LinkState : CMP.b #$14 : BEQ ++ ; skip if we're mid-mirror
@@ -356,6 +357,12 @@ RTL
 PrepItemAnimation:
 	LDA.b FrameCounter : AND.b #$30 : LSR #4 : STA.w SpriteDirectionTable, X
 RTS
+
+PrepAncillaAnimation:
+	PHP : SEP #$20
+		LDA.b FrameCounter : AND.b #$30 : LSR #4 : STA.w AncillaDirection, X
+	PLP
+RTL
 
 WaitForNewVBlank:
 	LDA.b #$00 : STA.w NMITIMEN ; Disable interrupts

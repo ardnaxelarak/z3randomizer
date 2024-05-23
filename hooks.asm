@@ -914,6 +914,7 @@ JSL Sprite_ConditionalPrepOAMCoord
 
 org $8799F7 ; 399F7 - Bank07.asm:4107 (JSL AddReceivedItem)
 JSL AddReceivedItemExpanded
+BRA Link_ReceiveItem_HUDRefresh
 
 org $88C505
 JSL Ancilla22_ItemReceipt_ContinueB : NOP #2
@@ -1049,10 +1050,13 @@ BCS Ancilla22_ItemReceipt_is_pendant : BRA Ancilla22_ItemReceipt_wait_for_music
 org $88C61D : JSL AnimatePrizeCutscene : NOP
 org $88C622 : BCC ItemReceipt_Animate_continue
 org $88C6BA : JSL CheckPoseItemCoordinates
+org $88C6C3 : JSL PrepPrizeVRAMHigh
+org $88C6F4 : JSL PrepPrizeVRAMLow
 org $88CAD6 : JSL HandleDropSFX : NOP #2
 org $88CADC : BCC Ancilla29_MilestoneItemReceipt_skip_crystal_sfx
 org $88CAE9 : JSL PrepPrizeTile
 org $88CB23 : JSL PrizeDropSparkle : BCC Ancilla29_MilestoneItemReceipt_no_sparkle : NOP #2
+org $88CB6A : JSL PrizeReceiveItem
 org $88CB97 : JSL PrepPrizeOAMCoordinates : BRA + : NOP #$12 : +
 org $88CBFF : JSL PrepPrizeShadow
 org $88CC6C : JSL HandleCrystalsField
@@ -1249,7 +1253,8 @@ org $87A3AB ; 3A3AB - Bank07.asm : 5726 - LDA.b #$12 : JSR Player_DoSfx2
 _Bank07_5726:
 ;--------------------------------------------------------------------------------
 org $879A0E ; 39A0E - Bank07.asm : 4117 - JSL HUD.RefreshIconLong
-JSL Link_ReceiveItem_HUDRefresh
+Link_ReceiveItem_HUDRefresh:
+JSL HUDRefresh
 
 ;================================================================================
 ; Swordless Mode
@@ -1693,14 +1698,6 @@ org $82B15C ; <- 1315C - Bank02.asm:7672 - (LDA $7EF3CA : EOR.b #$40 : STA $7EF3
 JSL IncrementOWMirror
 JSL FlipLWDWFlag : NOP #2
 ;================================================================================
-;org $8AC5BB ; < 545BB - Bank0A.asm:1856 - (LDA $7EF3C7 : CMP.b #$03 : BNE .fail)
-;JSL OverworldMap_CheckObject : RTS
-;org $8AC5D8 ; < 545D8 - Bank0A.asm:1885 - (LDA $7EF3C7 : CMP.b #$07 : BNE OverworldMap_CheckPendant_fail)
-;JSL OverworldMap_CheckObject : RTS
-;================================================================================
-org $8AC53E ; <- 5453E - Bank0A.asm:1771 - (LDA $0AC50D, X : STA $0D)
-LDA.l CrystalNumberTable-1,X
-;================================================================================
 ; EVERY INSTANCE OF STA $7EF3C7 IN THE ENTIRE CODEBASE
 org $829D51 : JSL SetLWDWMap
 org $8589BB : JSL SetLWDWMap
@@ -1720,9 +1717,6 @@ org $85F17D : JSL GetMapMode
 org $85FF7D : JSL GetMapMode
 org $8AC01A : JSL GetMapMode
 org $8DC849 : JSL GetMapMode
-;================================================================================
-org $8AC012 ; <- 54012 - Bank0A.asm:1039 (LDA $7EF2DB : AND.b #$20 : BNE BRANCH_DELTA)
-NOP #8
 ;================================================================================
 org $828B8F ; <- 10B8F - Bank02.asm:2236 (LDA $7EF374 : LSR A)
 JSL CheckHeraBossDefeated : NOP

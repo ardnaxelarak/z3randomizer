@@ -31,6 +31,7 @@ RTL
 ;--------------------------------------------------------------------------------
 OnDungeonBossExit:
         JSL StatTransitionCounter
+        JSL ClearMultiworldText
         JSL DynamicDropGFXClear
 RTL
 ;--------------------------------------------------------------------------------

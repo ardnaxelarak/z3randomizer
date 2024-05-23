@@ -31,6 +31,7 @@ ReloadPreviouslyLoadedSheets                               = $80D7C8
 Attract_DecompressStoryGfx                                 = $80D84E
 InitializeTilesets                                         = $80E1DB
 LoadCommonSprites_long                                     = $80E3C4
+Graphics_LoadChrHalfSlot                                   = $80E43A
 LoadSelectScreenGfx                                        = $80E529
 CopyFontToVRAM                                             = $80E596
 LoadCommonSprites_in_file_select                           = $80E784

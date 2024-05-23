@@ -123,10 +123,14 @@ db #$00 ; #$00 = Off (default) - #$01 = Display Dungeon Count w/Map - #$02 = Dis
 MapMode:
 db $00 ; #$00 = Always On (default) - #$01 = Require Map Item
 CompassMode:
-db $00 ; #$00 = Off (default) - #$01 = Display Dungeon Count w/Compass - #$02 = Display Dungeon Count Always
-       ; #$80 = Move prizes to custom position
-       ; #$40 = Compasses or Maps are shuffled and must be obtained to show position if bit on
-       ; #$20 = Use Compass for position, otherwise use Map
+;xbcm --ii
+;
+;x - True CompassMode Check (similar to MapMode):  #$00 = Always On (default) - #$01 = Require Compass Item
+;b - Boss Reveal - Beating a boss reveals the location of the prize
+;c - Compass Reveal - Collecting the compass reveals the location of the dungeon
+;m - Map Reveal - Collecting the map reveals the location of the dungeon
+;i - Dungeon Item Counts: #$00 = Off (default) - #$01 = Display w/ Compass - #$02 = Always Display
+db $00
 ;--------------------------------------------------------------------------------
 org $B0803D ; PC 0x18003D
 PersistentFloodgate:
@@ -570,52 +574,6 @@ dw $0190
 ;--------------------------------------------------------------------------------
 org $87F52F
 dw $0191
-
-;--------------------------------------------------------------------------------
-;Map Pendant / Crystal Indicators - DEPRECATED in favor of WorldMapIcon_tile, don't use
-
-org $8ABF2E ; PC 0x53F02
-dw $0100 ; #$6234 - Master Sword
-
-org $8ABEF8 ; PC 0x53EF8
-MapObject_Eastern:
-dw $6238 ; #$6038 - Green Pendant / Courage
-
-org $8ABF1C ; PC 0x53F1C
-MapObject_Desert:
-dw $6034 ; #$6034 - Blue Pendant / Power
-
-org $8ABF0A ; PC 0x53F0A
-MapObject_Hera:
-dw $6032 ; #$6032 - Red Pendant / Wisdom
-
-org $8ABF00 ; PC 0x53F00
-MapObject_Darkness:
-dw $6434 ; #6434 - Crystal
-
-org $8ABF6C ; PC 0x53F6C
-MapObject_Swamp:
-dw $6434 ; #6434 - Crystal
-
-org $8ABF12 ; PC 0x53F12
-MapObject_Skull:
-dw $6434 ; #6434 - Crystal
-
-org $8ABF36 ; PC 0x53F36
-MapObject_Thieves:
-dw $6434 ; #6434 - Crystal
-
-org $8ABF5A ; PC 0x53F5A
-MapObject_Ice:
-dw $6432 ; #6434 - Crystal 5/6
-
-org $8ABF48 ; PC 0x53F48
-MapObject_Mire:
-dw $6432 ; #6434 - Crystal 5/6
-
-org $8ABF24 ; PC 0x53F24
-MapObject_TRock:
-dw $6434 ; #6434 - Crystal
 
 ;--------------------------------------------------------------------------------
 org $82A09B ; PC 0x1209B - Bank02.asm:5802 - (pool MilestoneItem_Flags:)
@@ -2530,6 +2488,26 @@ TreeKidItem_Player: ; EE2A
 db #$00
 ChestGameItem_Player: ; EE2B
 db #$00
+Prize_ArmosKnights_Player: ; EE2C
+db #$00
+Prize_Lanmolas_Player: ; EE2D
+db #$00
+Prize_Moldorm_Player: ; EE2E
+db #$00
+Prize_HelmasaurKing_Player: ; EE2F
+db #$00
+Prize_Arrghus_Player: ; EE30
+db #$00
+Prize_Mothula_Player: ; EE31
+db #$00
+Prize_Blind_Player: ; EE32
+db #$00
+Prize_Kholdstare_Player: ; EE33
+db #$00
+Prize_Vitreous_Player: ; EE34
+db #$00
+Prize_Trinexx_Player: ; EE35
+db #$00
 ;--------------------------------------------------------------------------------
 org $B0EE30 ; PC 0x18636C
 RemoteItems:
@@ -2623,140 +2601,3 @@ org $B0F0C0 ; PC 0x1870C0
 ;--------------------------------------------------------------------------------
 ; 0x1870C0 - 187FFF (unused)
 ;--------------------------------------------------------------------------------
-
-pushpc
-;--------------------------------------------------------------------------------
-; Overworld Map Tables
-;--------------------------------------------------------------------------------
-org $8ABDF6
-WorldMapIcon_posx_vanilla:
-dw $0F31 ; prize1
-dw $08D0 ; prize2
-dw $0108
-dw $0F40
-
-dw $0082
-dw $0F11
-dw $01D0
-dw $0100
-
-dw $0CA0
-dw $0759
-dw $FF00
-dw $FF00
-
-dw $FF00
-dw $FFFF ; reserved - not used
-dw $FFFF
-dw $FFFF
-
-org $8ABE16
-WorldMapIcon_posy_vanilla:
-dw $0620 ; prize1
-dw $0080 ; prize2
-dw $0D70
-dw $0620
-
-dw $00B0
-dw $0103
-dw $0780
-dw $0CA0
-
-dw $0DA0
-dw $0ED0
-dw $FF00
-dw $FF00
-
-dw $FF00
-dw $FFFF ; reserved - not used
-dw $FFFF
-dw $FFFF
-
-org $8ABE36
-WorldMapIcon_posx_located:
-dw $FF00 ; prize1
-dw $FF00 ; prize2
-dw $FF00
-dw $FF00
-
-dw $FF00
-dw $FF00
-dw $FF00
-dw $FF00
-
-dw $FF00
-dw $FF00
-dw $FF00
-dw $FF00
-
-dw $FF00
-dw $FFFF ; reserved - not used
-dw $FFFF
-dw $FFFF
-
-org $8ABE56
-WorldMapIcon_posy_located:
-dw $FF00 ; prize1
-dw $FF00 ; prize2
-dw $FF00
-dw $FF00
-
-dw $FF00
-dw $FF00
-dw $FF00
-dw $FF00
-
-dw $FF00
-dw $FF00
-dw $FF00
-dw $FF00
-
-dw $FF00
-dw $FFFF ; reserved - not used
-dw $FFFF
-dw $FFFF
-
-org $8ABE76
-WorldMapIcon_tile:
-db $38, $62 ; green pendant        ; Eastern Palace
-db $32, $60 ; red pendant          ; Hera
-db $34, $60 ; blue pendant         ; Desert
-db $34, $64 ; crystal              ; PoD
-
-db $34, $64 ; crystal              ; Skull Woods
-db $34, $64 ; crystal              ; Turtle Rock
-db $34, $64 ; crystal              ; Thieves Town
-db $34, $64 ; crystal              ; Misery Mire
-
-db $34, $64 ; crystal              ; Ice Palace
-db $34, $64 ; crystal              ; Swamp Palace
-db $32, $66 ; skull looking thing
-db $00, $00 ; red x
-
-db $00, $00 ; red x
-db $00, $00 ; unused red x's
-db $00, $00
-db $00, $00
-
-org $8ABE96
-CompassExists:
-; dw $37FC ; todo: convert to two bytes with masks? so much extra code...
-; eastern hera desert pod skull trock thieves mire ice swamp gt at escape
-db $01, $01, $01, $01, $01, $01, $01, $01, $01, $01, $01, $00, $00, $00, $00, $00
-
-; 0 = light world, 1 = dark world
-org $8ABEA6
-WorldCompassMask:
-; eastern desert hera pod skull trock thieves mire ice swamp gt at escape x1 x2 x3
-db $00, $00, $00, $01, $01, $01, $01, $01, $01, $01, $01, $00, $00, $00, $00, $00
-
-; eastern desert hera pod skull trock thieves mire ice swamp gt at escape
-MC_DungeonIdsForPrize:
-db $02, $0A, $03, $06, $08, $0C, $0B, $07, $09, $05, $00, $04, $01
-MC_SRAM_Offsets:
-db $01, $00, $01, $01, $00, $00, $00, $01, $00, $01, $00, $01, $01
-MC_Masks:
-;   EP   TH   DP   PD   SK   TR   TT   MM
-db $20, $20, $10, $02, $80, $08, $10, $01, $40, $04, $04, $08, $40
-
-pullpc

@@ -190,7 +190,9 @@ DrawMoonPearlInMenuLocation:
 RTL
 ;--------------------------------------------------------------------------------
 DrawHUDDungeonItems:
-	LDA.l HUDDungeonItems : BNE .continue
+	LDA.l HUDDungeonItems : BEQ .return
+		JMP .continue
+.return
 RTL
 
 .dungeon_positions
@@ -207,6 +209,21 @@ RTL
 		dw 24 ; Mire
 		dw 26 ; Turtle Rock
 		dw 30 ; Ganon's Tower
+
+.dungeon_reorder ; why was I forced to make this table? smh.
+		dw  0 ; Hyrule Castle
+		dw  2 ; Eastern
+		dw  4 ; Desert
+		dw 18 ; Hera
+		dw  6 ; Agahnims Tower
+		dw 10 ; PoD
+		dw  8 ; Swamp
+		dw 14 ; Skull Woods
+		dw 20 ; Thieves Town
+		dw 16 ; Ice
+		dw 12 ; Mire
+		dw 22 ; Turtle Rock
+		dw 24 ; Ganon's Tower
 
 .small_key_x_offset
 		dw HyruleCastleKeys-DungeonKeys ; Hyrule Castle
@@ -373,8 +390,16 @@ RTL
         BIT.w .dungeon_bitmasks,X
         BEQ ..skip_map
 
+        PHX : TXA : TAX
+                LDA.w .dungeon_reorder,X
+                LSR : TAX
+                LDA.l CrystalPendantFlags_3+1,X
+                AND.w #$00FF : ASL : TAX
+                LDA.w PrizeIconTiles,X : BNE +
+                        LDA.w #$2826
+                +
+        PLX
         LDY.w .dungeon_positions,X
-        LDA.w #$2826
         STA.w GFXStripes+$0686,Y
         LDA.l MapField
 
@@ -412,6 +437,18 @@ RTL
         PLP
 RTL
 ;--------------------------------------------------------------------------------
+PrizeIconTiles:
+dw $0000  ; no icon
+dw $2981  ; crystal 1
+dw $2982  ; crystal 2
+dw $2983  ; crystal 3
+dw $2984  ; crystal 4
+dw $2985  ; crystal 5
+dw $2986  ; crystal 6
+dw $2987  ; crystal 7
+dw $2990  ; green pendant
+dw $298B  ; blue pendant
+dw $299B  ; red pendant
 ;================================================================================
 DrawPendantCrystalDiagram:
 	PHP : PHB : PHK : PLB

@@ -1,8 +1,6 @@
 !BlankTile = $207F
 !SlashTile = $2830
 !HyphenTile = $2405
-!PTile = $296C
-!CTile = $295F
 !LTile = $2D68
 !DTile = $2D60
 !RedSquare = $345E
@@ -114,8 +112,8 @@ dw $0000, $0000, $0000, $0000, $000a, $000a, $000a, $0014, $000a, $0014, $0000, 
 DrHudDungeonItemsAdditions:
 {
     jsl DrawHUDDungeonItems
-    lda.l HUDDungeonItems : and.b #$ff : bne + : rtl : +
-    lda.l DRMode : cmp.b #$02 : beq + : rtl : +
+    lda.l DRMode : cmp.b #$02 : beq + : rtl
+    +
 
     phx : phy : php
     rep #$30

@@ -592,9 +592,9 @@ endmacro
 %SpriteProps($AD, 0, 0, $02, $04, PalettesVanilla_blue_ice+$0E)         ; AD - Small key of Ganon's Tower
 %SpriteProps($AE, 2, 2, $02, $02, $0000)                                ; AE - Reserved
 %SpriteProps($AF, 0, 0, $02, $04, PalettesVanilla_blue_ice+$0E)         ; AF - Generic small key
-%SpriteProps($B0, 2, 2, $80, $80, PalettesCustom_crystal)               ; B0 - Crystal 6
+%SpriteProps($B0, 2, 2, $80, $80, PalettesCustom_red_crystal)           ; B0 - Crystal 6
 %SpriteProps($B1, 2, 2, $80, $80, PalettesCustom_crystal)               ; B1 - Crystal 1
-%SpriteProps($B2, 2, 2, $80, $80, PalettesCustom_crystal)               ; B2 - Crystal 5
+%SpriteProps($B2, 2, 2, $80, $80, PalettesCustom_red_crystal)           ; B2 - Crystal 5
 %SpriteProps($B3, 2, 2, $80, $80, PalettesCustom_crystal)               ; B3 - Crystal 7
 %SpriteProps($B4, 2, 2, $80, $80, PalettesCustom_crystal)               ; B4 - Crystal 2
 %SpriteProps($B5, 2, 2, $80, $80, PalettesCustom_crystal)               ; B5 - Crystal 4
@@ -1522,8 +1522,8 @@ VRAMAddressOffset:
 	dw $0024                               ; 21 - Net
 	dw $0024                               ; 22 - Blue Mail
 	dw $0024                               ; 23 - Red Mail
-	dw $0024                               ; 24 - Small Key
-	dw $0024                               ; 25 - Compbutt
+	dw $006B                               ; 24 - Small Key
+	dw $0024                               ; 25 - Compass
 	dw $0024                               ; 26 - Heart Container from 4/4
 	dw $0024                               ; 27 - Bomb
 	dw $0024                               ; 28 - 3 bombs

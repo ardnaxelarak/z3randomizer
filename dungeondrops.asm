@@ -3,9 +3,6 @@
 ;--------------------------------------------------------------------------------
 SpawnDungeonPrize:
         PHX : PHB
-        PHA : LDA.b #$00 : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : PLA
-        JSL AttemptItemSubstitution
-        JSL ResolveLootIDLong
         STA.w ItemReceiptID
         TAX
         LDA.b #$29 : LDY.b #$06
@@ -13,7 +10,7 @@ SpawnDungeonPrize:
         JSL AddAncillaLong
         BCS .failed_spawn
                 LDA.w ItemReceiptID
-                STA.w AncillaGet,X : STA.w SprItemReceipt,X
+                STA.w AncillaGet,X
                 JSR AddDungeonPrizeAncilla
         .failed_spawn
         PLB : PLX
@@ -62,13 +59,31 @@ RTS
 
 PrepPrizeTile:
         PHA : PHX : PHY
-        LDA.b #$00 : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-        LDA.w AncillaGet, X
-        JSL AttemptItemSubstitution
-        JSL ResolveLootIDLong
-        STA.w SprItemReceipt,X
-        JSL TransferItemReceiptToBuffer_using_ReceiptID
+        JSL BossPrizeGetPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+        LDA.b #$01 : STA.l SpriteSkipEOR
+                LDA.w AncillaGet, X
+                JSL AttemptItemSubstitution
+                JSL ResolveLootIDLong
+                STA.w AncillaGet, X
+                JSL RequestStandingItemVRAMSlot
+        LDA.b #$00 : STA.l SpriteSkipEOR
         PLY : PLX : PLA
+RTL
+
+PrizeReceiveItem:
+        PHA
+        JSL BossPrizeGetPlayer : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+        PLA
+        CMP.b #$6A : BNE +
+                ; TODO : This doesn't increment any item counts/stats
+                JML ActivateTriforceCutscene
+        +
+        JSL Link_ReceiveItem
+        LDA.l TextBoxDefer : BEQ +
+                STZ.w TextID : STZ.w TextID+1 ; reset decompression buffer
+                JSL Main_ShowTextMessage_Alt
+                LDA.b #$00 : STA.l TextBoxDefer
+        +
 RTL
 
 SetItemPose:
@@ -232,7 +247,6 @@ PrepPrizeOAMCoordinates:
         STA.b Scrap02
         STA.b Scrap04
 
-        REP #$20
         LDA.w AncillaZCoord,X
         AND.w #$00FF
         STA.b ScrapBuffer72
@@ -243,9 +257,35 @@ PrepPrizeOAMCoordinates:
         SBC.b ScrapBuffer72
         STA.b Scrap00
 
-        SEP #$20
+        JSL PrepAncillaAnimation
         TXY
-        LDA.w AncillaGet,X : TAX
+        LDA.w AncillaGet,Y : AND.w #$00FF : PHA
+        REP #$10
+                ASL : TAX
+                LDA.l VRAMAddressOffset,X : STA.b Scrap0C
+                CLC : ADC.w #$0010 : STA.b Scrap0D
+        PLX
+        SEP #$10
+        PHX
+                ; special animation handling
+                CPX.b #$D2 : BNE + ; fairy
+                        LDX.w AncillaDirection,Y : BEQ ++ : CPX.b #$03 : BEQ ++ ; use other fairy GFX
+                                LDA.b Scrap0C : CLC : ADC.w #$0002 : STA.b Scrap0C
+                                CLC : ADC.w #$0010 : STA.b Scrap0D
+                        ++ CPX.b #$02 : BCC .check_width ; move fairy up 2 pixels
+                                LDA.b Scrap00 : SEC : SBC.w #$0002 : STA.b Scrap00
+                                BRA .check_width
+                + CPX.b #$D6 : BNE + ; good bee
+                        LDA.b Scrap0C : AND.w #$FF00 : ORA.w #$007C : STA.b Scrap0C ; use blank GFX for high VRAM
+                        LDX.w AncillaDirection,Y : BEQ ++ : CPX.b #$03 : BEQ ++ ; use other bee GFX
+                                LDA.b Scrap0D : SEC : SBC.w #$0010 : STA.b Scrap0D
+                        ++ CPX.b #$02 : BCC + ; move bee up 2 pixels
+                                LDA.b Scrap00 : SEC : SBC.w #$0002 : STA.b Scrap00
+                +
+        
+        .check_width
+        PLX
+        SEP #$20
         LDA.l SpriteProperties_chest_width,X : BNE .wide
                 TYX
                 LDA.w AncillaID,X : CMP.b #$3E : BEQ .rising_crystal
@@ -267,20 +307,70 @@ PrepPrizeOAMCoordinates:
         PLY : PLX
 RTL
 
+PrepPrizeVRAMHigh:
+        PHX
+                LDX.b #$00
+                JSL PrepPrizeVRAM : BCS .store
+                        LDA.b #$24
+                .store
+                STA.b ($90),Y
+        PLX
+RTL
+
+PrepPrizeVRAMLow:
+        PHX
+                LDX.b #$01
+                JSL PrepPrizeVRAM : BCS .store
+                        LDA.b #$34
+                .store
+                STA.b ($90),Y
+        PLX
+RTL
+
+PrepPrizeVRAM:
+        PHY
+                LDA.b 9,S : TAY
+                LDA.w AncillaID,Y : CMP.b #$29 : BEQ +
+                        PLY : CLC : RTL  ; not a prize drop ancilla
+                + LDA.b Scrap0C,X : CMP.b #$24 : BEQ + : CMP.b #$34 : BEQ +
+                        PLY : SEC : RTL  ; in vanilla VRAM
+                +
+                ; use dynamic VRAM slot
+                PHX
+                        LDA.w SprItemGFXSlot,Y : ASL : TAX
+                        REP #$20
+                        LDA.l FreeUWGraphics,X : LSR #4
+                PLX
+                CPX.b #$01 : BNE +
+                        CLC : ADC.w #$0010
+                +
+                SEP #$20
+        PLY : SEC
+RTL
+
 PrepPrizeShadow:
         PHX
-        LDA.w ItemReceiptID : TAX
+        LDA.b 5,S : TAX : LDA.w AncillaGet,X : TAX
         LDA.l SpriteProperties_standing_width,X : BNE .wide
                 LDA.b Scrap02
                 SEC : SBC.b #$04
                 STA.b Scrap02
+                PLX : LDX.b #$02
+                BRA .wide+1
         .wide
-        LDA.b #$20 : STA.b Scrap04 ; What we wrote over
         PLX
+        LDA.b #$20 : STA.b Scrap04 ; What we wrote over
 RTL
 
 CheckPoseItemCoordinates:
         PHX
+        LDA.w SprRedrawFlag,X : BEQ +
+                JSL BossPrizeGetPlayer : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+                LDA.b #$01 : STA.l SpriteSkipEOR
+                LDA.w AncillaGet,X
+                JSL RequestStandingItemVRAMSlot
+                LDA.b #$00 : STA.l SpriteSkipEOR
+        +
         LDA.w ItemReceiptPose : BEQ .done
                    BIT.b #$02 : BEQ .done
                 LDA.w AncillaGet,X : TAX
@@ -302,6 +392,9 @@ CrystalOrPendantBehavior:
         AND.w #$00FF : ASL : TAX
         LDA.l InventoryTable_properties,X : BIT.w #$0080 : BNE .crystal_behavior
                 SEP #$30
+                LDA.w ItemReceiptPose : BEQ +
+                        LDA.b #$02 : STA.b LinkDirection
+                +
                 PLX : PLA
                 RTS
         .crystal_behavior
@@ -325,3 +418,13 @@ SetDungeonCompleted:
                 SEP #$20
         +
 RTS
+
+ClearMultiworldText:
+        PHP : PHX 
+                SEP #$30
+                LDA.l !MULTIWORLD_HUD_TIMER : BEQ +
+                        LDA.b #$01 : STA.l !MULTIWORLD_HUD_TIMER
+                        JSL GetMultiworldItem
+                +
+        PLX : PLP
+RTL 

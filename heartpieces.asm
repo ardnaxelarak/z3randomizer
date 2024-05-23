@@ -3,7 +3,7 @@
 ;--------------------------------------------------------------------------------
 HeartPieceGet:
     PHX : PHY
-    LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+    LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
     LDY.w SprItemReceipt, X : BNE +
         LDA.w SprSourceItemId, X : BNE ++
             JSL LoadHeartPieceRoomValue
@@ -16,8 +16,9 @@ HeartPieceGet:
     +
     JSL MaybeMarkDigSpotCollected
     .skipLoad
+	LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
     CPY.b #$26 : BNE .not_heart ; don't add a 1/4 heart if it's not a heart piece
-        LDA.w SprItemMWPlayer, X : BNE .not_heart
+        CMP.b #$00 : BNE .not_heart
         LDA.l HeartPieceQuarter : INC A : AND.b #$03 : STA.l HeartPieceQuarter
     .not_heart
     JSL Player_HaltDashAttackLong
@@ -110,8 +111,8 @@ RTL
 ;--------------------------------------------------------------------------------
 NormalItemSkipSound:
 ; Out: c - skip sounds if set
-    LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .skip
     JSL CheckIfBossRoom : BCS .boss_room
+    LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .skip
         TDC
         CPY.b #$17 : BEQ .skip
         CLC
@@ -813,6 +814,50 @@ HeartPieceGetPlayer:
 	AND.w #$00FF ; the loads are words but the values are 1-byte so we need to clear the top half of the accumulator - no guarantee it was 8-bit before
 	PLP
 	PLY
+RTL
+}
+;--------------------------------------------------------------------------------
+BossPrizeGetPlayer:
+{
+	PHP
+	REP #$20 ; set 16-bit accumulator
+	LDA.b RoomIndex ; these are all decimal because i got them that way
+	CMP.w #200 : BNE +
+		LDA.l Prize_ArmosKnights_Player
+		BRA .done
+	+ CMP.w #51 : BNE +
+		LDA.l Prize_Lanmolas_Player
+		BRA .done
+	+ CMP.w #7 : BNE +
+		LDA.l Prize_Moldorm_Player
+		BRA .done
+	+ CMP.w #90 : BNE +
+		LDA.l Prize_HelmasaurKing_Player
+		BRA .done
+	+ CMP.w #6 : BNE +
+		LDA.l Prize_Arrghus_Player
+		BRA .done
+	+ CMP.w #41 : BNE +
+		LDA.l Prize_Mothula_Player
+		BRA .done
+	+ CMP.w #172 : BNE +
+		LDA.l Prize_Blind_Player
+		BRA .done
+	+ CMP.w #222 : BNE +
+		LDA.l Prize_Kholdstare_Player
+		BRA .done
+	+ CMP.w #144 : BNE +
+		LDA.l Prize_Vitreous_Player
+		BRA .done
+	+ CMP.w #164 : BNE +
+		LDA.l Prize_Trinexx_Player
+		BRA .done
+	+
+	LDA.w #$0000
+
+	.done
+	AND.w #$00FF ; the loads are words but the values are 1-byte so we need to clear the top half of the accumulator - no guarantee it was 8-bit before
+	PLP
 RTL
 }
 ;--------------------------------------------------------------------------------

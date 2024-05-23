@@ -247,7 +247,7 @@ CheckForCrystalBossesDefeated:
 	LDY.w #10
 
 .next_check
-	LDA.w CrystalPendantFlags_2-2,Y
+	LDA.w CrystalPendantFlags_2+2,Y
 	BIT.w #$0040
 	BEQ ++
 
