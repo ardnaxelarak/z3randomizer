@@ -102,10 +102,7 @@ IncrementSmallKeysNoPrimary:
                         PLP : PHY
                         LDY.b #$24
                         JSL AddInventory
-                        LDA.l StandingItemsOn : BNE +++
-                        	JSR CountChestKey
-                        +++ PLY
-                        BRA +
+                        PLY : BRA +
                 ++
                 PLP
         +
