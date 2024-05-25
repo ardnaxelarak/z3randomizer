@@ -88,6 +88,8 @@ dw $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, 
 .tr
 dw $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FFFF
 
+; FREE: 0x20 bytes, for any future usage of extra icons ^^^
+
 warnpc $8ABF36
 org $8ABF36
 ; vhpp ccco  tttttttt
@@ -115,20 +117,20 @@ db $00, $00 ;                ; Ganon's Tower
 warnpc $8ABF52
 org $8ABF52
 WorldMapIcon_dungeon_tile:
-db $22, $7E ; white H ; Hyrule Castle
+db $1A, $7E ; white H ; Hyrule Castle
 db $00, $00 ;         ; Sewers
-db $24, $7F ; blue 1  ; Eastern Palace
-db $24, $79 ; blue 2  ; Desert Palace
-db $22, $7D ; white A ; Agahnim's Tower
-db $22, $79 ; red 2   ; Swamp Palace
-db $22, $7F ; red 1   ; Dark Palace
-db $22, $6F ; red 6   ; Misery Mire
-db $22, $6C ; red 3   ; Skull Woods
-db $22, $6E ; red 5   ; Ice Palace
-db $24, $6C ; blue 3  ; Tower of Hera
-db $22, $6D ; red 4   ; Thieves' Town
-db $22, $7C ; red 7   ; Turtle Rock
-db $22, $66 ; skull   ; Ganon's Tower
+db $14, $7F ; blue 1  ; Eastern Palace
+db $14, $79 ; blue 2  ; Desert Palace
+db $1A, $7D ; white A ; Agahnim's Tower
+db $12, $79 ; red 2   ; Swamp Palace
+db $12, $7F ; red 1   ; Dark Palace
+db $12, $6F ; red 6   ; Misery Mire
+db $12, $6C ; red 3   ; Skull Woods
+db $12, $6E ; red 5   ; Ice Palace
+db $14, $6C ; blue 3  ; Tower of Hera
+db $12, $6D ; red 4   ; Thieves' Town
+db $12, $7C ; red 7   ; Turtle Rock
+db $12, $66 ; skull   ; Ganon's Tower
 ; db $22, $68 ; red X
 
 warnpc $8ABF6E
@@ -375,7 +377,8 @@ WorldMap_LoadChrHalfSlot:
 	LDA.b #PreloadedGraphicsROM>>16 : STA.b Scrap02
 	REP #$20
 	LDX.b GameSubMode : CPX.b #$07 : BEQ .not_flute_menu
-		LDX.b #(.list_end-.list_flute)-6
+		REP #$10
+		LDX.w #(.list_end-.list_flute)-6
 
 		.next_flute_group
 		LDA.l .list_flute+4,X : TAY
@@ -386,7 +389,8 @@ WorldMap_LoadChrHalfSlot:
 		BRA .return
 
 	.not_flute_menu
-	LDX.b #(.list_flute-.list)-6
+	REP #$10
+	LDX.w #(.list_flute-.list)-6
 
 	.next_group
 	LDA.l .list+4,X : TAY
@@ -396,17 +400,16 @@ WorldMap_LoadChrHalfSlot:
 	TXA : SBC.w #6 : TAX : BPL .next_group ; SEC is always set
 
 	.return
-	SEP #$20
+	SEP #$30
 	PLB
 RTL
 
-; from (bank $A2 only), to (bank $7F only), length (limited to 8-bit)
+; from (bank $A2 only), to (bank $7F only), length
 .list
-dw #PreloadedGraphicsROM+$180, $7F1180, $80-2
-dw #PreloadedGraphicsROM+$380, $7F1380, $80-2
-dw #PreloadedGraphicsROM+$360, $7F1320, $20-2
+dw #PreloadedGraphicsROM+$140, $7F1140, $C0-2
+dw #PreloadedGraphicsROM+$320, $7F1320, $E0-2
 .list_flute
-dw #PreloadedGraphicsROM+$160, $7F13C0, $20-2
+dw #PreloadedGraphicsROM+$120, $7F13C0, $20-2
 .list_end
 
 warnpc $8AC3B1
