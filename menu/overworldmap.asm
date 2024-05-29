@@ -88,9 +88,13 @@ dw $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, 
 .tr
 dw $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FFFF
 
-; FREE: 0x20 bytes, for any future usage of extra icons ^^^
+; FREE: 0x1E bytes, for any future usage of extra icons ^^^
 
-warnpc $8ABF36
+warnpc $8ABF34
+org $8ABF34
+PrizeExists:
+dw $37F8
+
 org $8ABF36
 ; vhpp ccco  tttttttt
 ; v/h - vert/horiz flip
@@ -136,7 +140,7 @@ db $12, $66 ; skull   ; Ganon's Tower
 warnpc $8ABF6E
 org $8ABF6E
 CompassExists:
-dw $37F8
+dw $37FC
 
 ; mirror portal fixes
 org $8ABF74
@@ -205,7 +209,7 @@ DrawPrizesOverride:
 				.main_dungeon_icon
 				LDA.l CompassMode : AND.w #$00F0 : ORA.b Scrap06
 				BIT.w #$0020 : BEQ + : BIT.w #$0004 : BNE .show_dungeon ; compass mode, show dungeon icon if its allowed to
-				+ BIT.w #$0001 : BNE + : JMP .advance : + ; hidden
+				+ BIT.w #$0040 : BEQ + : JMP .advance : + ; hidden
 				.show_dungeon
 				LDY.b #$00 ; 0 is located
 				BIT.w #$0004 : BNE + : BIT.w #$0030 : BEQ +
@@ -368,6 +372,10 @@ WorldMap_CheckForDungeonState:
 			LDA.l CompassExists : AND.l DungeonItemMasks,X : BEQ .setLocateDungeon
 			LDA.l CompassField : AND.l DungeonItemMasks,X : BNE .setLocateDungeon
 		+ ; Overworld Map: Default or Map option
+		LDA.l CompassMode : BIT.w #$0010 : BNE ++
+		BIT.w #$0040 : BEQ ++ ; skip if wild prizes
+			LDA.l PrizeExists : AND.l DungeonItemMasks,X : BNE +
+		++
 		LDA.l MapMode : AND.w #$00FF : BNE + ; 0 = always show, 1 = requires map
 		LDA.l MapField : AND.l DungeonItemMasks,X : BEQ +
 			.setLocateDungeon
