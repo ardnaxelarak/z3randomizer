@@ -1047,6 +1047,7 @@ org $8799EA : JML SetItemPose
 org $88C415 : JSL PendantMusicCheck
 BCS Ancilla22_ItemReceipt_is_pendant : BRA Ancilla22_ItemReceipt_wait_for_music
 ;org $88C452 : JSL MaybeKeepLootID : NOP #2 DR overwrote hook see RetrieveBunnyState
+org $88C469 : JSL MaybeSkipHeartRefill : db $90 ;BCC
 org $88C61D : JSL AnimatePrizeCutscene : NOP
 org $88C622 : BCC ItemReceipt_Animate_continue
 org $88C6BA : JSL CheckPoseItemCoordinates

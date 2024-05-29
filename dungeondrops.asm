@@ -419,6 +419,26 @@ SetDungeonCompleted:
         +
 RTS
 
+MaybeSkipHeartRefill:
+        LDA.w CurrentControlRequest : CMP.b #$13 : BNE .vanilla
+        LDA.l HeartPieceQuarter : BNE +
+                ; increase health
+                LDA.l MaximumHealth : CMP.b #$A0 : BEQ .reset_skip
+                CLC : ADC.b #$08 : STA.l MaximumHealth
+        +
+        .reset_skip
+        LDA.b #$00 ; just to ensure the MaximumHealth doesn't flow outside
+        BRA .skip
+
+        .vanilla
+        LDA.l HeartPieceQuarter : BEQ .do ; what we wrote over
+.skip
+CLC
+RTL
+.do
+SEC
+RTL
+
 ClearMultiworldText:
         PHP : PHX 
                 SEP #$30
