@@ -101,7 +101,7 @@ org $8ABF36
 WorldMapIcon_prize_tile:
 db $00, $00 ;                ; Hyrule Castle
 db $00, $00 ;                ; Sewers
-db $38, $62 ; green pendant  ; Eastern Palace
+db $38, $60 ; green pendant  ; Eastern Palace
 db $34, $60 ; blue pendant   ; Desert Palace
 db $00, $00 ;                ; Agahnim's Tower
 db $34, $64 ; crystal        ; Swamp Palace
@@ -155,11 +155,13 @@ BRA + : NOP #6 : + ; skip pyramid open check
 ; $04 = Current World
 ; $05 = Current Dungeon
 ; $06 = Helper Bitfield
+; $0A = Used as flag to draw icon overlay
 ; $0B-$0F = OAM GFX Data
 org $8AC02B
 DrawPrizesOverride:
 	PHB : LDA.b #WorldMapIcon_DungeonPointers>>16 : PHA : PLB
 		LDA.l CurrentWorld : STA.b Scrap04
+		LDY.b #$00 : STY.b Scrap0A
 		REP #$20
 		LDA.w #$0800+8 : STA.b OAMPtr
 		LDA.w #$0A20+2 : STA.b OAMPtr+2
@@ -249,6 +251,7 @@ DrawPrizesOverride:
 
 			; determine if draw and/or continue
 			JSR WorldMap_ValidateCoords : BCS .advance
+			JSR WorldMap_DrawTileOverlay
 			JSR WorldMap_DrawTile
 		.advance
 		LDY.b Scrap05 : DEY #2 : BMI + : JMP .next_dungeon : +
@@ -275,6 +278,22 @@ CLC : RTS
 .fail
 SEC : RTS
 
+WorldMap_DrawTileOverlay:
+	LDA.b Scrap0C : PHA : AND.w #$0EFF
+	CMP.w #$0264 : BEQ .do_overlay ; red crystal
+	CMP.w #$0860 : BEQ .do_overlay ; green pendant
+	PLA
+RTS
+	.do_overlay
+	LDX.b Scrap0B : PHX
+		LDX.b #$01 : STX.b Scrap0A
+		DEX : STX.b Scrap0B
+		LDA.b Scrap0C : AND.w #$FF00 : ORA.w #$006A : STA.w Scrap0C
+		JSR WorldMap_DrawTile
+		LDX.b #$00 : STX.b Scrap0A
+	PLX : PLA : STX.b Scrap0B : STA.b Scrap0C
+RTS
+
 WorldMap_DrawTile:
 	SEP #$20
 	LDX.b Scrap0B : TXA : STA.b (OAMPtr+2)
@@ -282,6 +301,10 @@ WorldMap_DrawTile:
 	LDA.b Scrap00 : PHA
 	JSR WorldMap_CalculateOAMCoordinates
 	PLA : STA.b Scrap00
+	LDX.b Scrap0A : BEQ +
+		LDA.b Scrap0E : CLC : ADC.b #$04 : STA.b Scrap0E
+		LDA.b Scrap0F : CLC : ADC.b #$04 : STA.b Scrap0F
+	+
 	LDX.b Scrap0B : BEQ +
 		LDA.b Scrap0E : SEC : SBC.b #$04 : STA.b Scrap0E
 		LDA.b Scrap0F : SEC : SBC.b #$04 : STA.b Scrap0F
