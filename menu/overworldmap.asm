@@ -88,9 +88,13 @@ dw $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, 
 .tr
 dw $FF00, $FF00, $FF00, $FF00, $FF00, $FF00, $FFFF
 
-; FREE: 0x1E bytes, for any future usage of extra icons ^^^
+; FREE: 0x15 bytes, for any future usage of extra icons ^^^
 
-warnpc $8ABF34
+warnpc $8ABF2B
+org $8ABF2B
+WorldMapIcon_Numbers:
+db $7F, $79, $6C, $6D, $6E, $6F, $7C, $7D, $7E
+
 org $8ABF34
 PrizeExists:
 dw $37F8
@@ -283,16 +287,30 @@ CLC : RTS
 SEC : RTS
 
 WorldMap_DrawTileOverlay:
-	LDA.b Scrap0C : PHA : AND.w #$0EFF
+	LDA.l CompassMode : AND.w #$0040 : BEQ +
+		LDA.b Scrap05 : BIT.w #$0100 : BEQ .skip+1
+		LSR : AND.w #$000F : TAX
+		LDA.l CrystalPendantFlags_3,X : TAX : BEQ .skip+1
+		CPX.b #$08 : !BGE +
+			LDA.b Scrap0C : PHA
+			LDA.l WorldMapIcon_Numbers-1,X
+				AND.w #$00FF : ORA.w #$3A00 : STA.b Scrap08
+		BRA .do_overlay
+	+
+	LDA.b Scrap0C : PHA
+	AND.w #$FF00 : ORA.w #$006A : STA.b Scrap08 ; temp store overlay tile info
+	LDA.b 1,S : AND.w #$0EFF
 	CMP.w #$0264 : BEQ .do_overlay ; red crystal
 	CMP.w #$0860 : BEQ .do_overlay ; green pendant
+
+	.skip
 	PLA
 RTS
 	.do_overlay
 	LDX.b Scrap0B : PHX
 		LDX.b #$01 : STX.b Scrap0A
 		DEX : STX.b Scrap0B
-		LDA.b Scrap0C : AND.w #$FF00 : ORA.w #$006A : STA.w Scrap0C
+		LDA.b Scrap08 : STA.w Scrap0C
 		JSR WorldMap_DrawTile
 		LDX.b #$00 : STX.b Scrap0A
 	PLX : PLA : STX.b Scrap0B : STA.b Scrap0C
@@ -401,6 +419,9 @@ WorldMap_CheckPrizeCollected:
 	PLX : CLC
 RTS
 
+warnpc $8AC3B1
+pullpc
+
 WorldMap_LoadChrHalfSlot:
 	JSL Graphics_LoadChrHalfSlot ; what we wrote over
 
@@ -442,6 +463,3 @@ dw #PreloadedGraphicsROM+$320, $7F1320, $E0-2
 .list_flute
 dw #PreloadedGraphicsROM+$120, $7F13C0, $20-2
 .list_end
-
-warnpc $8AC3B1
-pullpc

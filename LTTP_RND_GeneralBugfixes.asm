@@ -82,7 +82,6 @@ incsrc ram.asm
 incsrc sram.asm
 incsrc registers.asm
 incsrc vanillalabels.asm
-incsrc menu/overworldmap.asm ; Overwrites some code in bank $8A
 
 org $A08000 ; bank $20
 incsrc itemdowngrade.asm
@@ -177,6 +176,7 @@ incsrc elder.asm
 incsrc toast.asm
 incsrc fastcredits.asm
 incsrc msu.asm
+incsrc menu/overworldmap.asm ; Overwrites some code in bank $8A
 incsrc dungeonmap.asm
 incsrc hextodec.asm
 incsrc multiworld.asm
