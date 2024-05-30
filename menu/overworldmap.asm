@@ -127,15 +127,15 @@ org $8ABF52
 WorldMapIcon_dungeon_tile:
 db $1A, $7E ; white H ; Hyrule Castle
 db $00, $00 ;         ; Sewers
-db $14, $7F ; blue 1  ; Eastern Palace
-db $14, $79 ; blue 2  ; Desert Palace
+db $14, $7B ; blue 1  ; Eastern Palace
+db $14, $6B ; blue 2  ; Desert Palace
 db $1A, $7D ; white A ; Agahnim's Tower
 db $12, $79 ; red 2   ; Swamp Palace
 db $12, $7F ; red 1   ; Dark Palace
 db $12, $6F ; red 6   ; Misery Mire
 db $12, $6C ; red 3   ; Skull Woods
 db $12, $6E ; red 5   ; Ice Palace
-db $14, $6C ; blue 3  ; Tower of Hera
+db $14, $7A ; blue 3  ; Tower of Hera
 db $12, $6D ; red 4   ; Thieves' Town
 db $12, $7C ; red 7   ; Turtle Rock
 db $12, $66 ; skull   ; Ganon's Tower
