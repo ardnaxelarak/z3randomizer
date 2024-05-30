@@ -313,9 +313,9 @@ endmacro
 %ReceiptProps($AD, -4, 4, $0F, $F36A, $FF, free_smallkey, skip) ; AD - Small key of Ganon's Tower
 %ReceiptProps($AE, -4, 4, $0F, $F36A, $FF, skip, skip) ; AE - Reserved
 %ReceiptProps($AF, -4, 4, $0F, $F36A, $FF, generic_smallkey, skip) ; AF - Generic small key
-%ReceiptProps($B0, -4, 0, $28, $F36A, $FF, free_crystal, skip) ; B0 - Crystal 6 
+%ReceiptProps($B0, -4, 0, $4C, $F36A, $FF, free_crystal, skip) ; B0 - Crystal 6 
 %ReceiptProps($B1, -4, 0, $28, $F36A, $FF, free_crystal, skip) ; B1 - Crystal 1 
-%ReceiptProps($B2, -4, 0, $28, $F36A, $FF, free_crystal, skip) ; B2 - Crystal 5 
+%ReceiptProps($B2, -4, 0, $4C, $F36A, $FF, free_crystal, skip) ; B2 - Crystal 5 
 %ReceiptProps($B3, -4, 0, $28, $F36A, $FF, free_crystal, skip) ; B3 - Crystal 7 
 %ReceiptProps($B4, -4, 0, $28, $F36A, $FF, free_crystal, skip) ; B4 - Crystal 2 
 %ReceiptProps($B5, -4, 0, $28, $F36A, $FF, free_crystal, skip) ; B5 - Crystal 4 
@@ -1402,9 +1402,9 @@ StandingItemGraphicsOffsets:
 	dw BigDecompressionBuffer+$1DC0        ; AD - Small key of Ganon's Tower
 	dw $0                                  ; AE - Reserved
 	dw BigDecompressionBuffer+$1DC0        ; AF - Generic small key
-	dw BigDecompressionBuffer+$08A0        ; B0 - Crystal 6
+	dw $0C60                               ; B0 - Crystal 6
 	dw BigDecompressionBuffer+$08A0        ; B1 - Crystal 1
-	dw BigDecompressionBuffer+$08A0        ; B2 - Crystal 5
+	dw $0C60                               ; B2 - Crystal 5
 	dw BigDecompressionBuffer+$08A0        ; B3 - Crystal 7
 	dw BigDecompressionBuffer+$08A0        ; B4 - Crystal 2
 	dw BigDecompressionBuffer+$08A0        ; B5 - Crystal 4
