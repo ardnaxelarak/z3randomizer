@@ -213,10 +213,11 @@ DrawPrizesOverride:
 				.main_dungeon_icon
 				LDA.l CompassMode : AND.w #$00F0 : ORA.b Scrap06
 				BIT.w #$0020 : BEQ + : BIT.w #$0004 : BNE .show_dungeon ; compass mode, show dungeon icon if its allowed to
-				+ BIT.w #$0040 : BEQ + : JMP .advance : + ; hidden
+				+ BIT.w #$0040 : BEQ + : BIT.w #$0008 : BNE .show_dislocated_dungeon : JMP .advance : + ; hidden
 				.show_dungeon
 				LDY.b #$00 ; 0 is located
 				BIT.w #$0004 : BNE + : BIT.w #$0030 : BEQ +
+					.show_dislocated_dungeon
 					LDY.b #$04 ; 4 is dislocated
 				+
 
@@ -245,9 +246,11 @@ DrawPrizesOverride:
 			; determine located/dislocated/unknown
 			LDA.l CompassMode : AND.w #$00F0 : ORA.b Scrap06
 			LDY.b #$04 ; 4 is dislocated
-			BIT.w #$0003 : BEQ .advance
+			BIT.w #$000B : BEQ .advance
+			BIT.w #$0008 : BNE .prize_known_check
 			BIT.w #$0002 : BEQ +
 				LDY.b #$08 ; 8 is located
+				.prize_known_check
 				BIT.w #$0001 : BNE +
 					; don't know what prize
 					BIT.w #$0040 : BEQ .advance
@@ -364,7 +367,7 @@ WorldMap_CheckForDungeonState:
 		; determine if prize is located
 		LDA.l CompassMode : BIT.w #$0040 : BEQ + ; boss defeated
 			JSR WorldMap_CheckPrizeCollected : BCC ++
-				TYA : AND.w #$00FC : TAY ; prize collected, hide prize icons
+				TYA : AND.w #$00FD : ORA.w #$0008 : TAY ; prize collected, hide prize icons
 				BRA .dungeon_icon
 			++ LDA.l DungeonsCompleted : AND.l DungeonItemMasks,X : BEQ ++
 				.setLocatePrize
