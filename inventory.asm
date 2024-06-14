@@ -168,7 +168,7 @@ AddInventory:
                                 LDA.l BootsEquipment : AND.w #$00FF : BNE +
                                         TYA : STA.l PreBootsLocations
                                 +
-                                LDA.l MirrorEquipment : AND.w #$00FF : BNE +
+                                LDA.l MirrorEquipment : AND.w #$00FE : BNE +  ; FE to ignore mirror scroll
                                         TYA : STA.l PreMirrorLocations
                                 +
                                 LDA.l FluteEquipment : AND.w #$00FF : BNE +

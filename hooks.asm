@@ -750,10 +750,16 @@ org $8DE7B9 ; <- 6E7B9 - equipment.asm : 1548 (LDA.w #$16D0 : STA $00)
 JSL DrawGlovesInMenuLocation : NOP
 org $8DE7CF ; <- 6E7CF - equipment.asm : 1554 (LDA.w #$16C8 : STA $00)
 JSL DrawBootsInMenuLocation : NOP
+org $8DE7DD
+JSL ChangeBootsColorForFakeBoots : NOP
 org $8DE7E5 ; <- 6E7E5 - equipment.asm : 1560 (LDA.w #$16D8 : STA $00)
 JSL DrawFlippersInMenuLocation : NOP
 org $8DECEB ; <- 6ECEB - equipment.asm : 1946 (LDA.w #$16E0 : STA $00)
 JSL DrawMoonPearlInMenuLocation : NOP
+
+; Fake boots icon
+org $8DF851
+dw $2C29, $2C2A, $2C2B, $2C2C
 
 ;================================================================================
 ; Zelda S&Q Mirror Fix

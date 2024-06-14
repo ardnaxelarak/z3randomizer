@@ -299,7 +299,13 @@ DrawPlayerFileShared:
 	%fs_drawItemBasic(EquipmentSRAM+$12,9,18,FileSelectItems_cape)
 
 	; Mirror
-	%fs_drawItemBasic(EquipmentSRAM+$13,9,20,FileSelectItems_mirror)
+	LDA.l EquipmentSRAM+$13 : AND.w #$00FF : BEQ +
+		CMP.w #$0001 : BNE +
+			%fs_drawItem(9,20,FileSelectItems_mirrorScroll)
+			BRA ++
+	+
+		%fs_drawItemBasic(EquipmentSRAM+$13,9,20,FileSelectItems_mirror)
+	++
 
 	; Bottles
 	%fs_drawBottle(EquipmentSRAM+$1C,3,23)
@@ -543,6 +549,8 @@ FileSelectItems:
 	dw #$0288|!FS_COLOR_RED, #$0289|!FS_COLOR_RED, #$0298|!FS_COLOR_RED, #$0299|!FS_COLOR_RED
 	.mirror
 	dw #$028A|!FS_COLOR_BLUE, #$028B|!FS_COLOR_BLUE, #$029A|!FS_COLOR_BLUE, #$029B|!FS_COLOR_BLUE
+	.mirrorScroll
+	dw #$02C2|!FS_COLOR_YELLOW, #$02C3|!FS_COLOR_YELLOW, #$02D2|!FS_COLOR_YELLOW, #$02d3|!FS_COLOR_YELLOW
 
 	.flippers
 	dw #$024E|!FS_COLOR_BLUE, #$024F|!FS_COLOR_BLUE, #$025F|!FS_COLOR_BLUE|!FS_HFLIP, #$025F|!FS_COLOR_BLUE
