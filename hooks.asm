@@ -1026,7 +1026,7 @@ org $81C517 : JSL CheckDungeonCompletion
 org $81C523 : JSL CheckDungeonCompletion
 org $81C710 : JSL CheckSpawnPrize
 BCS RoomTag_GetHeartForPrize_spawn_prize : BRA RoomTag_GetHeartForPrize_delete_tag
-org $81C742 : JSL SpawnDungeonPrize
+org $81C742 : JSL SpawnDungeonPrize : PLA : RTS
 org $8799EA : JML SetItemPose
 org $88C415 : JSL PendantMusicCheck
 BCS Ancilla22_ItemReceipt_is_pendant : BRA Ancilla22_ItemReceipt_wait_for_music
@@ -1464,7 +1464,7 @@ RebuildHUD_update_long:
 JSR RebuildHUD_update : RTL
 
 RefreshIcon_UpdateHUD:
-INC.w UpdateHUDFlag
+LDA.b #$01 : STA.l UpdateHUDFlag
 JSR RebuildHUD
 JSR UpdateEquippedItem
 RTS

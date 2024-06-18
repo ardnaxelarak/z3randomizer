@@ -29,6 +29,44 @@ print "Collection Rate Low Start: ", pc
 db $9F, $EE ; " /"
 db $7B, $7A, $7F ; 216
 
+!FEATURE_PATREON_SUPPORTERS ?= 0
+
+table "data/creditscharmapbighi.txt"
+PatronCredit1Hi:
+db 2
+db 55
+db "                            " ; $23803E
+
+table "data/creditscharmapbiglo.txt"
+PatronCredit1Lo:
+db 2
+db 55
+db "                            " ; $23805C
+
+table "data/creditscharmapbighi.txt"
+PatronCredit2Hi:
+db 2
+db 55
+db "                            " ; $23807A
+
+table "data/creditscharmapbiglo.txt"
+PatronCredit2Lo:
+db 2
+db 55
+db "                            " ; $238098
+
+table "data/creditscharmapbighi.txt"
+PatronCredit3Hi:
+db 2
+db 55
+db "                            " ; $2380B6
+
+table "data/creditscharmapbiglo.txt"
+PatronCredit3Lo:
+db 2
+db 55
+db "                            " ; $2380D4
+
 ;===================================================================================================
 
 CreditsLineTable:
@@ -514,6 +552,24 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
+if !FEATURE_PATREON_SUPPORTERS
+	%smallcredits("PATREON SUPPORTERS", "yellow")
+
+	%addarbline(PatronCredit1Hi)
+	%addarbline(PatronCredit1Lo)
+
+	%blankline()
+	%addarbline(PatronCredit2Hi)
+	%addarbline(PatronCredit2Lo)
+
+	%blankline()
+	%addarbline(PatronCredit3Hi)
+	%addarbline(PatronCredit3Lo)
+
+	%blankline()
+	%blankline()
+endif
+
 %smallcredits("SPECIAL THANKS", "red")
 
 %blankline()
@@ -546,7 +602,7 @@ CreditsLineBlank:
 
 %blankline()
 
-%bigcredits("AND&")
+%bigcredits("AND")
 
 %blankline()
 
@@ -571,17 +627,20 @@ CreditsLineBlank:
 %emptyline()
 %emptyline()
 %emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
+
+if !FEATURE_PATREON_SUPPORTERS == 0
+	%emptyline()
+	%emptyline()
+	%emptyline()
+	%emptyline()
+	%emptyline()
+	%emptyline()
+	%emptyline()
+	%emptyline()
+	%emptyline()
+	%emptyline()
+	%emptyline()
+endif
 
 ;===================================================================================================
 
