@@ -497,8 +497,8 @@ PHA : XBA : PHA
         ; dont save if we already saved recently
         REP #$20
         LDA.l MSUResumeTrack : AND.w #$00FF : BEQ ++
-            LDA.l NMIFrames : !SUB.w MSUResumeTime : PHA
-            LDA.l NMIFrames+2 : SBC.w MSUResumeTime+2 : BNE +++
+            LDA.l NMIFrames : !SUB.l MSUResumeTime : PHA
+            LDA.l NMIFrames+2 : SBC.l MSUResumeTime+2 : BNE +++
                 PLA : CMP.l MSUResumeTimer : !BLT .too_early
                 BRA ++
             +++
@@ -663,8 +663,8 @@ MSUMain:
     PLX
     TXA : CMP.l MSUResumeTrack : BNE + ; dont resume if too late
         REP #$20
-            LDA.l NMIFrames : !SUB.w MSUResumeTime : PHA
-            LDA.l NMIFrames+2 : SBC.w MSUResumeTime+2 : BNE ++
+            LDA.l NMIFrames : !SUB.l MSUResumeTime : PHA
+            LDA.l NMIFrames+2 : SBC.l MSUResumeTime+2 : BNE ++
                 PLA : CMP.l MSUResumeTimer : !BGE +++
                 SEP #$20
                 LDA.b #!FLAG_RESUME_FADEIN : BRA .done_resume
