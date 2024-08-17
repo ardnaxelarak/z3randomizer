@@ -158,6 +158,7 @@ RTL
 ;$389 = Ganon's Tower
 ;--------------------------------------------------------------------------------
 DrawBootsInMenuLocation:
+	LDA.l DRMode : AND.w #$00FF : CMP.w #$0002 : BEQ +
 	LDA.l HUDDungeonItems : BNE +
 		LDA.w #$1608 : STA.b Scrap00
 		RTL
@@ -166,6 +167,7 @@ DrawBootsInMenuLocation:
 RTL
 ;--------------------------------------------------------------------------------
 DrawGlovesInMenuLocation:
+	LDA.l DRMode : AND.w #$00FF : CMP.w #$0002 : BEQ +
 	LDA.l HUDDungeonItems : BNE +
 		LDA.w #$1610 : STA.b Scrap00
 		RTL
@@ -174,6 +176,7 @@ DrawGlovesInMenuLocation:
 RTL
 ;--------------------------------------------------------------------------------
 DrawFlippersInMenuLocation:
+	LDA.l DRMode : AND.w #$00FF : CMP.w #$0002 : BEQ +
 	LDA.l HUDDungeonItems : BNE +
 		LDA.w #$1618 : STA.b Scrap00
 		RTL
@@ -182,6 +185,7 @@ DrawFlippersInMenuLocation:
 RTL
 ;--------------------------------------------------------------------------------
 DrawMoonPearlInMenuLocation:
+	LDA.l DRMode : AND.w #$00FF : CMP.w #$0002 : BEQ +
 	LDA.l HUDDungeonItems : BNE +
 		LDA.w #$1620 : STA.b Scrap00
 		RTL
@@ -190,8 +194,9 @@ DrawMoonPearlInMenuLocation:
 RTL
 ;--------------------------------------------------------------------------------
 DrawHUDDungeonItems:
+	LDA.l DRMode : CMP.b #$02 : BEQ ++
 	LDA.l HUDDungeonItems : BEQ .return
-		JMP .continue
+		++ JMP .continue
 .return
 RTL
 

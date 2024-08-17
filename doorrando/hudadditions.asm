@@ -112,8 +112,7 @@ dw $0000, $0000, $0000, $0000, $000a, $000a, $000a, $0014, $000a, $0014, $0000, 
 DrHudDungeonItemsAdditions:
 {
     jsl DrawHUDDungeonItems
-    lda.l DRMode : cmp.b #$02 : beq + : rtl
-    +
+    lda.l DRMode : cmp.b #$02 : beq + : rtl : +
 
     phx : phy : php
     rep #$30
@@ -170,7 +169,6 @@ DrHudDungeonItemsAdditions:
             + inx #2 : cpx.w #$001b : bcs ++ : JMP -
     ++
     lda.l HudFlag : and.w #$0020 : bne + : JMP ++ : +
-    lda.l HUDDungeonItems : and.w #$000c : bne + : JMP ++ : +
         ; map symbols (do I want these) ; note compass symbol is 2c20
         lda.w #$2821 : sta.w $1606 : sta.w $1610 : sta.w $161a : sta.w $1624
         ; blank out a couple thing from old hud
