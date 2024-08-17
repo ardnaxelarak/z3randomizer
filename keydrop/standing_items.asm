@@ -674,12 +674,13 @@ KeyGet:
         + LDY.w SprItemReceipt, X
         LDA.w SprItemIndex, X : STA.w SpawnedItemIndex
         LDA.w SprItemFlags, X : STA.w SpawnedItemFlag
-        LDA.b RoomIndex : CMP.b #$87 : BNE + ;check for hera cage
-        LDA.w SpawnedItemFlag : BNE + ; if it came from a pot, it's fine
-            JSR ShouldKeyBeCountedForDungeon : BCC ++
-            JSL CountChestKeyLong
-            ++ PLA : RTL
-        + STY.b Scrap00
+        ; LDA.b RoomIndex : CMP.b #$87 : BNE + ;check for hera cage
+        ; LDA.w SpawnedItemFlag : BNE + ; if it came from a pot, it's fine
+        ;     JSR ShouldKeyBeCountedForDungeon : BCC ++
+        ;     JSL CountChestKeyLong
+        ;     ++ PLA : RTL
+        ;+ 
+        STY.b Scrap00
         LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
         STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .receive
         PHX
