@@ -218,7 +218,7 @@ RevealPotItem:
 				; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 			+ REP #$10
 			LDA.l TotalItemCounter : INC : STA.l TotalItemCounter ; Increment Item Total
-			INC.w UpdateHUDFlag
+			LDA.w #$0001 : STA.l UpdateHUDFlag
 		.obtained
 	PLY : PLX
 
@@ -317,7 +317,7 @@ IncrementCountsForSubstitute:
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 		+
 		LDA.l TotalItemCounter : INC : STA.l TotalItemCounter ; Increment Item Total
-		INC.w UpdateHUDFlag
+		LDA.w #$0001 : STA.l UpdateHUDFlag
 	.obtained
 	SEP #$30 : PLX
 RTS
@@ -556,7 +556,7 @@ IncrementCountForMinor:
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 		+
 		LDA.l TotalItemCounter : INC : STA.l TotalItemCounter ; Increment Item Total
-		INC.w UpdateHUDFlag
+		LDA.w #$0001 : STA.l UpdateHUDFlag
 	.obtained
 	SEP #$30 : PLX
 RTS
@@ -674,12 +674,6 @@ KeyGet:
         + LDY.w SprItemReceipt, X
         LDA.w SprItemIndex, X : STA.w SpawnedItemIndex
         LDA.w SprItemFlags, X : STA.w SpawnedItemFlag
-        ; LDA.b RoomIndex : CMP.b #$87 : BNE + ;check for hera cage
-        ; LDA.w SpawnedItemFlag : BNE + ; if it came from a pot, it's fine
-        ;     JSR ShouldKeyBeCountedForDungeon : BCC ++
-        ;     JSL CountChestKeyLong
-        ;     ++ PLA : RTL
-        ;+ 
         STY.b Scrap00
         LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
         STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE .receive
@@ -705,18 +699,6 @@ KeyGet:
 
 KeyTable:
 db $A0, $A0, $A2, $A3, $A4, $A5, $A6, $A7, $A8, $A9, $AA, $AB, $AC, $AD
-
-; Input Y - the item type
-ShouldKeyBeCountedForDungeon:
-	PHX
-		LDA.w DungeonID : CMP.b #$FF : BEQ .done
-		LSR : TAX
-		TYA : CMP.w KeyTable, X : BNE +
-			- PLX : SEC : RTS
-		+ CMP.b #$24 : BEQ -
-	.done
-	PLX : CLC : RTS
-
 
 BigKeyGet:
 	LDY.w SprItemReceipt, X

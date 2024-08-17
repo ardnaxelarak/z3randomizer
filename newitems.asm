@@ -437,7 +437,7 @@ ItemBehavior:
         .single_arrow
         LDA.l ArrowMode : BEQ +
                 LDA.l CurrentArrows : INC : STA.l CurrentArrows ; Should be sole write to this address
-                INC.w UpdateHUDFlag                             ; in retro/rupee bow mode.
+                LDA.b #$01 : STA.l UpdateHUDFlag                             ; in retro/rupee bow mode.
         +
         RTS
 
@@ -893,15 +893,15 @@ ResolveLootID:
         JMP .have_item
 
         .rng_single
-        JSL GetRNGItemSingle : STA.w ScratchBufferV+6
+        JSL GetRNGItemSingle : STA.l ScratchBufferV+6
         XBA : JSR MarkRNGItemSingle
         LDA.b #$FF : STA.l RNGLockIn ; clear lock-in
-        LDA.w ScratchBufferV+6 : JMP .get_item
+        LDA.l ScratchBufferV+6 : JMP .get_item
 
         .rng_multi
-        JSL GetRNGItemMulti : STA.w ScratchBufferV+6
+        JSL GetRNGItemMulti : STA.l ScratchBufferV+6
         LDA.b #$FF : STA.l RNGLockIn ; clear lock-in
-        LDA.w ScratchBufferV+6 : JMP .get_item
+        LDA.l ScratchBufferV+6 : JMP .get_item
 
 ;--------------------------------------------------------------------------------
 DungeonItemMasks:
@@ -956,7 +956,7 @@ HandleBowTracking:
         ; at this point.
         LDA.w ItemReceiptMethod : CMP.b #$01 : BEQ +
                 LDX.w CurrentSpriteSlot
-                LDA.w SpriteMetaData,X : BEQ +
+                LDA.w SpriteMetaData,X : BEQ .done
                         BRA .done
         +
         LDA.b #$00
@@ -1026,32 +1026,32 @@ GetRNGItemSingle:
 			CMP.l RNGSingleTableSize : !BGE .single_reroll
 		+++
 
-		STA.w ScratchBufferV ; put our index value here
+		STA.l ScratchBufferV ; put our index value here
 		LDX.b #$00
 		TAY
 		.recheck
 			TYA
 			JSR CheckSingleItem : BEQ .single_unused ; already used
-				LDA.w ScratchBufferV : INC ; increment index
+				LDA.l ScratchBufferV : INC ; increment index
 				CMP.l RNGSingleTableSize : BCC +++ : LDA.b #$00 : +++ ; rollover index if needed
-				STA.w ScratchBufferV ; store index
+				STA.l ScratchBufferV ; store index
 				INX : TAY : TXA : CMP.l RNGSingleTableSize : BCC .recheck
 				LDA.b #$5A ; everything is gone, default to null item - MAKE THIS AN OPTION FOR THIS AND THE OTHER ONE
 				BRA .single_done
 		.single_unused
-			LDA.w ScratchBufferV
+			LDA.l ScratchBufferV
 		.single_done
 			TAX : LDA.l RNGSingleItemTable, X
-			XBA : LDA.w ScratchBufferV : STA.l RNGLockIn : XBA
+			XBA : LDA.l ScratchBufferV : STA.l RNGLockIn : XBA
 	PLY
 RTL
 ;--------------------------------------------------------------------------------
 CheckSingleItem:
 	LSR #3 : TAX
-	LDA.l RNGItem, X : STA.w ScratchBufferV+2 ; load value to temporary
+	LDA.l RNGItem, X : STA.l ScratchBufferV+2 ; load value to temporary
 	PHX
-		LDA.w ScratchBufferV : AND.b #$07 : TAX ; load 0-7 part into X
-		LDA.w ScratchBufferV+2
+		LDA.l ScratchBufferV : AND.b #$07 : TAX ; load 0-7 part into X
+		LDA.l ScratchBufferV+2
 		---
 		CPX.b #$00 : BEQ +++
 			LSR
@@ -1063,10 +1063,10 @@ CheckSingleItem:
 RTS
 ;--------------------------------------------------------------------------------
 MarkRNGItemSingle:
-	LSR #3 : STA.w ScratchBufferV+1 : TAX
+	LSR #3 : STA.l ScratchBufferV+1 : TAX
 	LDA.l RNGItem, X
-	STA.w ScratchBufferV+2
-	LDA.w ScratchBufferV : AND.b #$07 : TAX ; load 0-7 part into X
+	STA.l ScratchBufferV+2
+	LDA.l ScratchBufferV : AND.b #$07 : TAX ; load 0-7 part into X
 	LDA.b #01
 	---
 	CPX.b #$00 : BEQ +++
@@ -1076,9 +1076,9 @@ MarkRNGItemSingle:
 	+++
 
 	PHA
-		LDA.w ScratchBufferV+1 : TAX
+		LDA.l ScratchBufferV+1 : TAX
 	PLA
-	ORA.w ScratchBufferV+2
+	ORA.l ScratchBufferV+2
 	STA.l RNGItem, X
 RTS
 ;--------------------------------------------------------------------------------

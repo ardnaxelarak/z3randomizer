@@ -78,12 +78,12 @@ IncrementSmallKeys:
 	STA.l CurrentSmallKeys ; thing we wrote over, write small key count
 	PHX
 		LDA.l StatsLocked : BNE +
-                        LDA.l SmallKeyCounter : INC : STA.l SmallKeyCounter
+			LDA.l SmallKeyCounter : INC : STA.l SmallKeyCounter
 		+
 		JSL UpdateKeys
 		PHY : LDY.b #24 : JSL AddInventory : PLY
 		JSL HUD_RebuildLong
-                INC.w UpdateHUDFlag
+	LDA.b #$01 : STA.l UpdateHUDFlag
 	PLX
 RTL
 ;--------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ IncrementSmallKeysNoPrimary:
                 ++
                 PLP
         +
-        INC.w UpdateHUDFlag
+        LDA.b #$01 : STA.l UpdateHUDFlag
         JSL HUD_RebuildLong
         PLX
 RTL
@@ -330,15 +330,15 @@ StatsFinalPrep:
 		INC : STA.l StatsLocked
 	
 		JSL IncrementFinalSword
-	
+
 		LDA.l HighestMail : INC : STA.l HighestMail ; add green mail to mail count
-		
+		LDA.l Aga2Duck : BEQ .ramPostOnly
 		LDA.l ScreenTransitions : DEC : STA.l ScreenTransitions ; remove extra transition from exiting gtower via duck
-		
+
 		.ramPostOnly
 		LDA.l SwordBossKills : LSR #4 : !ADD.l SwordBossKills : STA.l BossKills
 		LDA.l SwordBossKills+1 : LSR #4 : !ADD.l SwordBossKills+1 : !ADD.l BossKills : AND.b #$0F : STA.l BossKills
-	
+
 		LDA.l NMIFrames : !SUB.l LoopFrames : STA.l LagTime
 		LDA.l NMIFrames+1 : SBC.l LoopFrames+1 : STA.l LagTime+1
 		LDA.l NMIFrames+2 : SBC.l LoopFrames+2 : STA.l LagTime+2
@@ -356,7 +356,3 @@ StatsFinalPrep:
         STZ.b GameSubMode
         STZ.b SubSubModule
 RTL
-;--------------------------------------------------------------------------------
-; Notes:
-; s&q counter
-;================================================================================

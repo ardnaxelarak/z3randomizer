@@ -5,6 +5,7 @@ SpawnDungeonPrize:
         PHX : PHB
         STA.w ItemReceiptID
         TAX
+        LDA.b $06,S : STA.b ScrapBuffer72 ; Store current RoomTag index
         LDA.b #$29 : LDY.b #$06
 
         JSL AddAncillaLong
@@ -12,6 +13,7 @@ SpawnDungeonPrize:
                 LDA.w ItemReceiptID
                 STA.w AncillaGet,X
                 JSR AddDungeonPrizeAncilla
+                LDX.b ScrapBuffer72 : STZ.b RoomTag,X
         .failed_spawn
         PLB : PLX
 RTL

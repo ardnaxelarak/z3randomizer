@@ -17,7 +17,7 @@ RTL
 ;================================================================================
 HUDRebuildIndoorHole:
 	PHA
-        INC.w UpdateHUDFlag
+	LDA.b #$01 : STA.l UpdateHUDFlag
 	LDA.l GenericKeys : BEQ .normal
 	.generic
 	PLA
@@ -30,7 +30,7 @@ RTL
 RTL
 ;================================================================================
 HUDRebuildIndoor:
-        INC.w UpdateHUDFlag
+	LDA.b #$01 : STA.l UpdateHUDFlag
 	LDA.l GenericKeys : BEQ .normal
 	.generic
 	LDA.b #$00 : STA.l RoomDarkness
@@ -164,6 +164,15 @@ DrawBootsInMenuLocation:
 		RTL
 	+
 	LDA.w #$1588 : STA.b Scrap00
+RTL
+;--------------------------------------------------------------------------------
+ChangeBootsColorForFakeBoots:
+	LDA.l FakeBoots : AND.w #$00FF : BEQ +
+	LDA.l EquipmentSRAM+$15 : AND.w #$00FF : BNE +
+		LDA.w #$F851	; address of ItemMenu_ItemIcons_usused_nothing, which has the fake boots now
+		BRA ++
+	+ LDA.w #$F821  ; address of ItemMenu_ItemIcons_boots
+	++ STA.b Scrap04
 RTL
 ;--------------------------------------------------------------------------------
 DrawGlovesInMenuLocation:

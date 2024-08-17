@@ -49,7 +49,7 @@ LoadModifiedArmorLevel:
 		CMP.b #$03 : !BLT + : LDA.b #$02 : +
 		STA.l ScratchBufferV
 	PLA
-	!ADD.w ScratchBufferV
+	!ADD.l ScratchBufferV
 RTL
 ;================================================================================
 ; MagicConsumption - Magic Inventory

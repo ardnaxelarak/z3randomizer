@@ -168,7 +168,7 @@ AddInventory:
                                 LDA.l BootsEquipment : AND.w #$00FF : BNE +
                                         TYA : STA.l PreBootsLocations
                                 +
-                                LDA.l MirrorEquipment : AND.w #$00FF : BNE +
+                                LDA.l MirrorEquipment : AND.w #$00FE : BNE +  ; FE to ignore mirror scroll
                                         TYA : STA.l PreMirrorLocations
                                 +
                                 LDA.l FluteEquipment : AND.w #$00FF : BNE +
@@ -254,10 +254,9 @@ StampItem:
                 LDA.b [Scrap0B] : BNE .skip
                 INC.b Scrap0B : INC.b Scrap0B
                 LDA.b [Scrap0B] : BNE .skip
+                        LDA.l NMIFrames+2 : STA.b [Scrap0B]
                         DEC.b Scrap0B : DEC.b Scrap0B
                         LDA.l NMIFrames : STA.b [Scrap0B]
-                        INC.b Scrap0B : INC.b Scrap0B
-                        LDA.l NMIFrames+2 : STA.b [Scrap0B]
         .skip
         SEP #$20
 RTS
@@ -374,7 +373,7 @@ HUDRefresh:
 	+
 
 	JSL HUD_RefreshIconLong ; thing we wrote over
-        INC.w UpdateHUDFlag
+	LDA.b #$01 : STA.l UpdateHUDFlag
 	JSL PostItemGet
 RTL
 ;--------------------------------------------------------------------------------
@@ -389,7 +388,7 @@ HandleBombAbsorbtion:
 		LDA.b #$04 : STA.w ItemCursor ; set selected item to bombs
 		LDA.b #$01 : STA.w CurrentYItem ; set selected item to bombs
 		JSL HUD_RebuildLong
-                INC.w UpdateHUDFlag
+		LDA.b #$01 : STA.l UpdateHUDFlag
 	+
 RTL
 ;--------------------------------------------------------------------------------

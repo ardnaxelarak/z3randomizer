@@ -757,10 +757,16 @@ org $8DE7B9 ; <- 6E7B9 - equipment.asm : 1548 (LDA.w #$16D0 : STA $00)
 JSL DrawGlovesInMenuLocation : NOP
 org $8DE7CF ; <- 6E7CF - equipment.asm : 1554 (LDA.w #$16C8 : STA $00)
 JSL DrawBootsInMenuLocation : NOP
+org $8DE7DD
+JSL ChangeBootsColorForFakeBoots : NOP
 org $8DE7E5 ; <- 6E7E5 - equipment.asm : 1560 (LDA.w #$16D8 : STA $00)
 JSL DrawFlippersInMenuLocation : NOP
 org $8DECEB ; <- 6ECEB - equipment.asm : 1946 (LDA.w #$16E0 : STA $00)
 JSL DrawMoonPearlInMenuLocation : NOP
+
+; Fake boots icon
+org $8DF851
+dw $2C29, $2C2A, $2C2B, $2C2C
 
 ;================================================================================
 ; Zelda S&Q Mirror Fix
@@ -1042,7 +1048,7 @@ org $81C517 : JSL CheckDungeonCompletion
 org $81C523 : JSL CheckDungeonCompletion
 org $81C710 : JSL CheckSpawnPrize
 BCS RoomTag_GetHeartForPrize_spawn_prize : BRA RoomTag_GetHeartForPrize_delete_tag
-org $81C742 : JSL SpawnDungeonPrize
+org $81C742 : JSL SpawnDungeonPrize : PLA : RTS
 org $8799EA : JML SetItemPose
 org $88C415 : JSL PendantMusicCheck
 BCS Ancilla22_ItemReceipt_is_pendant : BRA Ancilla22_ItemReceipt_wait_for_music
@@ -1491,7 +1497,7 @@ RebuildHUD_update_long:
 JSR RebuildHUD_update : RTL
 
 RefreshIcon_UpdateHUD:
-INC.w UpdateHUDFlag
+LDA.b #$01 : STA.l UpdateHUDFlag
 JSR RebuildHUD
 JSR UpdateEquippedItem
 RTS
