@@ -1820,6 +1820,9 @@ JML MaidenCrystalScript
 org $9ECCEB ; <- F4CEB - sprite_crystal_maiden.asm : 25 ; skip all palette nonsense
 BRA CrystalCutscene_Initialize_skip_palette
 ;--------------------------------------------------------------------------------
+org $9ECD97
+JSL MaybeSkipCrystalCutsceneFollowerReset
+;--------------------------------------------------------------------------------
 org $88C3FD ; <- 443FD - ancilla_receive_item.asm : 89
 BRA + : NOP #4 : +
 ;--------------------------------------------------------------------------------

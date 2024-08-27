@@ -228,6 +228,7 @@ CopyDecompressedCharToTransferBuffer                       = $8EF5BC
 CopyDecompressedToFullBuffer                               = $8EF6A8
 Trinexx_FinalPhase                                         = $9DADB5
 Trinexx_PreFinalPhase                                      = $9DB0D2
+CrystalCutscene_SpawnMaiden_PostFollowerGfx                = $9ECDA7
 CrystalMaiden_KickOutOfDungeon                             = $9ECF35
 GoldBee_Dormant_exit                                       = $9EDE89
 GoldBee_SpawnSelf                                          = $9EDE8A

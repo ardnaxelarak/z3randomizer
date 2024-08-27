@@ -450,3 +450,15 @@ ClearMultiworldText:
                 +
         PLX : PLP
 RTL 
+
+MaybeSkipCrystalCutsceneFollowerReset:
+PHA
+        ; skip if prizes are shuffled outside of normal boss drops
+        LDA.l InventoryTable_properties+($37*2) : AND.b #$01 : BEQ .continue
+.skip
+PLA : PLA : PLA : PLA
+JML CrystalCutscene_SpawnMaiden_PostFollowerGfx
+.continue
+PLA
+STA.l FollowerIndicator ; what we wrote over
+RTL
