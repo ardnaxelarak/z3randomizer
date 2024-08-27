@@ -291,32 +291,6 @@ PostItemAnimation:
         		JML Ancilla_ReceiveItem_objectFinished
 	+
 
-        REP #$20
-        PEA.w $7E00
-        PLB : PLB
-        LDA.w TransparencyFlag : BNE .SP05
-                LDA.l PalettesCustom_off_black+$00 : STA.w PaletteBuffer+$0170 : STA.w PaletteBufferAux+$0170
-                LDA.l PalettesCustom_off_black+$02 : STA.w PaletteBuffer+$0172 : STA.w PaletteBufferAux+$0172
-                STA.w PaletteBuffer+$0174 : STA.w PaletteBufferAux+$0174
-                STA.w PaletteBuffer+$0176 : STA.w PaletteBufferAux+$0176
-                STA.w PaletteBuffer+$0178 : STA.w PaletteBufferAux+$0178
-                STA.w PaletteBuffer+$017A : STA.w PaletteBufferAux+$017A
-                STA.w PaletteBuffer+$017C : STA.w PaletteBufferAux+$017C
-                STA.w PaletteBuffer+$017E : STA.w PaletteBufferAux+$017E
-                BRA .done
-        .SP05
-        LDA.l PalettesCustom_off_black+$00 : STA.w PaletteBuffer+$01B0 : STA.w PaletteBufferAux+$01B0
-        LDA.l PalettesCustom_off_black+$02 : STA.w PaletteBuffer+$01B2 : STA.w PaletteBufferAux+$01B2
-        STA.w PaletteBuffer+$01B4 : STA.w PaletteBufferAux+$01B4
-        STA.w PaletteBuffer+$01B6 : STA.w PaletteBufferAux+$01B6
-        STA.w PaletteBuffer+$01B8 : STA.w PaletteBufferAux+$01B8
-        STA.w PaletteBuffer+$01BA : STA.w PaletteBufferAux+$01BA
-        STA.w PaletteBuffer+$01BC : STA.w PaletteBufferAux+$01BC
-        STA.w PaletteBuffer+$01BE : STA.w PaletteBufferAux+$01BE
-        .done
-        INC.b NMICGRAM
-        SEP #$20
-
         STZ.w ItemReceiptMethod : LDA.w AncillaGet, X ; thing we wrote over to get here
         PLB
 JML Ancilla_ReceiveItem_optimus+6
