@@ -298,7 +298,7 @@ DrawPotItem:
 			LDA.b IndoorsFlag : AND.w #$00FF : BEQ +
 			LDA.w SpriteTypeTable, X : AND.w #$00FF : CMP.w #$00EB : BEQ .drawSpecial
 			LDA.w SprItemFlags, X : AND.w #$00FF : BEQ .shiftUpLeft ; hera cage item
-			BRA .drawSpecial
+			BRA .shiftLeft
 		+
 		LDA.w SprItemFlags, X : AND.w #$00FF : BEQ .drawSpecial
 
