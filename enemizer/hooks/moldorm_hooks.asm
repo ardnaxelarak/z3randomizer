@@ -18,3 +18,10 @@ org $9DD88E
     ;0EDBB2 0EDBB3
 ;    LDX.b #$01
 ;}
+
+org $85B8BA ; geldman
+JSL Sprite_MaybeForceDrawShadow
+org $9EAAAC ; stalfos knight
+JSL Sprite_MaybeForceDrawShadow
+org $9EB209 ; blob
+JSL Sprite_MaybeForceDrawShadow

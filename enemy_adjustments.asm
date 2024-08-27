@@ -25,3 +25,15 @@ NewFireBarDamage:
                 RTL
 .NotSameLayer
 RTL
+;--------------------------------------------------------------------------------
+Sprite_MaybeForceDrawShadow:
+	JSL Sprite_PrepOAMCoordLong
+	LDA.l DRFlags+1 : AND.b #$08 : BEQ .return
+	LDA.b GameMode : CMP.b #$07 : BNE .return
+		JSL Sprite_DrawShadowLong
+		; LDA.w SpriteTypeTable,X : CMP.b #$91 : BNE .return ; stalfos knight
+		; 	; move shadow down by 8 pixels
+		; 	+ LDA.w SpriteOAMProperties,X : AND.b #$1F : ASL #2 : TAY : INY ; get OAM offset
+		; 	LDA.b (OAMPtr),Y : CLC : ADC.b #$08 : STA.b (OAMPtr),Y
+.return
+RTL
