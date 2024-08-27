@@ -428,9 +428,7 @@ MSUInit:
 
     LDA.b #$00
     STA.l MSULoadedTrack
-    STA.l MSUResumeTrack
-    STA.l MSUResumeTime : STA.l MSUResumeTime+1 : STA.l MSUResumeTime+2 : STA.l MSUResumeTime+3
-    STA.l MSUResumeControl
+    JSL MSUResumeReset
 
     LDA.l NoBGM : BNE .done
 
@@ -493,6 +491,17 @@ MSUInit:
     PLA : DEC
     BRA .check_track
 
+;--------------------------------------------------------------------------------
+
+;================================================================================
+; Purge MSU Resume values
+;--------------------------------------------------------------------------------
+MSUResumeReset:
+    LDA.b #$00
+    STA.l MSUResumeTrack
+    STA.l MSUResumeTime : STA.l MSUResumeTime+1 : STA.l MSUResumeTime+2 : STA.l MSUResumeTime+3
+    STA.l MSUResumeControl
+RTL
 ;--------------------------------------------------------------------------------
 
 ;================================================================================
