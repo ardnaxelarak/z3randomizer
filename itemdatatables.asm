@@ -592,9 +592,9 @@ endmacro
 %SpriteProps($AD, 0, 0, $02, $04, PalettesVanilla_blue_ice+$0E)         ; AD - Small key of Ganon's Tower
 %SpriteProps($AE, 2, 2, $02, $02, $0000)                                ; AE - Reserved
 %SpriteProps($AF, 0, 0, $02, $04, PalettesVanilla_blue_ice+$0E)         ; AF - Generic small key
-%SpriteProps($B0, 2, 2, $01, $01, $0000)                                ; B0 - Crystal 6
+%SpriteProps($B0, 2, 2, $01, $01, PalettesVanilla_red_melon+$0E)        ; B0 - Crystal 6
 %SpriteProps($B1, 2, 2, $80, $80, PalettesCustom_crystal)               ; B1 - Crystal 1
-%SpriteProps($B2, 2, 2, $01, $01, $0000)                                ; B2 - Crystal 5
+%SpriteProps($B2, 2, 2, $01, $01, PalettesVanilla_red_melon+$0E)        ; B2 - Crystal 5
 %SpriteProps($B3, 2, 2, $80, $80, PalettesCustom_crystal)               ; B3 - Crystal 7
 %SpriteProps($B4, 2, 2, $80, $80, PalettesCustom_crystal)               ; B4 - Crystal 2
 %SpriteProps($B5, 2, 2, $80, $80, PalettesCustom_crystal)               ; B5 - Crystal 4
