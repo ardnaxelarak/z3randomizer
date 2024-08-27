@@ -520,6 +520,7 @@ macro DoIndirectPlanesA(offset)
 
 	XBA
 	ORA.b Decomp3BPPScratch
+	AND.w #$00FF ; idk why this line works but the 2 sheets we pull in aren't correct without it
 	STA.l BigDecompressionBuffer+$10+<offset>+<offset>,X
 
 endmacro
