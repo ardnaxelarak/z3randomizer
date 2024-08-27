@@ -76,15 +76,27 @@ BirdTravel_LoadTargetAreaMusic:
 ;--------------------------------------------------------------------------------
 
 ;--------------------------------------------------------------------------------
+Overworld_DetermineAndSetMusic:
+	PHX
+		JSL Overworld_DetermineMusic : STX.w MusicControlRequest
+	PLX
+RTL
+;--------------------------------------------------------------------------------
+
+;--------------------------------------------------------------------------------
 ;X to be set to music track to load
 Overworld_DetermineMusic:
     LDA.l ProgressIndicator : CMP.b #$02 : !BGE +
         LDX.b #$03 ; If phase < 2, play the rain music
         BRA .done
-    
-    + LDA.b OverworldIndex : CMP.b #$43 : BEQ .darkMountain
-    CMP.b #$45 : BEQ .darkMountain
-    CMP.b #$47 : BEQ .darkMountain
+    +
+
+    LDA.l CurrentWorld : BEQ +
+        LDA.b OverworldIndex : ORA.b #$40
+        CMP.b #$43 : BEQ .darkMountain
+        CMP.b #$45 : BEQ .darkMountain
+        CMP.b #$47 : BEQ .darkMountain
+    +
 
     LDX.b #$02  ; hyrule field theme
 
@@ -202,11 +214,14 @@ Underworld_DoorDown_Entry:
 ;--------------------------------------------------------------------------------
 
 ;--------------------------------------------------------------------------------
+CheckHeraBossDefeated_AlsoCheckMusic:
+LDA.w LastAPUCommand : AND.w #$00FF : CMP.w #$0015 : BNE + ; if boss music is playing
+
 ; Check if the boss in ToH has been defeated (16-bit accumulator)
 CheckHeraBossDefeated:
-LDA.l RoomDataWRAM[$07].high : AND.w #$00FF : BEQ +
-    SEC : RTL
-+ CLC : RTL
+LDA.l RoomDataWRAM[$07].high : AND.w #$00FF : BNE +
+    CLC : RTL
++ SEC : RTL
 
 FallingMusicFadeOut:
     CMP.w #$0017 ; what we wrote over

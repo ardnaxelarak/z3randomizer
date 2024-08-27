@@ -81,11 +81,8 @@ FixAga2Bunny:
 	JSL DecideIfBunny : BNE +
 		JSR MakeBunny
 	+
-	.done
-	PHX
-		JSL Overworld_DetermineMusic : STX.w MusicControlRequest
-	PLX
-RTL
+.done
+JML Overworld_DetermineAndSetMusic
 ;--------------------------------------------------------------------------------
 
 ;--------------------------------------------------------------------------------

@@ -1732,7 +1732,7 @@ org $828D6E
 JSL FallingMusicFadeOut : BRA + : NOP #2 : +
 ;================================================================================
 org $829090 ; <- 11090 - Bank02.asm:3099 (LDA $7EF374 : LSR A)
-JSL CheckHeraBossDefeated : NOP
+JSL CheckHeraBossDefeated_AlsoCheckMusic : NOP
 ;================================================================================
 org $829798 ; <- 11798 - Bank02.asm:4287 (CMP $02895C, X : BNE BRANCH_ALPHA)
 NOP #6 ; remove crystal room cutscene check that causes softlocks
@@ -2243,9 +2243,39 @@ org $8AB949 ; <- Bank0A.asm:270 (Different from US ROM)
 JSL BirdTravel_LoadTargetAreaMusic
 BRA + : NOP #14 : +
 ;--------------------------------------------------------------------------------
+org $829D42
+JSL Overworld_DetermineMusic
+BRA + : NOP #4 : +
+;--------------------------------------------------------------------------------
+org $82A981
+JSL Overworld_DetermineAndSetMusic
+;--------------------------------------------------------------------------------
 org $82B027 ; <- Bank02.asm:7535-7541
 JSL Overworld_DetermineMusic
 BRA + : NOP #42 : +
+;--------------------------------------------------------------------------------
+org $82B0C4
+JSL Overworld_DetermineAndSetMusic
+BRA + : NOP #16 : +
+;--------------------------------------------------------------------------------
+org $82B1C1
+JSL Overworld_DetermineAmbientSFX
+JSL Overworld_DetermineMusic
+BRA + : NOP #64 : +
+;--------------------------------------------------------------------------------
+org $82B441
+JSL Overworld_DetermineMusic
+BRA + : NOP #4 : +
+;--------------------------------------------------------------------------------
+org $82C1BA
+JSL Overworld_DetermineMusic
+BRA + : NOP #12 : +
+;--------------------------------------------------------------------------------
+org $88C442
+JSL Overworld_DetermineAndSetMusic
+;--------------------------------------------------------------------------------
+org $9DFD27
+JSL Overworld_DetermineAndSetMusic : NOP
 ;================================================================================
 
 ;================================================================================

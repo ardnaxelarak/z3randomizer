@@ -120,6 +120,7 @@ IsOverworldTrack:
     CMP.b #05 : BEQ .yes ;  5 - Forest of Mystery
     CMP.b #07 : BEQ .yes ;  7 - Kakariko Village
     CMP.b #09 : BEQ .yes ;  9 - Dark Golden Land
+    CMP.b #13 : BEQ .yes ; 13 - Dark Death Mountain
     CMP.b #15 : BEQ .yes ; 15 - Dark Woods
     CMP.b #60 : BEQ .yes ; 60 - Light World OW (after ped pull)
     CMP.b #61 : BEQ .yes ; 61 - Dark World OW (with all crystals)
@@ -349,7 +350,7 @@ SpiralStairsPreCheck:
         JSL LookupSpiralOffset_long
         REP #$30 : AND.w #$00FF : ASL #2 : TAX
         LDA.l SpiralTable,X
-        SEP #$10 : TAX : CPX.b #$07 : BNE .done ; check if hera boss
+        SEP #$10 : CMP.w #$0007 : BNE .done ; check if hera boss
         JSL CheckHeraBossDefeated : BCS .done
         LDX.b #$F1 : STX.w MusicControlRequest
         BRA .done
