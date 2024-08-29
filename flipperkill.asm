@@ -88,3 +88,9 @@ FlipperScrollWarp:
 		+ LDA.l $7EC184
 		STA.b LinkPosY
 RTL
+
+pushpc
+; fixes incorrect vanilla camera scroll boundary values for Zora's Domain
+org $82E4E9 : dw $0600
+org $82E529 : dw $0600
+pullpc
