@@ -800,9 +800,9 @@ Shopkeeper_DrawNextPrice:
         REP #$20 ; set 16-bit accumulator
         PHY
         LDA.l ShopType : AND.w #$0003 : DEC : ASL : TAY
+        LDA.w .price_columns_idx, Y : STA.b Scrap02 ; get table from the table table
         LDA.b RoomIndex : CMP.w #$109 : BNE + : INY #6 : +
         LDA.w Shopkeeper_DrawNextItem_item_offsets_idx, Y : STA.b Scrap00 ; get table from the table table
-        LDA.w .price_columns_idx, Y : STA.b Scrap02 ; get table from the table table
         PLY : PHY
         TYA : ASL #2 : TAY
         LDA.b (Scrap00), Y : STA.b Scrap0E ; set coordinate
