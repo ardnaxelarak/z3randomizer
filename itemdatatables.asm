@@ -1555,7 +1555,7 @@ VRAMAddressOffset:
 	dw $0024                               ; 42 - Heart
 	dw $0024                               ; 43 - Arrow
 	dw $0024                               ; 44 - 10 arrows
-	dw $0060                               ; 45 - Small magic
+	dw $0024                               ; 45 - Small magic
 	dw $0024                               ; 46 - 300 rupees
 	dw $0024                               ; 47 - 20 rupees green
 	dw $0024                               ; 48 - Full bottle (good bee)
