@@ -415,7 +415,7 @@ CheckReceivedItemPropertiesBeforeLoad:
         LDA.w AncillaID,X : CMP.b #$29 : BEQ .falling_sprite
                 PLX
                 LDA.b RoomIndex : BEQ .normalCode
-                LDA.b DungeonID : BMI .normalCode
+                LDA.w DungeonID : BMI .normalCode
                 LDA.l RoomFade : BNE .load_palette
                         .normalCode
                         LDA.l SpriteProperties_chest_palette,X : BIT #$80 : BNE .load_palette
