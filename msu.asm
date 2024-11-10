@@ -350,7 +350,8 @@ SpiralStairsPreCheck:
         JSL LookupSpiralOffset_long
         REP #$30 : AND.w #$00FF : ASL #2 : TAX
         LDA.l SpiralTable,X
-        SEP #$10 : CMP.w #$0007 : BNE .done ; check if hera boss
+        SEP #$10 : LDX.w DungeonID : CPX.b #$FF : BEQ .done
+        TAX : CPX.b #$07 : BNE .done ; check if hera boss
         JSL CheckHeraBossDefeated : BCS .done
         LDX.b #$F1 : STX.w MusicControlRequest
         BRA .done
