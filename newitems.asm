@@ -442,6 +442,22 @@ ItemBehavior:
 
         .red_clock
         REP #$20 ; set 16-bit accumulator
+        LDA.l RewindRoomId
+        CMP.w #$FFFF
+        BEQ +
+        ; restore
+            SEP #$20
+            LDA.b #$01
+            STA.l RewindTrigger
+        RTS
+
+        ; save
+        +
+            JSL.l SaveRewind
+            SEP #$20
+        RTS
+
+
         LDA.l ChallengeTimer : !ADD.l RedClockAmount : STA.l ChallengeTimer
         LDA.l ChallengeTimer+2 : ADC.l RedClockAmount+2 : STA.l ChallengeTimer+2
         SEP #$20 ; set 8-bit accumulator
@@ -760,12 +776,13 @@ ResolveLootID:
 
 
         .gloves
+        print ".gloves ", pc
         SEP #$20
         LDA.l GloveEquipment : TAX
         LDA.w .gloves_ids,X
         JMP.w .have_item
         ..ids
-        db $1B, $1C, $1C
+        db $66, $1B, $1C, $1C
 
         .progressive_bow
         ; For non-chest progressive bows we assign the tracking bits to SpriteMetaData,X

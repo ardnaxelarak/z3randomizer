@@ -1487,8 +1487,9 @@ JSL SpiralStairsPreCheck
 org $829069 ; <- A21C A5A0 - Bank02.asm:3081 (LDX.b #$1C : LDA $A0)
 JSL SpiralStairsPostCheck
 
-org $82D6E8 ; <- 9C0A01 - Bank02.asm:10811 (STZ $010A)
-NOP #3
+; this is covered by a hook in rewind.asm
+; org $82D6E8 ; <- 9C0A01 - Bank02.asm:10811 (STZ $010A)
+; NOP #3
 
 org $88C421 ; <- AD4021 F005 - ancilla_receive_item.asm:108 (LDA $2140 : BEQ .wait_for_music)
 JML PendantFanfareWait : NOP

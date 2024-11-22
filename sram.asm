@@ -426,7 +426,35 @@ RomVersionSRAM: skip 4          ; ALTTPR ROM version. Low byte is the version, h
 RomNameSRAM: skip 21            ; ROM name from $FFC0, burned in during init (21 bytes)
                                 ; If value in the ROM doesn't match SRAM, save is cleared.
 PasswordSRAM: skip 16           ; Password value (16 bytes)
-skip 8155                       ;
+
+
+RewindTrigger: skip 1
+RewindDungeonEntrance: skip 2
+RewindRoomId: skip 2
+RewindVerticalScroll: skip 2
+RewindHorizontalScroll: skip 2
+RewindYCoordinate: skip 2
+RewindXCoordinate: skip 2
+RewindCameraTriggerY: skip 2
+RewindCameraTriggerX: skip 2
+RewindOverworldDoorTilemap: skip 2
+RewindCameraScrollBoundaries: skip 8
+RewindLinkFacing: skip 1
+RewindMainGFX: skip 1
+RewindSong: skip 1
+RewindFloor: skip 1
+RewindDungeonId: skip 1
+Rewind_6C: skip 1
+Rewind_EE: skip 1
+Rewind_0476: skip 1
+Rewind_A6: skip 1
+Rewind_A7: skip 1
+Rewind_A9: skip 1
+Rewind_AA: skip 1
+skip $B4
+RewindSRAM: skip $1500
+
+skip $A00                       ;
 SaveBackupSRAM:                 ; Backup copy of save ram. Game will attempt to use this if
                                 ; checksum on file select screen load fails.
 base off

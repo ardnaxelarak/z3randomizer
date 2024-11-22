@@ -123,6 +123,12 @@ OnFileCreation:
         MVN CartridgeSRAM>>16, InitSRAMTable>>16 
         PLB
 
+        ; initialize rewind table
+        LDA.w #$0000
+        STA.l RewindTrigger
+        LDA.w #$FFFF
+        STA.l RewindRoomId
+
         ; Resolve instant post-aga if standard
         SEP #$20
         LDA.l InitProgressIndicator : BIT #$80 : BEQ +
@@ -289,6 +295,16 @@ PostItemAnimation:
         .done
         INC.b NMICGRAM
         SEP #$20
+
+        LDA.l RewindTrigger
+        BEQ +
+            LDA.b #$19
+            STA.b $11
+            STZ.b $B0
+
+            LDA.b #$33
+            STA.w $012E
+        +
 
         STZ.w ItemReceiptMethod : LDA.w AncillaGet, X ; thing we wrote over to get here
         PLB

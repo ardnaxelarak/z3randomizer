@@ -157,6 +157,8 @@ incsrc msu.asm
 incsrc dungeonmap.asm
 incsrc hextodec.asm
 incsrc textrenderer.asm
+incsrc rewind.asm
+incsrc lift.asm
 warnpc $A58000
 
 org $A28000
