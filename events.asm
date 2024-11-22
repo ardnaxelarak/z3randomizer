@@ -125,9 +125,9 @@ OnFileCreation:
 
         ; initialize rewind table
         LDA.w #$0000
-        STA.l RewindTrigger
+        STA.l RewindTriggerSRAM
         LDA.w #$FFFF
-        STA.l RewindRoomId
+        STA.l RewindRoomIdSRAM
 
         ; Resolve instant post-aga if standard
         SEP #$20

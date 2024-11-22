@@ -390,7 +390,32 @@ ExtendedFileNameWRAM: skip 24    ; File name, 12 word-length characters.
 RoomPotData: skip 592            ; Table for expanded pot shuffle. One word per room.
 SpritePotData: skip 592          ; Table for expanded pot shuffle. One word per room.
 PurchaseCounts: skip 96          ; Keeps track of shop purchases
-PrivateBlockPersistent: skip 513 ; Reserved for 3rd party developers
+
+PrivateBlockPersistent:          ; Reserved for 3rd party developers
+RewindTrigger: skip 1
+RewindRoomId: skip 2
+RewindDungeonEntrance: skip 2
+RewindVerticalScroll: skip 2
+RewindHorizontalScroll: skip 2
+RewindYCoordinate: skip 2
+RewindXCoordinate: skip 2
+RewindCameraTriggerY: skip 2
+RewindCameraTriggerX: skip 2
+RewindOverworldDoorTilemap: skip 2
+RewindCameraScrollBoundaries: skip 8
+RewindLinkFacing: skip 1
+RewindMainGFX: skip 1
+RewindSong: skip 1
+RewindFloor: skip 1
+RewindDungeonId: skip 1
+Rewind_6C: skip 1
+Rewind_EE: skip 1
+Rewind_0476: skip 1
+Rewind_A6: skip 1
+Rewind_A7: skip 1
+Rewind_A9: skip 1
+Rewind_AA: skip 1
+skip 474
 
 ;================================================================================
 ; Direct SRAM Assignments ($700000 - $7080000)
@@ -420,41 +445,16 @@ skip 283                        ;
 InverseChecksumSRAM: skip 2     ;
 ExtendedSaveDataSRAM:           ;
 ExtendedFileNameSRAM: skip 24   ; We read and write the file name directly from and to SRAM (24 bytes)
-skip $1AE4                      ;
+skip $500
+RewindTriggerSRAM: skip 1
+RewindRoomIdSRAM: skip 2
+skip $15E1                      ;
 RomVersionSRAM: skip 4          ; ALTTPR ROM version. Low byte is the version, high byte writes
                                 ; $01 for now (32-bits total)
 RomNameSRAM: skip 21            ; ROM name from $FFC0, burned in during init (21 bytes)
                                 ; If value in the ROM doesn't match SRAM, save is cleared.
 PasswordSRAM: skip 16           ; Password value (16 bytes)
-
-
-RewindTrigger: skip 1
-RewindDungeonEntrance: skip 2
-RewindRoomId: skip 2
-RewindVerticalScroll: skip 2
-RewindHorizontalScroll: skip 2
-RewindYCoordinate: skip 2
-RewindXCoordinate: skip 2
-RewindCameraTriggerY: skip 2
-RewindCameraTriggerX: skip 2
-RewindOverworldDoorTilemap: skip 2
-RewindCameraScrollBoundaries: skip 8
-RewindLinkFacing: skip 1
-RewindMainGFX: skip 1
-RewindSong: skip 1
-RewindFloor: skip 1
-RewindDungeonId: skip 1
-Rewind_6C: skip 1
-Rewind_EE: skip 1
-Rewind_0476: skip 1
-Rewind_A6: skip 1
-Rewind_A7: skip 1
-Rewind_A9: skip 1
-Rewind_AA: skip 1
-skip $B4
-RewindSRAM: skip $1500
-
-skip $A00                       ;
+skip 8155                       ;
 SaveBackupSRAM:                 ; Backup copy of save ram. Game will attempt to use this if
                                 ; checksum on file select screen load fails.
 base off
