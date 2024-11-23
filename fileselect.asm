@@ -403,6 +403,9 @@ DrawPlayerFileShared:
 		%fs_drawItemGray(5,28,FileSelectItems_gloves)
 		BRA ++
 	+ : DEC : BNE +
+		%fs_drawItem(5,28,FileSelectItems_weak_gloves)
+		BRA ++
+	+ : DEC : BNE +
 		%fs_drawItem(5,28,FileSelectItems_gloves)
 		BRA ++
 	+
@@ -564,6 +567,8 @@ FileSelectItems:
 	.red_pendant
 	dw #$02C5|!FS_COLOR_RED, #$02C6|!FS_COLOR_RED, #$02D5|!FS_COLOR_RED, #$02D6|!FS_COLOR_RED
 
+	.weak_gloves
+	dw #$02A0|!FS_COLOR_GREEN, #$02A1|!FS_COLOR_GREEN, #$02B0|!FS_COLOR_GREEN, #$02B1|!FS_COLOR_GREEN
 	.gloves
 	dw #$028E|!FS_COLOR_BROWN, #$028F|!FS_COLOR_BROWN, #$029E|!FS_COLOR_BROWN, #$029F|!FS_COLOR_BROWN
 	.mitts
