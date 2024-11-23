@@ -159,6 +159,7 @@ incsrc hextodec.asm
 incsrc textrenderer.asm
 incsrc rewind.asm
 incsrc lift.asm
+incsrc mothula.asm
 warnpc $A58000
 
 org $A28000
