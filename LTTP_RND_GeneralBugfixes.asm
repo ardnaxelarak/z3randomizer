@@ -160,6 +160,8 @@ incsrc textrenderer.asm
 incsrc rewind.asm
 incsrc lift.asm
 incsrc mothula.asm
+incsrc switches.asm
+incsrc zoom_on_carry.asm
 warnpc $A58000
 
 org $A28000

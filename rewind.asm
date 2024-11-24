@@ -6,23 +6,6 @@ pushpc
 	+
 pullpc
 
-; pushpc
-; 	org $87A46E
-; 	JSL CheckBookTriggerSave
-; pullpc
-
-CheckBookTriggerSave:
-	LDA.b $10
-	CMP.b #$07
-	BNE +
-
-	JSL SaveRewind
-
-	; what we wrote over
-+	LDA.b $3A
-	AND.b #$BF
-RTL
-
 CheckLoadRewind:
 	; what we wrote over
 	STZ.w $011A

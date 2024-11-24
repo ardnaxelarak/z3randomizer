@@ -64,22 +64,23 @@ LoadModifiedMagicLevel:
 RTL
 ;================================================================================
 ; $7E0348 - Ice Value
-LoadModifiedIceFloorValue_a11:
-	LDA.b RoomIndex : CMP.b #$91 : BEQ + : CMP.b #$92 : BEQ + : CMP.b #$93 : BEQ + ; mire basement currently broken - not sure why
-	LDA.b LinkState : CMP.b #$01 : BEQ + : CMP.b #$17 : BEQ + : CMP.b #$1C : BEQ +
-	LDA.b LinkSpeed : CMP.b #$02 : BEQ +  
-	LDA.b LinkSlipping : BNE +  
-		LDA.w TileActIce : ORA.l IceModifier : AND.b #$11 : RTL  
-	+ : LDA.w TileActIce : AND.b #$11  
-RTL  
-LoadModifiedIceFloorValue_a01:  
+
+LoadModifiedIceFloorValue:
 	LDA.b RoomIndex : CMP.b #$91 : BEQ + : CMP.b #$92 : BEQ + : CMP.b #$93 : BEQ + ; mire basement currently broken - not sure why
 	LDA.b LinkState : CMP.b #$01 : BEQ + : CMP.b #$17 : BEQ + : CMP.b #$1C : BEQ +
 	LDA.b LinkSpeed : CMP.b #$02 : BEQ +
 	LDA.b LinkSlipping : BNE +
-		LDA.w TileActIce : ORA.l IceModifier : AND.b #$01 : RTL
-	+ : LDA.w TileActIce : AND.b #$01
-RTL
+	LDA.b $3C : AND.b #$0F : CMP.b #$09 : BNE ++
+	LDA.w $0372 : BNE ++
+	.yes
+	LDA.w TileActIce : ORA.l IceModifier : ORA.b #$10 : RTS
+	++ : LDA.w TileActIce : ORA.l IceModifier : RTS
+	+ : LDA.w TileActIce
+RTS
+LoadModifiedIceFloorValue_a11:
+	JSR LoadModifiedIceFloorValue : AND.b #$11 : RTL
+LoadModifiedIceFloorValue_a01:
+	JSR LoadModifiedIceFloorValue : AND.b #$01 : RTL
 ;================================================================================
 CheckTabletSword:
 	LDA.l AllowHammerTablets : BEQ +
