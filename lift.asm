@@ -6,7 +6,7 @@ db $01, $02, $01, $01, $03, $02, $03
 org $8DF809
 MenuEquipmentIcons:
 .gloves
-dw $20F5, $20F5, $20F5, $20F5 ; No glove
+dw $2121, $2122, $2123, $2124 ; No glove
 dw $3CDA, $3CDB, $3CEA, $3CEB ; Weak glove
 dw $2130, $2131, $2140, $2141 ; Power glove
 dw $28DA, $28DB, $28EA, $28EB ; Titan's mitt
