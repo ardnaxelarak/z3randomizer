@@ -922,7 +922,7 @@ dw $00D8        ; 216
 
 org $B08198             ; PC 0x180198-0x1801A9
 GanonsTowerOpenAddress: ; 0x180198-0x180199
-dw CrystalCounter       ; Target address for GT open check
+dw DeadrockCounter      ; Target address for GT open check
 GanonsTowerOpenTarget:  ; 0x18019A-0x18019B
 dw $0007                ; Target amount for GT open modes to compare
 GanonsTowerOpenMode:    ; 0x18019C-0x18019D

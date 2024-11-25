@@ -321,7 +321,8 @@ DungeonsCompleted: skip 2       ; Bitfield indicating whether a dungeon's prize 
                                 ; This has the same shape as the dungeon item bitfields.
 MapCountDisplay: skip 2         ;
 CrystalCounter: skip 2          ; Total Number of crystals collected (integer)
-skip 40                         ; Unused
+DeadrockCounter: skip 2         ; Number of deadrocks killed
+skip 38                         ; Unused
 ServiceSequence:                ; See servicerequest.asm
 ServiceSequenceRx: skip 8       ; Service sequence receive
 ServiceSequenceTx: skip 8       ; Service sequence transmit

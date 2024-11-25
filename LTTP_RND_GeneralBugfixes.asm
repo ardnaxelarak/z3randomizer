@@ -165,6 +165,7 @@ incsrc zoom_on_carry.asm
 incsrc iframes.asm
 incsrc improve_items.asm
 incsrc 2waymirror.asm
+incsrc deadrocks.asm
 warnpc $A58000
 
 org $A28000
