@@ -123,9 +123,9 @@ OnFileCreation:
         MVN CartridgeSRAM>>16, InitSRAMTable>>16 
         PLB
 
-        ; initialize rewind table
-        LDA.w #$0000
-        STA.l RewindTriggerSRAM
+        ; initialize rewind table and IFrames
+        LDA.w #$0014
+        STA.l IFramesSRAM ; low byte i-frames, high byte rewind trigger
         LDA.w #$FFFF
         STA.l RewindRoomIdSRAM
 

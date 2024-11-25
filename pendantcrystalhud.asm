@@ -602,6 +602,8 @@ RestoreMenu_SetSubModule:
 RTL
 ;-------------------------------------------------------------------------------
 DrawHeartPiecesMenu:
+        JSL DrawIFrames
+
         LDA.l HUDHeartColors_index : AND.w #$00FF
         ASL : TAX
         LDA.l HUDHeartColors_masks_game_hud,X
@@ -609,7 +611,7 @@ DrawHeartPiecesMenu:
 
         LDA.l HeartPieceQuarter : AND.w #$00FF
         ASL #3 : TAX
-        LDY.w #$16F2
+        LDY.w #$16F6
 
         LDA.l HeartPieceMenuBaseTiles,X
         ORA.b Scrap0D

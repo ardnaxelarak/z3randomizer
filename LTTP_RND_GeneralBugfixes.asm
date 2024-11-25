@@ -162,6 +162,7 @@ incsrc lift.asm
 incsrc mothula.asm
 incsrc switches.asm
 incsrc zoom_on_carry.asm
+incsrc iframes.asm
 warnpc $A58000
 
 org $A28000

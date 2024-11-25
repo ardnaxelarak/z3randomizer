@@ -670,11 +670,16 @@ ItemBehavior:
             LDA.b #$01
             STA.l RewindTrigger
         RTS
-
         ; save
         +
             JSL.l SaveRewind
             SEP #$20
+        RTS
+
+        .i_frames
+        LDA.l IFrames
+        CLC : ADC.b #10
+        STA.l IFrames
         RTS
 
 ResolveReceipt:

@@ -392,6 +392,7 @@ SpritePotData: skip 592          ; Table for expanded pot shuffle. One word per 
 PurchaseCounts: skip 96          ; Keeps track of shop purchases
 
 PrivateBlockPersistent:          ; Reserved for 3rd party developers
+IFrames: skip 1
 RewindTrigger: skip 1
 RewindRoomId: skip 2
 RewindDungeonEntrance: skip 2
@@ -415,7 +416,7 @@ Rewind_A6: skip 1
 Rewind_A7: skip 1
 Rewind_A9: skip 1
 Rewind_AA: skip 1
-skip 474
+skip 473
 
 ;================================================================================
 ; Direct SRAM Assignments ($700000 - $7080000)
@@ -446,9 +447,10 @@ InverseChecksumSRAM: skip 2     ;
 ExtendedSaveDataSRAM:           ;
 ExtendedFileNameSRAM: skip 24   ; We read and write the file name directly from and to SRAM (24 bytes)
 skip $500
+IFramesSRAM: skip 1
 RewindTriggerSRAM: skip 1
 RewindRoomIdSRAM: skip 2
-skip $15E1                      ;
+skip $15E0                      ;
 RomVersionSRAM: skip 4          ; ALTTPR ROM version. Low byte is the version, high byte writes
                                 ; $01 for now (32-bits total)
 RomNameSRAM: skip 21            ; ROM name from $FFC0, burned in during init (21 bytes)
