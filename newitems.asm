@@ -361,7 +361,6 @@ ItemBehavior:
         RTS
 
         .magic_item
-        print pc
         LDA.b #$7E
         STA.b $02
         REP #$30
@@ -373,6 +372,12 @@ ItemBehavior:
         BCS +
         INC
         STA.b [$00]
+        +
+        RTS
+
+        .mirror
+        LDA.l MirrorEquipment : CMP.b #$02 : !BGE +
+                INC : STA.l MirrorEquipment ; upgrade mirror
         +
         RTS
 

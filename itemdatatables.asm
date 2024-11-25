@@ -162,7 +162,7 @@ endmacro
 %ReceiptProps($17, -4, 0, $2F, $F36B, $FF, skip, skip) ; 17 - Heart piece
 %ReceiptProps($18, -4, 4, $07, $F351, $FF, magic_item, skip) ; 18 - Byrna
 %ReceiptProps($19, -4, 0, $15, $F352, $FF, magic_item, skip) ; 19 - Cape
-%ReceiptProps($1A, -4, 0, $12, $F353, $02, skip, skip) ; 1A - Mirror
+%ReceiptProps($1A, -4, 0, $12, $F353, $FF, mirror, skip) ; 1A - Mirror
 %ReceiptProps($1B, -4, 0, $0D, $F354, $02, skip, skip) ; 1B - Glove
 %ReceiptProps($1C, -4, 0, $0D, $F354, $03, skip, skip) ; 1C - Mitts
 %ReceiptProps($1D, -4, 0, $0E, $F34E, $01, skip, skip) ; 1D - Book
