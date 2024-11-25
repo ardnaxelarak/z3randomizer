@@ -418,6 +418,8 @@ AddYMarker:
 
 	.drawTile
 	STA.w $FFC4, Y
+
+	JSL AddMagicMarker
 RTL
 ;--------------------------------------------------------------------------------
 

@@ -143,25 +143,25 @@ endmacro
 %ReceiptProps($04, -5, 4, $2D, $F35A, $01, fighter_shield, skip) ; 04 - Fighter shield
 %ReceiptProps($05, -4, 0, $20, $F35A, $02, red_shield, skip) ; 05 - Fire shield
 %ReceiptProps($06, -4, 0, $2E, $F35A, $03, mirror_shield, skip) ; 06 - Mirror shield
-%ReceiptProps($07, -5, 4, $09, $F345, $01, skip, skip) ; 07 - Fire rod
-%ReceiptProps($08, -5, 4, $09, $F346, $01, skip, skip) ; 08 - Ice rod
+%ReceiptProps($07, -5, 4, $09, $F345, $FF, magic_item, skip) ; 07 - Fire rod
+%ReceiptProps($08, -5, 4, $09, $F346, $FF, magic_item, skip) ; 08 - Ice rod
 %ReceiptProps($09, -4, 4, $0A, $F34B, $01, skip, skip) ; 09 - Hammer
 %ReceiptProps($0A, -4, 4, $08, $F342, $01, skip, skip) ; 0A - Hookshot
 %ReceiptProps($0B, -4, 4, $05, $F340, $01, bow, skip) ; 0B - Bow
 %ReceiptProps($0C, -2, 5, $10, $F341, $01, blue_boomerang, skip) ; 0C - Blue Boomerang
 %ReceiptProps($0D, -4, 0, $0B, $F344, $02, powder, skip) ; 0D - Powder
 %ReceiptProps($0E, -4, 0, $2C, $F35C, $FF, skip, skip) ; 0E - Bottle refill (bee)
-%ReceiptProps($0F, -4, 0, $1B, $F347, $01, skip, skip) ; 0F - Bombos
-%ReceiptProps($10, -4, 0, $1A, $F348, $01, skip, skip) ; 10 - Ether
-%ReceiptProps($11, -4, 0, $1C, $F349, $01, skip, skip) ; 11 - Quake
-%ReceiptProps($12, -4, 0, $14, $F34A, $01, skip, skip) ; 12 - Lamp
+%ReceiptProps($0F, -4, 0, $1B, $F347, $FF, magic_item, skip) ; 0F - Bombos
+%ReceiptProps($10, -4, 0, $1A, $F348, $FF, magic_item, skip) ; 10 - Ether
+%ReceiptProps($11, -4, 0, $1C, $F349, $FF, magic_item, skip) ; 11 - Quake
+%ReceiptProps($12, -4, 0, $14, $F34A, $FF, magic_item, skip) ; 12 - Lamp
 %ReceiptProps($13, -4, 4, $19, $F34C, $01, shovel, skip) ; 13 - Shovel
 %ReceiptProps($14, -4, 0, $0C, $F34C, $02, flute_inactive, skip) ; 14 - Flute
-%ReceiptProps($15, -4, 4, $07, $F350, $01, skip, skip) ; 15 - Somaria
+%ReceiptProps($15, -4, 4, $07, $F350, $FF, magic_item, skip) ; 15 - Somaria
 %ReceiptProps($16, -4, 0, $1D, $F35C, $FF, skip, bottles) ; 16 - Bottle
 %ReceiptProps($17, -4, 0, $2F, $F36B, $FF, skip, skip) ; 17 - Heart piece
-%ReceiptProps($18, -4, 4, $07, $F351, $01, skip, skip) ; 18 - Byrna
-%ReceiptProps($19, -4, 0, $15, $F352, $01, skip, skip) ; 19 - Cape
+%ReceiptProps($18, -4, 4, $07, $F351, $FF, magic_item, skip) ; 18 - Byrna
+%ReceiptProps($19, -4, 0, $15, $F352, $FF, magic_item, skip) ; 19 - Cape
 %ReceiptProps($1A, -4, 0, $12, $F353, $02, skip, skip) ; 1A - Mirror
 %ReceiptProps($1B, -4, 0, $0D, $F354, $02, skip, skip) ; 1B - Glove
 %ReceiptProps($1C, -4, 0, $0D, $F354, $03, skip, skip) ; 1C - Mitts

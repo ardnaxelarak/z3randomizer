@@ -360,6 +360,22 @@ ItemBehavior:
         LDA.b #70 : STA.l ArrowsFiller ; fill arrows
         RTS
 
+        .magic_item
+        print pc
+        LDA.b #$7E
+        STA.b $02
+        REP #$30
+        LDA.w ItemReceipts_target, X
+        STA.b $00
+        SEP #$30
+        LDA.b [$00]
+        CMP.b #$03
+        BCS +
+        INC
+        STA.b [$00]
+        +
+        RTS
+
         .magic_2
         LDA.l MagicConsumption : CMP.b #$02 : !BGE +
                 INC : STA.l MagicConsumption ; upgrade magic
@@ -903,6 +919,8 @@ RTS
 ;--------------------------------------------------------------------------------
 ;Return BowEquipment but also draw silver arrows if you have the upgrade even if you don't have the bow
 CheckHUDSilverArrows:
+        JSL.l CheckMagicLevel
+
         LDA.l ArrowMode : BNE .rupee_bow
                 LDA.l BowEquipment : TAX : BEQ .nobow
                         JSL.l DrawHUDArrows_normal
