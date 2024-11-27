@@ -234,7 +234,12 @@ RTL
 ;--------------------------------------------------------------------------------
 DialogItemReceive:
 	BCS .nomessage ; if doubling the item value overflowed it must be a rando item
-	CPY.b #$98 : BCC ++ ;if the item is $4C or greater it must be a rando item
+	CPY.b #$98 : BCS .nomessage ; if the item is $4C or greater it must be a rando item
+	CPY.b #$34 : BEQ .mirror
+	BRA ++
+.mirror
+	LDA.l MirrorEquipment : AND.w #$00FF
+	CMP.w #$0002 : BEQ ++
 .nomessage
 	LDA.w #$FFFF
 

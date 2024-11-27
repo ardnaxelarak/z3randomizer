@@ -159,7 +159,7 @@ incsrc hextodec.asm
 incsrc textrenderer.asm
 incsrc rewind.asm
 incsrc lift.asm
-incsrc mothula.asm
+; incsrc mothula.asm
 incsrc switches.asm
 incsrc zoom_on_carry.asm
 incsrc iframes.asm

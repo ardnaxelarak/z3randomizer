@@ -169,6 +169,15 @@ OnFileLoad:
 	JSL.l RefreshRainAmmo
 	JSL.l SetEscapeAssist
 
+	REP #$20
+	LDA.l CurrentRupees
+	CMP.w #50
+	BCS +
+	LDA.w #50
+	STA.l CurrentRupees
+	+
+	SEP #$20
+
 	LDA.l IsEncrypted : CMP.b #01 : BNE +
 		JSL LoadStaticDecryptionKey
 	+

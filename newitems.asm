@@ -377,7 +377,7 @@ ItemBehavior:
 
         .mirror
         LDA.l MirrorEquipment : CMP.b #$02 : !BGE +
-                INC : STA.l MirrorEquipment ; upgrade mirror
+            INC : STA.l MirrorEquipment ; upgrade mirror
         +
         RTS
 
