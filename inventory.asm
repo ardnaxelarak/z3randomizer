@@ -652,16 +652,24 @@ RTL
 ; DrawMagicHeader:
 ;--------------------------------------------------------------------------------
 DrawMagicHeader:
-	LDA.l MagicConsumption : AND.w #$00FF : CMP.w #$0002 : BEQ .quarterMagic
-	.halfMagic
-    LDA.w #$28F7 : STA.l HUDTileMapBuffer+$04
-    LDA.w #$2851 : STA.l HUDTileMapBuffer+$06
-    LDA.w #$28FA : STA.l HUDTileMapBuffer+$08
-RTL   
-	.quarterMagic   
-    LDA.w #$28F7 : STA.l HUDTileMapBuffer+$04
-    LDA.w #$2800 : STA.l HUDTileMapBuffer+$06
-    LDA.w #$2801 : STA.l HUDTileMapBuffer+$08
+	LDA.l MagicConsumption : AND.w #$00FF
+	CMP.w #$0000 : BEQ .normalMagic
+	CMP.w #$0001 : BEQ .halfMagic
+	BRA .quarterMagic
+.normalMagic
+	LDA.w #$2850 : STA.l HUDTileMapBuffer+$04
+	LDA.w #$A856 : STA.l HUDTileMapBuffer+$06
+	LDA.w #$2852 : STA.l HUDTileMapBuffer+$08
+RTL
+.halfMagic
+	LDA.w #$28F7 : STA.l HUDTileMapBuffer+$04
+	LDA.w #$2851 : STA.l HUDTileMapBuffer+$06
+	LDA.w #$28FA : STA.l HUDTileMapBuffer+$08
+RTL
+.quarterMagic
+	LDA.w #$28F7 : STA.l HUDTileMapBuffer+$04
+	LDA.w #$2800 : STA.l HUDTileMapBuffer+$06
+	LDA.w #$2801 : STA.l HUDTileMapBuffer+$08
 RTL
 ;--------------------------------------------------------------------------------
 

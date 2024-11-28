@@ -1385,9 +1385,9 @@ ReturnFromOnDrawHud:
 SEP #$30
 LDX.b #$FF ; vanilla hud code ends with #$FF in X, and it's required for unknown reasons.
 
-org $8DFC37 ; <- 6FC37 - headsup_display.asm : 828 (LDA.w #$28F7)
+org $8DFC2B ; <- 6FC37 - headsup_display.asm : 828 (LDA.w #$28F7)
 JSL DrawMagicHeader
-BRA + : NOP #15 : +
+BRA + : NOP #27 : +
 ;--------------------------------------------------------------------------------
 org $81CF67 ; <- CF67 - Bank01.asm : 11625 (STA $7EF36F)
 JSL DecrementSmallKeys

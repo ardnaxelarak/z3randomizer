@@ -37,8 +37,8 @@ SpriteSwap_Palette_ArmorAndGloves:
 	SEP #$30
 	LDA.l SpriteSwapper : BNE .continue
 		REP #$30
-		LDA.l GloveEquipment 
-		JSL $9BEE21 ; Read Original Palette Code
+		JSL.l LoadModifiedGloveValue
+		JSL $9BEE24 ; Read Original Palette Code
 	RTL
 
 	.continue

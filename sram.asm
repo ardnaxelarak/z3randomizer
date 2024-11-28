@@ -417,7 +417,8 @@ Rewind_A6: skip 1
 Rewind_A7: skip 1
 Rewind_A9: skip 1
 Rewind_AA: skip 1
-skip 473
+RewindEntranceCache: skip $28
+skip 433
 
 ;================================================================================
 ; Direct SRAM Assignments ($700000 - $7080000)

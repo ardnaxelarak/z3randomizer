@@ -168,12 +168,12 @@ LoadRewind:
 	LDA.w #$FFFF
 	STA.l RewindRoomId
 
-;	PHB
-;	LDX.w #RewindSRAM
-;	LDY.w #SaveDataWRAM
-;	LDA.w #$4FF
-;	MVN SaveDataWRAM>>16, RewindSRAM>>16
-;	PLB
+	PHB
+	LDX.w #RewindEntranceCache
+	LDY.w #$C140
+	LDA.w #$27
+	MVN $7E, RewindEntranceCache>>16
+	PLB
 	PLP
 RTS
 
@@ -270,12 +270,12 @@ SaveRewind:
 	LDA.b $AA
 	STA.l Rewind_AA
 
-;	PHB
-;	REP #$30
-;	LDX #SaveDataWRAM
-;	LDY #RewindSRAM
-;	LDA #$4FF
-;	MVN RewindSRAM>>16, SaveDataWRAM>>16
-;	PLB
+	PHB
+	REP #$30
+	LDX.w #$C140
+	LDY.w #RewindEntranceCache
+	LDA.w #$27
+	MVN RewindEntranceCache>>16, $7E
+	PLB
 	PLP
 RTL

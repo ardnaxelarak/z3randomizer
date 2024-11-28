@@ -43,3 +43,9 @@ dw MenuEquipmentIcons_pearl
 
 pullpc
 
+LoadModifiedGloveValue:
+	LDA.l GloveEquipment : AND.w #$00FF
+	BEQ .done
+	DEC
+.done
+	RTL

@@ -85,6 +85,7 @@ GetItemLevelForHud:
 +	RTL
 
 CheckMagicLevel:
+	PHP : SEP #$30
 	LDA.w ItemCursor ; load item value
 	TAX
 	LDA.l CanReduceMagic, X
@@ -103,6 +104,7 @@ CheckMagicLevel:
 	LDA.b #$00
 .write
 	STA.l MagicConsumption
+	PLP
 	RTL
 
 
