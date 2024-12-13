@@ -74,3 +74,22 @@ BonkRecoil:
     +
     LDA.b #$24 : STA.b LinkRecoilZ ; things we wrote over
 RTL
+;--------------------------------------------------------------------------------
+BonkRecoilStop:
+    LDA.l BootsModifier : CMP.b #$01 : BEQ .return
+    LDA.l BootsEquipment : BNE .return
+    LDA.b LinkState : CMP.b #$02 : BNE .return
+    LDA.b LinkPosZ : BMI .return : CMP.b #$09 : BCC .return
+    LDA.b FrameCounter : AND.b #$01 : BNE .return
+        REP #$20
+            LDA.w $0114 : CMP.w #$0020 : SEP #$20 : BNE .return
+                LDA.b LinkRecoilY : BEQ ++ : BMI +
+                    DEC : BRA ++
+                + INC
+                ++ STA.b LinkRecoilY
+                LDA.b LinkRecoilX : BEQ ++ : BMI +
+                    DEC : BRA ++
+                + INC
+                ++ STA.b LinkRecoilX
+    .return
+    JML LinkHop_FindArbitraryLandingSpot

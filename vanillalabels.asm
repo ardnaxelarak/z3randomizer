@@ -91,6 +91,7 @@ Player_HaltDashAttackLong                                  = $8791B3
 Link_ReceiveItem                                           = $87999D
 Link_ReceiveItem_cool_pose                                 = $8799EE
 Link_ReceiveItem_not_cool_pose                             = $8799F2
+LinkHop_FindArbitraryLandingSpot                           = $87E359
 Link_HandleMovingAnimation_FullLongEntry                   = $87E68F
 Link_CheckForEdgeScreenTransition                          = $87F413
 Sprite_CheckIfPlayerPreoccupied                            = $87F4AA
