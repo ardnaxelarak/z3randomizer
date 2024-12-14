@@ -2258,7 +2258,7 @@ JSL Overworld_DetermineMusic
 BRA + : NOP #4 : +
 ;--------------------------------------------------------------------------------
 org $82A981
-JSL Overworld_DetermineAndSetMusic
+JSL Overworld_DetermineAndSetMusic : NOP
 ;--------------------------------------------------------------------------------
 org $82B027 ; <- Bank02.asm:7535-7541
 JSL Overworld_DetermineMusic
