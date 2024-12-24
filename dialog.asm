@@ -148,7 +148,11 @@ FreeDungeonItemNotice:
                 LDA.w DungeonID : CMP.w #$0003 : BCS +
                         .self_notice
                         SEP #$20
-		        %CopyDialog(Notice_Self)
+                        LDA.l FreeItemText : AND.b #$40 : BEQ ++
+                                LDA.b #$00 : STA.l DialogOffsetPointer : STA.l DialogOffsetPointer+1
+                                JMP .skip
+                        ++
+                        %CopyDialog(Notice_Self)
                         JMP .done
         +
         SEP #$20

@@ -765,9 +765,10 @@ db $01 ; #00 = Never Locked - #$01 = Locked During Escape (default) - #$02 = Loc
 org $B0816A ; PC 0x18016A
 FreeItemText:
 db $00 ; #00 = Off (default)
-;--po bmcs
+;-tpo bmcs
+;t - suppress "this dungeon" textboxes (temporary fix)
 ;p - enabled for non-prize crystals
-;o - enabled for outside dungeon items
+;o - enabled for outside dungeon items (not used?)
 ;b - enabled for inside big key items
 ;m - enabled for inside map items
 ;c - enabled for inside compass items
