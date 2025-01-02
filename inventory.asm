@@ -468,7 +468,7 @@ RTL
 ;--------------------------------------------------------------------------------
 ; sets A to #$02 to ignore summoning the duck
 FluteCallForDuck:
-	LDA.l WarningFlags : AND.b #$20 : BNE .vanilla ; glitched modes allowed flute in rain state
+	LDA.l OverworldEventDataWRAM+$18 : AND.b #$20 : BNE .vanilla ; allow flute in rain state if weathervane activated
 	LDA.l ProgressIndicator : CMP.b #$02 : BCS .vanilla ; must rescue Zelda first
 
 	.noDuck
