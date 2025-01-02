@@ -228,7 +228,6 @@ DungeonIncrement:
         LDA.w DungeonID : BMI .done
                 CMP.l BallNChainDungeon : BNE +
                         CPY.b #$32 : BEQ .ballchain_bigkey
-                        CPY.b #$9F : BEQ .ballchain_bigkey
 	        +
                 CMP.b #$00 : BNE +
                 	INC #2

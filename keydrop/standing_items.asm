@@ -432,10 +432,8 @@ CheckIfDropValid:
 		LDA.w SprSourceItemId, X : STA.w SpawnedItemID
 		LDA.w SprItemMWPlayer, X : STA.w SpawnedItemMWPlayer
 		LDY.b #$01 ; trigger the small key routines
-		LDA.w SpawnedItemID : STA.b Scrap00
-		CMP.b #$32 : BEQ ++
-		CMP.b #$9F : BNE + ; HC BK check
-		++ LDA.l StandingItemsOn : BNE +
+		LDA.w SpawnedItemID : STA.b Scrap00 : CMP.b #$32 : BNE +
+		LDA.l StandingItemsOn : BNE +
 			INY ; big key routine
 		+
 		PHX
@@ -704,9 +702,8 @@ db $A0, $A0, $A2, $A3, $A4, $A5, $A6, $A7, $A8, $A9, $AA, $AB, $AC, $AD
 
 BigKeyGet:
 	LDY.w SprItemReceipt, X
-	CPY.b #$32 : BEQ ++
-	CPY.b #$9F : BNE + : LDA.l StandingItemsOn : BNE +; HC BK check
-		++ STZ.w ItemReceiptMethod : LDY.b #$32 ; what we wrote over
+	CPY.b #$32 : BNE +
+		STZ.w ItemReceiptMethod : LDY.b #$32 ; what we wrote over
 		PHX : JSL Link_ReceiveItem : PLX ; what we wrote over
 		CLC : RTL
 	+ SEC : RTL
