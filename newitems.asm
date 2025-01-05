@@ -1225,7 +1225,8 @@ FlagCompassCount:
 RTS
 ;--------------------------------------------------------------------------------
 FlagMapCount:
-        CMP.w #$0002 : BEQ .mapShown
+;        CMP.w #$0002 : BEQ .mapShown
+        LDA.l MapMode : AND.w #$00FF : BEQ .mapShown
                 LDA.l MapField : AND.l DungeonItemMasks, X : BEQ .done ; skip if we don't have map
                         .mapShown
                         TYA : ORA.l MapCountDisplay : STA.l MapCountDisplay
