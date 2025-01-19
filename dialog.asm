@@ -301,10 +301,7 @@ DialogGanon2:
         BIT.w #$0020 : BNE + ; branch if p bow
         LDA.w #$0194 : BRA ++
         +
-        BIT.w #$0080 : BEQ + ; branch if no bow
         LDA.w #$0193 : BRA ++
-        +
-        LDA.w #$016E
         ++
         STA.w TextID
         SEP #$20
