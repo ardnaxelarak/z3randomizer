@@ -320,12 +320,11 @@ RTS
 RTS
 
 WorldMap_DrawTile:
+	LDA.b Scrap00 : PHA
 	SEP #$20
 	LDX.b Scrap0B : TXA : STA.b (OAMPtr+2)
 	INC.b OAMPtr+2
-	LDA.b Scrap00 : PHA
 	JSR WorldMap_CalculateOAMCoordinates
-	PLA : STA.b Scrap00
 	LDX.b Scrap0A : BEQ +
 		LDA.b Scrap0E : CLC : ADC.b #$04 : STA.b Scrap0E
 		LDA.b Scrap0F : CLC : ADC.b #$04 : STA.b Scrap0F
@@ -335,6 +334,7 @@ WorldMap_DrawTile:
 		LDA.b Scrap0F : SEC : SBC.b #$04 : STA.b Scrap0F
     +
 	REP #$20
+	PLA : STA.b Scrap00
 	LDA.b Scrap0E : STA.b (OAMPtr)
 	INC.b OAMPtr : INC.b OAMPtr
 	LDA.b Scrap0C : STA.b (OAMPtr)
