@@ -415,8 +415,9 @@ CheckReceivedItemPropertiesBeforeLoad:
         LDA.w AncillaID,X : CMP.b #$29 : BEQ .falling_sprite
                 PLX
                 LDA.b RoomIndex : BEQ .normalCode
-                LDA.w DungeonID : BMI .normalCode
-                LDA.l RoomFade : BNE .load_palette
+                CMP.b #$09 : BNE + ; potion shop to skip RoomFade check to avoid bad palette issue
+                        LDA.b RoomIndex+1 : CMP.b #$01 : BEQ .normalCode
+                + LDA.l RoomFade : BNE .load_palette
                         .normalCode
                         LDA.l SpriteProperties_chest_palette,X : BIT #$80 : BNE .load_palette
                         RTL
