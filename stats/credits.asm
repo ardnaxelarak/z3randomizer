@@ -477,6 +477,24 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
+%smallcredits("APRIL SILLIES RANDOMIZER", "green")
+
+%blankline()
+
+%bigcredits("KARAFRUIT")
+
+%blankline()
+%blankline()
+
+%smallcredits("APRIL SILLIES BETA TESTERS", "yellow")
+
+%blankline()
+
+%bigcredits("FOUTON                WILLOW")
+
+%blankline()
+%blankline()
+
 %smallcredits("SPRITE DEVELOPMENT", "green")
 
 %blankline()
@@ -536,24 +554,6 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-if !FEATURE_PATREON_SUPPORTERS
-	%smallcredits("PATREON SUPPORTERS", "yellow")
-
-	%addarbline(PatronCredit1Hi)
-	%addarbline(PatronCredit1Lo)
-
-	%blankline()
-	%addarbline(PatronCredit2Hi)
-	%addarbline(PatronCredit2Lo)
-
-	%blankline()
-	%addarbline(PatronCredit3Hi)
-	%addarbline(PatronCredit3Lo)
-
-	%blankline()
-	%blankline()
-endif
-
 %smallcredits("SPECIAL THANKS", "red")
 
 %blankline()
@@ -610,21 +610,6 @@ endif
 %emptyline()
 %emptyline()
 %emptyline()
-%emptyline()
-
-if !FEATURE_PATREON_SUPPORTERS == 0
-	%emptyline()
-	%emptyline()
-	%emptyline()
-	%emptyline()
-	%emptyline()
-	%emptyline()
-	%emptyline()
-	%emptyline()
-	%emptyline()
-	%emptyline()
-	%emptyline()
-endif
 
 ;===================================================================================================
 
