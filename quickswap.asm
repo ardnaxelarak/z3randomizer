@@ -83,10 +83,13 @@ LCode:
 RTS
 
 IsItemAvailable:
-        LDA.l InfiniteBombs : BEQ .finite
-        .infinite
-                CPX.b #$04 : BNE .finite
-                LDA.b #$01 : RTL
-        .finite
-                LDA.l EquipmentWRAM-1, X
+	CPX.b #$14 : BNE .not_mirror
+		LDA.b #$01 : RTL
+	.not_mirror
+	LDA.l InfiniteBombs : BEQ .finite
+	.infinite
+		CPX.b #$04 : BNE .finite
+		LDA.b #$01 : RTL
+	.finite
+		LDA.l EquipmentWRAM-1, X
 RTL

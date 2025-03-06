@@ -20,10 +20,11 @@ StoreBombCount:
 		PLA : STA.l BombsEquipment
 RTL
 SearchForEquippedItem:
-	LDA.l InfiniteBombs : BEQ +
-		LDA.b #$01 : LDX.b #$00 : RTL
-	+
-	LDA.l BowEquipment ; thing we wrote over
+	LDA.b #$01 : LDX.b #$00 : RTL
+	; LDA.l InfiniteBombs : BEQ +
+	; 	LDA.b #$01 : LDX.b #$00 : RTL
+	; +
+	; LDA.l BowEquipment ; thing we wrote over
 RTL
 
 DecrementArrows:
