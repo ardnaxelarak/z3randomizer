@@ -521,6 +521,8 @@ CreditsLineBlank:
 
 %smallcredits("YOUR SPRITE BY", "yellow")
 
+%blankline()
+
 %addarbline(YourSpriteCreditsHi)
 %addarbline(YourSpriteCreditsLo)
 
@@ -603,7 +605,6 @@ CreditsLineBlank:
 
 %blankline()
 
-%emptyline()
 %emptyline()
 %emptyline()
 %emptyline()
