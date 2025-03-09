@@ -420,7 +420,13 @@ db $01 ; #$00 = Original Behavior - #$01 = Randomizer Behavior (Default)
 Bugfix_PodEG:
 db $01 ; #$00 = Original Behavior - #$01 = Randomizer Behavior (Default)
 ;--------------------------------------------------------------------------------
-; 0x1800A5 - 0x1800AF (unused)
+org $B080A5 ; PC 0x1800A5
+MimicDash:
+db $00 ; #$00 = Original Behavior (default) - #$01 = Mimics move when link dashes
+CrystalSwitchBook:
+db $00 ; #$00 = Original Behavior (default) - #$01 = Book can flip crystal switch
+;--------------------------------------------------------------------------------
+; 0x1800A7 - 0x1800AF (unused)
 ;--------------------------------------------------------------------------------
 org $B080B0 ; 0x1800B0-0x1800BF
 StaticDecryptionKey:
