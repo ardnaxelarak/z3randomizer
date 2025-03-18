@@ -23,8 +23,14 @@ NewHUD_DrawBombs:
         BRA .draw
 
 .finite
+        LDA.w BombCapacity : BEQ .no_bomb_bag
         LDA.w BombsEquipment
         JSR HUDHex2Digit
+        BRA .draw
+
+.no_bomb_bag
+        LDY.w #!BlankTile
+        TYX
 
 .draw
         STY.w HUDBombCount+0

@@ -426,7 +426,11 @@ db $00 ; #$00 = Original Behavior (default) - #$01 = Mimics move when link dashe
 CrystalSwitchBook:
 db $00 ; #$00 = Original Behavior (default) - #$01 = Book can flip crystal switch
 ;--------------------------------------------------------------------------------
-; 0x1800A7 - 0x1800AF (unused)
+; 0x1800A7 - 0x1800AE (unused)
+;--------------------------------------------------------------------------------
+org $B080AF ; PC 0x1800AF
+MultiworldJunkItemTimer:
+db $00 ; number of frames to show junk items in a multiworld (#$00 = no change)
 ;--------------------------------------------------------------------------------
 org $B080B0 ; 0x1800B0-0x1800BF
 StaticDecryptionKey:

@@ -806,10 +806,19 @@ RTL
 ; A = item id being collected
 ItemGetAlternateSFX:
 PEA.w $C567 ; SNES to RTS to in bank 08
-LDA.w AncillaGet,X : CMP.b #$4A : BNE +
+LDA.w AncillaGet, X : CMP.b #$4A : BNE +
 	; collecting pre-activated flute
 	LDA.b #$13 : JML Ancilla_SFX2_Near
-+ ; normal itemget sfx
++ ; not pre-activated flute
+	LDA.l !MULTIWORLD_RECEIVING_ITEM : BEQ .normal
+	LDA.l MultiworldJunkItemTimer : BEQ .normal
+	LDA.w AncillaGet, X
+	JSL.l ItemIsJunk : BEQ .normal
+
+.multijunk
+LDA.b #$3B : JML Ancilla_SFX3_Near ; what we wrote over
+
+.normal
 LDA.b #$0F : JML Ancilla_SFX3_Near ; what we wrote over
 
 ; A = item id being collected
@@ -818,6 +827,16 @@ CPY.b #$4A : BNE +
 	JSL Sound_SetSfxPanWithPlayerCoords : ORA.b #$13 : STA.w SFX2
 	RTL
 + ; normal itemget sfx
+	LDA.l !MULTIWORLD_RECEIVING_ITEM : BEQ .normal
+	LDA.l MultiworldJunkItemTimer : BEQ .normal
+	TYA
+	JSL.l ItemIsJunk : BEQ .normal
+
+.multijunk
+JSL Sound_SetSfxPanWithPlayerCoords : ORA.b #$3B : STA.w SFX3
+RTL
+
+.normal
 JSL Sound_SetSfxPanWithPlayerCoords : ORA.b #$0F : STA.w SFX3 ; what we wrote over
 RTL
 ;--------------------------------------------------------------------------------

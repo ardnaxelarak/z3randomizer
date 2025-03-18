@@ -267,9 +267,65 @@ ParadoxCaveGfxFix:
     BRA .uploadLine
 ;--------------------------------------------------------------------------------
 SetItemRiseTimer:
-        LDA.w ItemReceiptMethod : CMP.b #$01 : BNE .not_from_chest
-                LDA.b #$38 : STA.w AncillaTimer, X
-                RTL
-        .not_from_chest
-        TYA : STA.w AncillaTimer, X ; What we wrote over
+	LDA.w ItemReceiptMethod : CMP.b #$01 : BNE .not_from_chest
+		LDA.b #$38 : STA.w AncillaTimer, X
+		RTL
+
+	.not_from_chest
+	LDA.l MultiworldJunkItemTimer : BEQ .default
+	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .multiworld
+	LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .multiworld
+	BRA .default
+
+	.multiworld
+	LDA.l !MULTIWORLD_ITEM_ID
+	JSL.l ItemIsJunk
+	BEQ .default
+
+	.junk
+	LDA.l MultiworldJunkItemTimer : STA.w AncillaTimer, X
+	RTL
+
+	.default
+	TYA : STA.w AncillaTimer, X ; What we wrote over
+	RTL
+;--------------------------------------------------------------------------------
+ItemIsJunk:
+	PHX
+	LDX.b #JunkItems_end-JunkItems-1
+	-
+		CMP.l JunkItems, X : BEQ .junk
+		DEX : BPL -
+	PLX
+	LDA.b #$00
+	RTL
+.junk
+	PLX
+	LDA.b #$01
+	RTL
 RTL
+
+JunkItems:
+	db $27 ; Bomb
+	db $28 ; 3 bombs
+	db $31 ; 10 bombs
+	db $34 ; 1 rupee
+	db $35 ; 5 rupees
+	db $36 ; 20 rupees
+	db $40 ; 100 rupees
+	db $41 ; 50 rupees
+	db $42 ; Heart
+	db $43 ; Arrow
+	db $44 ; 10 arrows
+	db $45 ; Small magic
+	db $46 ; 300 rupees
+	db $47 ; 20 rupees green
+	db $59 ; Rupoor
+	db $D1 ; Apples
+	db $D2 ; Fairy
+	db $D3 ; Chicken
+	db $D4 ; Big Magic
+	db $D5 ; 5 Arrows
+	db $D6 ; Good Bee
+.end
+;--------------------------------------------------------------------------------
