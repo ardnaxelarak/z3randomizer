@@ -490,7 +490,7 @@ CreditsLineBlank:
 
 %blankline()
 
-%bigcredits("FOUTON                WILLOW")
+%bigcredits("WILLOW")
 
 %blankline()
 %blankline()
