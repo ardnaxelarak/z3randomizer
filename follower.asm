@@ -443,8 +443,7 @@ DetermineFollowerSpawn:
     + CMP.b #$0A : BNE +
         LDA.l OverworldEventDataWRAM+$5E : AND.b #$20 : CMP.b #$20 : RTL
     + CMP.b #$0C : BNE +
-        LDA.l NpcFlagsVanilla : AND.b #$10 : CMP.b #$10
-        RTL
+        LDA.l NpcFlagsVanilla : AND.b #$10 : CMP.b #$10 : RTL
     +
 .always_spawn
     CLC : RTL ; big bomb and locksmith have no completion condition in code
