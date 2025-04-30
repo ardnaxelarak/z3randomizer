@@ -52,8 +52,5 @@ incsrc falling_death.asm
 incsrc shell_gfx.asm
 warnpc $B6FFFF ;if we hit this we need to split stuff by bank
 
-org $8684BD
-Sprite_Get16BitCoords_long:
-
 org $9EC6FA ;F46FA
 SpritePrep_Eyegore:

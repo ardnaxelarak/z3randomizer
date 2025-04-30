@@ -123,8 +123,8 @@ InitNpcFlagsVanilla: skip 1             ; PC 0x1833C9
 InitCurrentWorld: skip 1                ; PC 0x1833CA
 skip 1                                  ; PC 0x1833CB
 InitFollowerIndicator: skip 1           ; PC 0x1833CC
-InitFollowerXCoord: skip 2              ; PC 0x1833CD
-InitFollowerYCoord: skip 2              ; PC 0x1833CF
+InitFollowerYCoord: skip 2              ; PC 0x1833CD
+InitFollowerXCoord: skip 2              ; PC 0x1833CF
 InitDroppedFollowerIndoors: skip 1      ; PC 0x1833D1
 InitDroppedFollowerLayer: skip 1        ; PC 0x1833D2
 InitFollowerDropped: skip 1             ; PC 0x1833D3

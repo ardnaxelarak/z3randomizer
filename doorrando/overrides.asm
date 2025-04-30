@@ -11,6 +11,7 @@ rtl
 
 OnFileLoadOverride:
     jsl OnFileLoad ; what I wrote over
+    jsl StartingFollower
     + lda.l DRFlags : and.b #$02 : beq + ; Mirror Scroll
         lda.l MirrorEquipment : bne +
             lda.b #$01 : sta.l MirrorEquipment
@@ -52,8 +53,9 @@ GuruguruFix:
 
 BlindAtticFix:
     lda.l DRMode : beq +
-        lda.b #$01 : rtl
-    + lda.l FollowerIndicator : cmp.b #$06
+        - lda.b #$01 : rtl
+    + lda.l FollowerTravelAllowed : cmp.b #$02 : beq -
+    lda.l FollowerIndicator : cmp.b #$06
     rtl
 
 SuctionOverworldFix:
@@ -118,12 +120,6 @@ BlindsAtticHint:
 	LDA.l RoomDataWRAM[$65].low : AND.w #$0100 : BEQ +
 		SEP #$20 : RTL ; skip the dialog box if the hole is already open
 	+ SEP #$20 : JML Main_ShowTextMessage
-
-BlindZeldaDespawnFix:
-	CMP.b #06 : BEQ +
-	LDA.w SpritePosYLow,X : BEQ + ; don't despawn follower if maiden isn't "present"
-		PLA : PLA : PEA.w SpritePrep_BlindMaiden_despawn_follower-1 : RTL
-	+ PLA : PLA : PEA.w SpritePrep_BlindMaiden_kill_the_girl-1 : RTL
 
 BigKeyDoorCheck:
 	CPY.w #$001E : BNE + ; skip if it isn't a BK door

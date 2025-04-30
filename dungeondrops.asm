@@ -453,6 +453,7 @@ RTL
 
 MaybeSkipCrystalCutsceneFollowerReset:
 PHA
+        LDA.l FollowerTravelAllowed : CMP.b #$02 : BEQ .skip
         ; skip if prizes are shuffled outside of normal boss drops
         LDA.l InventoryTable_properties+($37*2) : AND.b #$01 : BEQ .continue
 .skip

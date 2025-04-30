@@ -63,8 +63,8 @@ RTS
 RTS
 ;--------------------------------------------------------------------------------
 SmithDoorCheck:
-	LDA.l SmithTravelsFreely : AND.w #$00FF : BEQ .orig
-		;If SmithTravelsFreely is set Frog/Smith can enter multi-entrance overworld doors
+	LDA.l FollowerTravelAllowed : AND.w #$00FF : BEQ .orig
+		;If FollowerTravelAllowed is set Frog/Smith can enter multi-entrance overworld doors
 		JML Overworld_Entrance_BRANCH_RHO
 
 	.orig ; The rest is equivlent to what we overwrote

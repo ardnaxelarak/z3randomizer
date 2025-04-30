@@ -48,7 +48,7 @@ JML NMIHookReturn
 ;--------------------------------------------------------------------------------
 PostNMIHookAction:
         LDA.w NMIAux : BEQ +
-                PHK : PEA .return-1 ; push stack for RTL return
+                PHK : PEA.w .return-1 ; push stack for RTL return
                 JMP.w [NMIAux]
                 .return
                 STZ.w NMIAux ; zero bank byte of NMI hook pointer
