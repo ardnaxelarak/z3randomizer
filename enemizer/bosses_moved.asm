@@ -23,12 +23,13 @@ boss_move:
 	+
 
 	CMP.b #41 : BNE +                   ; Is it Skull Woods Boss Room
-        ; TODO: Add moving floor sprite
         JSL Sprite_ResetAll             ; reset sprites twice in that room for some reasons (fix bug with kholdstare)
         JSL Dungeon_ResetSprites        ; Restore the dungeon_resetsprites
-        LDA.b #$07 : STA.w $0B00        ;Spawn the moving floor sprite
-        STZ.w $0B28
-        INC.w OverlordXLow
+        LDA.w $0E20 : CMP.b #$92 : BNE ++  ; Is it Helmasuar King?
+          LDA.b #$07 : STA.w $0B00         ;Spawn the bugged moving floor sprite
+          STZ.w $0B28
+          INC.w OverlordXLow
+        ++
         BRL .move_to_bottom_right
 	+
 
