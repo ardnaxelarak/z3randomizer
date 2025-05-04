@@ -180,6 +180,10 @@ LDA.b IndoorsFlag : BNE +
 +
 RTL
 
+PostFixMirrorGfx:
+	JSL HandleFollowersAfterMirroring
+	JML FollowerGfxRedraw
+
 PostFixOAMGfx:
 	JSL FollowerGfxRedraw
 	REP #$30 : LDA.w #$2000 ; what we wrote over

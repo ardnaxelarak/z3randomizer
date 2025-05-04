@@ -77,6 +77,8 @@ org $9EE495
 JSL Kiki_FollowCheck : BRA + : NOP #12 : +
 org $9EE4AF
 JSL Kiki_BecomeFollower : NOP #2
+org $89A1B2
+JSL Kiki_DontScareTheMonke : NOP #3
 
 org $868D63
 JSL SpritePrep_Locksmith : NOP #2 : db $90 ; BCC
@@ -84,13 +86,13 @@ org $868D7E
 db $80 ; BRA
 org $86BCD9
 JML Locksmith_Chillin_PostMessage
+org $86BD09
+JSL Locksmith_BecomeFollower : NOP #2
 org $86BD7A ; allow follower pickup after purple chest item
 LDA.b #$00 : STA.w SpriteActivity, X
 JSL Locksmith_RespondToAnswer_PostItem
 org $86BDB4
 JSL SpriteDraw_LocksmithFollower
-org $86BD09
-JSL Locksmith_BecomeFollower : NOP #2
 pullpc
 
 MaybeDeleteFollowersOnDeath:
@@ -421,11 +423,14 @@ DetermineFollowerSpawn:
     PHA
         ; despawn if pre-requisite not met
         LDA.w SpriteTypeTable, X : CMP.b #$B4 : BNE +
-            LDA.l NpcFlagsVanilla : AND.b #$20 : EOR.b #$20 : CMP.b #$20 : PLA : RTL
+            LDA.l NpcFlagsVanilla : AND.b #$20 : EOR.b #$20 : CMP.b #$20
+            BRA .prereq_check
         + CMP.b #$B5 : BNE +
             LDA.l CrystalsField : AND.b #$05 : CMP.b #$05
             LDA.b #$FF : ADC.b #$00 : ROR ; flip carry flag
-            PLA : RTL
+        .prereq_check
+        PLA : BCC .check_resolved
+            RTL
         +
     PLA
 .check_resolved
@@ -811,6 +816,18 @@ Kiki_BecomeFollower:
     LDA.b #$0A : STA.l FollowerIndicator
 RTL
 
+; on return it checks BEQ and if non-zero, kiki get spook
+Kiki_DontScareTheMonke:
+    LDA.b LinkJumping : BEQ .return
+    LDA.w NoDamage : BNE .no_spook
+    LDA.w LinkThud : BNE .no_spook
+.spook
+    LDA.b #$01 : RTL
+.no_spook
+    LDA.b #$00
+.return
+    RTL
+
 SpritePrep_Locksmith:
     LDA.l FollowerTravelAllowed : CMP.b #$02 : BNE .vanilla
         JSL DetermineFollowerSpawn_locksmith_check : BCS +
@@ -880,8 +897,10 @@ Locksmith_BecomeFollower:
 Locksmith_RespondToAnswer_PostItem:
     STA.l FollowerIndicator ; what we wrote over
     LDA.l FollowerTravelAllowed : CMP.b #$02 : BNE .no_despawn
+    LDA.l Follower_Locksmith : CMP.b #$0C : BEQ .despawn
     LDA.w SpriteAux, X : BNE .no_despawn
     LDA.l Follower_Locksmith : CMP.b #$0C : BNE .no_despawn
-        STZ.w SpriteAITable, X
+.despawn
+    STZ.w SpriteAITable, X
 .no_despawn
     RTL

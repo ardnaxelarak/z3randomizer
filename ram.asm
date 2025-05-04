@@ -221,6 +221,7 @@ ItemReceiptMethod = $7E02E9       ;
                                   ;
 TileActBE = $7E02EF               ; Bitfield used by breakables and entrances. b b b b d d d d
                                   ; b = Breakables | d = Entrances
+LinkThud = $7E02F8                ; When set, guarantees a thud on landing
 FollowerNoDraw = $7E02F9          ; When set, prevents follower from drawing and forces a game mode check
 UseY1 = $7E0301                   ; Bitfield for Y-item usage: b p - a x z h r
                                   ; b = Boomerang                | p = Powder | a = Bow  | x = Hammer (tested, never set)
@@ -842,6 +843,7 @@ endmacro
 %assertRAM(CutsceneFlag, $7E02E4)
 %assertRAM(ItemReceiptMethod, $7E02E9)
 %assertRAM(TileActBE, $7E02EF)
+%assertRAM(LinkThud, $7E02F8)
 %assertRAM(FollowerNoDraw, $7E02F9)
 %assertRAM(UseY1, $7E0301)
 %assertRAM(CurrentYItem, $7E0303)
