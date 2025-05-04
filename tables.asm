@@ -190,8 +190,11 @@ QuickSwapFlag:
 db $00 ; #$00 = Off (default) - #$01 = On
 ;--------------------------------------------------------------------------------
 org $B0804C ; PC 0x18004C
-SmithTravelsFreely:
-db $00 ; #$00 = Off (default) - #$01 = On (frog/smith can enter multi-entrance doors)
+FollowerTravelAllowed:
+db $00
+; #$00 = Off (default)
+; #$01 = On (frog/smith can enter multi-entrance doors)
+; #$02 = Follower Shuffle Enabled
 ;--------------------------------------------------------------------------------
 org $B0804D ; PC 0x18004D
 EscapeAssist: ; ScrubMode:
@@ -1021,14 +1024,14 @@ org $B08220 ; PC 0x180220
 org $B08240 ; PC 0x180240
 StartingAreaExitOffset:
 db $00, $00, $00, $00, $00, $00, $00
-;--------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
 org $B08247 ; PC 0x180247
 ; For any starting areas in single entrance caves you can specify the overworld door here
 ; to enable drawing the doorframes These values should be the overworld door index+1.
 ; A value of zero will draw no door frame.
 StartingAreaOverworldDoor:
 db $00, $00, $00, $00, $00, $00, $00
-;--------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
 ; 0x18024E - 0x18024F (unused)
 ;-------------------------------------------------------------------------------
 ; $308250 (0x180250) - $30829F (0x18029F)
@@ -1043,11 +1046,50 @@ dw $0000 : db $00 : dw $0000, $0000, $0000, $0000, $0000, $0000, $0000 : db $00,
 dw $0000 : db $00 : dw $0000, $0000, $0000, $0000, $0000, $0000, $0000 : db $00, $00, $00
 ;--------------------------------------------------------------------------------
 ; 0x1802A0 - 0x1802BF (unused)
-;---------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------
+; $3082C0 (0x1802C0) - $3082D7 (0x1802D7)
+org $B082C0
+; Follower data
+; First byte is the Follower ID awarded at each of the locations
+; Next 2 bytes are OAM address references to the head/body gfx
+Follower_Zelda: ; PC 0x1802C0
+db $01
+.vram
+dw $CCCE
+Follower_OldMan: ; PC 0x1802C3
+db $04
+.vram
+dw $ACAE
+Follower_Maiden: ; PC 0x1802C6
+db $06
+.vram
+dw $CCCE
+Follower_Frog: ; PC 0x1802C9
+db $07
+.vram
+dw $C8EE
+Follower_Locksmith: ; PC 0x1802CC
+db $09
+.vram
+dw $EAEC
+Follower_Kiki: ; PC 0x1802CF
+db $0A
+.vram
+dw $C0C2
+Follower_PurpleChest: ; PC 0x1802D2
+db $0C
+.vram
+dw $C8EE
+Follower_SuperBomb: ; PC 0x1802D5
+db $0D
+.vram
+dw $AE4E
+;--------------------------------------------------------------------------------
 
 ;--------------------------------------------------------------------------------
-; 0x1802C0 - 0x1802FF (unused)
-;---------------------------------------------------------------------------------
+; 0x1802D8 - 0x1802FF (unused)
+;--------------------------------------------------------------------------------
 ;--------------------------------------------------------------------------------
 ; $308300 (0x180300) - $30834F (0x18034F)
 org $B08300 ; PC 0x180300

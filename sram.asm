@@ -212,8 +212,8 @@ FollowerIndicator: skip 1       ; $00 = No Follower  | $01 = Zelda    | $04 = Ol
                                 ; $06 = Blind Maiden | $07 = Frog     | $08 = Dwarf
                                 ; $09 = Locksmith    | $0A = Kiki     | $0C = Purple Chest
                                 ; $0D = Big Bomb
-FollowerXCoord: skip 2          ; \ Cached X and Y overworld coordinates of dropped follower
-FollowerYCoord: skip 2          ; / (16-bit integers)
+FollowerYCoord: skip 2          ; \ Cached X and Y overworld coordinates of dropped follower
+FollowerXCoord: skip 2          ; / (16-bit integers)
 DroppedFollowerIndoors: skip 1  ; $00 = Dropped follower outdoors | $01 = Dropped follower indoors
 DroppedFollowerLayer: skip 1    ; $00 = Upper layer | $01 =.lower layer
 FollowerDropped: skip 1         ; Set to $80 when a follower exists and has been dropped somewhere
@@ -512,8 +512,8 @@ endmacro
 %assertSRAM(NpcFlagsVanilla, $7EF3C9)
 %assertSRAM(CurrentWorld, $7EF3CA)
 %assertSRAM(FollowerIndicator, $7EF3CC)
-%assertSRAM(FollowerXCoord, $7EF3CD)
-%assertSRAM(FollowerYCoord, $7EF3CF)
+%assertSRAM(FollowerYCoord, $7EF3CD)
+%assertSRAM(FollowerXCoord, $7EF3CF)
 %assertSRAM(DroppedFollowerIndoors, $7EF3D1)
 %assertSRAM(DroppedFollowerLayer, $7EF3D2)
 %assertSRAM(FollowerDropped, $7EF3D3)

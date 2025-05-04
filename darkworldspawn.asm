@@ -12,6 +12,7 @@ DoWorldFix:
 	+
 	LDA.l Bugfix_MirrorlessSQToLW : BEQ .skip_mirror_check
 		LDA.l FollowerIndicator : CMP.b #$04 : BNE + ; if old man following, skip mirror/aga check
+		LDA.l FollowerTravelAllowed : CMP.b #$02 : BEQ +
 			LDA.l OldManRetrievalWorld
 			BRA .noMirror
 		+ LDA.l MirrorEquipment : AND.b #$02 : BEQ .noMirror ; check if we have the mirror
@@ -60,6 +61,7 @@ RTL
 DoWorldFix_Inverted:
 	LDA.l Bugfix_MirrorlessSQToLW : BEQ .skip_mirror_check
 		LDA.l FollowerIndicator : CMP.b #$04 : BNE + ; if old man following, skip mirror/aga check
+		LDA.l FollowerTravelAllowed : CMP.b #$02 : BEQ +
 			LDA.l OldManRetrievalWorld
 			BRA .setWorld
 	    + LDA.l MirrorEquipment : AND.b #$02 : BEQ .noMirror ; check if we have the mirror
@@ -115,12 +117,12 @@ FakeWorldFix:
 RTL
 ;--------------------------------------------------------------------------------
 GetCurrentWorldForLoad:
-LDA FollowerIndicator : CMP #$04 : BNE .default
-	LDA InvertedMode : BEQ +
-		LDA #$40
-	+ RTL 
+LDA.l FollowerTravelAllowed : CMP.b #$02 : BEQ .default
+LDA.l FollowerIndicator : CMP.b #$04 : BNE .default
+	LDA.l OldManRetrievalWorld
+	RTL
 .default
-LDA CurrentWorld
+LDA.l CurrentWorld
 RTL 
 ;--------------------------------------------------------------------------------
 MasterSwordFollowerClear:
@@ -131,7 +133,9 @@ MasterSwordFollowerClear:
 	RTL
 ;--------------------------------------------------------------------------------
 FixAgahnimFollowers:
-	LDA.b #$00 : STA.l FollowerIndicator ; clear follower
+	LDA.l FollowerTravelAllowed : CMP.b #$02 : BEQ +
+		LDA.b #$00 : STA.l FollowerIndicator ; clear follower
+	+
 	JML PrepDungeonExit ; thing we wrote over
 
 ;--------------------------------------------------------------------------------

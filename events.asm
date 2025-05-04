@@ -135,7 +135,7 @@ OnFileCreation:
 
         ; Resolve instant post-aga if standard
         SEP #$20
-        LDA.l InitProgressIndicator : BIT #$80 : BEQ +
+        LDA.l InitProgressIndicator : BIT.b #$80 : BEQ +
                 LDA.b #$00 : STA.l ProgressIndicatorSRAM  ; set post-aga after zelda rescue
                 LDA.b #$00 : STA.l OverworldEventDataSRAM+$02 ; keep rain state vanilla
         +

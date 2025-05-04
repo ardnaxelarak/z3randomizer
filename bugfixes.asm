@@ -1,13 +1,6 @@
 ;================================================================================
 
 ;--------------------------------------------------------------------------------
-AssignKiki:
-    LDA.b #$00 : STA.l FollowerDropped ; defuse bomb
-    LDA.b #$0A : STA.l FollowerIndicator ; assign kiki as follower
-RTL
-;--------------------------------------------------------------------------------
-
-;--------------------------------------------------------------------------------
 ; Name: AllowSQ
 ; Returns: Accumulator = 0 if S&Q is disallowed, 1 if allowed
 ;--------------------------------------------------------------------------------
@@ -187,6 +180,15 @@ LDA.b IndoorsFlag : BNE +
 +
 RTL
 
+PostFixMirrorGfx:
+	JSL HandleFollowersAfterMirroring
+	JML FollowerGfxRedraw
+
+PostFixOAMGfx:
+	JSL FollowerGfxRedraw
+	REP #$30 : LDA.w #$2000 ; what we wrote over
+	RTL
+
 ;--------------------------------------------------------------------------------
 ; Fix losing VRAM gfx when using quake
 PostNMIUpdateBGCharHalf:
@@ -259,7 +261,7 @@ ParadoxCaveGfxFix:
     LDA.b #$01 : STA.w DMAENABLE
 
 .skipLine
-    RTL
+	JML FollowerGfxRedraw
 
 .skipMostOfLine
     ; Set line length to 192 bytes (the first 6 8x8 tiles in the line)

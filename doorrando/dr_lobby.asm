@@ -13,6 +13,7 @@ PHP
 
 SetDefaultWorld:
 PHP : SEP #$20
+LDA.l FollowerTravelAllowed : CMP.b #$02 : BEQ .default
 LDA.l FollowerIndicator : CMP.b #$04 : BNE .default
 	LDA.l OldManRetrievalWorld : BRA +
 .default

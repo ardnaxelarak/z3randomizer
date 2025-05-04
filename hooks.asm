@@ -408,6 +408,14 @@ org $8AB76E ; <- 5376E - Bank0A.asm : 30 (JSL OverworldMap_InitGfx)
 JSL OnLoadDuckMap
 
 ;================================================================================
+; Fix Clobbered Gfx
+;--------------------------------------------------------------------------------
+org $80DB92
+JSL PostFixMirrorGfx
+org $80E259
+JSL PostFixOAMGfx : NOP
+
+;================================================================================
 ; Infinite Bombs / Arrows / Magic
 ;--------------------------------------------------------------------------------
 org $88A17A ; <- 4217A - ancilla_arrow.asm : 42 (AND.b #$04 : BEQ .dont_spawn_sparkle)
@@ -556,12 +564,6 @@ org $9ED6E8
 JSL CheckAgaForPed : NOP
 
 ;================================================================================
-; Zelda Sprite Fixes
-;--------------------------------------------------------------------------------
-org $85EBCF ; <- 2EBCF - sprite_zelda.asm : 23 (LDA $7EF359 : CMP.b #$02 : BCS .hasMasterSword)
-JSL SpawnZelda : NOP #2
-
-;================================================================================
 ; Alternate Goal
 ;--------------------------------------------------------------------------------
 ;Invincible Ganon
@@ -687,12 +689,6 @@ db $06, $1F, $40, $12, $01, $3F, $14, $01, $3F, $13, $1F, $42, $1A, $1F, $4B, $1
 ;--------------------------------------------------------------------------------
 org $85DFB1 ; <- 2DFB1 - Bank05.asm : 2499
 JSL SkipDrawEOR
-
-;================================================================================
-; Kiki Big Bomb Fix
-;--------------------------------------------------------------------------------
-org $9EE4AF ; <- f64af sprite_kiki.asm : 285 (LDA.b #$0A : STA $7EF3CC)
-JSL AssignKiki : NOP #2
 
 ;================================================================================
 ; Wallmaster camera fix
@@ -844,11 +840,6 @@ db $B1, $C6, $F9, $C9, $C6, $F9 ; data insert - 2 chests, fat fairy room
 org $81E97E
 dw $0116 : db $08
 dw $0116 : db $25
-;--------------------------------------------------------------------------------
-org $9EE16E ; <- F616E - sprite_bomb_shop_entity.asm : 73
-NOP #8 ; fix bomb shop dialog for dwarfless big bomb
-org $868A14 ; <- 30A14 - sprite_prep.asm : 716
-NOP #8 ; fix bomb shop spawn for dwarfless big bomb
 ;--------------------------------------------------------------------------------
 org $86B489 ; <- 33489 - sprite_smithy_bros.asm : 473 (LDA $7EF359 : CMP.b #$03 : BCS .tempered_sword_or_better)
 JML GetSmithSword : NOP #4
@@ -1819,7 +1810,9 @@ Sprite_ShowMessageUnconditional_Rest:
 ;--------------------------------------------------------------------------------
 ;-- Music restarting at zelda fix
 org $85ED10 ; <- 2ED10 - sprite_zelda.asm : 233 - (LDA.b #$19 : STA $012C)
-NOP #5
+BRA + : NOP #3 : +
+org $85ED63
+BRA + : NOP #3 : +
 ;--------------------------------------------------------------------------------
 org $9ECE47 ; <- F4E47 - sprite_crystal_maiden.asm : 220
 JML MaidenCrystalScript
@@ -2347,24 +2340,6 @@ org $82A451 ; <- 12451 - Bank02.asm:6283 (LDA $F6 : AND.b #$40 : BEQ .xButtonNot
 JSL QuickSwap
 ;================================================================================
 
-;================================================================================
-; Tagalong Fixes
-;--------------------------------------------------------------------------------
-org $8689AB ; <- 309AB - sprite_prep.asm: 647 (LDA $7EF3CC : CMP.b #$06 : BEQ .killSprite)
-; Note: In JP 1.0 we have: (CMP.b #$00 : BNE .killSprite) appling US bugfix
-; Prevent followers from causing blind/maiden to despawn:
-; Door rando: let zelda despawn the maiden.
-JSL BlindZeldaDespawnFix
-
-org $8689AF
-SpritePrep_BlindMaiden_despawn_follower: ; this is the normal execution path
-
-org $8689C9
-SpritePrep_BlindMaiden_kill_the_girl: ; not the follower
-;--------------------------------------------------------------------------------
-; Fix old man purple chest issues using the same method as above
-org $9EE906 ; <- F6906 - sprite_old_mountain_man.asm : 31 (LDA $7EF3CC : CMP.b #$00 : BNE .already_have_tagalong)
-CMP.b #$04 : db $F0 ; BEQ
 ;--------------------------------------------------------------------------------
 ;Control which doors frog/smith can enter
 org $9BBCF0 ; <- DBCF0 - Bank1B.asm: 248 (LDA $04B8 : BNE BRANCH_MU)

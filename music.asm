@@ -96,15 +96,14 @@ Overworld_DetermineMusic:
         CMP.b #$43 : BEQ .darkMountain
         CMP.b #$45 : BEQ .darkMountain
         CMP.b #$47 : BEQ .darkMountain
+        LDX.b #$09  ; default dark world theme
+        BRA .default_set
     +
-
     LDX.b #$02  ; hyrule field theme
 
-    LDA.l CurrentWorld : BEQ +
-        LDX.b #$09  ; default dark world theme
-
+    .default_set
     ; Check if we're entering the village
-    + LDA.b OverworldIndex : CMP.b #$18 : BNE +
+    LDA.b OverworldIndex : CMP.b #$18 : BNE +
         ; Check what phase we're in
         ; LDA ProgressIndicator : CMP.b #$03 : !BGE .bunny
             LDX.b #$07 ; Default village theme (phase <3)

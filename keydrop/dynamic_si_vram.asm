@@ -376,7 +376,7 @@ TransferCommonToVRAM:
 	REP #$21
 	SEP #$10
 
-	LDA.w #BigDecompressionBuffer+$2000
+	LDA.w #BigDecompressionBuffer+$2400
 	LDX.b #BigDecompressionBuffer>>16
 	STA.w $4302
 	STX.w $4304

@@ -435,7 +435,7 @@ LoadItemPalette:
 ; Out: A - Sprite palette index
         PHX : PHY : PHB
         LDA.b #PalettesVanillaBank>>16 : STA.b Scrap0C
-        PEA $7E00
+        PEA.w $7E00
         PLB : PLB
         REP #$30
 

@@ -202,6 +202,8 @@ DecompressAllItemGraphics:
 	LDX.b #$5C+$73 : JSR AddGfxSheetToBigBuffer
 	LDX.b #$5B+$73 : JSR AddGfxSheetToBigBuffer
 	LDX.b #$5A+$73 : JSR AddGfxSheetToBigBuffer
+	JSR AddCherryPickGfxToBigBuffer
+	LDX.b #$01 : STX.w $06FA
 	LDX.b #$06+$73 : JSR AddGfxSheetToBigBuffer
 	LDX.b #$07+$73 : JSR AddGfxSheetToBigBuffer
 
@@ -497,6 +499,11 @@ macro DoPlanesA(offset)
 
 	XBA
 	ORA.b Decomp3BPPScratch
+	PHY
+		LDY.w $06FA : BEQ +
+			AND.w #$00FF ; idk why this line works but some sheets we pull in aren't correct without it
+		+
+	PLY
 	STA.w BigDecompressionBuffer+$10+<offset>+<offset>,X
 
 endmacro
@@ -520,7 +527,11 @@ macro DoIndirectPlanesA(offset)
 
 	XBA
 	ORA.b Decomp3BPPScratch
-	AND.w #$00FF ; idk why this line works but the 2 sheets we pull in aren't correct without it
+	PHY
+		LDY.w $06FA : BEQ +
+			AND.w #$00FF ; idk why this line works but some sheets we pull in aren't correct without it
+		+
+	PLY
 	STA.l BigDecompressionBuffer+$10+<offset>+<offset>,X
 
 endmacro
@@ -612,4 +623,57 @@ Unrolled3BPPConvert:
 
 ;===================================================================================================
 
+macro CherryPickGfx(source,dest,length)
+	LDX.w #BigDecompressionBuffer+<source>
+	LDY.w #BigDecompressionBuffer+<dest>
+	LDA.w #<length>-1
+	MVN BigDecompressionBuffer>>16,BigDecompressionBuffer>>16
+
+	LDX.w #BigDecompressionBuffer+<source>+$200
+	LDY.w #BigDecompressionBuffer+<dest>+$200
+	LDA.w #<length>-1
+	MVN BigDecompressionBuffer>>16,BigDecompressionBuffer>>16
+endmacro
+
+;===================================================================================================
+
+AddCherryPickGfxToBigBuffer:
+	; this is mostly to load and rearrange follower gfx to save on space
+	; assumes DecompBufferOffset left off at $A000 (#BigDecompressionBuffer+$2000)
+	; adjustments will be needed if anything prior to this changes
+	LDX.b #$01 : STX.w $06FA
+	LDX.b #$35+$73 : JSR AddGfxSheetToBigBuffer
+	LDX.b #$55+$73 : JSR AddGfxSheetToBigBuffer
+		REP #$30
+		%CherryPickGfx($2400,$2140,$40) ; move old man head
+		%CherryPickGfx($2D40,$20C0,$40) ; move zelda body
+		LDA.b DecompBufferOffset : SEC : SBC.w #$0C00 : STA.b DecompBufferOffset
+		SEP #$30
+	LDX.b #$11+$73 : JSR AddGfxSheetToBigBuffer
+	LDX.b #$15+$73 : JSR AddGfxSheetToBigBuffer
+		REP #$30
+		%CherryPickGfx($2940,$2180,$80) ; move locksmith head/body
+		%CherryPickGfx($2D00,$0440,$40) ; move frog
+		%CherryPickGfx($31C0,$0500,$40) ; move purple chest
+		LDA.b DecompBufferOffset : SEC : SBC.w #$1000 : STA.b DecompBufferOffset
+		SEP #$30
+	LDX.b #$59+$73 : JSR AddGfxSheetToBigBuffer
+	LDX.b #$58+$73 : JSR AddGfxSheetToBigBuffer
+		REP #$30
+		%CherryPickGfx($2880,$0480,$40) ; move kiki head
+		%CherryPickGfx($2900,$04C0,$40) ; move kiki body
+		%CherryPickGfx($30C0,$0540,$40) ; move big bomb
+		%CherryPickGfx($2C40,$0180,$40) ; move duck
+		LDA.b DecompBufferOffset : SEC : SBC.w #$1000 : STA.b DecompBufferOffset
+		SEP #$30
+	LDX.b #$4D+$73 : JSR AddGfxSheetToBigBuffer
+	LDX.b #$50+$73 : JSR AddGfxSheetToBigBuffer
+		REP #$30
+		%CherryPickGfx($2880,$0580,$40) ; move smith
+		%CherryPickGfx($3140,$0140,$40) ; move chicken
+		LDA.b DecompBufferOffset : SEC : SBC.w #$1000 : STA.b DecompBufferOffset
+		SEP #$30
+
+	STZ.w $06FA
+	RTS
 
