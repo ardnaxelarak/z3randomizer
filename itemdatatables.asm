@@ -377,16 +377,16 @@ endmacro
 %ReceiptProps($ED, -4, 0, $49, $F36A, $FF, skip, skip) ; ED - 
 %ReceiptProps($EE, -4, 0, $49, $F36A, $FF, skip, skip) ; EE - 
 %ReceiptProps($EF, -4, 0, $49, $F36A, $FF, skip, skip) ; EF - 
-%ReceiptProps($F0, -4, 0, $49, $F36A, $FF, skip, skip) ; F0 - 
-%ReceiptProps($F1, -4, 0, $49, $F36A, $FF, skip, skip) ; F1 - 
-%ReceiptProps($F2, -4, 0, $49, $F36A, $FF, skip, skip) ; F2 - 
-%ReceiptProps($F3, -4, 0, $49, $F36A, $FF, skip, skip) ; F3 - 
-%ReceiptProps($F4, -4, 0, $49, $F36A, $FF, skip, skip) ; F4 - 
-%ReceiptProps($F5, -4, 0, $49, $F36A, $FF, skip, skip) ; F5 - 
-%ReceiptProps($F6, -4, 0, $49, $F36A, $FF, skip, skip) ; F6 - 
-%ReceiptProps($F7, -4, 0, $49, $F36A, $FF, skip, skip) ; F7 - 
-%ReceiptProps($F8, -4, 0, $49, $F36A, $FF, skip, skip) ; F8 - 
-%ReceiptProps($F9, -4, 0, $49, $F36A, $FF, skip, skip) ; F9 - 
+%ReceiptProps($F0, -4, 0, $51, $F36A, $FF, skip, skip) ; F0 - Armos Soul
+%ReceiptProps($F1, -4, 0, $52, $F36A, $FF, skip, skip) ; F1 - Lanmolas Soul
+%ReceiptProps($F2, -4, 0, $53, $F36A, $FF, skip, skip) ; F2 - Moldorm Soul
+%ReceiptProps($F3, -4, 0, $54, $F36A, $FF, skip, skip) ; F3 - Helmasaur Soul
+%ReceiptProps($F4, -4, 0, $55, $F36A, $FF, skip, skip) ; F4 - Arrghus Soul
+%ReceiptProps($F5, -4, 0, $56, $F36A, $FF, skip, skip) ; F5 - Mothula Soul
+%ReceiptProps($F6, -4, 0, $57, $F36A, $FF, skip, skip) ; F6 - Blind Soul
+%ReceiptProps($F7, -4, 0, $58, $F36A, $FF, skip, skip) ; F7 - Kholdstare Soul
+%ReceiptProps($F8, -4, 0, $59, $F36A, $FF, skip, skip) ; F8 - Vitreous Soul
+%ReceiptProps($F9, -4, 0, $5A, $F36A, $FF, skip, skip) ; F9 - Trinexx Soul
 %ReceiptProps($FA, -4, 0, $49, $F36A, $FF, skip, skip) ; FA - 
 %ReceiptProps($FB, -4, 0, $49, $F36A, $FF, skip, skip) ; FB - 
 %ReceiptProps($FC, -4, 0, $49, $F36A, $FF, skip, skip) ; FC - 
@@ -656,16 +656,16 @@ endmacro
 %SpriteProps($ED, 2, 2, $04, $04, $0000)                                ; ED - 
 %SpriteProps($EE, 2, 2, $04, $04, $0000)                                ; EE - 
 %SpriteProps($EF, 2, 2, $04, $04, $0000)                                ; EF - 
-%SpriteProps($F0, 2, 2, $04, $04, $0000)                                ; F0 - 
-%SpriteProps($F1, 2, 2, $04, $04, $0000)                                ; F1 - 
-%SpriteProps($F2, 2, 2, $04, $04, $0000)                                ; F2 - 
-%SpriteProps($F3, 2, 2, $04, $04, $0000)                                ; F3 - 
-%SpriteProps($F4, 2, 2, $04, $04, $0000)                                ; F4 - 
-%SpriteProps($F5, 2, 2, $04, $04, $0000)                                ; F5 - 
-%SpriteProps($F6, 2, 2, $04, $04, $0000)                                ; F6 - 
-%SpriteProps($F7, 2, 2, $04, $04, $0000)                                ; F7 - 
-%SpriteProps($F8, 2, 2, $04, $04, $0000)                                ; F8 - 
-%SpriteProps($F9, 2, 2, $04, $04, $0000)                                ; F9 - 
+%SpriteProps($F0, 2, 2, $83, $83, PalettesCustom_armos)                 ; F0 - Armos Soul
+%SpriteProps($F1, 2, 2, $83, $83, PalettesCustom_lanmolas)              ; F1 - Lanmolas Soul
+%SpriteProps($F2, 2, 2, $83, $83, PalettesCustom_moldorm)               ; F2 - Moldorm Soul
+%SpriteProps($F3, 2, 2, $83, $83, PalettesCustom_helmasaur)             ; F3 - Helmasuar Soul
+%SpriteProps($F4, 2, 2, $83, $83, PalettesCustom_arrghus)               ; F4 - Arrghus Soul
+%SpriteProps($F5, 2, 2, $83, $83, PalettesCustom_mothula)               ; F5 - Mothula Soul
+%SpriteProps($F6, 2, 2, $83, $83, PalettesCustom_blind)                 ; F6 - Blind Soul
+%SpriteProps($F7, 2, 2, $83, $83, PalettesCustom_kholdstare)            ; F7 - Kholdstare Soul
+%SpriteProps($F8, 2, 2, $83, $83, PalettesCustom_vitreous)              ; F8 - Vitreous Soul
+%SpriteProps($F9, 2, 2, $83, $83, PalettesCustom_trinexx)               ; F9 - Trinexx Soul
 %SpriteProps($FA, 2, 2, $04, $04, $0000)                                ; FA - 
 %SpriteProps($FB, 2, 2, $04, $04, $0000)                                ; FB - 
 %SpriteProps($FC, 2, 2, $04, $04, $0000)                                ; FC - 
@@ -932,16 +932,16 @@ endmacro
 %InventoryItem($ED, $0001, $0000, $0000) ; ED -
 %InventoryItem($EE, $0001, $0000, $0000) ; EE -
 %InventoryItem($EF, $0001, $0000, $0000) ; EF -
-%InventoryItem($F0, $0001, $0000, $0000) ; F0 -
-%InventoryItem($F1, $0001, $0000, $0000) ; F1 -
-%InventoryItem($F2, $0001, $0000, $0000) ; F2 -
-%InventoryItem($F3, $0001, $0000, $0000) ; F3 -
-%InventoryItem($F4, $0001, $0000, $0000) ; F4 -
-%InventoryItem($F5, $0001, $0000, $0000) ; F5 -
-%InventoryItem($F6, $0001, $0000, $0000) ; F6 -
-%InventoryItem($F7, $0001, $0000, $0000) ; F7 -
-%InventoryItem($F8, $0001, $0000, $0000) ; F8 -
-%InventoryItem($F9, $0001, $0000, $0000) ; F9 -
+%InventoryItem($F0, $0081, $0000, $0000) ; F0 - Armos Soul
+%InventoryItem($F1, $0081, $0000, $0000) ; F1 - Lanmolas Soul
+%InventoryItem($F2, $0081, $0000, $0000) ; F2 - Moldorm Soul
+%InventoryItem($F3, $0081, $0000, $0000) ; F3 - Helmasuar Soul
+%InventoryItem($F4, $0081, $0000, $0000) ; F4 - Arrghus Soul
+%InventoryItem($F5, $0081, $0000, $0000) ; F5 - Mothula Soul
+%InventoryItem($F6, $0081, $0000, $0000) ; F6 - Blind Soul
+%InventoryItem($F7, $0081, $0000, $0000) ; F7 - Kholdstare Soul
+%InventoryItem($F8, $0081, $0000, $0000) ; F8 - Vitreous Soul
+%InventoryItem($F9, $0081, $0000, $0000) ; F9 - Trinexx Soul
 %InventoryItem($FA, $0001, $0000, $0000) ; FA -
 %InventoryItem($FB, $0001, $0000, $0000) ; FB -
 %InventoryItem($FC, $0001, $0000, $0000) ; FC -
@@ -1196,16 +1196,16 @@ ItemReceiptGraphicsOffsets:
 	dw $0                                  ; ED -
 	dw $0                                  ; EE -
 	dw $0                                  ; EF -
-	dw $0                                  ; F0 -
-	dw $0                                  ; F1 -
-	dw $0                                  ; F2 -
-	dw $0                                  ; F3 -
-	dw $0                                  ; F4 -
-	dw $0                                  ; F5 -
-	dw $0                                  ; F6 -
-	dw $0                                  ; F7 -
-	dw $0                                  ; F8 -
-	dw $0                                  ; F9 -
+	dw $1C20                               ; F0 - Armos Soul
+	dw $1C60                               ; F1 - Lanmolas Soul
+	dw $1CA0                               ; F2 - Moldorm Soul
+	dw $1D20                               ; F3 - Helmasuar Soul
+	dw $1D60                               ; F4 - Arrghus Soul
+	dw $1DA0                               ; F5 - Mothula Soul
+	dw $1DE0                               ; F6 - Blind Soul
+	dw $2020                               ; F7 - Kholdstare Soul
+	dw $2060                               ; F8 - Vitreous Soul
+	dw $20A0                               ; F9 - Trinexx Soul
 	dw $0                                  ; FA -
 	dw $0                                  ; FB -
 	dw $0                                  ; FC -
@@ -1466,16 +1466,16 @@ StandingItemGraphicsOffsets:
 	dw $0                                  ; ED -
 	dw $0                                  ; EE -
 	dw $0                                  ; EF -
-	dw $0                                  ; F0 -
-	dw $0                                  ; F1 -
-	dw $0                                  ; F2 -
-	dw $0                                  ; F3 -
-	dw $0                                  ; F4 -
-	dw $0                                  ; F5 -
-	dw $0                                  ; F6 -
-	dw $0                                  ; F7 -
-	dw $0                                  ; F8 -
-	dw $0                                  ; F9 -
+	dw $1C20                               ; F0 - Armos Soul
+	dw $1C60                               ; F1 - Lanmolas Soul
+	dw $1CA0                               ; F2 - Moldorm Soul
+	dw $1D20                               ; F3 - Helmasuar Soul
+	dw $1D60                               ; F4 - Arrghus Soul
+	dw $1DA0                               ; F5 - Mothula Soul
+	dw $1DE0                               ; F6 - Blind Soul
+	dw $2020                               ; F7 - Kholdstare Soul
+	dw $2060                               ; F8 - Vitreous Soul
+	dw $20A0                               ; F9 - Trinexx Soul
 	dw $0                                  ; FA -
 	dw $0                                  ; FB -
 	dw $0                                  ; FC -

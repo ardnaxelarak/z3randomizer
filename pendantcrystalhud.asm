@@ -464,7 +464,40 @@ dw $2990  ; green pendant
 dw $298B  ; blue pendant
 dw $299B  ; red pendant
 ;================================================================================
+DrawBossSouls:
+	PHP : PHB : PHK : PLB
+		REP #$30 ; Set 16-bit accumulator & index registers
+		LDX.w #$0000 ; Paint entire box black & draw empty pendants and crystals
+		-
+		LDA.l .row0, X : STA.w GFXStripes+$02EA, X
+		LDA.l .row1, X : STA.w GFXStripes+$032A, X
+		LDA.l .row2, X : STA.w GFXStripes+$036A, X
+		LDA.l .row3, X : STA.w GFXStripes+$03AA, X
+		LDA.l .row4, X : STA.w GFXStripes+$03EA, X
+		LDA.l .row5, X : STA.w GFXStripes+$042A, X
+		LDA.l .row6, X : STA.w GFXStripes+$046A, X
+		LDA.l .row7, X : STA.w GFXStripes+$04AA, X
+		LDA.l .row8, X : STA.w GFXStripes+$04EA, X
+		INX #2 : CPX.w #$0014 : BCC -
+		
+	PLB : PLP
+RTL
+;================================================================================
+.row0 dw $28FB, $28F9, $28F9, $28F9, $28F9, $28F9, $28F9, $28F9, $28F9, $68FB
+.row1 dw $28FC, $31A4, $31A5, $24F5, $31A6, $31A7, $24F5, $31A8, $31A9, $68FC
+.row2 dw $28FC, $24F5, $24F5, $24F5, $24F5, $24F5, $24F5, $24F5, $24F5, $68FC
+.row3 dw $28FC, $31AA, $31AB, $24F5, $31AC, $31AD, $24F5, $31AE, $31AF, $68FC
+.row4 dw $28FC, $24F5, $24F5, $24F5, $24F5, $24F5, $24F5, $24F5, $24F5, $68FC
+.row5 dw $28FC, $31B0, $31B1, $24F5, $31B2, $31B3, $24F5, $31B4, $31B5, $68FC
+.row6 dw $28FC, $24F5, $24F5, $24F5, $24F5, $24F5, $24F5, $24F5, $24F5, $68FC
+.row7 dw $28FC, $24F5, $31B6, $31B7, $24F5, $24F5, $31B8, $31B9, $24F5, $68FC
+.row8 dw $A8FB, $A8F9, $A8F9, $A8F9, $A8F9, $A8F9, $A8F9, $A8F9, $A8F9, $E8FB
+;================================================================================
 DrawPendantCrystalDiagram:
+	LDA.l HudFlag : AND.b #$40 : BEQ +
+		JML.l DrawBossSouls
+	+
+
 	PHP : PHB : PHK : PLB
 		REP #$30 ; Set 16-bit accumulator & index registers
 		LDX.w #$0000 ; Paint entire box black & draw empty pendants and crystals

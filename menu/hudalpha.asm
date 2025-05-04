@@ -9,7 +9,7 @@ UploadMenuOnlyIcons:
     REP #$20
     LDA.w #MenuOnlyIcons : STA.w $4342
     LDA.w #$1801 : STA.w $4340
-    LDA.w #$0240 : STA.w $4345
+    LDA.w #$03A0 : STA.w $4345
     LDA.w #$0F800>>1 : STA.w $2116
 
     SEP #$20

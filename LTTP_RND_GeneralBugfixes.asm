@@ -192,6 +192,7 @@ fillbyte $00 : fill 32
 incbin "data/customitems.4bpp"
 PreloadedGraphicsROM:
 incbin "data/preloadedgfx.4bpp"
+incbin "data/bossicons.souls.4bpp"
 warnpc $A2B000
 org $A2B000
 incsrc itemdatatables.asm ; Statically mapped
