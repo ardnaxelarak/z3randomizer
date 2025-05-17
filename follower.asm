@@ -862,11 +862,18 @@ dw 0,  0 : db $EC, $00, $00, $02
 db $00, $00, $00, $0E, $00, $00, $0E, $0E, $00, $0E, $00, $0E, $0E
 
 Locksmith_Chillin_PostMessage:
+    LDA.w SpriteAux, X : BEQ +
+        ; when a follower is stored, merely walk near them
+        LDA.w SpritePosXLow, X : PHA
+        JSL Follower_CheckCollision : BCC .return
+        BRA .continue
+    +
     LDA.w SpritePosXLow, X : PHA
-    SEC : SBC.b #$0A : STA.w SpritePosXLow, X
-    LDA.w SpritePosYLow, X : PHA
-    SEC : SBC.b #$0A : STA.w SpritePosYLow, X
-    JSL Follower_CheckCollision : BCC .return
+    SEC : SBC.b #$10 : STA.w SpritePosXLow, X
+    LDA.b #$01 : STA.w SpriteVelocityX, X
+    JSL Sprite_Get16BitCoords_long
+    JSL Follower_CheckTileCollision : BNE .return
+.continue
         INC.w SpriteActivity, X ; award follower
         LDA.l FollowerIndicator : CMP.b #$0C : BEQ .purple_chest_prize
         LDA.l FollowerTravelAllowed : CMP.b #$02 : BEQ .return
@@ -876,7 +883,6 @@ Locksmith_Chillin_PostMessage:
 .purple_chest_prize
     INC.w SpriteActivity, X ; prep for purple chest prize
 .return
-    PLA : STA.w SpritePosYLow, X
     PLA : STA.w SpritePosXLow, X
     JML $86BD08 ; jump back to immediately RTS
 
@@ -899,7 +905,6 @@ Locksmith_RespondToAnswer_PostItem:
     LDA.l FollowerTravelAllowed : CMP.b #$02 : BNE .no_despawn
     LDA.l Follower_Locksmith : CMP.b #$0C : BEQ .despawn
     LDA.w SpriteAux, X : BNE .no_despawn
-    LDA.l Follower_Locksmith : CMP.b #$0C : BNE .no_despawn
 .despawn
     STZ.w SpriteAITable, X
 .no_despawn
