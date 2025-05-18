@@ -509,7 +509,7 @@ UpdateHearts:
 	LDA.l HUDHeartColors_index : ASL : TAX
 	LDA.l HUDHeartColors_masks_game_hud,X
 	PLX
-	ORA.l HeartIcon
+	ORA.w #$20A0
 
 	CPY.b #$01
 	BPL .add_heart
@@ -553,14 +553,14 @@ UpdateHearts:
 
 	LDA.l HUDHeartColors_index : ASL : TAX
 	LDA.l HUDHeartColors_masks_game_hud,X
-	ORA.l HalfHeartIcon
+	ORA.w #$20A1
 	STA.b (Scrap09)
 	BRA .skip_partial
 
 .more_than_half
 	LDA.l HUDHeartColors_index : ASL : TAX
 	LDA.l HUDHeartColors_masks_game_hud,X
-	ORA.l HeartIcon
+	ORA.w #$20A0
 	STA.b (Scrap09)
 
 .skip_partial
@@ -580,7 +580,7 @@ CheckHeartPalette:
 	PHX
 	LDA.l HUDHeartColors_index : ASL : TAX
 	LDA.l HUDHeartColors_masks_game_hud,X
-	ORA.l HeartIcon
+	ORA.w #$20A0
 	PLX
 RTS
 

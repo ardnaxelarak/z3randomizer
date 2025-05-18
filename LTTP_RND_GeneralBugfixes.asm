@@ -184,6 +184,7 @@ incsrc multiworld.asm
 incsrc textrenderer.asm
 incsrc crystalswitchbook.asm
 incsrc mimicdash.asm
+incsrc gloom.asm
 warnpc $A58000
 
 org $A28000
