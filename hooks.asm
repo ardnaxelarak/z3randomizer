@@ -2729,7 +2729,3 @@ JSL MimicDirection
 ;--------------------------------------------------------------------------------
 org $828068
 JSL AdjustDefaultGraphics
-org $8CC229
-JSL AdjustDefaultGraphics
-org $8CCCC0
-JSL AdjustDefaultGraphics

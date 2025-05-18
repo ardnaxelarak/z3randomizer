@@ -7,30 +7,21 @@ AdjustDefaultGraphics:
 .gloom
 	LDA.b #$80
 	STA.w $2115
-	LDA.b #$00
+
+	REP #$20
+	LDA.w #$7500
 	STA.w $2116
-	LDA.b #$75
-	STA.w $2117
 
-	LDA.b #$01
-	STA.w $4300
-	LDA.b #$18
-	STA.w $4301
+	LDY.b #SkullGfx_end-SkullGfx
+	LDX.b #$00
 
-	LDA.b #SkullGfx
-	STA.w $4302
-	LDA.b #SkullGfx>>8
-	STA.w $4303
-	LDA.b #SkullGfx>>16
-	STA.w $4304
+-	LDA.l SkullGfx, X
+	STA.w $2118
+	INX #2
+	DEY #2
+	BNE -
 
-	LDA.b #SkullGfx_end-SkullGfx
-	STA.w $4305
-	LDA.b #(SkullGfx_end-SkullGfx)>>8
-	STA.w $4306
-
-	LDA.b #$01
-	STA.w $420B
+	SEP #$20
 	RTL
 
 SkullGfx:
