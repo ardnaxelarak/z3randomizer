@@ -163,6 +163,7 @@ RTL
 ;--------------------------------------------------------------------------------
 OHKOTimer:
 	LDA.l OHKOFlag : BNE .kill
+	LDA.l ChallengeModes : AND.b #$03 : CMP.b #$01 : BEQ .kill
 	LDA.l TimeoutBehavior : CMP.b #$02 : BNE +
 	LDA.l ClockStatus : AND.b #$02 : BEQ +
 		.kill

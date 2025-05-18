@@ -452,6 +452,15 @@ HUDHex4Digit_Long:
 RTL
 
 ;================================================================================
+ClearHearts:
+	LDA.w #!BlankTile
+	LDX.b #$14
+-	STA.l HUDTileMapBuffer+$066, X
+	STA.l HUDTileMapBuffer+$0A6, X
+	DEX #2
+	BPL -
+	RTS
+;================================================================================
 UpdateHearts:
 	PHB
 	REP #$20
@@ -460,6 +469,22 @@ UpdateHearts:
 	LDX.b #$7E
 	PHX
 	PLB
+
+	; OHKO mode
+	LDA.l ChallengeModes : AND.w #$0003 : CMP.w #$0001 : BNE +
+	LDA.w #$240A
+	STA.l HUDTileMapBuffer+$068
+	INC
+	STA.l HUDTileMapBuffer+$06A
+	INC
+	STA.l HUDTileMapBuffer+$06C
+	JMP .skip_partial
++
+
+	; Gloom mode
+	LDA.l ChallengeModes : AND.w #$0003 : CMP.w #$0002 : BNE +
+	JSR ClearHearts
++
 
 	LDA.w MaximumHealth
 	LSR
@@ -480,11 +505,11 @@ UpdateHearts:
 	CPX.b #$01
 	BMI .done_hearts
 
-        PHX
-        LDA.l HUDHeartColors_index : ASL : TAX
-        LDA.l HUDHeartColors_masks_game_hud,X
-        PLX
-        ORA.w #$20A0
+	PHX
+	LDA.l HUDHeartColors_index : ASL : TAX
+	LDA.l HUDHeartColors_masks_game_hud,X
+	PLX
+	ORA.l HeartIcon
 
 	CPY.b #$01
 	BPL .add_heart
@@ -526,16 +551,16 @@ UpdateHearts:
 	CMP.w #$0005
 	BCS .more_than_half
 
-        LDA.l HUDHeartColors_index : ASL : TAX
-        LDA.l HUDHeartColors_masks_game_hud,X
-        ORA.w #$20A1
+	LDA.l HUDHeartColors_index : ASL : TAX
+	LDA.l HUDHeartColors_masks_game_hud,X
+	ORA.l HalfHeartIcon
 	STA.b (Scrap09)
-        BRA .skip_partial
+	BRA .skip_partial
 
 .more_than_half
-        LDA.l HUDHeartColors_index : ASL : TAX
-        LDA.l HUDHeartColors_masks_game_hud,X
-        ORA.w #$20A0
+	LDA.l HUDHeartColors_index : ASL : TAX
+	LDA.l HUDHeartColors_masks_game_hud,X
+	ORA.l HeartIcon
 	STA.b (Scrap09)
 
 .skip_partial
@@ -545,29 +570,29 @@ UpdateHearts:
 	RTL
 
 CheckHeartPaletteFileSelect:
-        LDA.l HUDHeartColors_index : ASL : TAX
-        LDA.l HUDHeartColors_masks_file_select,X
-        ORA.w #$0200
-        LDX.w #$000A
+	LDA.l HUDHeartColors_index : ASL : TAX
+	LDA.l HUDHeartColors_masks_file_select,X
+	ORA.w #$0200
+	LDX.w #$000A
 RTL
 
 CheckHeartPalette:
-        PHX
-        LDA.l HUDHeartColors_index : ASL : TAX
-        LDA.l HUDHeartColors_masks_game_hud,X
-        ORA.w #$20A0
-        PLX
+	PHX
+	LDA.l HUDHeartColors_index : ASL : TAX
+	LDA.l HUDHeartColors_masks_game_hud,X
+	ORA.l HeartIcon
+	PLX
 RTS
 
 ColorAnimatedHearts:
-        PHX
-        REP #$20
-        LDA.l HUDHeartColors_index : ASL : TAX
-        LDA.l HUDHeartColors_masks_game_hud,X
-        PLX
-        ORA.l HeartFramesBaseTiles,X
-        STA.b [Scrap00],Y
-        SEP #$20
+	PHX
+	REP #$20
+	LDA.l HUDHeartColors_index : ASL : TAX
+	LDA.l HUDHeartColors_masks_game_hud,X
+	PLX
+	ORA.l HeartFramesBaseTiles,X
+	STA.b [Scrap00],Y
+	SEP #$20
 RTL
 
 HeartFramesBaseTiles:

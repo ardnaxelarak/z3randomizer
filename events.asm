@@ -208,18 +208,37 @@ OnInitFileSelect:
 	JSL EnableForceBlank
 RTL
 ;--------------------------------------------------------------------------------
+OnGloomDamage:
+	LDA.b #$01
+	STA.l UpdateHUDFlag
+	LDA.l MaximumHealth
+	SEC : SBC.b #$08
+	STA.l CurrentHealth
+	BEQ +
+	STA.l MaximumHealth
++	RTL
+;--------------------------------------------------------------------------------
 OnLinkDamaged:
 	JSL IncrementDamageTakenCounter_Arb
+	LDA.l ChallengeModes : AND.b #$03 : CMP.b #$02 : BEQ .gloom
 	JML OHKOTimer
+.gloom
+	STZ.b $00
+	JML OnGloomDamage
 ;--------------------------------------------------------------------------------
 ;OnEnterWater:
 ;       JSL UnequipCapeQuiet ; what we wrote over
 ;RTL
 ;--------------------------------------------------------------------------------
 OnLinkDamagedFromPit:
+	LDA.l ChallengeModes : AND.b #$03 : CMP.b #$02 : BEQ .gloom
 	JSL OHKOTimer
+	BRA +
+.gloom
+	JSL OnGloomDamage
+	CLC : ADC.b #$08 : STA.l CurrentHealth
 
-	LDA.l AllowAccidentalMajorGlitch
++	LDA.l AllowAccidentalMajorGlitch
 	BEQ ++
 --	LDA.b #$14 : STA.b GameSubMode ; thing we wrote over
 
@@ -231,7 +250,12 @@ OnLinkDamagedFromPit:
 	RTL
 ;--------------------------------------------------------------------------------
 OnLinkDamagedFromPitOutdoors:
+	LDA.l ChallengeModes : AND.b #$03 : CMP.b #$02 : BEQ .gloom
 	JML OHKOTimer ; make sure this is last
+.gloom
+	JSL OnGloomDamage
+	CLC : ADC.b #$08
+	RTL
 ;--------------------------------------------------------------------------------
 OnOWTransition:
         JSL FloodGateReset
