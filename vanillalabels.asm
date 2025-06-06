@@ -286,4 +286,5 @@ Overworld_Entrance_ID                                      = $9BBB73
 SwordPaletteOffsets                                        = $9BEBB4
 ShieldPaletteOffsets                                       = $9BEBC1
 LinkMailPalettesOffsets                                    = $9BEC06
+Sprite_ReducedTileInteractionTable                         = $9DF6CF
 RoomData_ObjectDataPointers                                = $9F8000
