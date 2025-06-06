@@ -61,9 +61,13 @@ OnDungeonExit:
         PLP : PLA
 RTL
 ;--------------------------------------------------------------------------------
+OnSave:
+        JSL MSUResumeReset
+        REP #$30 : LDX.w #$0002
+RTL
+;--------------------------------------------------------------------------------
 OnQuit:
 	JSL SQEGFix
-        JSL MSUResumeReset
 	LDA.b #$00 : STA.l AltTextFlag ; bandaid patch bug with mirroring away from text
 	LDA.b #$10 : STA.b MAINDESQ ; thing we wrote over
 RTL

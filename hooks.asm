@@ -366,8 +366,8 @@ BRA AfterFileWrittenChecks
 org $80881F ; <- Bank00.asm : 1011 (STY $01FE)
 AfterFileWrittenChecks:
 ;--------------------------------------------------------------------------------
-org $808951 ; <- Bank00.asm : 1278 (LDX $1FFE : LDA $00848A, X : TAY : PHY)
-LDX.w #$0002
+org $80894F ; <- Bank00.asm : 1278 (LDX $1FFE : LDA $00848A, X : TAY : PHY)
+JSL OnSave : NOP
 ;--------------------------------------------------------------------------------
 org $8CCE85 ; <- Bank0C.asm : 1953 (LDA $C8 : ASL A : INC #2 : STA $701FFE)
 NOP #4
