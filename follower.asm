@@ -793,7 +793,7 @@ Kiki_OfferToFollow:
     PHA
         LDA.w SpriteTimerE, X : BNE .skip_collision_check
     PLA
-    JML Sprite_ShowMessageFromPlayerContact ; what we wrote over
+    JML Sprite_ShowMessageUnconditional ; what we wrote over
 .skip_collision_check
     PLA
     CLC : RTL
