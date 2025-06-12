@@ -60,12 +60,6 @@ OnDungeonExit:
         JSL SetSilverBowMode
         PLP : PLA
 RTL
-;--------------------------------------------------------------------------------
-OnSave:
-        JSL MSUResumeReset
-        REP #$30 : LDX.w #$0002
-RTL
-;--------------------------------------------------------------------------------
 OnQuit:
 	JSL SQEGFix
 	LDA.b #$00 : STA.l AltTextFlag ; bandaid patch bug with mirroring away from text
