@@ -2,7 +2,6 @@
 ; Dark World Spawn Location Fix & Master Sword Grove Fix
 ;--------------------------------------------------------------------------------
 DarkWorldSaveFix:
-	LDA.b #$70 : PHA : PLB ; thing we wrote over - data bank change
 	JSL MasterSwordFollowerClear
 	JML StatSaveCounter
 ;--------------------------------------------------------------------------------
