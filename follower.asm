@@ -819,6 +819,7 @@ RTL
 ; on return it checks BEQ and if non-zero, kiki get spook
 Kiki_DontScareTheMonke:
     LDA.b LinkJumping : BEQ .return
+    CMP.b #$02 : BEQ .no_spook ; needed for quake usage
     LDA.w NoDamage : BNE .no_spook
     LDA.w LinkThud : BNE .no_spook
 .spook
