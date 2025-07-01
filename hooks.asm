@@ -1874,10 +1874,13 @@ JSL CalculateSignIndex
 ; Dark World Spawn Location Fix & Follower Fixes
 ;--------------------------------------------------------------------------------
 org $80894A ; <- 94A
-PHB : JSL DarkWorldSaveFix
+PHB : JSL OnSave
 ;--------------------------------------------------------------------------------
 org $828046 ; <- 10046 - Bank02.asm : 217 (JSL EnableForceBlank) (Start of Module_LoadFile)
 JSL OnFileLoad
+;--------------------------------------------------------------------------------
+org $89F5DF
+JSL OnDeathNoSave
 ;--------------------------------------------------------------------------------
 org $8280A2
 JSL GetCurrentWorldForLoad

@@ -61,11 +61,20 @@ OnDungeonExit:
         PLP : PLA
 RTL
 ;--------------------------------------------------------------------------------
+OnSave:
+        LDA.b #$70 : PHA : PLB ; thing we wrote over - data bank change
+	JSL DarkWorldSaveFix
+        JML MSUResumeReset
+;--------------------------------------------------------------------------------
 OnQuit:
 	JSL SQEGFix
-        JSL MSUResumeReset
 	LDA.b #$00 : STA.l AltTextFlag ; bandaid patch bug with mirroring away from text
 	LDA.b #$10 : STA.b MAINDESQ ; thing we wrote over
+RTL
+;--------------------------------------------------------------------------------
+OnDeathNoSave:
+        JSL MSUResumeReset
+        LDA.b #$05 : STA.b $10 ; what we wrote over
 RTL
 ;--------------------------------------------------------------------------------
 OnUncleItemGet:

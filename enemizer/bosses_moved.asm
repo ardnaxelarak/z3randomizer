@@ -288,3 +288,16 @@ new_trinexx_code:
 
     RTL
 ;--------------------------------------------------------------------------------
+
+;================================================================================
+; Check if water tile in Swamp boss room, skip interaction
+;--------------------------------------------------------------------------------
+swamp_boss_tile_interaction:
+    LDA.l Sprite_ReducedTileInteractionTable, X : BEQ .return
+    CPX.b #$09 : BNE .return ; return if non-water tile
+    LDX.b IndoorsFlag : BEQ .return ; return if overworld
+    LDX.b RoomIndex : CPX.b #$06 : BNE .return ; return if not swamp boss room
+        LDA.b #$00
+.return
+    RTL
+;--------------------------------------------------------------------------------
