@@ -180,12 +180,14 @@ DrHudDungeonItemsAdditions:
         	lda.l DungeonReminderTable, x : sta.w $1644, y
         	iny #2
         	lda.w #$24f5 : sta.w $1644, y ; blank out map spot
-        	lda.l MapField : and.l DungeonMask, x : beq + ; must have map
+        	lda.l MapField : ora.l MapCountDisplay : ora.l MapOverlay
+        	and.l DungeonMask, x : beq + ; must have map
         		JSR MapIndicatorShort : STA.w $1644, Y
 			+ iny #2
             cpx.w #$001a : bne +
 				tya : !ADD.w #$003c : tay
-			+ lda.l CompassField : and.l DungeonMask, x : beq + ; must have compass
+			+ lda.l CompassField : ora.l CompassCountDisplay
+			and.l DungeonMask, x : beq + ; must have compass
                 phx ; total chest counts
                     LDA.l CompassTotalsWRAM, x : !SUB.l DungeonLocationsChecked, x
                     SEP #$30 : JSR HudHexToDec2DigitCopy : REP #$30
