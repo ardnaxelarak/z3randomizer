@@ -687,7 +687,8 @@ MapTotalsWRAM: skip $10            ; / on boot for tracking.
 skip $20                           ; Reserved for general dungeon tracking data. May have over
                                    ; allocated here. Feel free to reassign.
 MapCompassFlag: skip 2             ; Used to flag overworld map drawing.
-skip $3E                           ; Unused
+SpriteInvincibilityFlag: skip $10  ; Used for boss soul shuffle
+skip $2E                           ; Unused
 skip $260                          ; Unused
 DialogBuffer: skip $100            ; Dialog Buffer
                                    ;

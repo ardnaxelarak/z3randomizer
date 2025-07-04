@@ -2747,3 +2747,31 @@ LDA.b #$30
 ;--------------------------------------------------------------------------------
 org $9EC7BE
 JSL MimicDirection
+
+;===================================================================================================
+;--------------------------------------------------------------------------------
+; Boss souls changes
+;--------------------------------------------------------------------------------
+org $8DB866
+JSL CheckBossSoul : BRA + : NOP #2 : +
+
+org $86ED9E
+JSL CheckInvincibleFlag : NOP
+
+org $85DFFE
+JSL SoulPaletteSet : BRA + : NOP #5 : +
+
+org $85DFB7
+JSL SoulPaletteApply : NOP #2
+
+org $9E8086
+JSL HelmasaurPaletteFix : BRA + : NOP #2 : +
+
+org $9E838C
+JSL HelmasaurHammerFix : NOP
+
+org $9DD884
+JSL MoldormPaletteFix_b : NOP
+
+org $9DDB2E
+JSL MoldormPaletteFix_d : NOP

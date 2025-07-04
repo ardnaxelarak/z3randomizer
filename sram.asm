@@ -237,7 +237,9 @@ CompassCountDisplay: skip 2     ; Compass count display flags (bitfield)
                                 ; High Byte: x c e d a s p m
                                 ; x = Sewers       | c = Hyrule Castle | e = Eastern Palace | d = Desert Palace
                                 ; a = Castle Tower | s = Swamp Palace  | p = PoD            | m = Mire
-skip 10                         ;
+BossSoulMissing: skip 2         ; bitfield for boss soul acquisition
+                                ; 0 = has soul, 1 = soul missing
+skip 8                          ;
 Aga2Duck: skip 1                ; Used in lieu of pyramid hole for checking if the duck should come
                                 ; 0 = Haven't called post-Aga 2 bird | 1 = Have called post-Aga 2 bird
 NpcFlags: skip 2                ; l - c s t k z o (bitfield)

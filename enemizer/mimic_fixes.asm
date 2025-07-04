@@ -26,7 +26,7 @@ SpritePrep_Eyegore_become_mimic:
 ;JSL resetSprite_Mimic : NOP
 
 org $86ED9E ; Sprite_ApplyCalculatedDamage, skip high sprite id early exit
-JSL IsItReallyAMimic : NOP
+; JSL IsItReallyAMimic : NOP ; now hooked into from souls.asm
 
 org $86EDA6 ; Sprite_ApplyCalculatedDamage .not_absorbable
 JSL notItemSprite_Mimic
