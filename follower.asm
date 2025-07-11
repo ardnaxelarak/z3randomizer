@@ -4,6 +4,8 @@ org $81EBB6
 JSL MaybeSetZeldaCheckpoint
 org $899FA1
 db $FF, $FF, $FF ; disable timed follower messages
+org $89A647
+JSL MaybeSkipFollowerTrigger : NOP
 org $89F544
 JSL MaybeDeleteFollowersOnDeath
 
@@ -94,6 +96,14 @@ JSL Locksmith_RespondToAnswer_PostItem
 org $86BDB4
 JSL SpriteDraw_LocksmithFollower
 pullpc
+
+MaybeSkipFollowerTrigger:
+    LDA.b GameMode : AND.w #$00FF : CMP.w #$0010 : BNE .normal
+.no_trigger
+    INC : RTL
+.normal
+    LDA.w $02F2 : AND.b Scrap06 ; what we wrote over
+    RTL
 
 MaybeDeleteFollowersOnDeath:
     LDA.l FollowerTravelAllowed : CMP.b #$02 : BNE .vanilla
