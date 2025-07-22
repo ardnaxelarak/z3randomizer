@@ -169,23 +169,26 @@ DrHudDungeonItemsAdditions:
             + inx #2 : cpx.w #$001b : bcs ++ : JMP -
     ++
     lda.l HudFlag : and.w #$0020 : bne + : JMP ++ : +
-        ; map symbols (do I want these) ; note compass symbol is 2c20
-        lda.w #$2821 : sta.w $1606 : sta.w $1610 : sta.w $161a : sta.w $1624
+        ; map symbols
+        lda.w #$2821 : sta.w $1606 : sta.w $1610 : sta.w $161a
+        ; compass symbols
+        lda.w #$2c20 : sta.w $160a : sta.w $1614 : sta.w $161e : sta.w $16e4
         ; blank out a couple thing from old hud
-        lda.w #$24f5 : sta.w $16e4 : sta.w $1724
-        sta.w $160a : sta.w $1614 : sta.w $161e ; blank out sm key indicators
+        lda.w #$24f5 : sta.w $1624 : sta.w $1724
         ldx.w #$0002
         	- lda.w #$0000 ; start of hud area
         	!ADD.l RowOffsets, x : !ADD.l ColumnOffsets, x : tay
         	lda.l DungeonReminderTable, x : sta.w $1644, y
         	iny #2
         	lda.w #$24f5 : sta.w $1644, y ; blank out map spot
-        	lda.l MapField : and.l DungeonMask, x : beq + ; must have map
+        	lda.l MapField : ora.l MapCountDisplay : ora.l MapOverlay
+        	and.l DungeonMask, x : beq + ; must have map
         		JSR MapIndicatorShort : STA.w $1644, Y
 			+ iny #2
             cpx.w #$001a : bne +
 				tya : !ADD.w #$003c : tay
-			+ lda.l CompassField : and.l DungeonMask, x : beq + ; must have compass
+			+ lda.l CompassField : ora.l CompassCountDisplay
+			and.l DungeonMask, x : beq + ; must have compass
                 phx ; total chest counts
                     LDA.l CompassTotalsWRAM, x : !SUB.l DungeonLocationsChecked, x
                     SEP #$30 : JSR HudHexToDec2DigitCopy : REP #$30
