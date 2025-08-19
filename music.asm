@@ -229,3 +229,13 @@ FallingMusicFadeOut:
 .return
     RTL
 ;--------------------------------------------------------------------------------
+FixHalfVolumeOnSpawnExitToOverworld:
+    BEQ .exit : STA.w MusicControlRequest ; what we wrote over
+    LDA.w DungeonID : BNE .exit
+    LDA.b LinkPosY+1 : ROR : LDA.b LinkPosY : ROR 
+    CMP.b #$DC : BCS .exit ; check if link loading in room from a spawn
+    ; set queue to half volume to trigger full volume on exit
+    LDA.b #$F2 : STA.w MusicControlQueue
+.exit
+    RTL
+;--------------------------------------------------------------------------------
