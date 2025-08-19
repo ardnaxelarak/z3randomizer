@@ -2280,6 +2280,9 @@ BRA + : NOP #12 : +
 org $88C442
 JSL Overworld_DetermineAndSetMusic : NOP
 ;--------------------------------------------------------------------------------
+org $9BD1CD
+JSL Overworld_DetermineAndSetMusic : NOP
+;--------------------------------------------------------------------------------
 org $9DFD27
 JSL Overworld_DetermineAndSetMusic : NOP
 ;--------------------------------------------------------------------------------
