@@ -293,3 +293,12 @@ FallingMusicFadeOut:
 .return
     RTL
 ;--------------------------------------------------------------------------------
+FixPreAgaMusicFadeOut:
+    LDA.l DRMode : TAX : CPX.b #$01 : BCS .exit_no_fade+1
+    LDA.b RoomIndex : CMP.w #$0030 : BEQ .exit_and_fade ; what we
+    CMP.w #$0040 : BEQ .exit_and_fade                   ;   wrote over
+.exit_no_fade
+    SEC : RTL
+.exit_and_fade
+    CLC : RTL
+;--------------------------------------------------------------------------------
