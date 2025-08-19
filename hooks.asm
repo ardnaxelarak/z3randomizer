@@ -2261,8 +2261,9 @@ JSL Overworld_DetermineMusic
 BRA + : NOP #42 : +
 ;--------------------------------------------------------------------------------
 org $82B0C4
+LDA.b OverworldIndex : CMP.b #$80 : BCS +
 JSL Overworld_DetermineAndSetMusic
-BRA + : NOP #16 : +
+BRA + : NOP #10 : +
 ;--------------------------------------------------------------------------------
 org $82B1C1
 JSL Overworld_DetermineAmbientSFX
