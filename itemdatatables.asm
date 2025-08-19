@@ -1437,7 +1437,7 @@ StandingItemGraphicsOffsets:
 	dw $0960                               ; D0 - Bee trap
 	dw $0                                  ; D1 - Apples
 	dw $0                                  ; D2 - Fairy
-	dw $11E0                               ; D3 - Chicken
+	dw BigDecompressionBuffer+$0140        ; D3 - Chicken
 	dw $01E0                               ; D4 - Big Magic
 	dw $11E0                               ; D5 - 5 Arrows
 	dw $0                                  ; D6 - Good Bee
