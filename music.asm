@@ -173,24 +173,21 @@ RTL
 ;--------------------------------------------------------------------------------
 
 ;--------------------------------------------------------------------------------
-; Additional dark world checks to determine whether or not to fade out music
-; on mosaic transitions
-; 
-; On entry, A = $8A (overworld area being loaded)
-Overworld_MosaicDarkWorldChecks:
-    CMP.b #$40 : BEQ .checkCrystals
-    CMP.b #$42 : BEQ .checkCrystals
-    CMP.b #$50 : BEQ .checkCrystals
-    CMP.b #$51 : BNE .doFade
+pushpc
+org $82AD6C
+; Determine whether or not to fade out music on mosaic transitions
+OverworldMosaicTransition_HandleSong:
+    LDA.b GameSubMode : CMP.b #$0D : BNE .dont_fade
+    LDA.w CurrentControlRequest : CMP.b #$04 : BEQ .dont_fade
+    BRA .fade_song
 
-.checkCrystals
-    LDA.l CrystalsField : CMP.b #$7F : BEQ .done
+warnpc $82ADA0
+org $82ADA0
+.fade_song
+org $82ADA5
+.dont_fade
 
-.doFade
-    LDA.b #$F1 : STA.w MusicControlRequest  ; thing we wrote over, fade out music
-
-.done
-    RTL
+pullpc
 ;--------------------------------------------------------------------------------
 
 ;--------------------------------------------------------------------------------
@@ -228,4 +225,23 @@ FallingMusicFadeOut:
         LDA.w LastAPUCommand : AND.w #$00FF : CMP.w #$0015 ; if boss music is playing, then fade out
 .return
     RTL
+;--------------------------------------------------------------------------------
+FixHalfVolumeOnSpawnExitToOverworld:
+    BEQ .exit : STA.w MusicControlRequest ; what we wrote over
+    LDA.w DungeonID : BNE .exit
+    LDA.b LinkPosY+1 : ROR : LDA.b LinkPosY : ROR 
+    CMP.b #$DC : BCS .exit ; check if link loading in room from a spawn
+    ; set queue to half volume to trigger full volume on exit
+    LDA.b #$F2 : STA.w MusicControlQueue
+.exit
+    RTL
+;--------------------------------------------------------------------------------
+FixPreAgaMusicFadeOut:
+    LDA.l DRMode : TAX : CPX.b #$01 : BCS .exit_no_fade+1
+    LDA.b RoomIndex : CMP.w #$0030 : BEQ .exit_and_fade ; what we
+    CMP.w #$0040 : BEQ .exit_and_fade                   ;   wrote over
+.exit_no_fade
+    SEC : RTL
+.exit_and_fade
+    CLC : RTL
 ;--------------------------------------------------------------------------------

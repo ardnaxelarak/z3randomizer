@@ -538,6 +538,8 @@ JML GTCutscene_ConditionalAnimateCrystals
 org $88CE93
 GTCutscene_DrawSingleCrystal:
 JML GTCutscene_ConditionalDrawSingleCrystal
+org $88CED1
+JSL AncillaDraw_GTCutsceneCrystal_OAMPrep : BRA + : NOP #3 : +
 ;--------------------------------------------------------------------------------
 org $88CF19 ; <- 44F19 - ancilla_break_tower_seal.asm : 336 (TXA : AND.b #$07 : TAX)
 JSL GTCutscene_ActivateSparkle_SelectCrystal
@@ -2237,8 +2239,6 @@ org $82A9B0 ; (BCS $A9B7)
 NOP #2
 org $82C1C8 ; (BCS $C1CC)
 NOP #2
-org $82ADA0 ; (LDA.b #$F1 : STA $012C)
-JSL Overworld_MosaicDarkWorldChecks : NOP
 ;--------------------------------------------------------------------------------
 org $85CC58 ; <- Bank05.asm:1307 (LDA $040A : CMP.b #$18)
 JSL PsychoSolder_MusicCheck : NOP #1
@@ -2264,8 +2264,9 @@ JSL Overworld_DetermineMusic
 BRA + : NOP #42 : +
 ;--------------------------------------------------------------------------------
 org $82B0C4
+LDA.b OverworldIndex : CMP.b #$80 : BCS +
 JSL Overworld_DetermineAndSetMusic
-BRA + : NOP #16 : +
+BRA + : NOP #10 : +
 ;--------------------------------------------------------------------------------
 org $82B1C1
 JSL Overworld_DetermineAmbientSFX
@@ -2283,8 +2284,18 @@ BRA + : NOP #12 : +
 org $88C442
 JSL Overworld_DetermineAndSetMusic : NOP
 ;--------------------------------------------------------------------------------
+org $9BD1CD
+JSL Overworld_DetermineAndSetMusic : NOP
+;--------------------------------------------------------------------------------
 org $9DFD27
 JSL Overworld_DetermineAndSetMusic : NOP
+;--------------------------------------------------------------------------------
+org $829253
+JSL FixHalfVolumeOnSpawnExitToOverworld : NOP
+;--------------------------------------------------------------------------------
+org $8292D9
+BRA + : NOP #4 : +
+JSL FixPreAgaMusicFadeOut : db $B0 ; BCS
 ;================================================================================
 
 ;================================================================================
@@ -2654,7 +2665,7 @@ org $898AEE : JSL TransferItemReceiptToBuffer_using_GraphicsID
 org $898C85 : JSL TransferItemReceiptToBuffer_using_GraphicsID
 
 ; gt cutscene
-org $899BBE : JSL TransferItemReceiptToBuffer_using_GraphicsID
+org $899BBE : JSL GTCutscene_TransferGfx
 
 ;===================================================================================================
 ; gratuitous NOPs removed for speed
