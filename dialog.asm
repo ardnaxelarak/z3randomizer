@@ -284,28 +284,68 @@ RTL
 ; s = silver arrow bow
 ; p = 2nd progressive bow
 DialogGanon2:
-        JSL CheckGanonVulnerability
+	JSL CheckGanonVulnerability
 
-        REP #$20
-        BCS +
-        LDA.w #$018D : BRA ++
-        +
-        LDA.l BowTracking
+	REP #$20
+	BCS +
+		LDA.w #$018D : JMP .done
+	+
+	LDA.l GanonVulnerabilityItem : AND.w #$00FF
+	BEQ .silver_arrows
+	CMP.w #$0001 : BEQ .silver_arrows
+	CMP.w #$0004 : BEQ .bombs
+	CMP.w #$0005 : BEQ .powder
+	CMP.w #$0010 : BEQ .bee
 
-        BIT.w #$0080 : BNE + ; branch if bow
-        LDA.w #$0192 : BRA ++
-        +
-        BIT.w #$0040 : BEQ + ; branch if no silvers
-        LDA.w #$0195 : BRA ++
-        +
-        BIT.w #$0020 : BNE + ; branch if p bow
-        LDA.w #$0194 : BRA ++
-        +
-        LDA.w #$0193 : BRA ++
-        ++
-        STA.w TextID
-        SEP #$20
-        JSL Sprite_ShowMessageMinimal_Alt
+	PHX : TAX
+	LDA.l EquipmentWRAM-1, X
+	PLX
+	AND.w #$00FF : BNE .have
+	BRA .dont_have
+
+.silver_arrows
+	LDA.l BowTracking
+
+	BIT.w #$0080 : BEQ .dont_have ; no bow
+	BIT.w #$0040 : BNE .have ; have silvers
+
+	BIT.w #$0020 : BNE +
+		LDA.w #$0194 : BRA .done ; have p bow
++	LDA.w #$0193 : BRA .done ; don't have p bow
+
+.dont_have
+	LDA.w #$0192 : BRA .done
+.have
+	LDA.w #$0195 : BRA .done
+
+.bombs
+	LDA.l BombsEquipment : AND.w #$00FF : BNE .have
+	LDA.l InfiniteBombs : AND.w #$00FF : BNE .have
+	BRA .dont_have
+
+.powder
+	LDA.l InventoryTracking : BIT.w #$0010 : BNE .have
+	BRA .dont_have
+
+.bee
+	LDA.l BottleContentsOne : AND.w #$00FF
+	CMP.w #$0007 : BEQ .have
+	CMP.w #$0008 : BEQ .have
+	LDA.l BottleContentsTwo : AND.w #$00FF
+	CMP.w #$0007 : BEQ .have
+	CMP.w #$0008 : BEQ .have
+	LDA.l BottleContentsThree : AND.w #$00FF
+	CMP.w #$0007 : BEQ .have
+	CMP.w #$0008 : BEQ .have
+	LDA.l BottleContentsFour : AND.w #$00FF
+	CMP.w #$0007 : BEQ .have
+	CMP.w #$0008 : BEQ .have
+	BRA .dont_have
+
+.done
+	STA.w TextID
+	SEP #$20
+	JSL Sprite_ShowMessageMinimal_Alt
 RTL
 ;--------------------------------------------------------------------------------
 DialogEtherTablet:

@@ -190,7 +190,9 @@ ItemLimitCounts: skip 16        ; Keeps track of limited non-progressive items s
                                 ; See: ItemSubstitutionRules in tables.asm
                                 ; Right now this is only used for three items but extra space is
                                 ; reserved
-skip 37                         ; Unused
+skip 35                         ; Unused
+SpecialWeaponLevel: skip 1      ; keeps track of level in special weapon modes
+ItemOnB: skip 1                 ; NYI
 ProgressIndicator: skip 1       ; $00 = Pre-Uncle | $01 = Post-Uncle item | $02 = Zelda Rescued
                                 ; $03 = Agahnim 1 defeated
                                 ; $04 and above don't do anything. $00-$02 used in standard mode

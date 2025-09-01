@@ -185,6 +185,8 @@ incsrc textrenderer.asm
 incsrc crystalswitchbook.asm
 incsrc mimicdash.asm
 incsrc gloom.asm
+incsrc special_weapons.asm
+incsrc variable_ganon_vulnerability.asm
 warnpc $A58000
 
 org $A28000

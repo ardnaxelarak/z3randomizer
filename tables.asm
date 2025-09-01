@@ -103,9 +103,25 @@ ChallengeModes:
 ; d - damage modes (0 - normal, 1 - ohko, 2 - gloom)
 db $00
 ;--------------------------------------------------------------------------------
-; 0x18002E (Reserved for Ganon Vulnerability Item)
+org $B0802E
+GanonVulnerabilityItem:
+db $00 ; $00 = default behavior (silver arrows)
 ;--------------------------------------------------------------------------------
-; 0x18002F (Reserved for Special Weapons)
+org $B0902F
+SpecialWeapons:
+db #$00
+; s - - -  m m m m (bitfield) - NYI
+; s - only swords damage can hurt enemies
+; m - special weapon mode
+; $00 = Off (default)
+; $01 = Bomb mode
+; $02 = Pseudosword
+; $03 = Byrna mode
+; $04 = Somaria mode
+; $05 = Canes mode
+; $06 = Bee mode
+; $07 = Unused
+; $08 = Bugnet mode
 ;--------------------------------------------------------------------------------
 ; 0x180030 (Unused)
 ;--------------------------------------------------------------------------------
