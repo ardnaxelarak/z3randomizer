@@ -463,9 +463,16 @@ db $00 ; #$00 = Original Behavior (default) - #$01 = Book can flip crystal switc
 ;--------------------------------------------------------------------------------
 ; 0x1800A7 - 0x1800AE (unused)
 ;--------------------------------------------------------------------------------
+; 0x1800AF
+; mtff ffff
+;
+;  m - 0 = only shorten timer on multiworld items, 1 = shorten all items
+;  t - 0 = triforce pieces considered important, 1 = triforce pieces considered junk
+;  f - number of frames to show items
+;--------------------------------------------------------------------------------
 org $B080AF ; PC 0x1800AF
-MultiworldJunkItemTimer:
-db $00 ; number of frames to show junk items in a multiworld (#$00 = no change)
+JunkItemTimer:
+db $00 ; number of frames to show junk items (#$00 = no change)
 ;--------------------------------------------------------------------------------
 org $B080B0 ; 0x1800B0-0x1800BF
 StaticDecryptionKey:

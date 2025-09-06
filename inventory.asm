@@ -810,12 +810,9 @@ LDA.w AncillaGet, X : CMP.b #$4A : BNE +
 	; collecting pre-activated flute
 	LDA.b #$13 : JML Ancilla_SFX2_Near
 + ; not pre-activated flute
-	LDA.l !MULTIWORLD_RECEIVING_ITEM : BEQ .normal
-	LDA.l MultiworldJunkItemTimer : BEQ .normal
-	LDA.w AncillaGet, X
 	JSL.l ItemIsJunk : BEQ .normal
 
-.multijunk
+.junk
 LDA.b #$3B : JML Ancilla_SFX3_Near ; what we wrote over
 
 .normal
@@ -827,12 +824,9 @@ CPY.b #$4A : BNE +
 	JSL Sound_SetSfxPanWithPlayerCoords : ORA.b #$13 : STA.w SFX2
 	RTL
 + ; normal itemget sfx
-	LDA.l !MULTIWORLD_RECEIVING_ITEM : BEQ .normal
-	LDA.l MultiworldJunkItemTimer : BEQ .normal
-	TYA
 	JSL.l ItemIsJunk : BEQ .normal
 
-.multijunk
+.junk
 JSL Sound_SetSfxPanWithPlayerCoords : ORA.b #$3B : STA.w SFX3
 RTL
 

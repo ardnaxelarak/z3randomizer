@@ -274,18 +274,11 @@ SetItemRiseTimer:
 		RTL
 
 	.not_from_chest
-	LDA.l MultiworldJunkItemTimer : BEQ .default
-	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .multiworld
-	LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .multiworld
-	BRA .default
-
-	.multiworld
-	LDA.l !MULTIWORLD_ITEM_ID
 	JSL.l ItemIsJunk
 	BEQ .default
 
 	.junk
-	LDA.l MultiworldJunkItemTimer : STA.w AncillaTimer, X
+	LDA.l JunkItemTimer : AND.b #$3F : STA.w AncillaTimer, X
 	RTL
 
 	.default
@@ -294,10 +287,24 @@ SetItemRiseTimer:
 ;--------------------------------------------------------------------------------
 ItemIsJunk:
 	PHX
-	LDX.b #JunkItems_end-JunkItems-1
+	LDA.l JunkItemTimer : BIT.b #$3F : BEQ .not_junk
+	BIT.b #$80 : BNE .check
+	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .check
+	LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .check
+	BRA .not_junk
+
+.check
+	LDA.l JunkItemTimer : AND.b #$40
+	BEQ +
+		LDA.b #JunkItems_triforce_end-JunkItems_end
+	+
+	CLC : ADC.b #JunkItems_end-JunkItems-1
+	LDA.w AncillaGet, X
+	TAX
 	-
 		CMP.l JunkItems, X : BEQ .junk
 		DEX : BPL -
+.not_junk
 	PLX
 	LDA.b #$00
 	RTL
@@ -330,4 +337,7 @@ JunkItems:
 	db $D5 ; 5 Arrows
 	db $D6 ; Good Bee
 .end
+	db $6B ; Power Star
+	db $6C ; Triforce Piece
+.triforce_end
 ;--------------------------------------------------------------------------------
