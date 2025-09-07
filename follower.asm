@@ -160,18 +160,23 @@ MaybeSetZeldaCheckpoint:
     AND.w #$7FFF : TAX ; what we wrote over
     SEP #$20
         LDA.l ProgressFlags : AND.b #$04 : BNE .return ; zelda rescued
-        LDA.l StartingEntrance : CMP.b #$04 : BEQ .return ; throne room checkpoint set
+        LDA.l StartingEntrance : CMP.b #$02 : BEQ .return ; cell checkpoint set
+            CMP.b #$04 : BEQ .return ; throne room checkpoint set
         LDA.l FollowerIndicator : CMP.b #$01 : BNE .return ; zelda following
         LDA.b RoomIndex : CMP.b #$80 : BNE + ;zelda cell
             LDA.l Follower_Zelda : CMP.b #$01 : BNE .return
-            JSL Dungeon_SaveRoomQuadrantData
             BRA .set_checkpoint
         + CMP.b #$45 : BNE .return ; maiden cell
             CPX.w #$0964 : BNE .return ; top big lock
             LDA.l Follower_Maiden : CMP.b #$01 : BNE .return
 .set_checkpoint
     LDA.b #$02 : STA.l StartingEntrance
-    JSL SaveDeathCount
+    PHX
+        SEP #$10
+        JSL SaveDeathCount
+        JSL Dungeon_SaveRoomQuadrantData
+        REP #$10
+    PLX
 .return
     REP #$30
     RTL
@@ -383,6 +388,9 @@ SetAndLoadFollower:
             JSL DetermineFollower_skip_stored : CMP.b #$01 : BNE +
                 LDA.b #$02 : STA.l StartingEntrance
                 JSL SaveDeathCount
+                PHX
+                    JSL Dungeon_SaveRoomQuadrantData
+                PLX
         + CMP.b #$09 : BNE +
             LDA.b #$40 : STA.w $02CD : STZ.w $02CE ; locksmith timed message
         +
