@@ -118,8 +118,9 @@ RTL
 GetCurrentWorldForLoad:
 LDA.l FollowerTravelAllowed : CMP.b #$02 : BEQ .default
 LDA.l FollowerIndicator : CMP.b #$04 : BNE .default
-	LDA.l OldManRetrievalWorld
-	RTL
+	LDA.l InvertedMode : BEQ +
+		LDA.b #$40
+	+ RTL
 .default
 LDA.l CurrentWorld
 RTL 
