@@ -441,7 +441,8 @@ SpriteSubPixelZ = $7E0F90         ;
 CurrentSpriteSlot = $7E0FA0       ; Holds the current sprite/ancilla's index
                                   ;
 FreezeSprites = $7E0FC1           ; "Seems to freeze sprites"
-                                  ;
+LinkPosXCache = $7E0FC2           ; Cache of Link's coordinates
+LinkPosYCache = $7E0FC4           ;   - Done at the beginning of Link_Main every frame
 GfxChrHalfSlotVerify = $7E0FC6    ; Mirrors $0AAA, set to >= $03 when VRAM has temp graphics loaded
 PrizePackIndexes = $7E0FC7        ; $07 bytes. One for each prize pack.
                                   ;

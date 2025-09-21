@@ -79,6 +79,8 @@ org $9EE495
 JSL Kiki_FollowCheck : BRA + : NOP #12 : +
 org $9EE4AF
 JSL Kiki_BecomeFollower : NOP #2
+org $9EE4F7
+JSL Kiki_FixTeleportOnExit
 org $89A1B2
 JSL Kiki_DontScareTheMonke : NOP #3
 
@@ -833,6 +835,14 @@ Kiki_BecomeFollower:
     LDA.b #$00 : STA.l FollowerDropped ; defuse bomb
     LDA.b #$0A : STA.l FollowerIndicator
 RTL
+
+Kiki_FixTeleportOnExit:
+    REP #$30
+        LDA.b LinkPosX : STA.w LinkPosXCache
+        LDA.b LinkPosY : STA.w LinkPosYCache
+    SEP #$30
+    LDA.b #$19 : LDY.b #$01 ; what we wrote over
+RTL 
 
 ; on return it checks BEQ and if non-zero, kiki get spook
 Kiki_DontScareTheMonke:
