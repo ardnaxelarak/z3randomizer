@@ -113,6 +113,7 @@ CheckGanonVulnerability:
 GTCutscene_TransferGfx:
 	PHA
 		REP #$20
+		STZ.w DuckPose
 		LDA.l GanonsTowerOpenGfx : BEQ .original_crystal
 		PHX
 			LDX.w ItemStackPtr : STA.l ItemGFXStack,X

@@ -348,6 +348,8 @@ TransparencyFlag = $7E0ABD        ; Flags transparency effects e.g. in Thieves T
                                   ;
 OWTransitionFlag = $7E0ABF        ; Used for certain transitions like smith, witch, etc.
                                   ;
+DuckPose = $7E0AF4                ; Used for duck gfx (2 bytes), zero value stops duck drawing in gfx slot
+                                  ;
 ItemGFXPtr = $7E0AFA              ; Pointer for item receipt graphics transfers
                                   ; $0000       - no transfer, do nothing
                                   ; bit 7 reset - offset into ROM table
