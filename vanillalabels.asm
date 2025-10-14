@@ -201,6 +201,7 @@ Sprite_BagOfPowder                                         = $85F644
 MagicShopAssistant_Main                                    = $85F893
 Sprite_SpawnSecret_SetCoords                               = $8682A5
 Chicken_SpawnAvengerChicken                                = $86A7DB
+Sprite_ScheduleForBreakage_exit                            = $86E273
 Link_PerformRead                                           = $87B4DB
 Link_PerformOpenChest_no_replacement                       = $87B59F
 Link_CheckNewAPress                                        = $87B5A9

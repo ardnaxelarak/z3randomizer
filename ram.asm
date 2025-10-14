@@ -272,6 +272,8 @@ DungeonID = $7E040C               ; High byte mostly unused but sometimes read. 
                                   ;
 TransitionDirection = $7E0418     ; OW: 0=N 1=S 2=W 3=E  UW: 0=S 1=N 2=E 3=W
                                   ;
+ManipIndex = $7E042C              ; Index of manipulable tile. Word length.
+                                  ;
 TrapDoorFlag = $7E0468            ; Flag that is set when trap doors are down. 2 bytes
                                   ;
 LayerAdjustment = $7E047A         ; Flags layer adjustments. Arms EG.
@@ -284,6 +286,8 @@ Map16ChangeIndex = $7E04AC        ; Word length.
 OWEntranceCutscene = $7E04C6      ;
                                   ;
 HeartBeepTimer = $7E04CA          ;
+                                  ;
+ManipTileMapX = $7E0540           ; Tilemap X position of manipulable tile. $10 x 2 bytes
                                   ;
 CameraTargetN = $7E0610           ; Camera scroll target for directions NSEW
 CameraTargetS = $7E0612           ;
@@ -367,6 +371,7 @@ EnemyStunTimer = $7E0B58          ; Auto-decrementing timer for stunned enemies.
                                   ;
 BowDryFire = $7E0B9A              ; If set, arrows are deleted immediately
                                   ;
+SecretId = $7E0B9C                ; Controls the secret spawned from bushes, pots, rocks, etc.
 SaveFileIndex = $7E0B9D           ;
                                   ;
 SpriteAncillaInteract = $7E0BA0   ; If nonzero, ancillae do not interact with the sprite. $10 bytes.
@@ -871,6 +876,7 @@ endmacro
 %assertRAM(OverworldIndexMirror, $7E040A)
 %assertRAM(DungeonID, $7E040C)
 %assertRAM(TransitionDirection, $7E0418)
+%assertRAM(ManipIndex, $7E042C)
 %assertRAM(TrapDoorFlag, $7E0468)
 %assertRAM(LayerAdjustment, $7E047A)
 %assertRAM(RoomIndexMirror, $7E048E)
@@ -878,6 +884,7 @@ endmacro
 %assertRAM(Map16ChangeIndex, $7E04AC)
 %assertRAM(OWEntranceCutscene, $7E04C6)
 %assertRAM(HeartBeepTimer, $7E04CA)
+%assertRAM(ManipTileMapX, $7E0540)
 %assertRAM(CameraTargetN, $7E0610)
 %assertRAM(CameraTargetS, $7E0612)
 %assertRAM(CameraTargetW, $7E0614)
@@ -928,6 +935,7 @@ endmacro
 %assertRAM(OverlordYHigh, $7E0B20)
 %assertRAM(EnemyStunTimer, $7E0B58)
 %assertRAM(BowDryFire, $7E0B9A)
+%assertRAM(SecretId, $7E0B9C)
 %assertRAM(SaveFileIndex, $7E0B9D)
 %assertRAM(SpriteAncillaInteract, $7E0BA0)
 %assertRAM(AncillaVelocityY, $7E0C22)
