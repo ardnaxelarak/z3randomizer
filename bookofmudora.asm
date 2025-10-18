@@ -16,7 +16,7 @@ DrawLibraryItemGFX:
 RTL
 ;--------------------------------------------------------------------------------
 SetLibraryItem:
-    LDY.w SprItemReceipt, X
+    LDY.w SprSourceItemId, X
     JSL ItemSet_Library ; contains thing we wrote over
 RTL
 ;--------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ RTL
 ;--------------------------------------------------------------------------------
 GiveBonkItem:
     LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
-    LDA.w SprItemReceipt, X
+    LDA.w SprSourceItemId, X
     JSR AbsorbKeyCheck : BCC .notKey
         PHY : LDY.b #$24 : JSL AddInventory : PLY ; do inventory processing for a small key
         LDA.l CurrentSmallKeys : INC A : STA.l CurrentSmallKeys

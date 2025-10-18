@@ -682,7 +682,7 @@ KeyGet:
     PHA
         LDA.l StandingItemsOn : BNE +
             PLA : RTL
-        + LDY.w SprItemReceipt, X
+        + LDY.w SprSourceItemId, X
         LDA.w SprItemIndex, X : STA.w SpawnedItemIndex
         LDA.w SprItemFlags, X : STA.w SpawnedItemFlag
         STY.b Scrap00
@@ -704,7 +704,7 @@ KeyGet:
         .skip PLX
         .receive
         JSL Player_HaltDashAttackLong
-        TYA : JSL AttemptItemSubstitution : JSL ResolveLootIDLong : TAY
+        TYA : JSL AttemptItemSubstitution : TAY
         JSL Link_ReceiveItem
     PLA : DEC : RTL
 
@@ -712,7 +712,7 @@ KeyTable:
 db $A0, $A0, $A2, $A3, $A4, $A5, $A6, $A7, $A8, $A9, $AA, $AB, $AC, $AD
 
 BigKeyGet:
-	LDY.w SprItemReceipt, X
+	LDY.w SprSourceItemId, X
 	CPY.b #$32 : BNE +
 		STZ.w ItemReceiptMethod : LDY.b #$32 ; what we wrote over
 		PHX : JSL Link_ReceiveItem : PLX ; what we wrote over

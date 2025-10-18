@@ -466,7 +466,6 @@ Shopkeeper_BuyItem:
     PLX
     LDA.l ShopInventory, X
     JSL AttemptItemSubstitution
-    JSL ResolveLootIDLong
     TAY : JSL Link_ReceiveItem
     LDA.l ShopInventory+3, X : INC : STA.l ShopInventory+3, X
     LDA.b #$00 : STA.l ShopEnableCount

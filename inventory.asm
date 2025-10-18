@@ -646,7 +646,7 @@ RTL
 ; CollectPowder:
 ;--------------------------------------------------------------------------------
 CollectPowder:
-  LDY.w SprItemReceipt, X ; Retrieve stored item type
+  LDY.w SprSourceItemId, X ; Retrieve stored item type
   BNE +
 	; if for any reason the item value is 0 reload it, just in case
 	  %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues) : TAY
