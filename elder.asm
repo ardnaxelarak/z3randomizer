@@ -39,32 +39,30 @@ RTL
 
     Elder_Code:
     {
-        REP #$20
-        LDA.l GoalItemRequirement : BEQ .despawn
-        LDA.l GanonVulnerableMode : AND.w #$00FF : CMP.w #$0005 : BEQ .despawn
-        LDA.l TurnInGoalItems : AND.w #$00FF : BNE +
+        TXY : LDX.b #$06
+            REP #$30
+            LDA.l GoalConditionTable, X
+            TAX : LDA.l $B00000, X
+            SEP #$30
+        TYX
+        CMP.b #$00 : BEQ .despawn ; no goal, despawn
+        LDA.l TurnInGoalItems : BNE +
             .despawn
-            SEP #$20
             STZ.w SpriteAITable, X ; despawn self
             RTS
         +
-        SEP #$20
         LDA.b GameSubMode
         BNE .done
         LDA.b #$96
         LDY.b #$01
         
         JSL Sprite_ShowSolicitedMessageIfPlayerFacing_PreserveMessage : BCC .dont_show
-            REP #$20
-            LDA.l GoalCounter
-            CMP.l GoalItemRequirement : !BLT +
-                SEP #$20
+            LDA.b #$03 : JSL CheckConditionPass : BCC +
                 JSL ActivateTriforceCutscene
             +
         .dont_show
         
         .done
-        SEP #$20
         LDA.b FrameCounter : LSR #5 : AND.b #$01 : STA.w SpriteGFXControl, X
         RTS
     }

@@ -520,3 +520,20 @@ AuxPaletteCheck:
         REP #$30
         PLX
 RTS
+
+CountBits:
+; In: A - value to count bits set in
+; Out: A - number of bits set
+; Flexible to use with 8 or 16-bit mode
+        PHX : TAX
+        PHY : PHP
+        SEP #$20
+        LDA.b 1,S : BIT.b #$20 : BNE +
+                PLP : TXA : LDX.w #$000F : LDY.w #$0000
+                BRA ++
+        + PLP : TXA : LDX.b #$07 : LDY.b #$00
+        ++ - LSR : BCC +
+                INY
+        + DEX : BPL -
+        TYA : PLY : PLX
+RTL

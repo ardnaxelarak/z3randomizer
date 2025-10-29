@@ -1,6 +1,6 @@
 GoalItemGanonCheck:
 	LDA.w SpriteTypeTable, X : CMP.b #$D6 : BNE .success ; skip if not ganon
-		JSL CheckGanonVulnerability
+		LDA.b #$01 : JSL CheckConditionPass
 		BCS .success
 
 		.fail
@@ -11,104 +11,162 @@ RTL
 		LDA.b OAMOffsetY : CMP.b #$80 ; thing we wrote over
 RTL
 ;--------------------------------------------------------------------------------
-;Carry clear = ganon invincible
-;Carry set = ganon vulnerable
-CheckGanonVulnerability:
-	PHX
-	LDA.l GanonVulnerableMode
-	ASL
-	TAX
+; Input A = Type of condition check
+; Carry clear = failed check
+; Carry set = successful check
+CheckConditionPass:
+	PHX : PHY
+	PHB
+		LDY.b #GoalConditionTable>>16 : PHY : PLB : STY.b Scrap02
+		REP #$20
+		ASL : TAY
+		LDA.w GoalConditionTable, Y : STA.b Scrap00
+	PHK : PLB
+	SEP #$20
+	LDY.b #$00
+	- LDA.b [Scrap00], Y : CMP.b #$FF : BEQ .exit
+		INY : ROL : TAX
+		JSR (.conditions, X) : BCC .exit : BRA -
 
-	; Carry
-	;  0 - invulnerable
-	;  1 - vulnerable
-	JSR (.goals, X)
+.exit
+	PLB : PLY : PLX
+RTL
 
-	PLX
-	RTL
-
-
-.goals
-	dw .vulnerable
-	dw .invulnerable
-	dw .all_dungeons
-	dw .crystals_and_aga
+; Y = index after condition code
+; Carry = Set if using default target value
+.conditions
+	dw .always_fail
+	dw .pendants
 	dw .crystals
+	dw .pendant_bosses
+	dw .crystal_bosses
+	dw .bosses
+	dw .agahnim_defeated
+	dw .agahnim2_defeated
 	dw .goal_item
-	dw .light_speed
-	dw .crystals_and_bosses
-	dw .bosses_only
-	dw .all_dungeons_no_agahnim
-	dw .all_items
-	dw .completionist
+	dw .collection_rate
+	dw .custom_goal
+	dw .bingo
+	dw .success
+	dw .success
+	dw .success
+	dw .success
 
-; 00 = always vulnerable
-.vulnerable
+.agahnim2_defeated
+	LDA.l RoomDataWRAM[$0D].high : AND.b #$08 : BEQ .fail
+.bingo ; not implemented yet
 .success
-	SEC
-	RTS
-
-; 01 = always invulnerable
-.invulnerable
+	SEC : RTS
+.always_fail
 .fail
-	CLC
-	RTS
-
-; 02 = All dungeons
-.all_dungeons
-	LDA.l ProgressIndicator : CMP.b #$03 : BCC .fail ; require post-aga world state
-
-; 09 = All dungeons except agahnim
-.all_dungeons_no_agahnim
-	LDA.l PendantsField : AND.b #$07 : CMP.b #$07 : BNE .fail ; require all pendants
-	LDA.l CrystalsField : AND.b #$7F : CMP.b #$7F : BNE .fail ; require all crystals
-	LDA.l RoomDataWRAM[$0D].high : AND.b #$08 : BEQ .fail ; require aga2 defeated (pyramid hole open)
-	BRA .success
-
-; 03 = crystals and aga 2
-.crystals_and_aga
-	LDA.l RoomDataWRAM[$0D].high : AND.b #$08 : BEQ .fail ; check aga2 first then bleed in
-
-; 04 = crystals only
+	CLC : RTS
+.pendants
+	PHP
+	LDA.l PendantCounter : PLP : BCC +
+		CMP.b #$03 : RTS
 .crystals
-	JSL CheckEnoughCrystalsForGanon
-	RTS
-
-; 05 = require goal item
+	PHP
+	LDA.l CrystalCounter : PLP : BCC +
+		CMP.b #$07 : RTS
+.pendant_bosses
+	PHP
+	LDA.b #$07 : STA.b Scrap03 : STZ.b Scrap04
+	JSR CheckForBossesDefeated : PLP : BCC +
+		CMP.b #$03 : RTS
+.crystal_bosses
+	PHP
+	LDA.b #$40 : STA.b Scrap03 : STZ.b Scrap04
+	JSR CheckForBossesDefeated : PLP : BCC +
+		CMP.b #$07 : RTS
+.bosses
+	PHP
+	LDA.b #$47 : STA.b Scrap03 : STZ.b Scrap04
+	JSR CheckForBossesDefeated : PLP : BCC +
+		CMP.b #$10 : RTS
+	+ CMP.b [Scrap00], Y : INY : RTS
+.agahnim_defeated
+	LDA.l ProgressIndicator : CMP.b #$03 : RTS
 .goal_item
-        REP #$20
-	LDA.l GoalCounter : CMP.l GoalItemRequirement
-        SEP #$20
+	REP #$20
+		LDA.l GoalCounter : BCC +
+			CMP.l GoalItemRequirement : BRA ++
+.collection_rate
+	REP #$20
+		LDA.l TotalItemCounter : BCC +
+			CMP.l TotalItemCount : BRA ++
+		+ CMP.b [Scrap00], Y : INY : INY : ++
+	SEP #$20
 	RTS
+.custom_goal
+	LDA.b [Scrap00], Y : INY ; options
+	PHA : AND.b #$07 : ASL : TAX : PLA
+	;JMP CheckConditionPassCustom
+	; flows into next function, do not insert code after without uncommenting above
 
-; 06 = light speed
-.light_speed
-	BRA .fail
+; --------------------------------------------------------------------------------
+; Input A = Options value, see GoalConditionTable for format
+; Input X = Condition check type index
+; Input Y = Index after Options byte
+CheckConditionPassCustom:
+	PHX : PHA : BIT.b #$08 : PHP
+		REP #$30
+		LDA.b [Scrap00], Y : INY : INY ; address
+	PLP : REP #$30 : BEQ .byte
+.word
+	TAX
+	SEP #$20
+	PLA
+		AND.b #$10
+		REP #$20
+		BNE +
+			LDA.l $7E0000, X : BRA ++
+		+
+		LDA.l $7F0000, X : ++
+	SEP #$10
+	PLX
+	REP #$10
+	JSR (.comparisons, X)
+	INY
+	SEP #$30
+	RTS
+.byte
+	TAX
+	SEP #$20
+	PLA
+		AND.b #$10 : BNE +
+			LDA.l $7E0000, X : BRA ++
+		+
+		LDA.l $7F0000, X : ++
+	SEP #$10
+	PLX
+	JMP (.comparisons, X)
 
-; 07 = Crystals and bosses
-.crystals_and_bosses
-	JSL CheckEnoughCrystalsForGanon ; check crystals first then bleed in to next
-	BCC .fail
+.comparisons
+	dw .minimum
+	dw .exact
+	dw .bitfield_nonzero
+	dw .bitfield_match
+	dw .count_bits
+	dw .fail
+	dw .fail
+	dw .fail
 
-; 08 = Crystal bosses but no crystals
-.bosses_only
-	JMP CheckForCrystalBossesDefeated
-
-; 09 = 100% item collection rate
-.all_items
-        REP #$20
-        LDA.l TotalItemCounter : CMP.l TotalItemCount
-        SEP #$20
-        RTS
-
-; 0A = 100% item collection rate and all dungeons
-.completionist
-        REP #$20
-        LDA.l TotalItemCounter : CMP.l TotalItemCount
-        SEP #$20
-        BCC .fail
-        BRA .all_dungeons
-
+.pass
+	INY : SEC : RTS
+.count_bits
+	JSL CountBits
+.minimum
+	CMP.b [Scrap00], Y : INY
+	RTS
+.bitfield_match
+	AND.b [Scrap00], Y
+.exact
+	CMP.b [Scrap00], Y : BEQ .pass
+	INY : CLC : RTS
+.bitfield_nonzero
+	AND.b [Scrap00], Y : BNE .pass
+.fail
+	INY : CLC : RTS
 ;--------------------------------------------------------------------------------
 GTCutscene_TransferGfx:
 	PHA
@@ -203,47 +261,83 @@ GTCutscene_ActivateSparkle_SelectCrystal:
 RTL
 ;--------------------------------------------------------------------------------
 GTCutscene_NumberOfCrystals:
+	PHX : PHY : PHP
 	REP #$20
-	LDA.l GanonsTowerOpenAddress : CMP.w #CrystalCounter : BEQ +
-	LDA.w #$0001 : BRA .done
-	+ LDA.l GanonsTowerOpenTarget
-	.done
+	LDA.l GanonsTowerOpenGfx+2 : BEQ .not_multiple_gfx
+		LDX.b #$04
+		- LDA.l GanonsTowerOpenGfx, X : BEQ +
+			INX : INX : CPX.b #$0E : BCC -
+		+
+		TXA : LSR
+		JMP .done
+.not_multiple_gfx
+	LDX.b #$00 : LDA.l GoalConditionTable, X
+	TXY : STY.b Scrap00
+	REP #$10
 	SEP #$20
+		TAX
+		- LDA.l $B00000, X : CMP.b #$FF : BEQ .use_y
+			ROL : PHP : CMP.b #$10 : BCS .not_8bit_compare
+				; uses 8-bit targets
+				CMP.b #$04 : BNE .not_crystal_goal ; crystal goal
+					PLP : BCC +
+						LDY.b #$07 : BRA .use_y
+			.not_crystal_goal
+				CMP.b #$02 : BNE .not_pendant_goal ; pendant goal
+					PLP : BCC +
+						LDY.b #$03 : BRA .use_y
+					+
+					INX : LDA.l $B00000, X : TAY : BRA .use_y
+			.not_pendant_goal
+				PLP : INX : BCS +
+					INX
+				+
+				BRA -
+		.not_8bit_compare
+			CMP.b #$14 : BCS .custom_goal
+				; uses 16-bit targets
+				PLP : INX : BCS +
+					INX : INX
+				+
+				BRA -
+		.custom_goal
+			BNE .unknown
+				PLP
+				INC.b Scrap00
+				INX : LDA.l $B00000, X : BIT.b #$08 : PHP
+				INX : INX : INX : AND.b #$03 : BEQ .use_custom_target
+					INY
+					INX : PLP : BEQ +
+						INX
+					+ 
+					BRA -
+			.use_custom_target
+				PLP : BEQ .8bit_target
+					; 16-bit target
+					REP #$20
+					LDA.l $B00000, X : CMP.w #$0008 : SEP #$20 : INX : BRA +
+			.8bit_target
+				LDA.l $B00000, X : CMP.b #$08 : + : BCC +
+					INY : INX : BRA -
+				+
+				PHY : ADC.b 1,S : PLY : TAY
+				INX : JMP -
+		.unknown ; unknown condition, exit with safe value
+			PLP : INY
+.use_y
+	TYA : CMP.b #$08 : BCC .done
+		LDA.b Scrap00
+.done
+	PLP : PLY : PLX
 	RTS
 ;--------------------------------------------------------------------------------
-CheckEnoughCrystalsForGanon:
-        REP #$20
-	LDA.l CrystalCounter
-	CMP.l GanonVulnerableTarget
-        SEP #$20
-RTL
-;--------------------------------------------------------------------------------
 CheckTowerOpen:
-        LDA.l GanonsTowerOpenMode : ASL : TAX
-        JSR (.tower_open_modes,X)
-RTL
-        .tower_open_modes
-        dw .vanilla
-        dw .arbitrary_cmp
-
-        .vanilla
-        LDA.l CrystalsField
-        AND.b #$7F : CMP.b #$7F
-        RTS
-
-        .arbitrary_cmp
-        REP #$30
-        LDA.l GanonsTowerOpenAddress : TAX
-        LDA.l $7E0000,X
-        CMP.l GanonsTowerOpenTarget
-        SEP #$30
-        RTS
-
+	LDA.b #$00 : JML CheckConditionPass
 ;---------------------------------------------------------------------------------------------------
 CheckAgaForPed:
         REP #$20
-        LDA.l GanonVulnerableMode
-        CMP.w #$0006 : BNE .vanilla
+		; seems light_speed option to force blue balls is unused for now
+        BRA .vanilla
 
 .light_speed
         SEP #$20
@@ -264,7 +358,7 @@ CheckAgaForPed:
         RTL
 
 ;---------------------------------------------------------------------------------------------------
-CheckForCrystalBossesDefeated:
+CheckForBossesDefeated:
 	PHB : PHX : PHY
 
 	LDA.b #CrystalPendantFlags_2>>16
@@ -273,13 +367,13 @@ CheckForCrystalBossesDefeated:
 	REP #$30
 
 	; count of number of bosses killed
-	STZ.b Scrap00
+	STZ.b Scrap04
 
 	LDY.w #10
 
 .next_check
 	LDA.w CrystalPendantFlags_2+2,Y
-	BIT.w #$0040
+	BIT.w Scrap03
 	BEQ ++
 
 	TYA
@@ -293,7 +387,7 @@ CheckForCrystalBossesDefeated:
 	AND.w #$0800
 	BEQ ++
 
-	INC.b Scrap00
+	INC.b Scrap04
 
 ++	DEY
 	BPL .next_check
@@ -301,36 +395,22 @@ CheckForCrystalBossesDefeated:
 	SEP #$30
 	PLY : PLX : PLB
 
-	LDA.b Scrap00 : CMP.l GanonVulnerableTarget
-
+	LDA.b Scrap04
 
 	RTS
 ;---------------------------------------------------------------------------------------------------
 CheckPedestalPull:
 ; Out: c - Successful ped pull if set, do nothing if unset.
-        PHX
-        LDA.l PedCheckMode : ASL : TAX
-        JSR (.pedestal_modes,X)
-        PLX
+	LDA.b #$02 : JSL CheckConditionPass : BCS .return
+		PHX : PHP
+			LDA.b GameMode : CMP.b #$0E : BEQ +
+			REP #$30
+			LDX.w #$0004 : LDA.l GoalConditionTable, X : TAX
+			LDA.l $B00000, X : CMP.w #$FF81 : BEQ +
+				SEP #$30
+				LDA.b #$97 : LDY.b #$01
+				JSL Sprite_ShowMessageUnconditional
+			+
+		PLP : PLX
+.return
 RTL
-
-        .pedestal_modes
-        dw .vanilla
-        dw .arbitrary_cmp
-
-        .vanilla
-        LDA.l PendantsField
-        AND.b #$07 : CMP.b #$07 : BNE ..nopull
-                SEC
-                RTS
-        ..nopull
-        CLC
-        RTS
-
-        .arbitrary_cmp
-        REP #$30
-        LDA.l PedPullAddress : TAX
-        LDA.l $7E0000,X
-        CMP.l PedPullTarget
-        SEP #$30
-        RTS

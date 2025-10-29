@@ -892,43 +892,84 @@ org $B08196     ; PC 0x180196-0x180197
 TotalItemCount: ; Total item count for HUD. Only counts items that use "item get" animation.
 dw $00D8        ; 216
 
-org $B08198             ; PC 0x180198-0x1801A9
-GanonsTowerOpenAddress: ; 0x180198-0x180199
-dw CrystalCounter       ; Target address for GT open check
-GanonsTowerOpenTarget:  ; 0x18019A-0x18019B
-dw $0007                ; Target amount for GT open modes to compare
-GanonsTowerOpenMode:    ; 0x18019C-0x18019D
-dw $0001                ; $00 = Vanilla | $01 = Compare target with address
-PedPullAddress:         ; 0x18019E-0x18019F
-dw PendantCounter       ; Target address for ped pull check
-PedPullTarget:          ; 0x1801A0-0x1801A1
-dw $0003                ; Target amount for ped pull modes to check
-PedCheckMode:           ; 0x1801A2-0x1801A3
-dw $0000                ; $00 = vanilla | $01 = Compare address to target value
-GanonVulnerableAddress: ; 0x1801A4-0x1801A5
-dw CrystalCounter       ; Target address for ped pull check
-GanonVulnerableTarget:  ; 0x1801A6-0x1801A7
-dw $0007                ; Target amount for Ganon vulnerability modes to compare
-GanonVulnerableMode:    ; 0x1801A8-0x1801A9
-dw $0000                ; #$00 = Off (default)
-                        ; #$01 = On
-                        ; #$02 = Require All Dungeons
-                        ; #$03 = Require "GanonVulnerableTarget" Crystals and Aga2
-                        ; #$04 = Require "GanonVulnerableTarget" Crystals
-                        ; #$05 = Require "GoalItemRequirement" Goal Items
-                        ; #$06 = Light Speed
-                        ; #$07 = Require All Crystals and Crystal Bosses
-                        ; #$08 = Require All Crystal Bosses only
-                        ; #$09 = Require All Dungeons No Agahnim
-                        ; #$0A = Require 100% Item Collection
-                        ; #$0B = Require 100% Item Collection and All Dungeons
-GanonsTowerOpenGfx:     ; 0x1801AA-0x1801AB
-dw $0000                ; Gfx used for GT open animation, similar to StandingItemGraphicsOffsets
-GanonsTowerOpenPalette: ; 0x1801AC
-db $00                  ; Palette for GanonsTowerOpenGfx
-;VHPP   CCC O
+org $B08198             ; PC 0x180198-0x1801D7 (variable tables, $FF terminated)
+GoalConditionTable:
+	dw GanonsTowerOpen
+	dw GanonVulnerable
+	dw PedPull
+	dw MurahdahlaComplete
+
+GanonsTowerOpen:
+	db $82 ; Crystal Count >= Default 7
+	db $FF
+GanonVulnerable:
+	db $82 ; Crystal Count >= Default 7
+	db $07 ; Agahnim 2 defeated
+	db $FF
+PedPull:
+	db $81 ; Pendant Count >= Default 3
+	db $FF
+MurahdahlaComplete:
+	db $88 ; Triforce Pieces >= Default Goal
+	db $FF
+; These are lists of conditions to check for various goals,
+;   each terminated by #$FF.
+; First byte is condition type, with most significant bit
+;   indicating the default value should be used, else the
+;   following byte/s indicate the custom target value.
+; -----------------------------------------------------------
+; Condition Types:
+; #$00 = Always Invulnerable
+; #$01 = Require Pendants - Default is 3
+; #$02 = Require Crystals - Default is 7
+; #$03 = Require Pendant Bosses - Default is 3
+; #$04 = Require Crystal Bosses - Default is 7
+; #$05 = Require Prize Bosses - Default is 10
+; #$06 = Require Agahnim 1
+; #$07 = Require Agahnim 2
+; #$08 = Require Goal Items (ie. Triforce Pieces) - Default is value at GoalItemRequirement
+; #$09 = Require Item Collection - Default is Max Collection Rate
+; #$0A = Require Custom Goal
+; -----------------------------------------------------------
+;   For Custom Goal, one byte indicates the bitfield options,
+;   followed by two bytes for the target address, followed
+;   by one or two bytes for the custom target value.
+; Options bitfield:
+; ---b  accc
+; b - bank flag - 0 = $7E - 1 = $7F
+; a - addressing mode - 0 = 8-bit - 1 = 16-bit
+; c - comparison mode
+;   0 = minimum (>=)
+;   1 = exact (==)
+;   2 = bitfield any
+;   3 = bitfield match
+;   4 = count bits set in bitfield
+;   5-7 = reserved
 ;--------------------------------------------------------------------------------
-; 0x1801AD - 0x1801FF (unused)
+org $B081D8 ; PC 0x1801D8 - 0x1801FE
+GanonsTowerOpenGfx:      ; 0x1801D8-0x1801E5
+dw $0000                 ; Gfx used for GT open animation, similar to StandingItemGraphicsOffsets
+dw $0000, $0000, $0000, $0000, $0000, $0000
+GanonsTowerOpenPalette:  ; 0x1801E6-0x1801EC
+db $00                   ; Palette for GanonsTowerOpenGfx
+db $00, $00, $00, $00, $00, $00
+; VHPP  CCCO (VertFlip, HorizFlip, Priority, ColorPalette, OAM Sheet)
+PedPullGfx:              ; 0x1801ED-0x1801F2
+dw $0000                 ; Gfx used for ped pull animation, similar to StandingItemGraphicsOffsets
+dw $0000, $0000
+PedPullPalette:          ; 0x1801F3-0x1801F5
+db $00                   ; Palette for PedPullGfx
+db $00, $00
+; VHPP  CCCO (VertFlip, HorizFlip, Priority, ColorPalette, OAM Sheet)
+MurahdahlaGfx:           ; 0x1801F6-0x1801FB
+dw $0000                 ; Gfx used for ped pull animation, similar to StandingItemGraphicsOffsets
+dw $0000, $0000
+MurahdahlaPalette:       ; 0x1801FC-0x1801FE
+db $00                   ; Palette for MurahdahlaGfx
+db $00, $00
+; VHPP  CCCO (VertFlip, HorizFlip, Priority, ColorPalette, OAM Sheet)
+;--------------------------------------------------------------------------------
+; 0x1801FF (unused)
 ;================================================================================
 org $B08200 ; PC 0x180200 - 0x18020B
 RedClockAmount:

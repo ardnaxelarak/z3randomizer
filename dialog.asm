@@ -265,7 +265,7 @@ RTL
 RTL
 ;--------------------------------------------------------------------------------
 DialogGanon1:
-	JSL CheckGanonVulnerability
+	LDA.b #$01 : JSL CheckConditionPass
 	REP #$20
 	LDA.w #$018C
 	BCC +
@@ -284,7 +284,7 @@ RTL
 ; s = silver arrow bow
 ; p = 2nd progressive bow
 DialogGanon2:
-        JSL CheckGanonVulnerability
+        LDA.b #$01 : JSL CheckConditionPass
 
         REP #$20
         BCS +
@@ -372,8 +372,8 @@ RTL
 
 ;---------------------------------------------------------------------------------------------------
 AgahnimAsksAboutPed:
-	LDA.l GanonVulnerableMode
-	CMP.b #$06 : BNE .vanilla
+	; seems light_speed option to change some aga text is unused for now
+	BRA .vanilla
 
 	LDA.l OverworldEventDataWRAM+$80 ; check ped flag
 	AND.b #$40
