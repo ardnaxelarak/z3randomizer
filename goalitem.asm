@@ -70,17 +70,17 @@ RTL
 		CMP.b #$07 : RTS
 .pendant_bosses
 	PHP
-	LDA.b #$07 : STA.b Scrap03 : STZ.b Scrap04
+	LDA.b #$02
 	JSR CheckForBossesDefeated : PLP : BCC +
 		CMP.b #$03 : RTS
 .crystal_bosses
 	PHP
-	LDA.b #$40 : STA.b Scrap03 : STZ.b Scrap04
+	LDA.b #$01
 	JSR CheckForBossesDefeated : PLP : BCC +
 		CMP.b #$07 : RTS
 .bosses
 	PHP
-	LDA.b #$47 : STA.b Scrap03 : STZ.b Scrap04
+	LDA.b #$00
 	JSR CheckForBossesDefeated : PLP : BCC +
 		CMP.b #$10 : RTS
 	+ CMP.b [Scrap00], Y : INY : RTS
@@ -361,41 +361,43 @@ CheckAgaForPed:
 CheckForBossesDefeated:
 	PHB : PHX : PHY
 
-	LDA.b #CrystalPendantFlags_2>>16
+	STA.b Scrap04 ; 0 = check all, 1 = check crystals, 2 = check pendants
+	
+	LDA.b #CrystalPendantFlags_3>>16
 	PHA : PLB
 
-	REP #$30
+	STZ.b Scrap03 ; count of number of bosses killed
+	STZ.b Scrap05
 
-	; count of number of bosses killed
-	STZ.b Scrap04
+	REP #$30
 
 	LDY.w #10
 
 .next_check
-	LDA.w CrystalPendantFlags_2+2,Y
-	BIT.w Scrap03
-	BEQ ++
+	LDA.w CrystalPendantFlags_3+2,Y : AND.w #$00FF : BEQ .skip
+	CMP.w #$0008 ; C set = pendant, C clear = crystal
+	LDA.b Scrap04 : BEQ .proceed
+		PHP : ROR : BCC +
+			PLP : BCS .skip : BRA .proceed
+		+ PLP : BCC .skip
 
-	TYA
-	ASL
-	TAX
+	.proceed
+	TYA : ASL : TAX
 
-	LDA.l DrawHUDDungeonItems_boss_room_ids-4,X
-	TAX
+	LDA.l DungeonMapBossRooms+4,X
+	ASL : TAX
 	LDA.l RoomDataWRAM.l,X
 
-	AND.w #$0800
-	BEQ ++
+	AND.w #$0800 : BEQ .skip
+		INC.b Scrap03
 
-	INC.b Scrap04
-
-++	DEY
-	BPL .next_check
+	.skip
+	DEY : BPL .next_check
 
 	SEP #$30
 	PLY : PLX : PLB
 
-	LDA.b Scrap04
+	LDA.b Scrap03
 
 	RTS
 ;---------------------------------------------------------------------------------------------------
