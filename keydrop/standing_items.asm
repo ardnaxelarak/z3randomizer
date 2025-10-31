@@ -1,4 +1,7 @@
 ; hooks
+org $81DB19
+	JSL MaybeSkipSmashTerrain : BCS $81DB11
+
 org $81E6B0
 	JSL RevealPotItem
 	RTS
@@ -43,12 +46,21 @@ org $86d180
 org $86d18d ; <- 3518D - sprite_absorbable.asm : 274 (LDA $7EF36F : INC A : STA $7EF36F)
 	JSL KeyGet
 
+org $86E24A
+	JSR MaybeSkipTerrainDebris
+
 org $86f9f3 ; bank06.asm : 6732 (JSL SpritePrep_LoadProperties)
 	JSL LoadProperties_PreserveCertainProps
 
 org $86828A
 Sprite_SpawnSecret_SpriteSpawnDynamically:
 	JSL CheckSprite_Spawn
+
+org $87B114
+	JSL MaybeUnableToLiftPotSfx
+	NOP #4
+	db $30 ; BMI
+
 
 org $87B169
 	JSL PreventPotSpawn : NOP
@@ -757,7 +769,9 @@ RTL
 		LDA.b #$00 : STZ.w SpriteAITable, X
 		LDA.b #$E4 : JSL Sprite_SpawnDynamically
 		BMI .error
-		LDA.b #$40 : TSB.w AButtonAct : RTL
+		LDA.w UseY1 : AND.b #$02 : BNE ++
+			LDA.b #$40 : TSB.w AButtonAct
+		++ RTL
 
 		.error
 		LDA.b #$3C ; SFX2_3C - error beep
@@ -775,6 +789,44 @@ PreventPotSpawn2:
 	LDA.w AButtonAct : BEQ +
 		LDA.b #$01 : TSB.b LinkStrafe ; what we wrote over
 + RTL
+
+MaybeSkipTerrainDebris_long:
+	STZ.w SecretId ; what we wrote over
+	LDA.w SpriteTypeTable, X : CMP.b #$EC
+	BEQ .return
+		PLA : PLA : PLA : PLA : PLA
+		LDA.b #Sprite_ScheduleForBreakage_exit>>16 : PHA
+		PEA.w Sprite_ScheduleForBreakage_exit-1
+.return
+RTL
+
+MaybeSkipSmashTerrain:
+	STY.w ManipIndex : LDA.w ManipTileMapX, Y ; what we wrote over
+	PHA
+	SEP #$30
+	LDX.b #$0F
+	- LDA.w SpriteAITable, X : BEQ .continue
+		DEX
+	BPL -
+	.skip
+	PLA : PLA
+	LDA.b #$3C : STA.w SFX2 ; error beep
+	SEC
+	RTL
+	.continue
+	REP #$30
+	PLA
+	CLC
+RTL
+
+MaybeUnableToLiftPotSfx:
+	- LDA.w SpriteAITable,X : BEQ .return
+		DEX
+	BPL -
+	LDA.b #$3C : STA.w SFX2 ; error beep
+	LDA.b #$FF
+.return
+RTL
 
 CheckIfPotIsSpecial:
 	TXA ; give index to A so we can do a CMP.l
