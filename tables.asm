@@ -953,21 +953,21 @@ dw $0000, $0000, $0000, $0000, $0000, $0000
 GanonsTowerOpenPalette:  ; 0x1801E6-0x1801EC
 db $00                   ; Palette for GanonsTowerOpenGfx
 db $00, $00, $00, $00, $00, $00
-; VHPP  CCCO (VertFlip, HorizFlip, Priority, ColorPalette, OAM Sheet)
+; -VHPPCCC (VertFlip, HorizFlip, Priority, ColorPalette)
 PedPullGfx:              ; 0x1801ED-0x1801F2
 dw $0000                 ; Gfx used for ped pull animation, similar to StandingItemGraphicsOffsets
 dw $0000, $0000
 PedPullPalette:          ; 0x1801F3-0x1801F5
 db $00                   ; Palette for PedPullGfx
 db $00, $00
-; VHPP  CCCO (VertFlip, HorizFlip, Priority, ColorPalette, OAM Sheet)
+; -VHPPCCC (VertFlip, HorizFlip, Priority, ColorPalette)
 MurahdahlaGfx:           ; 0x1801F6-0x1801FB
 dw $0000                 ; Gfx used for ped pull animation, similar to StandingItemGraphicsOffsets
 dw $0000, $0000
 MurahdahlaPalette:       ; 0x1801FC-0x1801FE
 db $00                   ; Palette for MurahdahlaGfx
 db $00, $00
-; VHPP  CCCO (VertFlip, HorizFlip, Priority, ColorPalette, OAM Sheet)
+; -VHPPCCCO (VertFlip, HorizFlip, Priority, ColorPalette)
 ;--------------------------------------------------------------------------------
 ; 0x1801FF (unused)
 ;================================================================================

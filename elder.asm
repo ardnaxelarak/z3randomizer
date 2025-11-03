@@ -142,19 +142,35 @@ MasterSword_CheckIfPulled:
 
 MasterSword_ConditionalActivateCutscene:
     LDA.w SpriteMovement,X : BNE .specialCutscene
+        PHX
+            REP #$30
+            LDA.w SprRedrawFlag, X : BNE .doNormalPed
+            INC.w SprRedrawFlag, X
+            LDA.l PedPullGfx : BEQ .doNormalPed
+            LDX.w ItemStackPtr : STA.l ItemGFXStack,X
+            LDA.w #$BCE0>>1 : STA.l ItemTargetStack,X
+            TXA : INC #2 : STA.w ItemStackPtr
+    .doNormalPed
+            SEP #$30
+        PLX
         JML Sprite_CheckDamageToPlayerSameLayerLong ; what we wrote over
     .specialCutscene
     LDA.b #$02 : STA.w ItemReceiptPose ; Link's 2-hands-up pose
     STA.b LinkLayer ; draw Link on top
     ; draw Triforce piece in VRAM
+    LDA.w SprRedrawFlag, X : BNE .skipTransfer
+    INC.w SprRedrawFlag, X
     PHX
         REP #$30
-        LDX.w #$006A<<1
-        LDA.l StandingItemGraphicsOffsets,X : LDX.w ItemStackPtr : STA.l ItemGFXStack,X
+        LDA.l MurahdahlaGfx : BNE .submitRequest
+        LDX.w #$006A<<1 : LDA.l StandingItemGraphicsOffsets,X
+    .submitRequest
+        LDX.w ItemStackPtr : STA.l ItemGFXStack,X
         LDA.w #$9CE0>>1 : STA.l ItemTargetStack,X
         TXA : INC #2 : STA.w ItemStackPtr
 	    SEP #$30
     PLX
+    .skipTransfer
     PLA : PLA : PLA : JML MasterSword_InPedestal_DoCutscene ; do cutscene
 
 MasterSword_ConditionalGrabPose:
@@ -171,10 +187,20 @@ RTL
 MasterSword_SpawnPendantProp_ChangePalette:
     STA.w SpriteVelocityY,Y : PLX ; what we wrote over
     LDA.w SpriteMovement,X : BNE .specialCutscene
+        LDA.l PedPullGfx : BNE .customPedGfx
+        LDA.l PedPullGfx+1 : BNE .customPedGfx
         BRA .done
+    .customPedGfx
+        LDA.l PedPullPalette : ASL : INC : BRA .setPalette
     .specialCutscene
-    LDA.b #$08 : STA.w SpriteOAMProp,Y ; change palette
     LDA.b #$02 : STA.w SpriteLayer,Y ; change layer
+    LDA.l MurahdahlaGfx : BNE .customGfx
+    LDA.l MurahdahlaGfx+1 : BNE .customGfx
+        LDA.b #$08 : BRA .setPalette
+    .customGfx
+    LDA.l MurahdahlaPalette : ASL
+    .setPalette
+    STA.w SpriteOAMProp,Y ; change palette
 .done
 JML MasterSword_SpawnPendantProp_ChangePalette_return
 
