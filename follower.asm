@@ -932,7 +932,8 @@ Locksmith_BecomeFollower:
 Locksmith_RespondToAnswer_PostItem:
     STA.l FollowerIndicator ; what we wrote over
     LDA.l FollowerTravelAllowed : CMP.b #$02 : BNE .no_despawn
-    LDA.w SpriteAux, X : BNE .no_despawn
+    LDA.w SpriteAux, X : CMP.b #$0C : BEQ .despawn
+        CMP.b #$00 : BNE .no_despawn
     LDA.l Follower_Locksmith : CMP.b #$0C : BEQ .despawn
     JSL DetermineFollowerSpawn_include_stored : BCC .no_despawn
 .despawn
