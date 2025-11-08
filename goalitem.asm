@@ -260,6 +260,9 @@ GTCutscene_ActivateSparkle_SelectCrystal:
 	PLY
 RTL
 ;--------------------------------------------------------------------------------
+; prioritizes: number of gfx used > sum of targets > number of goals
+; Scrap00 stores number of goals
+; Y sums all goal target values
 GTCutscene_NumberOfCrystals:
 	PHX : PHY : PHP
 	REP #$20
@@ -275,58 +278,65 @@ GTCutscene_NumberOfCrystals:
 	TXY : STY.b Scrap00
 	REP #$10
 	SEP #$20
-		TAX
-		- LDA.l $B00000, X : CMP.b #$FF : BEQ .use_y
+	TAX
+	.next
+		LDA.l $B00000, X : CMP.b #$FF : BNE + : JMP .use_y : +
+			INC.b Scrap00
 			ROL : PHP : CMP.b #$10 : BCS .not_8bit_compare
+				CMP.b #$0C : BEQ .agas_goal
+				CMP.b #$0E : BEQ .agas_goal
 				; uses 8-bit targets
-				CMP.b #$04 : BNE .not_crystal_goal ; crystal goal
-					PLP : BCC +
-						LDY.b #$07 : BRA .use_y
-			.not_crystal_goal
-				CMP.b #$02 : BNE .not_pendant_goal ; pendant goal
-					PLP : BCC +
-						LDY.b #$03 : BRA .use_y
-					+
-					INX : LDA.l $B00000, X : TAY : BRA .use_y
-			.not_pendant_goal
-				PLP : INX : BCS +
+				PLP : BCC .use_8bit_target
+				CMP.b #$04 : BEQ .crystal_goal ; crystal goal
+				CMP.b #$08 : BEQ .crystal_goal ; crystal bosses goal
+				CMP.b #$02 : BEQ .pendant_goal ; pendant goal
+				CMP.b #$06 : BEQ .pendant_goal ; pendant bosses goal
+				BRA .bosses_goal
+			.crystal_goal
+				LDA.b #$07 : INX : BRA .add_to_y
+			.pendant_goal
+				LDA.b #$03 : INX : BRA .add_to_y
+			.bosses_goal
+				INY : INX : BRA .next ; just increment Y by 1 since default of 10 is already more than max 7
+			.agas_goal
+				PLP : INX : BRA .next
+			.use_8bit_target
+				INX : LDA.l $B00000, X : INX
+			.add_to_y
+				PHY : CLC : ADC.b 1,S : PLY : TAY : BRA .next
+		.not_8bit_compare
+			CMP.b #$14 : BEQ .custom_goal : BCS .unknown
+				; triforce hunt/collection rate - uses 16-bit targets
+				PLP : INX : BCC +
+					LDA.l $B00000, X : INX : INX : BRA .add_to_y
+				+ INY : BRA .next
+		.custom_goal
+			PLP
+			INX : LDA.l $B00000, X : BIT.b #$08 : PHP
+			INX : INX : INX : AND.b #$03 : BEQ .use_custom_target
+				; comparison method doesn't use a quantity, increment Y by 1
+				INY : INX : PLP : BEQ +
 					INX
 				+
-				BRA -
-		.not_8bit_compare
-			CMP.b #$14 : BCS .custom_goal
-				; uses 16-bit targets
-				PLP : INX : BCS +
-					INX : INX
-				+
-				BRA -
-		.custom_goal
-			BNE .unknown
-				PLP
-				INC.b Scrap00
-				INX : LDA.l $B00000, X : BIT.b #$08 : PHP
-				INX : INX : INX : AND.b #$03 : BEQ .use_custom_target
-					INY
-					INX : PLP : BEQ +
-						INX
-					+ 
-					BRA -
-			.use_custom_target
-				PLP : BEQ .8bit_target
-					; 16-bit target
-					REP #$20
-					LDA.l $B00000, X : CMP.w #$0008 : SEP #$20 : INX : BRA +
-			.8bit_target
+				BRA .next
+		.use_custom_target
+			PLP : BEQ ..8bit
+				; 16-bit target
+				REP #$20
+				LDA.l $B00000, X : CMP.w #$0008 : SEP #$20 : INX : BRA +
+			..8bit
 				LDA.l $B00000, X : CMP.b #$08 : + : BCC +
-					INY : INX : BRA -
+					; target exceeds 7, just increment Y by 1
+					INY : INX : JMP .next
 				+
-				PHY : ADC.b 1,S : PLY : TAY
-				INX : JMP -
+				INX : BRA .add_to_y
 		.unknown ; unknown condition, exit with safe value
 			PLP : INY
 .use_y
-	TYA : CMP.b #$08 : BCC .done
-		LDA.b Scrap00
+	TYA : BEQ + : CMP.b #$08 : BCC .done
+		+ LDA.b Scrap00 : BEQ .use_one : CMP.b #$08 : BCC .done
+.use_one
+	LDA.b #$01
 .done
 	PLP : PLY : PLX
 	RTS
