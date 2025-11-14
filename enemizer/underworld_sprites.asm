@@ -9,3 +9,39 @@ GetSpriteSlot16Bit:
 	ASL A
 	TAY
 RTL
+
+GeldmanDrawOverride:
+    PLA : PLA : PLA ; fix the call stack
+    LDA.l DRFlags+1 : AND.b #$08 : BEQ .vanilla
+
+    LDA.b #$01
+    STA.w $0DC0,X
+    JML Sprite_4C_Geldman_do_indeed_draw
+
+.vanilla
+    JSL Sprite_PrepOAMCoordLong
+    JML Sprite_4C_Geldman_continue
+
+StalfosKnightDrawOverride:
+		LDA.l DRFlags+1 : AND.b #$08 : BEQ .vanilla
+
+    JSL Sprite_PrepOAMCoordLong
+    LDA.b #$12
+		JML Sprite_DrawShadowLong
+
+.vanilla
+    JSL Sprite_PrepOAMCoordLong
+    JML Sprite_91_StalfosKnight_continue
+
+BlobDrawOverride:
+    PLA : PLA : PLA ; fix the call stack
+    LDA.l DRFlags+1 : AND.b #$08 : BEQ .vanilla
+
+    LDA.b #$05
+    STA.w $0DC0,X
+
+    JML SpriteDraw_Blob_head_popping_out
+
+.vanilla
+    JSL Sprite_PrepOAMCoordLong
+    JML SpriteDraw_Blob_bad_gfx

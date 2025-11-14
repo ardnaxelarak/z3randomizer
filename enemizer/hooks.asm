@@ -15,3 +15,12 @@ incsrc hooks/damage_hooks.asm
 incsrc hooks/overworld_sprite_hooks.asm
 
 incsrc hooks/underworld_sprite_hooks.asm
+
+org $85B8BA
+JSL GeldmanDrawOverride
+
+org $9EAAAC
+JSL StalfosKnightDrawOverride
+
+org $9EB209
+JSL BlobDrawOverride
