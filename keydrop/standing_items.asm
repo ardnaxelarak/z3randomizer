@@ -837,7 +837,7 @@ MaybeSkipSmashTerrain:
 	PLA : PLA
 	LDA.b #$3C : STA.w SFX2 ; error beep
 	SEC
-	RTL 
+	RTL
 	.continue
 	REP #$30
 	PLA
