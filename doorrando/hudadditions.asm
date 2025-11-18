@@ -69,15 +69,14 @@ DRHUD_DrawCurrentDungeonIndicator: ; mX
 	STY.w HUDCurrentDungeonWorld
 
 DRHUD_DrawKeyCounter:
-    LDA.l DRFlags : AND.b #$04 : BEQ DRHUD_Finished
-    REP #$20
-    LDA.w MapField : AND.l DungeonMask, X : BEQ DRHUD_Finished
+	LDA.l DRFlags : AND.b #$04 : BEQ DRHUD_Finished
+	REP #$20
 	TXA : LSR : TAX
 	LDA.l GenericKeys : AND.w #$00FF : BNE .total_only
-	LDA.w DungeonCollectedKeys, X : JSR ConvertToDisplay : STA.w HUDKeysObtained
+	LDA.w DungeonKeys, X : JSR ConvertToDisplay : STA.w HUDKeysObtained
 	LDA.w #!SlashTile : STA.w HUDKeysSlash
 .total_only
-	LDA.l ChestKeys, x : JSR ConvertToDisplay : STA.w HUDKeysTotal
+	LDA.l TotalKeys, x : JSR ConvertToDisplay : STA.w HUDKeysTotal
 
 DRHUD_Finished:
     PLB : RTL
@@ -141,14 +140,13 @@ DrHudDungeonItemsAdditions:
         			jsr ConvertToDisplay2 : sta.w $1644, y
         		+ iny #2 : lda.w #$24f5 : sta.w $1644, y
         		phx : ldx.b Scrap00
-        			lda.l MapField : and.l DungeonMask, x : beq + ; must have map
-        				plx : sep #$30 : lda.l ChestKeys, x : sta.b Scrap02
-        				lda.l GenericKeys : bne +++
-        					lda.b Scrap02 : !SUB.l DungeonCollectedKeys, x : sta.b Scrap02
-        				+++ lda.b Scrap02
-        				rep #$30
-        				jsr ConvertToDisplay2 : sta.w $1644, y ; small key totals
-        				bra .skipStack
+							plx : sep #$30 : lda.l ChestKeys, x : sta.b Scrap02
+        			lda.l GenericKeys : bne +++
+        				lda.b Scrap02 : !SUB.l DungeonCollectedKeys, x : sta.b Scrap02
+        			+++ lda.b Scrap02
+        			rep #$30
+        			jsr ConvertToDisplay2 : sta.w $1644, y ; small key totals
+        			bra .skipStack
         		+ plx
         		.skipStack iny #2
         		cpx.w #$000d : beq +
