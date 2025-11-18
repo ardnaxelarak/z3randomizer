@@ -5,7 +5,7 @@
 ;--------------------------------------------------------------------------------
 LampCheck:
 	LDA.l LightConeModifier : BNE .lamp
-	LDA.l LampCone : AND.b #$10 : BEQ .lamp ; always on
+	LDA.l LampCone : AND.b #$10 : BNE .lamp ; always on
 	LDA.l LampEquipment : BNE .lamp ; skip if we already have lantern
 	LDA.w DungeonID : CMP.b #$04 : BCS +  ; are we en HC?
 		LDA.l LampCone : RTL
