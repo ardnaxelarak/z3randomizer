@@ -71,9 +71,12 @@ DRHUD_DrawCurrentDungeonIndicator: ; mX
 DRHUD_DrawKeyCounter:
 	LDA.l DRFlags : AND.b #$04 : BEQ DRHUD_Finished
 	REP #$20
-	TXA : LSR : TAX
+	TXA : LSR : BNE .dungeon_id
+	INC
+.dungeon_id
+	TAX
 	LDA.l GenericKeys : AND.w #$00FF : BNE .total_only
-	LDA.w DungeonKeys, X : JSR ConvertToDisplay : STA.w HUDKeysObtained
+	LDA.w DungeonAllCollectedKeys-1, X : JSR ConvertToDisplay : STA.w HUDKeysObtained
 	LDA.w #!SlashTile : STA.w HUDKeysSlash
 .total_only
 	LDA.l TotalKeys, x : JSR ConvertToDisplay : STA.w HUDKeysTotal
@@ -240,7 +243,13 @@ ConvertToDisplay2:
     ++ lda.w #$2827 : rts ; 0/O for 0 or placeholder digit ;2483
 
 CountAbsorbedKeys:
-    JML IncrementSmallKeysNoPrimary
+	CPY.b #$24 : BNE .done
+	PHA : PHX
+	LDA.b #$84 : TAX  ; pretend this isn't a smallkey, but an absorbed object (small heart)
+	REP #$10 : JSL CountAllKey : SEP #$10
+	PLX : PLA
+.done
+	JML IncrementSmallKeysNoPrimary
 
 ;================================================================================
 ; 8-bit registers

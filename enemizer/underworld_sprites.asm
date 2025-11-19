@@ -31,7 +31,7 @@ StalfosKnightDrawOverride:
 
 .vanilla
     JSL Sprite_PrepOAMCoordLong
-    JML Sprite_91_StalfosKnight_continue
+    RTL
 
 BlobDrawOverride:
     PLA : PLA : PLA ; fix the call stack

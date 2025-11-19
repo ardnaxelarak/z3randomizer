@@ -220,7 +220,8 @@ DungeonIncrement:
    REP #$10
    PHX
    LDA.w InventoryTable_properties,X : BIT.b #$40 : BEQ +
-   		JSL CountChestKeyLong
+	 		CPY.w #$0024 : BEQ + ; keys for this dungeon are done elsewhere
+   		JSL CountAllKey
    +
    LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .done
 	SEP #$10
