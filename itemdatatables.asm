@@ -243,7 +243,7 @@ endmacro
 %ReceiptProps($67, -4, 0, $FF, $F36A, $FF, skip, skip) ; 67 - 
 %ReceiptProps($68, -4, 0, $FF, $F36A, $FF, skip, skip) ; 68 - 
 %ReceiptProps($69, -4, 0, $FF, $F36A, $FF, skip, skip) ; 69 - 
-%ReceiptProps($6A, -4, 0, $49, $F36A, $FF, triforce, skip) ; 6A - Triforce
+%ReceiptProps($6A, -4, 0, $4A, $F36A, $FF, triforce, skip) ; 6A - Triforce
 %ReceiptProps($6B, -4, 0, $50, $F36A, $FF, goal_item, skip) ; 6B - Power star
 %ReceiptProps($6C, -4, 0, $49, $F36A, $FF, goal_item, skip) ; 6C - Triforce Piece
 %ReceiptProps($6D, -4, 0, $FF, $F36A, $FF, request_F0, skip) ; 6D - Server request item
