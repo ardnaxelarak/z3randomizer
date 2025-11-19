@@ -244,13 +244,13 @@ BkStatus:
 
 ConvertToDisplay:
     and.w #$00ff : cmp.w #$000a : !BLT +
-        !ADD.w #$2553 : rts
+        !ADD.w #$2519 : rts
     + !ADD.w #$2490 : rts
 
 ConvertToDisplay2:
     and.w #$00ff : beq ++
         cmp.w #$000a : !BLT +
-            !ADD.w #$2553 : rts ; 2580 with 258A as "A" for non transparent digits
+            !ADD.w #$2517 : rts ; 2580 with 258A as "A" for non transparent digits
         + !ADD.w #$2816 : rts
     ++ lda.w #$2827 : rts ; 0/O for 0 or placeholder digit ;2483
 
