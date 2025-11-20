@@ -71,6 +71,9 @@ DRHUD_DrawCurrentDungeonIndicator: ; mX
 DRHUD_DrawKeyCounter:
 	LDA.l DRFlags : AND.b #$04 : BEQ DRHUD_Finished
 	REP #$20
+	LDA.l FreeItemText : BIT.w #$0040 : BEQ .skip_map_check
+	LDA.w MapField : AND.l DungeonMask, X : BEQ DRHUD_Finished
+.skip_map_check
 	TXA : LSR : BNE .dungeon_id
 	INC
 .dungeon_id
@@ -143,15 +146,19 @@ DrHudDungeonItemsAdditions:
         			jsr ConvertToDisplay2 : sta.w $1644, y
         		+ iny #2 : lda.w #$24f5 : sta.w $1644, y
         		phx : ldx.b Scrap00
-							plx : sep #$30 : lda.l ChestKeys, x : sta.b Scrap02
-        			lda.l GenericKeys : bne +++
-        				lda.b Scrap02 : !SUB.l DungeonCollectedKeys, x : sta.b Scrap02
-        			+++ lda.b Scrap02
-        			rep #$30
-        			jsr ConvertToDisplay2 : sta.w $1644, y ; small key totals
-        			bra .skipStack
-        		+ plx
-        		.skipStack iny #2
+						LDA.l FreeItemText : BIT.w #$0040 : BEQ .skip_map_check
+					 	LDA.l MapField : AND.l DungeonMask, x : BEQ .key_info_done ; must have map, if shuffled
+					.skip_map_check
+						plx : sep #$30 : lda.l ChestKeys, x : sta.b Scrap02
+        		lda.l GenericKeys : bne +++
+        			lda.b Scrap02 : !SUB.l DungeonCollectedKeys, x : sta.b Scrap02
+        		+++ lda.b Scrap02
+        		rep #$30
+        		jsr ConvertToDisplay2 : sta.w $1644, y ; small key totals
+        		bra .skipStack
+					.key_info_done
+        		 plx
+        	.skipStack iny #2
         		cpx.w #$000d : beq +
         			lda.w #$24f5 : sta.w $1644, y
         		+
