@@ -46,7 +46,7 @@ CuccoStorm:
 			PHX
 				TYX : JSL ResetSpriteProperties
 			PLX
-			LDA.b #!OAMPROPS : STA.w SpriteOAMProperties, Y
+			LDA.b #!OAMPROPS : STA.w SpriteOAMProp, Y
 			LDA.b LinkPosY : STA.w SpritePosYLow, Y
 			LDA.b LinkPosY+1 : STA.w SpritePosYHigh, Y
 			LDA.b LinkPosX : STA.w SpritePosXLow, Y
