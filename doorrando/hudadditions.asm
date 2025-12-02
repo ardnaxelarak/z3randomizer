@@ -70,15 +70,16 @@ DRHUD_DrawCurrentDungeonIndicator: ; mX
 
 DRHUD_DrawKeyCounter:
 	LDA.l DRFlags : AND.b #$04 : BEQ DRHUD_Finished
+	LDA.l CompassMode : BIT.w #$03 : BEQ DRHUD_Finished
 	REP #$20
-	LDA.l FreeItemText : BIT.w #$0040 : BEQ .skip_map_check
+	BIT.w #$0002 : BEQ .skip_map_check
 	LDA.w MapField : AND.l DungeonMask, X : BEQ DRHUD_Finished
 .skip_map_check
 	TXA : LSR : BNE .dungeon_id
 	INC
 .dungeon_id
 	TAX
-	LDA.l GenericKeys : AND.w #$00FF : BNE .total_only
+	LDA.l GenericKeys : LSR : BCS .total_only
 	LDA.w DungeonAllCollectedKeys-1, X : JSR ConvertToDisplay : STA.w HUDKeysObtained
 	LDA.w #!SlashTile : STA.w HUDKeysSlash
 .total_only
@@ -146,8 +147,8 @@ DrHudDungeonItemsAdditions:
         			jsr ConvertToDisplay2 : sta.w $1644, y
         		+ iny #2 : lda.w #$24f5 : sta.w $1644, y
         		phx : ldx.b Scrap00
-						LDA.l FreeItemText : BIT.w #$0040 : BEQ .skip_map_check
-					 	LDA.l MapField : AND.l DungeonMask, x : BEQ .key_info_done ; must have map, if shuffled
+						LDA.l CompassMode : BIT.w #$0002 : BEQ .skip_map_check
+					 	LDA.l MapField : AND.l DungeonMask, x : BEQ .key_info_done ; must have map
 					.skip_map_check
 						plx : sep #$30 : lda.l ChestKeys, x : sta.b Scrap02
         		lda.l GenericKeys : bne +++
