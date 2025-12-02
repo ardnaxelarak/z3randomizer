@@ -3,6 +3,7 @@
 !INERT = $00
 !INIT = $08
 !ALIVE = $09
+!OAMPROPS = $09
 !CUCCO_ENRAGED = $23
 
 CuccoStorm:
@@ -12,6 +13,7 @@ CuccoStorm:
 	LDA.b GameMode : CMP.b #$09 : BNE + ; only if outdoors
 	LDA.l LoopFrames : AND.b #$7F : BNE + ; check every 128 frames
 
+.activate
 	-
 		;==== Find a Cucco
 
@@ -40,7 +42,11 @@ CuccoStorm:
 			PLY
 			CPY.b #$FF : BEQ + ; fail if no slots found
 			LDA.b #!CUCCO : STA.w SpriteTypeTable, Y
-			LDA.b #!INIT : STA.w SpriteAITable, Y
+			LDA.b #!ALIVE : STA.w SpriteAITable, Y
+			PHX
+				TYX : JSL ResetSpriteProperties
+			PLX
+			LDA.b #!OAMPROPS : STA.w SpriteOAMProperties, Y
 			LDA.b LinkPosY : STA.w SpritePosYLow, Y
 			LDA.b LinkPosY+1 : STA.w SpritePosYHigh, Y
 			LDA.b LinkPosX : STA.w SpritePosXLow, Y
