@@ -613,7 +613,13 @@ OWBonkDrops:
             LDA.w $0400 : ORA.b 1,S : STA.w $0400
             BRA .increment_collection
         ++
-        LDX.b OverworldIndex : LDA.l OverworldEventDataWRAM,X : ORA.b 1,S : STA.l OverworldEventDataWRAM,X
+        LDA.b OverworldIndex
+        BIT.b #$40 : BEQ + 
+                LDA.l ProgressIndicator : CMP.b #$02
+                LDA.b OverworldIndex : BCS ++ : AND.b #$BF
+            ++
+        +
+        TAX : LDA.l OverworldEventDataWRAM,X : ORA.b 1,S : STA.l OverworldEventDataWRAM,X
         
         .increment_collection
         REP #$20
@@ -673,13 +679,19 @@ OWBonkDropLookup:
 {
     ; loop thru rando bonk table to find match
     LDA.b OverworldIndex
+    BIT.b #$40 : BEQ + 
+            LDA.l ProgressIndicator : AND.b #$FF : CMP.b #$02
+            LDA.b OverworldIndex : BCS ++ : AND.b #$BF
+        ++
+    +
     LDX.b #((UWBonkPrizeData-OWBonkPrizeData)-sizeof(OWBonkPrizeTable)) ; 41 bonk items, 6 bytes each
     - CMP.w OWBonkPrizeData,X : BNE +
         INX
+        PHA
         LDA.w SpritePosXLow,Y : LSR A : LSR A : LSR A : LSR A
         EOR.w SpritePosYLow,Y : CMP.w OWBonkPrizeData,X : BNE ++ ; X = row + 1
             SEC : RTS
-        ++ DEX : LDA.b OverworldIndex
+        ++ DEX : PLA
     + CPX.b #$00 : BNE +
         CLC : RTS
     + DEX : DEX : DEX : DEX : DEX : DEX : BRA -
@@ -694,7 +706,14 @@ OWBonkDropCollected:
         LDA.l RoomDataWRAM[$0120].high : AND.b 3,S : BEQ .return ; S = Collected, FlagBitmask, X (row + 2)
             SEC : RTS
     +
-    LDX.b OverworldIndex : LDA.l OverworldEventDataWRAM,X : AND.b 3,S : BEQ .return ; S = Collected, FlagBitmask, X (row + 2)
+    LDA.b OverworldIndex
+    BIT.b #$40 : BEQ + 
+            LDA.l ProgressIndicator : CMP.b #$02
+            LDA.b OverworldIndex : BCS ++ : AND.b #$BF
+        ++
+    +
+    TAX
+    LDA.l OverworldEventDataWRAM,X : AND.b 3,S : BEQ .return ; S = Collected, FlagBitmask, X (row + 2)
         SEC : RTS
 
     .return
