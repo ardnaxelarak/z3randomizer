@@ -55,7 +55,7 @@ DRHUD_EnemyDropIndicator:
 	REP #$30
 	LDA.w EnemyDropIndicator : STA.w HUDMultiIndicator
 	SEP #$20
-	LDA.w DungeonID : CMP.b #$1B : BCS DRHUD_Finished
+	LDA.w DungeonID : CMP.b #$1B : BCC + : JMP DRHUD_Finished : +
 	SEP #$10 : TAX : REP #$10
 
 DRHUD_DrawCurrentDungeonIndicator: ; mX
