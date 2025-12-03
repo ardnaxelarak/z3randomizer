@@ -137,6 +137,7 @@ InitializeSaveFile                                         = $8CDB3E
 InitializeSaveFile_build_checksum                          = $8CDBC0
 InitializeSaveFile_checksum_done                           = $8CDBDB
 SpritePrep_LoadProperties                                  = $8DB818
+ResetSpriteProperties                                      = $8DB871
 GetRandomInt                                               = $8DBA71
 OAM_AllocateFromRegionA                                    = $8DBA80
 OAM_AllocateFromRegionB                                    = $8DBA84
