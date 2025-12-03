@@ -362,7 +362,21 @@ TRCollectedKeys: skip 1         ;  | Turtle Rock
 GTCollectedKeys: skip 1         ; /  Ganon's Tower
 skip 2                          ; Reserved for previous table
 FileMarker: skip 1              ; $FF = Active save file | $00 = Inactive save file
-skip 13                         ; Unused
+DungeonAllCollectedKeys:           ; \  Key Counters. Counts all keys for a dungeon. Chests and drops.
+                                   ;  | Note, this label is not indexed like others due to space. Sewers has no decicated entry.
+HCAllCollectedKeys: skip 1         ;  | Hyrule Castle
+EPAllCollectedKeys: skip 1         ;  | Eastern Palace
+DPAllCollectedKeys: skip 1         ;  | Desert Palace
+CTAllCollectedKeys: skip 1         ;  | Agahnim's Tower
+SPAllCollectedKeys: skip 1         ;  | Swamp Palace
+PDAllCollectedKeys: skip 1         ;  | Palace of Darkness
+MMAllCollectedKeys: skip 1         ;  | Misery Mire
+SWAllCollectedKeys: skip 1         ;  | Skull Woods
+IPAllCollectedKeys: skip 1         ;  | Ice Palace
+THAllCollectedKeys: skip 1         ;  | Tower of Hera
+TTAllCollectedKeys: skip 1         ;  | Thieves' Town
+TRAllCollectedKeys: skip 1         ;  | Turtle Rock
+GTAllCollectedKeys: skip 1         ; /  Ganon's Tower
 InverseChecksumWRAM: skip 2     ; Vanilla Inverse Checksum. Don't write unless computing checksum.
 
 ;================================================================================
@@ -624,6 +638,7 @@ endmacro
 %assertSRAM(TRCollectedKeys, $7EF4EC)
 %assertSRAM(GTCollectedKeys, $7EF4ED)
 %assertSRAM(FileMarker, $7EF4F0)
+%assertSRAM(DungeonAllCollectedKeys, $7EF4F1)
 ;--------------------------------------------------------------------------------
 %assertSRAM(ExtendedSaveDataWRAM, $7F6000)
 %assertSRAM(ExtendedFileNameWRAM, $7F6000)

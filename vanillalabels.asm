@@ -79,6 +79,7 @@ Sprite_TransmuteToBomb                                     = $86AD58
 Sprite_PrepAndDrawSingleLargeLong                          = $86DBF8
 Sprite_PrepAndDrawSingleSmallLong                          = $86DC00
 Sprite_DrawShadowLong                                      = $86DC5C
+Sprite_DrawShadowCustomLong                                = $86DC64
 DashKey_Draw                                               = $86DD40
 Sprite_PrepOAMCoordLong                                    = $86E41C
 Sprite_CheckTileCollisionLong                              = $86E49C
@@ -241,6 +242,16 @@ CrystalCutscene_SpawnMaiden_PostFollowerGfx                = $9ECDA7
 CrystalMaiden_KickOutOfDungeon                             = $9ECF35
 GoldBee_Dormant_exit                                       = $9EDE89
 GoldBee_SpawnSelf                                          = $9EDE8A
+
+;===================================================================================================
+; Spliced routines (use JML directly since the hook left these methods)
+;===================================================================================================
+
+Sprite_4C_Geldman_do_indeed_draw                           = $85B8C0
+Sprite_4C_Geldman_continue                                 = $85B8C3
+Sprite_91_StalfosKnight_continue                           = $9EAAB5
+SpriteDraw_Blob_bad_gfx                                    = $9EB20D
+SpriteDraw_Blob_head_popping_out                           = $9EB24E
 
 ;===================================================================================================
 ; Palettes

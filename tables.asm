@@ -110,8 +110,8 @@ RupoorDeduction:
 dw $000A ; #$0A - Default (10 decimal)
 ;--------------------------------------------------------------------------------
 org $B08038 ; PC 0x180038
-LampConeSewers:
-db $01 ; #$00 = Off - #$01 = On (default)
+LampCone:
+db $01 ; #$00 = Off - #$01 = Sewers only (default) - #$11 = Always On
 ;--------------------------------------------------------------------------------
 org $B08039 ; PC 0x180039
 ItemCounterHUD:

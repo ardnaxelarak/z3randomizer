@@ -856,12 +856,61 @@ RTL
 CheckIfPotIsSpecial:
 	TXA ; give index to A so we can do a CMP.l
 	CMP.l $018550 ; see if our current index is that of object 230
-	BEQ .specialpot
+	BNE .normal_pot
 
-    ; Normal pot, so run the vanilla code
+.special_pot
+	PHX
+
+	; get pot index and cache room ID offset
+	LDA.b RoomIndex : ASL : STA.b Scrap0E
+	TAX
+
+	LDA.b $08
+	BIT.b $BF : BVC .upper ; if $BF has bit 14 set, it's upper layer
+	ORA.w #$2000 ; set the lower layer bit ($2000)
+.upper
+  STA.b $90 ; cache tilemap offset
+
+	LDA.l UWPotsPointers,X : TAX
+	LDY.w #$0000
+
+.next_pot
+	LDA.l UWPotsPointers&$FF0000, X ; read only the bank
+	CMP.w #$FFFF
+	BEQ .nothing
+	AND.w #$3FFF ; mask out the first three bits (used for item indicators and layer)
+
+	CMP.b $90 ; check against the tilemap offset
+	BEQ .get_flag
+
+  INX #3
+  INY #2
+  BRA .next_pot
+
+.get_flag
+  TYX
+
+  LDA.l BitFieldMasks,X
+  LDX.b Scrap0E ; get room ID
+  STA.b Scrap0E
+  LDA.l RoomPotData,X
+
+  BRA .check_pot
+
+.nothing
+  INC ; from FFFF, A is now 0000 so the AND always fails
+
+.check_pot
+  LDY.b $08 : PLX
+  AND.b Scrap0E
+  BEQ .exit ; zero flag will be set, which is what we want
+	LDX.w #$0E82 ; the normal pot obj. See RoomDrawObjectData_#obj0E82
+
+.normal_pot
+  ; Normal pot, so run the vanilla code
 	LDA.l CurrentWorld ; check for dark world
-	.specialpot ; zero flag already set, so gtg
-RTL
+.exit
+	RTL
 
 SetTheSceneFix:
 	STZ.b $6C
