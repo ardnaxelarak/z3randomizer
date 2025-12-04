@@ -690,7 +690,7 @@ OWBonkDropLookup:
         PHA
         LDA.w SpritePosXLow,Y : LSR A : LSR A : LSR A : LSR A
         EOR.w SpritePosYLow,Y : CMP.w OWBonkPrizeData,X : BNE ++ ; X = row + 1
-            SEC : RTS
+            PLA : SEC : RTS
         ++ DEX : PLA
     + CPX.b #$00 : BNE +
         CLC : RTS
