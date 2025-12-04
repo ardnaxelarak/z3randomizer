@@ -251,12 +251,18 @@ ConvertToDisplay2:
     ++ lda.w #$2827 : rts ; 0/O for 0 or placeholder digit ;2483
 
 CountAbsorbedKeys:
-	CPY.b #$24 : BNE .done
 	PHA : PHX
-	LDA.b #$84 : TAX  ; pretend this isn't a smallkey, but an absorbed object (small heart)
+	LDA.l StandingItemsOn : BEQ .count_it
+	CPY.b #$24 : BEQ .count_it ; small key for this dungeon
+	LDA.w DungeonID : LSR : TAX
+	TYA : CMP.l KeyTable, X : BNE .done
+.count_it
+	STY.b Scrap02 : LDY.b #$24 ; for non-24 items (w/o standing_items a small key is just $C), fake it
+	LDX.b #$84 ; pretend this isn't a smallkey, but an absorbed object (small heart)
 	REP #$10 : JSL CountAllKey : SEP #$10
-	PLX : PLA
+	LDY.b Scrap02
 .done
+	PLX : PLA
 	JML IncrementSmallKeysNoPrimary
 
 ;================================================================================
