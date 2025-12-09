@@ -330,7 +330,6 @@ SpawnedItemFlag = $7E0726         ; 0x02 - one for pot, 2 for sprite drop
 SpawnedItemMWPlayer = $7E0728     ; Player Id for spawned item if Multiworld item 0x02
                                   ;
 EnemyDropIndicator = $7E072A      ; Used by HUD to indicate enemy drops remaining
-SpawnedItemKeyCounted = $7E072C   ; If set, the spawned item has been counted towards dungeon key total
 SkipBeeTrapDisguise = $7E072D     ; Flag to skip bee trap disguise during draw routine
 
 SprDropsItem = $7E0730            ; Array for whether a sprite drops an item 0x16
@@ -915,7 +914,6 @@ endmacro
 %assertRAM(SpawnedItemFlag, $7E0726)
 %assertRAM(SpawnedItemMWPlayer, $7E0728)
 %assertRAM(EnemyDropIndicator, $7E072A)
-%assertRAM(SpawnedItemKeyCounted, $7E072C)
 %assertRAM(SkipBeeTrapDisguise, $7E072D)
 %assertRAM(SprDropsItem, $7E0730)
 %assertRAM(SprItemReceipt, $7E0740)
