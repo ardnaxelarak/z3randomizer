@@ -701,7 +701,6 @@ OWBonkDropLookup:
 OWBonkDropCollected:
 {
     ; check if collected
-    CLC
     LDA.b IndoorsFlag : BEQ +
         LDA.l RoomDataWRAM[$0120].high : AND.b 3,S : BEQ .return ; S = Collected, FlagBitmask, X (row + 2)
             SEC : RTS
@@ -717,7 +716,7 @@ OWBonkDropCollected:
         SEC : RTS
 
     .return
-    RTS
+    CLC : RTS
 }
 
 ; A = SprItemReceipt, Y = Sprite Slot Index, X = free/overwritten
