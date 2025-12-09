@@ -118,7 +118,41 @@ RTL
 
 ;--------------------------------------------------------------------------------
 
+CountChestKeyLong:
+	PHX : PHP
+	SEP #$30
+	JSR CountChestKey
+	PLP : PLX
+	RTL
+;--------------------------------------------------------------------------------
+
+CountChestKey:
+	PHA : PHX
+  LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .done
+  LDA.l StatsLocked : BNE .done
+  CPY.b #$24 : BEQ .this_dungeon
+	TYA
+	AND.b #$0F : CMP.b #$02 : BCC .hc_sewers
+	TAX
+	LDA.l DungeonCollectedKeys,X : INC : STA.l DungeonCollectedKeys,X
+	BRA .done
+
+.this_dungeon
+	LDA.w DungeonID : CMP.b #$03 : BCC .hc_sewers
+	LSR : TAX
+	LDA.l DungeonCollectedKeys,X : INC : STA.l DungeonCollectedKeys,X
+	BRA .done
+
+.hc_sewers
+	LDA.l SewerCollectedKeys : INC
+	STA.l SewerCollectedKeys : STA.l HCCollectedKeys
+
+.done
+	PLX : PLA
+	RTS
+
 ; Expects 16 bit index mode upon entering. 8-bit Acumulator
+; This approach doesn't currently work - potentially dead code
 CountAllKey:
   PHP : PHA : PHX
 	SEP #$10

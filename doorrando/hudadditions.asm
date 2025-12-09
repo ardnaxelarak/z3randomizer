@@ -80,10 +80,10 @@ DRHUD_DrawKeyCounter:
 .dungeon_id
 	TAX
 	LDA.l GenericKeys : LSR : BCS .total_only
-	LDA.w DungeonAllCollectedKeys-1, X : JSR ConvertToDisplay : STA.w HUDKeysObtained
+	LDA.w DungeonCollectedKeys, X : JSR ConvertToDisplay : STA.w HUDKeysObtained
 	LDA.w #!SlashTile : STA.w HUDKeysSlash
 .total_only
-	LDA.l TotalKeys, x : JSR ConvertToDisplay : STA.w HUDKeysTotal
+	LDA.l ChestKeys, x : JSR ConvertToDisplay : STA.w HUDKeysTotal
 
 DRHUD_Finished:
     PLB : RTL
@@ -251,9 +251,13 @@ ConvertToDisplay2:
     ++ lda.w #$2827 : rts ; 0/O for 0 or placeholder digit ;2483
 
 CountAbsorbedKeys:
+	JML IncrementSmallKeysNoPrimary
+
+; This function apporach doesn't currently work
+CountAbsorbedKeysViaCountAllKey:
 	PHA : PHX
 	LDA.l StandingItemsOn : BEQ .count_it
-	LDA.w SpawnedItemKeyCounted : BNE .done
+;	LDA.w SpawnedItemKeyCounted : BNE .done ; this was added because pot keys were being double counted when they weren't shuffled
 	CPY.b #$24 : BEQ .count_it ; small key for this dungeon
 	LDA.w DungeonID : LSR : TAX
 	TYA : CMP.l KeyTable, X : BNE .done
@@ -263,7 +267,7 @@ CountAbsorbedKeys:
 	REP #$10 : JSL CountAllKey : SEP #$10
 	LDY.b Scrap02
 .done
-	STZ.w SpawnedItemKeyCounted ; reset to zero for next time
+;	STZ.w SpawnedItemKeyCounted ; reset to zero for next time
 	PLX : PLA
 	JML IncrementSmallKeysNoPrimary
 
