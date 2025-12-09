@@ -696,7 +696,8 @@ KeyGet:
             + LSR : TAX
             LDA.b Scrap00 : CMP.l KeyTable, X : BNE +
                 .countIt
-                LDA.l StandingItemCounterMask : AND.w SpawnedItemFlag : BEQ ++
+                LDA.l StandingItemCounterMask : AND SpawnedItemFlag : BEQ ++
+										STA.w SpawnedItemKeyCounted
                     JSL AddInventory
                 ++ PLX : PLA : RTL
             + CMP.b #$AF : beq .countIt ; universal key

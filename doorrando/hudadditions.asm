@@ -266,6 +266,7 @@ ConvertToDisplay2:
 CountAbsorbedKeys:
 	PHA : PHX
 	LDA.l StandingItemsOn : BEQ .count_it
+	LDA.w SpawnedItemKeyCounted : BNE .done
 	CPY.b #$24 : BEQ .count_it ; small key for this dungeon
 	LDA.w DungeonID : LSR : TAX
 	TYA : CMP.l KeyTable, X : BNE .done
@@ -275,6 +276,7 @@ CountAbsorbedKeys:
 	REP #$10 : JSL CountAllKey : SEP #$10
 	LDY.b Scrap02
 .done
+	STZ.w SpawnedItemKeyCounted ; reset to zero for next time
 	PLX : PLA
 	JML IncrementSmallKeysNoPrimary
 
