@@ -39,32 +39,30 @@ RTL
 
     Elder_Code:
     {
-        REP #$20
-        LDA.l GoalItemRequirement : BEQ .despawn
-        LDA.l GanonVulnerableMode : AND.w #$00FF : CMP.w #$0005 : BEQ .despawn
-        LDA.l TurnInGoalItems : AND.w #$00FF : BNE +
+        TXY : LDX.b #$06
+            REP #$30
+            LDA.l GoalConditionTable, X
+            TAX : LDA.l $B00000, X
+            SEP #$30
+        TYX
+        CMP.b #$00 : BEQ .despawn ; no goal, despawn
+        LDA.l TurnInGoalItems : BNE +
             .despawn
-            SEP #$20
             STZ.w SpriteAITable, X ; despawn self
             RTS
         +
-        SEP #$20
         LDA.b GameSubMode
         BNE .done
         LDA.b #$96
         LDY.b #$01
         
         JSL Sprite_ShowSolicitedMessageIfPlayerFacing_PreserveMessage : BCC .dont_show
-            REP #$20
-            LDA.l GoalCounter
-            CMP.l GoalItemRequirement : !BLT +
-                SEP #$20
+            LDA.b #$03 : JSL CheckConditionPass : BCC +
                 JSL ActivateTriforceCutscene
             +
         .dont_show
         
         .done
-        SEP #$20
         LDA.b FrameCounter : LSR #5 : AND.b #$01 : STA.w SpriteGFXControl, X
         RTS
     }
@@ -144,19 +142,35 @@ MasterSword_CheckIfPulled:
 
 MasterSword_ConditionalActivateCutscene:
     LDA.w SpriteMovement,X : BNE .specialCutscene
+        PHX
+            REP #$30
+            LDA.w SprRedrawFlag, X : BNE .doNormalPed
+            INC.w SprRedrawFlag, X
+            LDA.l PedPullGfx : BEQ .doNormalPed
+            LDX.w ItemStackPtr : STA.l ItemGFXStack,X
+            LDA.w #$BCE0>>1 : STA.l ItemTargetStack,X
+            TXA : INC #2 : STA.w ItemStackPtr
+    .doNormalPed
+            SEP #$30
+        PLX
         JML Sprite_CheckDamageToPlayerSameLayerLong ; what we wrote over
     .specialCutscene
     LDA.b #$02 : STA.w ItemReceiptPose ; Link's 2-hands-up pose
     STA.b LinkLayer ; draw Link on top
     ; draw Triforce piece in VRAM
+    LDA.w SprRedrawFlag, X : BNE .skipTransfer
+    INC.w SprRedrawFlag, X
     PHX
         REP #$30
-        LDX.w #$006A<<1
-        LDA.l StandingItemGraphicsOffsets,X : LDX.w ItemStackPtr : STA.l ItemGFXStack,X
+        LDA.l MurahdahlaGfx : BNE .submitRequest
+        LDX.w #$006A<<1 : LDA.l StandingItemGraphicsOffsets,X
+    .submitRequest
+        LDX.w ItemStackPtr : STA.l ItemGFXStack,X
         LDA.w #$9CE0>>1 : STA.l ItemTargetStack,X
         TXA : INC #2 : STA.w ItemStackPtr
 	    SEP #$30
     PLX
+    .skipTransfer
     PLA : PLA : PLA : JML MasterSword_InPedestal_DoCutscene ; do cutscene
 
 MasterSword_ConditionalGrabPose:
@@ -173,10 +187,20 @@ RTL
 MasterSword_SpawnPendantProp_ChangePalette:
     STA.w SpriteVelocityY,Y : PLX ; what we wrote over
     LDA.w SpriteMovement,X : BNE .specialCutscene
+        LDA.l PedPullGfx : BNE .customPedGfx
+        LDA.l PedPullGfx+1 : BNE .customPedGfx
         BRA .done
+    .customPedGfx
+        LDA.l PedPullPalette : ASL : INC : BRA .setPalette
     .specialCutscene
-    LDA.b #$08 : STA.w SpriteOAMProp,Y ; change palette
     LDA.b #$02 : STA.w SpriteLayer,Y ; change layer
+    LDA.l MurahdahlaGfx : BNE .customGfx
+    LDA.l MurahdahlaGfx+1 : BNE .customGfx
+        LDA.b #$08 : BRA .setPalette
+    .customGfx
+    LDA.l MurahdahlaPalette : ASL
+    .setPalette
+    STA.w SpriteOAMProp,Y ; change palette
 .done
 JML MasterSword_SpawnPendantProp_ChangePalette_return
 

@@ -107,8 +107,8 @@ RTL
 ;--------------------------------------------------------------------------------
 OnAga1Defeated:
         STA.l ProgressIndicator ; vanilla game state stuff we overwrote
-        LDA.l GanonVulnerableMode
-        CMP.b #$06 : BNE +
+        ; seems light_speed option to auto triforce room is unused for now
+        BRA +
                 .light_speed
                 REP #$20
                 LDA.w #$0019 : STA.b GameMode

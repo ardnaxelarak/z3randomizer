@@ -272,6 +272,8 @@ DungeonID = $7E040C               ; High byte mostly unused but sometimes read. 
                                   ;
 TransitionDirection = $7E0418     ; OW: 0=N 1=S 2=W 3=E  UW: 0=S 1=N 2=E 3=W
                                   ;
+ManipIndex = $7E042C              ; Index of manipulable tile. Word length.
+                                  ;
 TrapDoorFlag = $7E0468            ; Flag that is set when trap doors are down. 2 bytes
                                   ;
 LayerAdjustment = $7E047A         ; Flags layer adjustments. Arms EG.
@@ -284,6 +286,8 @@ Map16ChangeIndex = $7E04AC        ; Word length.
 OWEntranceCutscene = $7E04C6      ;
                                   ;
 HeartBeepTimer = $7E04CA          ;
+                                  ;
+ManipTileMapX = $7E0540           ; Tilemap X position of manipulable tile. $10 x 2 bytes
                                   ;
 CameraTargetN = $7E0610           ; Camera scroll target for directions NSEW
 CameraTargetS = $7E0612           ;
@@ -326,7 +330,7 @@ SpawnedItemFlag = $7E0726         ; 0x02 - one for pot, 2 for sprite drop
 SpawnedItemMWPlayer = $7E0728     ; Player Id for spawned item if Multiworld item 0x02
                                   ;
 EnemyDropIndicator = $7E072A      ; Used by HUD to indicate enemy drops remaining
-SkipBeeTrapDisguise = $7E072C     ; Flag to skip bee trap disguise during draw routine
+SkipBeeTrapDisguise = $7E072D     ; Flag to skip bee trap disguise during draw routine
 
 SprDropsItem = $7E0730            ; Array for whether a sprite drops an item 0x16
 SprItemReceipt = $7E0740          ; Array for item id for each sprite 0x16
@@ -348,6 +352,8 @@ TransparencyFlag = $7E0ABD        ; Flags transparency effects e.g. in Thieves T
                                   ;
 OWTransitionFlag = $7E0ABF        ; Used for certain transitions like smith, witch, etc.
                                   ;
+DuckPose = $7E0AF4                ; Used for duck gfx (2 bytes), zero value stops duck drawing in gfx slot
+                                  ;
 ItemGFXPtr = $7E0AFA              ; Pointer for item receipt graphics transfers
                                   ; $0000       - no transfer, do nothing
                                   ; bit 7 reset - offset into ROM table
@@ -365,6 +371,7 @@ EnemyStunTimer = $7E0B58          ; Auto-decrementing timer for stunned enemies.
                                   ;
 BowDryFire = $7E0B9A              ; If set, arrows are deleted immediately
                                   ;
+SecretId = $7E0B9C                ; Controls the secret spawned from bushes, pots, rocks, etc.
 SaveFileIndex = $7E0B9D           ;
                                   ;
 SpriteAncillaInteract = $7E0BA0   ; If nonzero, ancillae do not interact with the sprite. $10 bytes.
@@ -439,7 +446,8 @@ SpriteSubPixelZ = $7E0F90         ;
 CurrentSpriteSlot = $7E0FA0       ; Holds the current sprite/ancilla's index
                                   ;
 FreezeSprites = $7E0FC1           ; "Seems to freeze sprites"
-                                  ;
+LinkPosXCache = $7E0FC2           ; Cache of Link's coordinates
+LinkPosYCache = $7E0FC4           ;   - Done at the beginning of Link_Main every frame
 GfxChrHalfSlotVerify = $7E0FC6    ; Mirrors $0AAA, set to >= $03 when VRAM has temp graphics loaded
 PrizePackIndexes = $7E0FC7        ; $07 bytes. One for each prize pack.
                                   ;
@@ -868,6 +876,7 @@ endmacro
 %assertRAM(OverworldIndexMirror, $7E040A)
 %assertRAM(DungeonID, $7E040C)
 %assertRAM(TransitionDirection, $7E0418)
+%assertRAM(ManipIndex, $7E042C)
 %assertRAM(TrapDoorFlag, $7E0468)
 %assertRAM(LayerAdjustment, $7E047A)
 %assertRAM(RoomIndexMirror, $7E048E)
@@ -875,6 +884,7 @@ endmacro
 %assertRAM(Map16ChangeIndex, $7E04AC)
 %assertRAM(OWEntranceCutscene, $7E04C6)
 %assertRAM(HeartBeepTimer, $7E04CA)
+%assertRAM(ManipTileMapX, $7E0540)
 %assertRAM(CameraTargetN, $7E0610)
 %assertRAM(CameraTargetS, $7E0612)
 %assertRAM(CameraTargetW, $7E0614)
@@ -904,7 +914,7 @@ endmacro
 %assertRAM(SpawnedItemFlag, $7E0726)
 %assertRAM(SpawnedItemMWPlayer, $7E0728)
 %assertRAM(EnemyDropIndicator, $7E072A)
-%assertRAM(SkipBeeTrapDisguise, $7E072C)
+%assertRAM(SkipBeeTrapDisguise, $7E072D)
 %assertRAM(SprDropsItem, $7E0730)
 %assertRAM(SprItemReceipt, $7E0740)
 %assertRAM(SprItemIndex, $7E0750)
@@ -925,6 +935,7 @@ endmacro
 %assertRAM(OverlordYHigh, $7E0B20)
 %assertRAM(EnemyStunTimer, $7E0B58)
 %assertRAM(BowDryFire, $7E0B9A)
+%assertRAM(SecretId, $7E0B9C)
 %assertRAM(SaveFileIndex, $7E0B9D)
 %assertRAM(SpriteAncillaInteract, $7E0BA0)
 %assertRAM(AncillaVelocityY, $7E0C22)

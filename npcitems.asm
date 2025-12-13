@@ -138,7 +138,7 @@ RTL
 ItemSet_Mushroom:
 	PHA
 		LDA.l NpcFlags+1 : ORA.b #$10 : STA.l NpcFlags+1
-		LDY.w SprItemReceipt, X ; Retrieve stored item type
+		LDY.w SprSourceItemId, X ; Retrieve stored item type
 		BNE +
 			; if for any reason the item value is 0 reload it, just in case
 			%GetPossiblyEncryptedItem(MushroomItem, SpriteItemValues) : TAY

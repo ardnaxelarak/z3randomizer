@@ -115,38 +115,76 @@ DecrementSmallKeys:
 	STA.l CurrentSmallKeys ; thing we wrote over, write small key count
 	JSL UpdateKeys
 RTL
+
 ;--------------------------------------------------------------------------------
+
 CountChestKeyLong:
-        PHX : PHP
-        SEP #$30
+	PHX : PHP
+	SEP #$30
 	JSR CountChestKey
-        PLP : PLX
-RTL
+	PLP : PLX
+	RTL
 ;--------------------------------------------------------------------------------
 
 CountChestKey:
-        PHA : PHX
-        LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .done
-        LDA.l StatsLocked : BNE .done
-                CPY.b #$24 : BEQ .this_dungeon
-                        TYA
-                        AND.b #$0F : CMP.b #$02 : BCC .hc_sewers
-                                TAX
-                                LDA.l DungeonCollectedKeys,X : INC : STA.l DungeonCollectedKeys,X
-                                BRA .done
-                .this_dungeon
-                LDA.w DungeonID : CMP.b #$03 : BCC .hc_sewers
-                        LSR : TAX
-                        LDA.l DungeonCollectedKeys,X : INC : STA.l DungeonCollectedKeys,X
-                        BRA .done
+	PHA : PHX
+  LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .done
+  LDA.l StatsLocked : BNE .done
+  CPY.b #$24 : BEQ .this_dungeon
+	TYA
+	AND.b #$0F : CMP.b #$02 : BCC .hc_sewers
+	TAX
+	LDA.l DungeonCollectedKeys,X : INC : STA.l DungeonCollectedKeys,X
+	BRA .done
 
-                .hc_sewers
-                LDA.l SewerCollectedKeys : INC
-                STA.l SewerCollectedKeys : STA.l HCCollectedKeys
+.this_dungeon
+	LDA.w DungeonID : CMP.b #$03 : BCC .hc_sewers
+	LSR : TAX
+	LDA.l DungeonCollectedKeys,X : INC : STA.l DungeonCollectedKeys,X
+	BRA .done
 
-        .done
-        PLX : PLA
-RTS
+.hc_sewers
+	LDA.l SewerCollectedKeys : INC
+	STA.l SewerCollectedKeys : STA.l HCCollectedKeys
+
+.done
+	PLX : PLA
+	RTS
+
+; Expects 16 bit index mode upon entering. 8-bit Acumulator
+; This approach doesn't currently work - potentially dead code
+CountAllKey:
+  PHP : PHA : PHX
+	SEP #$10
+	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .done
+	CPY.b #$24 : BEQ .this_dungeon
+	TYA :	AND.b #$0F : CMP.b #$02 : BCC .hc_sewers
+	BRA .all_dungoens
+
+.this_dungeon
+	LDA.w DungeonID : CMP.b #$03 : BCC .hc_sewers
+	LSR
+
+.all_dungoens
+	STA.b Scrap00 : TAX ; store dungeon index in X, $00
+  LDA.l DungeonAllCollectedKeys-1, X : INC : STA.l DungeonAllCollectedKeys-1, X
+	REP #$10 : PLX : PHX ; 16 bit index
+  LDA.l InventoryTable_properties, X : BIT.b #$40 : BEQ .done
+	SEP #$10 : LDX.b Scrap00
+	LDA.l DungeonCollectedKeys,X : INC : STA.l DungeonCollectedKeys,X
+	BRA .done
+
+.hc_sewers
+	LDA.l HCAllCollectedKeys : INC : STA.l HCAllCollectedKeys
+	REP #$10 : PLX : PHX  ; 16 bit index
+	LDA.l InventoryTable_properties, X : BIT.b #$40 : BEQ .done
+	LDA.l SewerCollectedKeys : INC
+	STA.l SewerCollectedKeys : STA.l HCCollectedKeys
+
+.done
+	REP #$10
+	PLX : PLA : PLP
+	RTL
 
 ;--------------------------------------------------------------------------------
 IncrementAgahnim2Sword:

@@ -411,7 +411,9 @@ JSL OnLoadDuckMap
 ; Fix Clobbered Gfx
 ;--------------------------------------------------------------------------------
 org $80DB92
-JSL PostFixMirrorGfx
+JSL PostFixMirrorGfxPrep
+org $80D911
+JML PostFixMirrorGfx
 org $80E259
 JSL PostFixOAMGfx : NOP
 

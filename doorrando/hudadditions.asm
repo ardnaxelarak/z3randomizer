@@ -55,7 +55,7 @@ DRHUD_EnemyDropIndicator:
 	REP #$30
 	LDA.w EnemyDropIndicator : STA.w HUDMultiIndicator
 	SEP #$20
-	LDA.w DungeonID : CMP.b #$1B : BCS DRHUD_Finished
+	LDA.w DungeonID : CMP.b #$1B : BCC + : JMP DRHUD_Finished : +
 	SEP #$10 : TAX : REP #$10
 
 DRHUD_DrawCurrentDungeonIndicator: ; mX
@@ -69,11 +69,17 @@ DRHUD_DrawCurrentDungeonIndicator: ; mX
 	STY.w HUDCurrentDungeonWorld
 
 DRHUD_DrawKeyCounter:
-    LDA.l DRFlags : AND.b #$04 : BEQ DRHUD_Finished
-    REP #$20
-    LDA.w MapField : AND.l DungeonMask, X : BEQ DRHUD_Finished
-	TXA : LSR : TAX
-	LDA.l GenericKeys : AND.w #$00FF : BNE .total_only
+	LDA.l DRFlags : AND.b #$04 : BEQ DRHUD_Finished
+	LDA.l CompassMode : BIT.b #$03 : BEQ DRHUD_Finished
+	REP #$20
+	BIT.w #$0002 : BNE .skip_map_check
+	LDA.w MapField : AND.l DungeonMask, X : BEQ DRHUD_Finished
+.skip_map_check
+	TXA : LSR : BNE .dungeon_id
+	INC
+.dungeon_id
+	TAX
+	LDA.l GenericKeys : LSR : BCS .total_only
 	LDA.w DungeonCollectedKeys, X : JSR ConvertToDisplay : STA.w HUDKeysObtained
 	LDA.w #!SlashTile : STA.w HUDKeysSlash
 .total_only
@@ -152,16 +158,19 @@ DrHudDungeonItemsAdditions:
         			jsr ConvertToDisplay2 : sta.w $1644, y
         		+ iny #2 : lda.w #$24f5 : sta.w $1644, y
         		phx : ldx.b Scrap00
-        			lda.l MapField : and.l DungeonMask, x : beq + ; must have map
-        				plx : sep #$30 : lda.l ChestKeys, x : sta.b Scrap02
-        				lda.l GenericKeys : bne +++
-        					lda.b Scrap02 : !SUB.l DungeonCollectedKeys, x : sta.b Scrap02
-        				+++ lda.b Scrap02
-        				rep #$30
-        				jsr ConvertToDisplay2 : sta.w $1644, y ; small key totals
-        				bra .skipStack
-        		+ plx
-        		.skipStack iny #2
+						LDA.l CompassMode : BIT.w #$0002 : BNE .skip_map_check
+					 	LDA.l MapField : AND.l DungeonMask, x : BEQ .key_info_done ; must have map
+					.skip_map_check
+						plx : sep #$30 : lda.l ChestKeys, x : sta.b Scrap02
+        		lda.l GenericKeys : bne +++
+        			lda.b Scrap02 : !SUB.l DungeonCollectedKeys, x : sta.b Scrap02
+        		+++ lda.b Scrap02
+        		rep #$30
+        		jsr ConvertToDisplay2 : sta.w $1644, y ; small key totals
+        		bra .skipStack
+					.key_info_done
+        		 plx
+        	.skipStack iny #2
         		cpx.w #$000d : beq +
         			lda.w #$24f5 : sta.w $1644, y
         		+
@@ -244,18 +253,36 @@ BkStatus:
 
 ConvertToDisplay:
     and.w #$00ff : cmp.w #$000a : !BLT +
-        !ADD.w #$2553 : rts
+        !ADD.w #$2519 : rts
     + !ADD.w #$2490 : rts
 
 ConvertToDisplay2:
     and.w #$00ff : beq ++
         cmp.w #$000a : !BLT +
-            !ADD.w #$2553 : rts ; 2580 with 258A as "A" for non transparent digits
+            !ADD.w #$2517 : rts ; 2580 with 258A as "A" for non transparent digits
         + !ADD.w #$2816 : rts
     ++ lda.w #$2827 : rts ; 0/O for 0 or placeholder digit ;2483
 
 CountAbsorbedKeys:
-    JML IncrementSmallKeysNoPrimary
+	JML IncrementSmallKeysNoPrimary
+
+; This function apporach doesn't currently work
+CountAbsorbedKeysViaCountAllKey:
+	PHA : PHX
+	LDA.l StandingItemsOn : BEQ .count_it
+;	LDA.w SpawnedItemKeyCounted : BNE .done ; this was added because pot keys were being double counted when they weren't shuffled
+	CPY.b #$24 : BEQ .count_it ; small key for this dungeon
+	LDA.w DungeonID : LSR : TAX
+	TYA : CMP.l KeyTable, X : BNE .done
+.count_it
+	STY.b Scrap02 : LDY.b #$24 ; for non-24 items (w/o standing_items a small key is just $C), fake it
+	LDX.b #$84 ; pretend this isn't a smallkey, but an absorbed object (small heart)
+	REP #$10 : JSL CountAllKey : SEP #$10
+	LDY.b Scrap02
+.done
+;	STZ.w SpawnedItemKeyCounted ; reset to zero for next time
+	PLX : PLA
+	JML IncrementSmallKeysNoPrimary
 
 ;================================================================================
 ; 8-bit registers

@@ -79,6 +79,8 @@ org $9EE495
 JSL Kiki_FollowCheck : BRA + : NOP #12 : +
 org $9EE4AF
 JSL Kiki_BecomeFollower : NOP #2
+org $9EE4F7
+JSL Kiki_FixTeleportOnExit
 org $89A1B2
 JSL Kiki_DontScareTheMonke : NOP #3
 
@@ -160,18 +162,23 @@ MaybeSetZeldaCheckpoint:
     AND.w #$7FFF : TAX ; what we wrote over
     SEP #$20
         LDA.l ProgressFlags : AND.b #$04 : BNE .return ; zelda rescued
-        LDA.l StartingEntrance : CMP.b #$04 : BEQ .return ; throne room checkpoint set
+        LDA.l StartingEntrance : CMP.b #$02 : BEQ .return ; cell checkpoint set
+            CMP.b #$04 : BEQ .return ; throne room checkpoint set
         LDA.l FollowerIndicator : CMP.b #$01 : BNE .return ; zelda following
         LDA.b RoomIndex : CMP.b #$80 : BNE + ;zelda cell
             LDA.l Follower_Zelda : CMP.b #$01 : BNE .return
-            JSL Dungeon_SaveRoomQuadrantData
             BRA .set_checkpoint
         + CMP.b #$45 : BNE .return ; maiden cell
             CPX.w #$0964 : BNE .return ; top big lock
             LDA.l Follower_Maiden : CMP.b #$01 : BNE .return
 .set_checkpoint
     LDA.b #$02 : STA.l StartingEntrance
-    JSL SaveDeathCount
+    PHX
+        SEP #$10
+        JSL SaveDeathCount
+        JSL Dungeon_SaveRoomQuadrantData
+        REP #$10
+    PLX
 .return
     REP #$30
     RTL
@@ -383,6 +390,9 @@ SetAndLoadFollower:
             JSL DetermineFollower_skip_stored : CMP.b #$01 : BNE +
                 LDA.b #$02 : STA.l StartingEntrance
                 JSL SaveDeathCount
+                PHX
+                    JSL Dungeon_SaveRoomQuadrantData
+                PLX
         + CMP.b #$09 : BNE +
             LDA.b #$40 : STA.w $02CD : STZ.w $02CE ; locksmith timed message
         +
@@ -826,6 +836,14 @@ Kiki_BecomeFollower:
     LDA.b #$0A : STA.l FollowerIndicator
 RTL
 
+Kiki_FixTeleportOnExit:
+    REP #$30
+        LDA.b LinkPosX : STA.w LinkPosXCache
+        LDA.b LinkPosY : STA.w LinkPosYCache
+    SEP #$30
+    LDA.b #$19 : LDY.b #$01 ; what we wrote over
+RTL 
+
 ; on return it checks BEQ and if non-zero, kiki get spook
 Kiki_DontScareTheMonke:
     LDA.b LinkJumping : BEQ .return
@@ -914,8 +932,9 @@ Locksmith_BecomeFollower:
 Locksmith_RespondToAnswer_PostItem:
     STA.l FollowerIndicator ; what we wrote over
     LDA.l FollowerTravelAllowed : CMP.b #$02 : BNE .no_despawn
+    LDA.w SpriteAux, X : CMP.b #$0C : BEQ .despawn
+        CMP.b #$00 : BNE .no_despawn
     LDA.l Follower_Locksmith : CMP.b #$0C : BEQ .despawn
-    LDA.w SpriteAux, X : BNE .no_despawn
     JSL DetermineFollowerSpawn_include_stored : BCC .no_despawn
 .despawn
     STZ.w SpriteAITable, X

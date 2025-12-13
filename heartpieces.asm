@@ -4,19 +4,10 @@
 HeartPieceGet:
     PHX : PHY
     LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-    LDY.w SprItemReceipt, X : BNE +
-        LDA.w SprSourceItemId, X : BNE ++
-            JSL LoadHeartPieceRoomValue
-            STA.w SprSourceItemId, X
-        ++
-        JSL AttemptItemSubstitution
-        JSL ResolveLootIDLong
-        STA.w SprItemReceipt, X
-        TAY
-    +
+    LDY.w SprSourceItemId, X
     JSL MaybeMarkDigSpotCollected
     .skipLoad
-	LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+    LDA.w SprItemMWPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
     CPY.b #$26 : BNE .not_heart ; don't add a 1/4 heart if it's not a heart piece
         CMP.b #$00 : BNE .not_heart
         LDA.l HeartPieceQuarter : INC A : AND.b #$03 : STA.l HeartPieceQuarter
@@ -32,16 +23,7 @@ RTL
 HeartContainerGet:
     PHX : PHY
     JSL IncrementBossSword
-    LDY.w SprItemReceipt, X : BNE +
-        LDA.w SprSourceItemId, X : BNE ++
-            JSL LoadHeartContainerRoomValue
-            STA.w SprSourceItemId, X
-        ++
-        JSL AttemptItemSubstitution
-        JSL ResolveLootIDLong
-        STA.w SprItemReceipt, X
-        TAY
-    +
+    LDY.w SprSourceItemId, X
     BRA HeartPieceGet_skipLoad
 ;--------------------------------------------------------------------------------
 DrawHeartPieceGFX:
@@ -260,6 +242,12 @@ LoadOutdoorValue:
 	PHP
 	REP #$20 ; set 16-bit accumulator
 	LDA.b OverworldIndex
+	; Rain state fix: In rain state DW, use LW screen ID for item lookup
+	BIT.w #$0040 : BEQ +
+		LDA.l ProgressIndicator : AND.w #$00FF : CMP.w #$0002
+			LDA.b OverworldIndex : BCS ++ : AND.w #$00BF
+		++
+	+
 	CMP.w #$00 : BNE +
 		LDA.l OWBonkPrizeTable[$00].loot
 		JMP .done

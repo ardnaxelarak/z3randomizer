@@ -182,11 +182,6 @@ incsrc dungeonmap.asm
 incsrc hextodec.asm
 incsrc multiworld.asm
 incsrc textrenderer.asm
-incsrc crystalswitchbook.asm
-incsrc mimicdash.asm
-incsrc gloom.asm
-incsrc special_weapons.asm
-incsrc variable_ganon_vulnerability.asm
 warnpc $A58000
 
 org $A28000
@@ -205,6 +200,14 @@ incsrc utilities.asm
 incsrc inventory.asm
 incsrc menu/hudalpha.asm
 warnpc $A38000
+
+org $B98000
+incsrc crystalswitchbook.asm
+incsrc mimicdash.asm
+incsrc gloom.asm
+incsrc special_weapons.asm
+incsrc variable_ganon_vulnerability.asm
+warnpc $BA8000
 
 org $A38000
 incsrc stats/credits.asm ; Statically mapped
@@ -358,6 +361,7 @@ warnpc $B08000
 ;$33 Graphics Bank
 ;$36 reserved for Enemizer
 ;$37 Room data if needed for DR/Pottery/Enemizer
+;$39 GwaaKiwi Code Bank
 ;$3A reserved for downstream use
 ;$3B reserved for downstream use
 ;$3F reserved for internal debugging

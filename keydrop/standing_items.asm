@@ -1,4 +1,7 @@
 ; hooks
+org $81DB19
+	JSL MaybeSkipSmashTerrain : BCS $81DB11
+
 org $81E6B0
 	JSL RevealPotItem
 	RTS
@@ -39,12 +42,20 @@ org $86d180
 org $86d18d ; <- 3518D - sprite_absorbable.asm : 274 (LDA $7EF36F : INC A : STA $7EF36F)
 	JSL KeyGet
 
+org $86E24A
+	JSR MaybeSkipTerrainDebris
+
 org $86f9f3 ; bank06.asm : 6732 (JSL SpritePrep_LoadProperties)
 	JSL LoadProperties_PreserveCertainProps
 
 org $86828A
 Sprite_SpawnSecret_SpriteSpawnDynamically:
 	JSL CheckSprite_Spawn
+
+org $87B114
+	JSL MaybeUnableToLiftPotSfx
+	NOP #4
+	db $30 ; BMI
 
 org $87B169
 	JSL PreventPotSpawn : NOP
@@ -671,7 +682,7 @@ KeyGet:
     PHA
         LDA.l StandingItemsOn : BNE +
             PLA : RTL
-        + LDY.w SprItemReceipt, X
+        + LDY.w SprSourceItemId, X
         LDA.w SprItemIndex, X : STA.w SpawnedItemIndex
         LDA.w SprItemFlags, X : STA.w SpawnedItemFlag
         STY.b Scrap00
@@ -685,7 +696,7 @@ KeyGet:
             + LSR : TAX
             LDA.b Scrap00 : CMP.l KeyTable, X : BNE +
                 .countIt
-                LDA.l StandingItemCounterMask : AND.w SpawnedItemFlag : BEQ ++
+                LDA.l StandingItemCounterMask : AND SpawnedItemFlag : BEQ ++
                     JSL AddInventory
                 ++ PLX : PLA : RTL
             + CMP.b #$AF : beq .countIt ; universal key
@@ -693,7 +704,7 @@ KeyGet:
         .skip PLX
         .receive
         JSL Player_HaltDashAttackLong
-        TYA : JSL AttemptItemSubstitution : JSL ResolveLootIDLong : TAY
+        TYA : JSL AttemptItemSubstitution : TAY
         JSL Link_ReceiveItem
     PLA : DEC : RTL
 
@@ -701,7 +712,7 @@ KeyTable:
 db $A0, $A0, $A2, $A3, $A4, $A5, $A6, $A7, $A8, $A9, $AA, $AB, $AC, $AD
 
 BigKeyGet:
-	LDY.w SprItemReceipt, X
+	LDY.w SprSourceItemId, X
 	CPY.b #$32 : BNE +
 		STZ.w ItemReceiptMethod : LDY.b #$32 ; what we wrote over
 		PHX : JSL Link_ReceiveItem : PLX ; what we wrote over
@@ -773,7 +784,6 @@ CheckSprite_Spawn:
 RTL
 .check
 	LDA.b Scrap0D : CMP.b #$08 : BNE +
-	LDA.w LinkDashing : BNE .error
 		LDX.b #$0F
 
 		; loop looking for a Sprite with state 0A (carried by the player)
@@ -784,7 +794,9 @@ RTL
 		LDA.b #$00 : STZ.w SpriteAITable, X
 		LDA.b #$E4 : JSL Sprite_SpawnDynamically
 		BMI .error
-		LDA.b #$40 : TSB.w AButtonAct : RTL
+		LDA.w UseY1 : AND.b #$02 : BNE ++
+			LDA.b #$40 : TSB.w AButtonAct
+		++ RTL
 
 		.error
 		LDA.b #$3C ; SFX2_3C - error beep
@@ -803,15 +815,102 @@ PreventPotSpawn2:
 		LDA.b #$01 : TSB.b LinkStrafe ; what we wrote over
 + RTL
 
+MaybeSkipTerrainDebris_long:
+	STZ.w SecretId ; what we wrote over
+	LDA.w SpriteTypeTable, X : CMP.b #$EC
+	BEQ .return
+		PLA : PLA : PLA : PLA : PLA
+		LDA.b #Sprite_ScheduleForBreakage_exit>>16 : PHA
+		PEA.w Sprite_ScheduleForBreakage_exit-1
+.return
+RTL
+
+MaybeSkipSmashTerrain:
+	STY.w ManipIndex : LDA.w ManipTileMapX, Y ; what we wrote over
+	PHA
+	SEP #$30
+	LDX.b #$0F
+	- LDA.w SpriteAITable, X : BEQ .continue
+		DEX
+	BPL -
+	.skip
+	PLA : PLA
+	LDA.b #$3C : STA.w SFX2 ; error beep
+	SEC
+	RTL
+	.continue
+	REP #$30
+	PLA
+	CLC
+RTL
+
+MaybeUnableToLiftPotSfx:
+	- LDA.w SpriteAITable,X : BEQ .return
+		DEX
+	BPL -
+	LDA.b #$3C : STA.w SFX2 ; error beep
+	LDA.b #$FF
+.return
+RTL
+
 CheckIfPotIsSpecial:
 	TXA ; give index to A so we can do a CMP.l
 	CMP.l $018550 ; see if our current index is that of object 230
-	BEQ .specialpot
+	BNE .normal_pot
 
-    ; Normal pot, so run the vanilla code
+.special_pot
+	PHX
+
+	; get pot index and cache room ID offset
+	LDA.b RoomIndex : ASL : STA.b Scrap0E
+	TAX
+
+	LDA.b $08
+	BIT.b $BF : BVC .upper ; if $BF has bit 14 set, it's upper layer
+	ORA.w #$2000 ; set the lower layer bit ($2000)
+.upper
+  STA.b $90 ; cache tilemap offset
+
+	LDA.l UWPotsPointers,X : TAX
+	LDY.w #$0000
+
+.next_pot
+	LDA.l UWPotsPointers&$FF0000, X ; read only the bank
+	CMP.w #$FFFF
+	BEQ .nothing
+	AND.w #$3FFF ; mask out the first three bits (used for item indicators and layer)
+
+	CMP.b $90 ; check against the tilemap offset
+	BEQ .get_flag
+
+  INX #3
+  INY #2
+  BRA .next_pot
+
+.get_flag
+  TYX
+
+  LDA.l BitFieldMasks,X
+  LDX.b Scrap0E ; get room ID
+  STA.b Scrap0E
+  LDA.l RoomPotData,X
+
+  BRA .check_pot
+
+.nothing
+  INC ; from FFFF, A is now 0000 so the AND always fails
+
+.check_pot
+  LDY.b $08 : PLX
+  AND.b Scrap0E
+  BEQ .exit ; zero flag will be set, which is what we want
+	LDX.w #$0E82 ; the normal pot obj. See RoomDrawObjectData_#obj0E82
+
+.normal_pot
+  ; Normal pot, so run the vanilla code
 	LDA.l CurrentWorld ; check for dark world
-	.specialpot ; zero flag already set, so gtg
-RTL
+.exit
+	RTL
 
 SetTheSceneFix:
 	STZ.b $6C

@@ -180,9 +180,19 @@ LDA.b IndoorsFlag : BNE +
 +
 RTL
 
+PostFixMirrorGfxPrep:
+	LDA.b #$01 : STA.w OWTransitionFlag
+	JML HandleFollowersAfterMirroring ; what we wrote over
+
+; warning, this is called on frames after PostFixMirrorGfxPrep but for
+; several frames after, so we use OWTransitionFlag to run something once
 PostFixMirrorGfx:
-	JSL HandleFollowersAfterMirroring
-	JML FollowerGfxRedraw
+	STA.w SubModuleInterface ; what we wrote over
+	LDA.w OWTransitionFlag : CMP.b #$01 : BNE .done
+		LDA.b #$08 : STA.w OWTransitionFlag
+		JML FollowerGfxRedraw
+.done
+	RTL
 
 PostFixOAMGfx:
 	JSL FollowerGfxRedraw
