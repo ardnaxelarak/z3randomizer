@@ -91,7 +91,11 @@ InitializeMirrorHDMA:
 org $89D62E
 UWSpritesPointers: ; 0x250 bytes for 0x128 rooms' 16-bit pointers
 
-org $89D87E
+if !FEATURE_FIX_BASEROM
+	org $81DB67
+else
+	org $89D87E
+endif
 UWPotsPointers: ; 0x250 bytes for 0x128 rooms' 16-bit pointers
 
 org $89DACE
@@ -188,7 +192,7 @@ RevealPotItem:
 
 	LDA.b RoomIndex : ASL : TAX
 
-	LDA.l UWPotsPointers,X : STA.b Scrap00 ; we may move this
+	LDA.l UWPotsPointers, X : STA.b Scrap00 ; we may move this
 	LDA.w #UWPotsPointers>>16 : STA.b Scrap02
 
 	LDY.w #$FFFD : LDX.w #$FFFF
@@ -869,7 +873,7 @@ CheckIfPotIsSpecial:
 	BIT.b $BF : BVC .upper ; if $BF has bit 14 set, it's upper layer
 	ORA.w #$2000 ; set the lower layer bit ($2000)
 .upper
-  STA.b $90 ; cache tilemap offset
+	STA.b $90 ; cache tilemap offset
 
 	LDA.l UWPotsPointers,X : TAX
 	LDY.w #$0000

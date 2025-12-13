@@ -61,7 +61,3 @@ LDA.b [Scrap00],Y
 
 org $89C416
 LDA.b [Scrap00],Y
-
-
-
-
