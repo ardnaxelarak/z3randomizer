@@ -1,7 +1,9 @@
 SelectFirstFluteSpot:
 	LDA.l FluteBitfield
-	BNE .try_next
+	BNE +
 	RTL
++	LDA.b #$07
+	STA.w $1AF0
 .try_next
 	LDA.w $1AF0
 	INC A
@@ -110,3 +112,39 @@ CheckTransitionOverworld:
 	STA.b $8A
 	STA.w $040A ; what we wrote over
 	JML MaybeMarkFluteSpotVisited
+
+DrawFluteIcon:
+	AND.w #$00FF
+	CMP.w #$0002
+	BCC .write
+	LDA.l FluteBitfield
+	AND.w #$00FF
+	CMP.w #$00FF
+	BNE .pseudo
+.real
+	LDA.w #$0003
+	BRA .write
+.pseudo
+	LDA.w #$0002
+.write
+	STA.b $02
+	RTL
+
+CheckFluteInHUD:
+	LDA.l $7EF33F, X
+	AND.w #$00FF ; what we wrote over
+	CPX.w #$000D
+	BNE .done
+	CMP.w #$0002
+	BCC .done
+	LDA.l FluteBitfield
+	AND.w #$00FF
+	CMP.w #$00FF
+	BNE .pseudo
+.real
+	LDA.w #$0003
+	BRA .done
+.pseudo
+	LDA.w #$0002
+.done
+	RTL

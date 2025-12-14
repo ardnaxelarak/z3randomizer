@@ -248,7 +248,11 @@ DrawPlayerFileShared:
 
 	; Flute
 	LDA.l InventoryTrackingSRAM : AND.w #$0003 : BEQ +
+	LDA.l $7003C2 : AND.w #$00FF : CMP.w #$00FF : BNE .pseudo
 		%fs_drawItem(7,16,FileSelectItems_flute)
+		BRA ++
+	.pseudo
+		%fs_drawItem(7,16,FileSelectItems_flute_green)
 		BRA ++
 	+
 		%fs_drawItemGray(7,16,FileSelectItems_flute)
@@ -539,6 +543,8 @@ FileSelectItems:
 	dw #$0264|!FS_COLOR_BROWN, #$0265|!FS_COLOR_BROWN, #$0274|!FS_COLOR_BROWN, #$0275|!FS_COLOR_BROWN
 	.flute
 	dw #$0266|!FS_COLOR_BLUE, #$0267|!FS_COLOR_BLUE, #$0276|!FS_COLOR_BLUE, #$0277|!FS_COLOR_BLUE
+	.flute_green
+	dw #$0266|!FS_COLOR_GREEN, #$0267|!FS_COLOR_GREEN, #$0276|!FS_COLOR_GREEN, #$0277|!FS_COLOR_GREEN
 	.book
 	dw #$026A|!FS_COLOR_GREEN, #$026B|!FS_COLOR_GREEN, #$027A|!FS_COLOR_GREEN, #$027B|!FS_COLOR_GREEN
 	.redcane

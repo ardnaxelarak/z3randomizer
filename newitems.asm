@@ -188,10 +188,12 @@ ItemBehavior:
         BRA .store_inventory_tracking
 
         .flute_inactive
+        LDA.b #$FF : STA.l FluteBitfield
         LDA.l InventoryTracking : ORA.b #$02
         BRA .store_inventory_tracking
 
         .flute_active
+        LDA.b #$FF : STA.l FluteBitfield
         LDA.l InventoryTracking : ORA.b #$01
         BRA .store_inventory_tracking
 
