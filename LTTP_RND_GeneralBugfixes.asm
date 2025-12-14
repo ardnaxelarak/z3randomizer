@@ -208,6 +208,7 @@ incsrc mimicdash.asm
 incsrc gloom.asm
 incsrc special_weapons.asm
 incsrc variable_ganon_vulnerability.asm
+incsrc pseudoflute.asm
 warnpc $BA8000
 
 org $A38000

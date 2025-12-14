@@ -277,6 +277,7 @@ OnOWTransition:
 RTL
 ;--------------------------------------------------------------------------------
 OnLoadDuckMap:
+	JSL SelectFirstFluteSpot
 	LDA.l DuckMapFlag
 	BNE +
 		INC : STA.l DuckMapFlag

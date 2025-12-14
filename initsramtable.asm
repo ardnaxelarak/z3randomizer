@@ -114,7 +114,10 @@ StartingGenericKeys: skip 1             ; PC 0x18338B
 InitInventoryTracking: skip 2           ; PC 0x18338C \ Need to set bits here for silver arrows,
 InitBowTracking: skip 2                 ; PC 0x18338E / boomerangs, powder/mushroom, etc 
 InitItemLimitCounts: skip 16            ; PC 0x183390
-skip 37                                 ;
+skip 34                                 ;
+InitFluteBitfield: db $FF               ;
+InitSpecialWeaponLevel: db $00          ;
+InitItemOnB: db $00                     ;
 InitProgressIndicator: db $02           ; PC 0x1833C5 - Set to $80 for instant post-aga with standard
 InitProgressFlags: db $14               ; PC 0x1833C6 - Set to $00 for standard
 InitMapIcons: skip 1                    ; PC 0x1833C7
