@@ -7,25 +7,25 @@
 !FRAMES_PER_HOUR = 60*60*60
 ;--------------------------------------------------------------------------------
 macro DecIncr(value)
-	LDA.w <value> : INC
+	LDA.l <value> : INC
 		CMP.w #$000A : !BLT ?noIncr
-			LDA.w <value>+2 : INC : STA.w <value>+2
+			LDA.l <value>+2 : INC : STA.l <value>+2
 			LDA.w #$0000
 		?noIncr:
-	STA.w <value>
+	STA.l <value>
 endmacro
 ;--------------------------------------------------------------------------------
 macro Sub32(minuend,subtrahend,result)
 	LDA.l <minuend>
 	!SUB.l <subtrahend>		; perform subtraction on the LSBs
-	STA.w <result>
+	STA.l <result>
 	LDA.l <minuend>+2		; do the same for the MSBs, with carry
 	SBC.l <subtrahend>+2	; set according to the previous result
-	STA.w <result>+2
+	STA.l <result>+2
 endmacro
 ;--------------------------------------------------------------------------------
 macro Blt32(value1,value2)
-	LDA.w <value1>+2
+	LDA.l <value1>+2
 	CMP.l <value2>+2
 	!BLT ?done
 	BNE ?done
@@ -50,7 +50,7 @@ CalculateTimer:
 		%Sub32(ChallengeTimer,NMIFrames,ClockBuffer)
 	++
 
-	%Blt32(ClockBuffer,.halfCycle) : !BLT +
+	%Blt32(ClockBuffer,.halfCycle) : !BGE +++ : JMP + : +++
 		LDA.l TimeoutBehavior : AND.w #$00FF : BNE ++ ; DNF
 			LDA.w #$0002 : STA.l ClockStatus ; Set DNF Mode
 			LDA.l NMIFrames : STA.l ChallengeTimer
@@ -65,6 +65,17 @@ CalculateTimer:
 			LDA.w #$0002 : STA.l ClockStatus ; Set DNF Mode
 			LDA.l NMIFrames : STA.l ChallengeTimer
 			LDA.l NMIFrames+2 : STA.l ChallengeTimer+2
+			RTS
+		++ CMP.w #$0004 : BNE ++ ; Drop Into Ganon
+			LDA.w $048E
+			BEQ .already_ganon
+			LDA.w #$0002 : STA.l ClockStatus ; Set DNF Mode
+			LDA.w #$0011 : STA.b GameMode
+			SEP #$20
+			LDA.b #$7B
+			STA.w $010E
+			REP #$20
+			.already_ganon
 			RTS
 		++ ; End Game
 			SEP #$30
@@ -131,6 +142,13 @@ DrawChallengeTimer:
 				LDA.w #$2808 : STA.l HUDTileMapBuffer+$94
 				LDA.w #$2809 : STA.l HUDTileMapBuffer+$96
 				LDA.w #$247F : STA.l HUDTileMapBuffer+$98
+				STA.l HUDTileMapBuffer+$9A
+				BRA +++
+			++ CMP.w #$0004 : BNE ++ ; Ganon
+				LDA.w #$247F : STA.l HUDTileMapBuffer+$92
+				STA.l HUDTileMapBuffer+$94
+				STA.l HUDTileMapBuffer+$96
+				STA.l HUDTileMapBuffer+$98
 				STA.l HUDTileMapBuffer+$9A
 				BRA +++
 			++ ; OHKO
