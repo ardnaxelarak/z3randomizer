@@ -11,14 +11,16 @@ Sprite_ResetAll: ; Bank09.asm(1344)
 ;================================================================================
 ; On Room Transition -> Move Sprite depending on the room loaded
 ;--------------------------------------------------------------------------------
-org $828979 ;  JSL Dungeon_ResetSprites ; REPLACE THAT (Sprite initialization) original jsl : $09C114
-JSL boss_move
-org $828C16 ;  JSL Dungeon_ResetSprites ; REPLACE THAT (Sprite initialization) original jsl : $09C114
-JSL boss_move
-org $829338 ;  JSL Dungeon_ResetSprites ; REPLACE THAT (Sprite initialization) original jsl : $09C114
-JSL boss_move
-org $828256 ;  JSL Dungeon_ResetSprites ; REPLACE THAT (Sprite initialization) original jsl : $09C114
-JSL boss_move
+if not(!FEATURE_FIX_BASEROM)
+	org $828979 ;  JSL Dungeon_ResetSprites ; REPLACE THAT (Sprite initialization) original jsl : $09C114
+	JSL boss_move
+	org $828C16 ;  JSL Dungeon_ResetSprites ; REPLACE THAT (Sprite initialization) original jsl : $09C114
+	JSL boss_move
+	org $829338 ;  JSL Dungeon_ResetSprites ; REPLACE THAT (Sprite initialization) original jsl : $09C114
+	JSL boss_move
+	org $828256 ;  JSL Dungeon_ResetSprites ; REPLACE THAT (Sprite initialization) original jsl : $09C114
+	JSL boss_move
+endif
 ;--------------------------------------------------------------------------------
 
 ;--------------------------------------------------------------------------------
