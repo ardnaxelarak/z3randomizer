@@ -179,7 +179,7 @@ incsrc toast.asm
 incsrc fastcredits.asm
 incsrc msu.asm
 incsrc menu/overworldmap.asm ; Overwrites some code in bank $8A
-incsrc dungeonmap.asm
+incsrc bossicons.asm
 incsrc hextodec.asm
 incsrc multiworld.asm
 incsrc textrenderer.asm
