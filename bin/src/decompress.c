@@ -142,4 +142,6 @@ int main(int argc, char *argv[]) {
 
     fclose(outptr);
     printf("Input file: %X bytes. Decompressed: %X bytes.\n", size, oloc);
+
+    return 0;
 }

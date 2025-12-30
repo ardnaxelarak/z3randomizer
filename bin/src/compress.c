@@ -234,4 +234,6 @@ int main(int argc, char *argv[]) {
 
     fclose(outptr);
     printf("Input file: %X bytes. Compressed: %X bytes.\n", size, oloc);
+
+    return 0;
 }

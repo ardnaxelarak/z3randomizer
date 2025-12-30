@@ -20,7 +20,12 @@ DoDungeonMapBossIcon:
 	; get sprite pointer for room
 	LDA.l UWSpritesPointers,X
 	STA.b Scrap00                ; pointer in $00
-	LDA.w #$0028 : STA.b Scrap02 ; set the bank to 28 for now
+	if !FEATURE_FIX_BASEROM
+		LDA.w #$0089
+	else
+		LDA.w #$0028 ; set the bank to 28 for now
+	endif
+	STA.b Scrap02
 	LDY.w #$0001 ; to skip the "sort"
 
 	; get first byte to make sure it isn't an empty room
