@@ -65,6 +65,10 @@ CheckLoot:
 	JSR CheckBoss
 +
 
+	LDA.l ItemSources : BIT.w #$0010 : BEQ +
+	JSR CheckPrize
++
+
 	LDA.b $0E
 	AND.w #$00FF
 	CMP.w #$0001
@@ -172,6 +176,38 @@ CheckBoss:
 	JSR GetLootClass
 
 	BRA .next_boss
+
+CheckPrize:
+	LDX.w #$FFFD
+.next_prize
+	INX #3
+	LDA.l PrizeLocations, X
+	BPL .check
+	RTS
+
+.check
+	CMP.b $00
+	BNE .next_prize
+
+	TXY
+
+	ASL A
+	TAX
+	LDA.l SaveDataWRAM, X
+	TYX
+	BIT.w #$0800
+	BNE .next_prize
+
+	LDA.l PrizeLocations+2, X ; get which prize to look at
+	AND.w #$00FF
+	TAX
+	LDA.l DungeonPrizeReceiptID, X
+	TYX
+
+	AND.w #$00FF
+	JSR GetLootClass
+
+	BRA .next_prize
 
 CheckPots:
 	LDA.b $00

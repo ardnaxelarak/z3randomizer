@@ -31,22 +31,22 @@ endstruct
 
 ; $B9F480
 LootTypeIcons:
-dw $1300, $1300, $1300, $1300 ; 00 - nothing
-dw $334D, $734D, $335D, $735D ; 01 - unknown - basic chest
-dw $330D, $730D, $333D, $733D ; 02 - junk - pot
-dw $3307, $3308, $3317, $3318 ; 03 - small key
-dw $330A, $730A, $333A, $733A ; 04 - triforce piece
-dw $330C, $730C, $333C, $733C ; 05 - safety - heart
-dw $330E, $730E, $333E, $733E ; 06 - compass
-dw $3307, $3308, $3317, $3318 ; 07 - small key
-dw $3305, $7305, $3315, $3316 ; 08 - big key
-dw $3309, $7309, $3339, $7339 ; 09 - pendant
-dw $330F, $730F, $333F, $733F ; 0A - inventory item - big chest
-dw $3309, $7309, $3339, $7339 ; 0B - also pendant
-dw $3303, $7303, $B303, $F303 ; 0C - crystal
-dw $330A, $730A, $333A, $733A ; 0D - triforce piece
-dw $330B, $730B, $333B, $733B ; 0E - triforce
-dw $1300, $1300, $1300, $1300 ; 0F - empty (reserved)
+dw $0B00, $0B00, $0B00, $0B00 ; 00 - nothing
+dw $2B0E, $6B0E, $2B3E, $6B3E ; 01 - unknown - basic chest
+dw $2B0D, $6B0D, $2B3D, $6B3D ; 02 - junk - pot
+dw $2B07, $6B07, $2B17, $2B18 ; 03 - small key
+dw $2B0B, $6B0B, $2B3B, $6B3B ; 04 - triforce piece
+dw $6B08, $2B08, $EB08, $AB08 ; 05 - safety - plus
+dw $AB3A, $EB3A, $2B3A, $6B3A ; 06 - compass
+dw $2B07, $2B08, $2B17, $2B18 ; 07 - small key
+dw $2B05, $6B05, $2B15, $2B16 ; 08 - big key
+dw $2B09, $2B0A, $2B39, $6B39 ; 09 - pendant
+dw $2B0F, $6B0F, $2B3F, $6B3F ; 0A - inventory item - big chest
+dw $2B09, $2B0A, $2B39, $6B39 ; 0B - also pendant
+dw $6F02, $2B02, $EB02, $AF02 ; 0C - crystal
+dw $2B0B, $6B0B, $2B3B, $6B3B ; 0D - triforce piece
+dw $2B0C, $6B0C, $2B3C, $6B3C ; 0E - triforce
+dw $0B00, $0B00, $0B00, $0B00 ; 0F - empty (reserved)
 
 ; $B9F500
 LootTypeMapping:
@@ -73,14 +73,32 @@ dw $0087 : db $05 : dl StandingKey_Hera
 
 dw $FFFF : db $FF : dl $FFFFFF ; Placeholders
 dw $FFFF : db $FF : dl $FFFFFF
-dw $FFFF : db $FF : dl $FFFFFF
+dw $FFFF : db $FF : dl $FFFFFF ; Aga 1? ($0020)
+dw $FFFF : db $FF : dl $FFFFFF ; Ice Armos? ($001C)
+dw $FFFF : db $FF : dl $FFFFFF ; Lanmolas 2? ($0033)
+dw $FFFF : db $FF : dl $FFFFFF ; Moldorm 2? ($004D)
+dw $FFFF : db $FF : dl $FFFFFF ; Aga 2? ($000D)
 dw $FFFF
 
-; $B9F682
+; $B9F69A
 MapHUDPalette:
 	dw $0000, $3ED8, $2E54
 
-; $B9F688
+; $B9F6A0
+PrizeLocations:
+dw $00C8 : db $02 ; ArmosKnights
+dw $0033 : db $03 ; Lanmolas
+dw $0006 : db $05 ; Arrghus
+dw $005A : db $06 ; HelmasaurKing
+dw $0090 : db $07 ; Vitreous
+dw $0029 : db $08 ; Mothula
+dw $00DE : db $09 ; Kholdstare
+dw $0007 : db $0A ; Moldorm
+dw $00AC : db $0B ; Blind
+dw $00A4 : db $0C ; Trinexx
+dw $FFFF
+
+; $B9F6C0
 
 warnpc $B9FF00
 
@@ -125,10 +143,10 @@ ShowItems:
 
 org $B9FF10
 ; ---P bepc
-; P - dungeon prizes - NYI
+; P - dungeon prizes
 ; b - bosses (and torches in GT, plus hera basement standing item)
 ; e - enemy drops
 ; p - pots
 ; c - chests
 ItemSources:
-	db $0F
+	db $1F
