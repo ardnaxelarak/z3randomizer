@@ -209,7 +209,11 @@ incsrc gloom.asm
 incsrc special_weapons.asm
 incsrc variable_ganon_vulnerability.asm
 incsrc pseudoflute.asm
-warnpc $BA8000
+incsrc dungeon_map/main.asm
+warnpc $B9F000
+
+org $B9F000
+incsrc dungeon_map/settings.asm
 
 org $A38000
 incsrc stats/credits.asm ; Statically mapped
@@ -253,7 +257,7 @@ warnpc $B1A000
 
 org $B1A000
 GFX_HUD_Items:
-incbin "menu/drsheetdc.2bppc"
+incbin "menu/dr_sheet_dc.2bppc"
 warnpc $B1A800
 
 org $B1A800
@@ -306,6 +310,14 @@ NewFontInverted:
 incbin "data/newfont_inverted.bin"
 SmallCharacters:
 incbin "data/smallchars.2bpp"
+
+DungeonMapIcons1:
+incbin "menu/map_icons_1.3bppc"
+DungeonMapIcons2:
+incbin "menu/map_icons_2.3bppc"
+MapSheetD4:
+incbin "menu/map_sheet_d4.3bppc"
+
 org $8CD7DF
 incsrc data/playernamecharmap.asm
 org $8CE73D

@@ -274,6 +274,7 @@ GFXSheetPointers_background_bank                           = $80CFC0
 GFXSheetPointers_background_high                           = $80D09F
 GFXSheetPointers_background_low                            = $80D17E
 LayerOfDestination                                         = $81C31F
+RoomData_ChestItems                                        = $81E96C
 AnimatedTileSheets                                         = $82802E
 Module1B_SpawnSelect_spawns                                = $828481
 Overworld_ActualScreenID                                   = $82A4E3

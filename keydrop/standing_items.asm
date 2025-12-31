@@ -98,10 +98,18 @@ else
 endif
 UWPotsPointers: ; 0x250 bytes for 0x128 rooms' 16-bit pointers
 
-org $89DACE
+if !FEATURE_FIX_BASEROM
+	org $01DDE7
+else
+	org $89DACE
+endif
 UWPotsData: ; variable number of bytes (max 0x11D1) for all pots data
 
-org $A88000
+if !FEATURE_FIX_BASEROM
+	org $89D92E
+else
+	org $A88000
+endif
 UWSpritesData: ; variable number of bytes (max 0x2800) for all sprites and sprite drop data
 ; First $2800 bytes of this bank (28) is reserved for the sprite tables
 
