@@ -6,18 +6,77 @@ CheckLoot:
 	PHB : PHX : PHY
 
 	STA.b $00
-	ASL A
-	TAX
 
 	LDA.b $06 : PHA
+	LDA.b $0E : PHA
 
 	STZ.b $02 ; best item class found
 
-	JSR CheckChests
-	JSR CheckBoss
-	JSR CheckPots
-	JSR CheckEnemies
+	LDA.l ShowItems_default
+	AND.w #$00FF
+	STA.b $0E
 
+	LDA.l SaveDataWRAM, X
+	AND.w #$000F
+	BEQ +
+	LDA.l ShowItems_visited_tile
+	AND.w #$00FF
+	CMP.b $0E
+	BCC +
+	STA.b $0E
+
++	LDA.b DungeonID
+	TAX
+
+	LDA.l MapField
+	AND.l DungeonMask, X
+	BEQ +
+	LDA.l ShowItems_have_map
+	AND.w #$00FF
+	CMP.b $0E
+	BCC +
+	STA.b $0E
+
++	LDA.l CompassField
+	AND.l DungeonMask, X
+	BEQ +
+	LDA.l ShowItems_have_compass
+	AND.w #$00FF
+	CMP.b $0E
+	BCC +
+	STA.b $0E
+
++	LDA.b $0E
+	BEQ .done
+
+	LDA.l ItemSources : BIT.w #$0001 : BEQ +
+	JSR CheckChests
++
+
+	LDA.l ItemSources : BIT.w #$0002 : BEQ +
+	JSR CheckPots
++
+
+	LDA.l ItemSources : BIT.w #$0004 : BEQ +
+	JSR CheckEnemies
++
+
+	LDA.l ItemSources : BIT.w #$0008 : BEQ +
+	JSR CheckBoss
++
+
+	LDA.b $0E
+	AND.w #$00FF
+	CMP.w #$0001
+	BNE .done
+
+	LDA.b $02
+	BEQ .done
+	LDA.w #$0001
+	STA.b $02
+
+.done
+	PLA : STA.b $0E
 	PLA : STA.b $06
 	PLY : PLX : PLB
 	PLP
@@ -25,6 +84,10 @@ CheckLoot:
 	RTL
 
 CheckChests:
+	LDA.b $00
+	ASL A
+	TAX
+
 	LDA.w #($81<<8)
 	PHA
 	PLB : PLB

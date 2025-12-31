@@ -81,3 +81,54 @@ MapHUDPalette:
 	dw $0000, $3ED8, $2E54
 
 ; $B9F688
+
+warnpc $B9FF00
+
+org $B9FF00
+; $00 - do not show anything
+; $01 - show presence of supertile as dark square
+; $02 - show shape of quadrants
+; $03 - show outline of shape but no details
+; $04 - show dark but detailed
+; $05 - show lit with detail
+ShowRooms: ; NYI
+.default
+	db $02
+.have_map
+	db $04
+.have_compass
+	db $03
+.visited_tile
+	db $04
+.visited_quadrant
+	db $05
+.reserved
+	skip 3
+
+org $B9FF08
+; $00 - do not show anything
+; $01 - show presence of unobtained items
+; $02 - show category of item
+ShowItems:
+.default
+	db $00
+.have_map
+	db $00
+.have_compass
+	db $02
+.visited_tile
+	db $01
+.item_is_compass ; NYI
+	db $00
+.reserved
+	skip 3
+
+org $B9FF10
+; ---P bepc
+; P - dungeon prizes - NYI
+; b - bosses (and torches in GT, plus hera basement standing item)
+; e - enemy drops
+; p - pots
+; c - chests
+ItemSources:
+	db $0F
