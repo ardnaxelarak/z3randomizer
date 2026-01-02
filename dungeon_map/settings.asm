@@ -106,9 +106,9 @@ org $B9FF00
 ; $00 - do not show anything
 ; $01 - show presence of supertile as dark square
 ; $02 - show presence of quadrants as dark squares
-; $03 - show outline of shape with walls but no interior details (palette 3)
+; $03 - show outline of shape with walls but no interior details (palette 5)
 ; $04 - show dark with stairs but no hole/internal walls (palette 4)
-; $05 - show mostly lit with stairs and holes/internal walls (palette 5)
+; $05 - show mostly lit with stairs and holes/internal walls (palette 3)
 ; $06 - show fully lit with stairs and holes/internal walls (palette 2)
 ShowRooms:
 .default

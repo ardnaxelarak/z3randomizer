@@ -40,11 +40,11 @@ DrawDungeonMapRoom:
 +
 
 	LDA.b $0A : BNE + : LDA.w #$0F00 : BRA ++
-+	DEC A     : BNE + : LDA.w #$0F7B : BRA ++
-+	DEC A     : BNE + : LDA.w #$0F7B : BRA ++
-+	DEC A     : BNE + : LDA.w #$0C00 : BRA ++
-+	DEC A     : BNE + : LDA.w #$1000 : BRA ++
++	DEC A     : BNE + : LDA.w #$174F : BRA ++
++	DEC A     : BNE + : LDA.w #$174F : BRA ++
 +	DEC A     : BNE + : LDA.w #$1400 : BRA ++
++	DEC A     : BNE + : LDA.w #$1000 : BRA ++
++	DEC A     : BNE + : LDA.w #$0C00 : BRA ++
 +	LDA.w #$0800
 ++	STA.b $0C
 
@@ -94,7 +94,7 @@ DrawDungeonMapRoom:
 		BRA ?.write
 
 		?.full_square
-		LDA.w #$0F7B
+		LDA.w #$174F
 
 		?.write
 		ORA.w #(3-<quadrant>)<<14
