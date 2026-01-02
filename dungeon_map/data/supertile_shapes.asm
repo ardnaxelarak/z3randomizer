@@ -7,9 +7,9 @@ db $FF, $FF, $FF, $FF ; 05 - unused
 db $FF, $FF, $4F, $FF ; 06 - Arrghus
 db $00, $40, $00, $00 ; 07 - Moldorm
 db $FF, $FF, $72, $5F ; 08 - useless fairy entrance
-db $66, $66, $FF, $FF ; 09
-db $58, $58, $FF, $FF ; 0A
-db $2E, $67, $2E, $70 ; 0B
+db $66, $3B, $FF, $FF ; 09
+db $58, $1F, $FF, $FF ; 0A
+db $2E, $67, $2E, $1E ; 0B
 db $31, $31, $24, $24 ; 0C
 db $FF, $FF, $4F, $FF ; 0D - Aga 2
 db $FF, $FF, $57, $5F ; 0E
@@ -25,7 +25,7 @@ db $40, $40, $00, $00
 db $75, $FF, $74, $FF ; 18 - useless fairy drop
 db $FF, $29, $FF, $1A ; 19
 db $6E, $6F, $6D, $75 ; 1A
-db $2E, $67, $75, $FF
+db $2E, $67, $75, $FF ; 1B
 db $74, $74, $3E, $2E ; 1C
 db $72, $67, $FF, $FF
 db $FF, $68, $57, $4B
@@ -72,8 +72,8 @@ db $14, $14, $00, $00
 db $FF, $FF, $FF, $FF ; 47 - unused
 db $FF, $FF, $FF, $FF ; 48 - unused
 db $72, $2E, $72, $2E ; 49
-db $61, $61, $24, $24
-db $75, $74, $2E, $2E
+db $61, $61, $24, $24 ; 4A
+db $75, $0E, $2E, $2E ; 4B
 db $FF, $65, $FF, $77 ; 4C
 db $10, $30, $01, $00
 db $72, $57, $FF, $FF ; 4E
@@ -104,7 +104,7 @@ db $00, $30, $10, $00
 db $00, $10, $00, $01 ; 67
 db $00, $10, $01, $00 ; 68
 db $FF, $FF, $FF, $FF ; 69 - unused
-db $FF, $4C, $FF, $74 ; 6A
+db $FF, $4C, $FF, $0E ; 6A
 db $65, $75, $2E, $2E ; 6B
 db $65, $FF, $2E, $71 ; 6C - Lanmolas 2
 db $75, $FF, $77, $FF ; 6D
@@ -121,9 +121,9 @@ db $30, $00, $60, $60
 db $FF, $FF, $FF, $FF ; 78 - unused
 db $FF, $FF, $FF, $FF ; 79 - unused
 db $FF, $FF, $FF, $FF ; 7A - unused
-db $70, $71, $4F, $4D
+db $1E, $71, $4F, $4D ; 7B
 db $77, $74, $77, $77
-db $2E, $70, $77, $4F ; 7D
+db $2E, $70, $52, $51 ; 7D - warp tiles
 db $FF, $77, $53, $2D ; 7E
 db $77, $FF, $55, $FF
 db $67, $70, $FF, $FF ; 80
@@ -153,9 +153,9 @@ db $65, $74, $2E, $2F ; 97
 db $FF, $FF, $5F, $57 ; 98
 db $FF, $74, $0A, $18 ; 99
 db $FF, $FF, $FF, $FF ; 9A - unused
-db $72, $70, $70, $71
+db $72, $1E, $1E, $38 ; 9B
 db $10, $10, $01, $01
-db $70, $72, $71, $70
+db $1E, $72, $71, $1E ; 9D
 db $FF, $65, $70, $79 ; 9E
 db $FF, $FF, $5B, $FF ; 9F
 db $72, $57, $FF, $FF ; A0
@@ -163,8 +163,8 @@ db $70, $1D, $FF, $2A ; A1
 db $45, $45, $16, $06
 db $1A, $FF, $2A, $FF ; A3
 db $FF, $FF, $4E, $FF ; A4
-db $65, $75, $2E, $2E
-db $00, $30, $00, $00
+db $65, $75, $2E, $2E ; A5
+db $00, $30, $00, $00 ; A6
 db $56, $FF, $FF, $FF ; A7 - ToH fairy basement room
 db $00, $03, $00, $12 ; A8
 db $17, $17, $16, $16
@@ -175,8 +175,8 @@ db $FF, $FF, $FF, $FF ; AD - unused
 db $FF, $59, $FF, $FF ; AE
 db $5B, $FF, $FF, $FF ; AF
 db $2E, $67, $2E, $57 ; B0
-db $74, $75, $2E, $2D
-db $14, $05, $10, $11 ; B2 - split this monster somehow?
+db $0E, $75, $0C, $2D ; B1
+db $1C, $62, $72, $4B ; B2 - split this monster somehow?
 db $4A, $FF, $4A, $FF
 db $10, $00, $44, $44
 db $30, $00, $10, $00
@@ -207,7 +207,7 @@ db $FF, $FF, $FF, $FF ; CD - unused
 db $FF, $78, $FF, $FF
 db $FF, $FF, $FF, $FF ; CF - unused
 db $2E, $67, $2E, $57 ; D0
-db $4E, $4F, $70, $70
+db $4E, $4F, $1E, $70 ; D1
 db $FF, $75, $FF, $55
 db $FF, $FF, $FF, $FF ; D3 - unused
 db $FF, $FF, $FF, $FF ; D4 - unused
