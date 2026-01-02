@@ -225,7 +225,7 @@ CheckPots:
 	LDA.b [$04], Y
 	CMP.w #$FFFF : BEQ .done
 	INX : INY : INY
-	BIT.w #$8000 : BNE .we_care ; marked as major item
+	BIT.w #$8000 : BNE .major_item ; marked as major item
 	LDA.b [$04], Y
 	AND.w #$00FF
 	CMP.w #$0008 : BEQ .small_key
@@ -234,10 +234,13 @@ CheckPots:
 
 .small_key
 	LDA.w #$0024
-.we_care
-	INY
+	BRA .continue
+.major_item
+	LDA.b [$04], Y
+.continue
 	PHA
 	PHX
+	INY
 	TXA : ASL A
 	EOR.w #$FFFF
 	CLC : ADC.w #$001F ; bit mask table is in opposite order of what we want

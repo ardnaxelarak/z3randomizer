@@ -14,10 +14,10 @@ org $9BE564
 dw $0000, $34E0, $7FFF, $34E0, $34E0, $0000, $7EB5, $1CE7
 
 org $9BE584
-dw $0000, $71E7, $7FFF, $3B5F, $71E7, $0000, $7EB5, $1CE7
+dw $0000, $4100, $7FFF, $2656, $4100, $0000, $7EB5, $1CE7
 
 org $9BE5A4
-dw $0000, $34E0, $7FFF, $2656, $34E0, $0000, $7EB5, $1CE7
+dw $0000, $5565, $7FFF, $2BE9, $0000, $0000, $7EB5, $1CE7
 
 ; move BG1 to main screen in dungeon map screen
 org $8AE130

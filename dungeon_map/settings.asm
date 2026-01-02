@@ -38,7 +38,7 @@ dw $2B07, $6B07, $2B17, $2B18 ; 03 - small key
 dw $2B0B, $6B0B, $2B3B, $6B3B ; 04 - triforce piece
 dw $6B08, $2B08, $EB08, $AB08 ; 05 - safety - plus
 dw $AB3A, $EB3A, $2B3A, $6B3A ; 06 - compass
-dw $2B07, $2B08, $2B17, $2B18 ; 07 - small key
+dw $2B07, $6B07, $2B17, $2B18 ; 07 - small key
 dw $2B05, $6B05, $2B15, $2B16 ; 08 - big key
 dw $2B09, $2B0A, $2B39, $6B39 ; 09 - pendant
 dw $2B0F, $6B0F, $2B3F, $6B3F ; 0A - inventory item - big chest
@@ -105,23 +105,22 @@ warnpc $B9FF00
 org $B9FF00
 ; $00 - do not show anything
 ; $01 - show presence of supertile as dark square
-; $02 - show shape of quadrants
-; $03 - show outline of shape but no details
-; $04 - show dark but detailed
-; $05 - show lit with detail
-ShowRooms: ; NYI
+; $02 - show presence of quadrants as dark squares
+; $03 - show outline of shape with walls but no interior details (palette 3)
+; $04 - show dark with stairs but no hole/internal walls (palette 4)
+; $05 - show mostly lit with stairs and holes/internal walls (palette 5)
+; $06 - show fully lit with stairs and holes/internal walls (palette 2)
+ShowRooms:
 .default
-	db $02
+	db $01
 .have_map
 	db $04
 .have_compass
 	db $03
 .visited_tile
-	db $04
-.visited_quadrant
 	db $05
 .reserved
-	skip 3
+	skip 4
 
 org $B9FF08
 ; $00 - do not show anything
