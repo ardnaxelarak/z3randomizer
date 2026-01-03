@@ -60,6 +60,11 @@ DrawDungeonMapRoom:
 		LDA.w SupertileRoomShapes+<quadrant>, Y
 		AND.w #$00FF
 		CMP.w #$00FF : BEQ ?.empty
+		BIT.w #$0080
+		BEQ ?+
+		AND.w #$007F
+		ORA.w #$C000
+	?+
 		CLC : ADC.w #$0340
 		PHA
 		LDA.b $0E
@@ -97,7 +102,7 @@ DrawDungeonMapRoom:
 		LDA.w #$174F
 
 		?.write
-		ORA.w #(3-<quadrant>)<<14
+		EOR.w #(3-<quadrant>)<<14
 		STA.l $7F0000+<writeOffset>, X
 		?.done
 	endmacro
