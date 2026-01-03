@@ -108,7 +108,25 @@ padbyte $FF
 pad $B9F700
 
 ; $B9F700
+DungeonLabels:
+dw $2561, $256F ; Sewers
+dw $2564, $255F ; Hyrule Castle
+dw $2561, $256C ; Eastern Palace
+dw $2560, $256C ; Desert Palace
+dw $255D, $2570 ; Agahnim's Tower
+dw $256F, $256C ; Swamp Palace
+dw $256C, $2560 ; Palace of Darkness
+dw $2569, $2569 ; Misery Mire
+dw $256F, $2573 ; Skull Woods
+dw $2565, $256C ; Ice Palace
+dw $2570, $2564 ; Tower of Hera
+dw $2570, $2570 ; Thieves' Town
+dw $2570, $256E ; Turtle Rock
+dw $2563, $2570 ; Ganon's Tower
+dw $25A4, $25A4 ; Reserved
+dw $25A4, $25A4 ; Reserved
 
+; $B9F740
 
 warnpc $B9FF00
 

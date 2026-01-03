@@ -73,6 +73,10 @@ org $8AEFC5
 	JSL RestoreCurrentDungeon
 	NOP
 
+org $8AE1EC
+	PLB
+	JML DrawDungeonLabel
+
 ;================================================================================
 ; Show indicators of what is left in each room
 ;--------------------------------------------------------------------------------

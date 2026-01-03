@@ -110,3 +110,32 @@ RestoreDungeonMapFloorIndex:
 	LDA.b $0A ; the rest of what we wrote over
 	AND.b #$08
 	RTL
+
+DrawDungeonLabel:
+	LDY.b #$00
+	LDA.w DungeonID
+	ASL A
+	TAX
+	LDA.b NMISTRIPES
+	BEQ +
+	LDY.b #$20
++
+
+	REP #$20
+	LDA.w #$E660
+	STA.w GFXStripes+$02, Y
+	LDA.w #$0300
+	STA.w GFXStripes+$04, Y
+
+	LDA.l DungeonLabels+0, X
+	STA.w GFXStripes+$06, Y
+	LDA.l DungeonLabels+2, X
+	STA.w GFXStripes+$08, Y
+	SEP #$20
+	LDA.b #$FF
+	STA.w GFXStripes+$0A, Y
+	LDA.b #$01
+	STA.b NMISTRIPES
+
+	INC.w $020D ; what we wrote over
+	RTL
