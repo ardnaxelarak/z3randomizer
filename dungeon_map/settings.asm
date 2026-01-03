@@ -2,6 +2,8 @@
 SupertileRoomShapes:
 incsrc data/supertile_shapes.asm
 warnpc $B9F400
+padbyte $FF
+pad $B9F400
 
 org $B9F400
 DungeonMapData:
@@ -99,6 +101,14 @@ dw $00A4 : db $0C ; Trinexx
 dw $FFFF
 
 ; $B9F6C0
+SupertileEntrances:
+incsrc data/entrance_tiles.asm
+warnpc $B9F700
+padbyte $FF
+pad $B9F700
+
+; $B9F700
+
 
 warnpc $B9FF00
 

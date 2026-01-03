@@ -111,3 +111,136 @@ DrawDungeonMapRoom:
 	PLA : STA.b $0A
 	PLB
 	RTL
+
+DrawEntrances:
+	REP #$30
+	PHX : PHY
+	LDA.b $06 : PHA
+
+	LDX.w DungeonID
+	LDA.l DungeonMapRoomPointers, X
+	STA.b $0C
+
+	SEP #$20
+	LDA.l DungeonMapFloorCountData, X
+	AND.b #$0F
+	CLC : ADC.w $020E
+	DEC A
+	REP #$20
+	AND.w #$00FF
+
+	JSR DrawBothFloorsEntrances
+
+.done
+	REP #$20
+	PLA : STA.b $06
+	PLY : PLX
+	SEP #$30
+	RTL
+
+DrawBothFloorsEntrances:
+	ASL A
+	TAX
+
+	LDA.l DungeonMapFloorToDataOffset, X
+	TAY
+	STZ.b $06
+
+.next_room
+	REP #$20
+	LDA.b ($0C), Y ; get room id
+	AND.w #$00FF
+	CMP.w #$000F ; $0F = empty room
+
+	BEQ +
+	JSR DrawSingleRoomEntrances
++
+
+	INY
+
+	SEP #$20
+	INC.b $06
+	LDA.b $06
+	CMP.b #$05
+	BCC .next_room
+
+	STZ.b $06
+-	INC.b $07
+	LDA.b $07
+	CMP.b #$0A
+	BCC .next_room
+
+.done
+	RTS
+
+macro DrawSingleEntrance(offset)
+	LDX.b $00
+	STZ.w OAMBufferAux, X ; high x-bit and size bit
+	TXA
+	ASL #2
+	TAX
+
+	LDA.b $06
+	ASL #4
+	CLC : ADC.b #$90+<offset>
+	STA.w OAMBuffer+0, X
+
+	LDA.b $07
+	ASL #4
+	CMP.b #$50
+	BCC ?+
+	CLC : ADC.b #$50
+?+	CLC : ADC.b #$87
+	CLC : ADC.w $0213
+	SEC : SBC.b $E8
+	STA.w OAMBuffer+1, X
+
+	LDA.b #$33
+	STA.w OAMBuffer+2, X
+
+	LDA.b #$23
+	STA.w OAMBuffer+3, X
+
+	INC.b $00
+endmacro
+
+DrawSingleRoomEntrances:
+	STA.b $0E
+	SEP #$10
+
+	LDX.b #$FE
+.next_entry
+	INX : INX
+	LDA.l SupertileEntrances, X
+	BPL +
+	JMP .done
++
+
+	AND.w #$0FFF
+	CMP.b $0E
+	BNE .next_entry
+
+	SEP #$20
+	LDA.l SupertileEntrances+1, X
+	PHA : PHA
+
+	BIT.b #$40
+	BEQ +
+	%DrawSingleEntrance(0)
++
+
+	PLA
+	BIT.b #$20
+	BEQ +
+	%DrawSingleEntrance(4)
++
+
+	PLA
+	BIT.b #$10
+	BEQ +
+	%DrawSingleEntrance(8)
++
+
+.done
+	REP #$30
+	RTS

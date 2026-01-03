@@ -41,6 +41,10 @@ org $8AE64F
 org $8AE152
 	JSL LoadLastHUDPalette
 
+org $8AEAE8 ; vanilla checks number of sprites drawn instead of... counting...
+	LDA.b $0E
+	CMP.b #$02
+
 ;================================================================================
 ; Swapping Dungeon in Dungeon Map Screen (L/R)
 ;--------------------------------------------------------------------------------

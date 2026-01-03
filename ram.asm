@@ -347,6 +347,7 @@ DynamicDropGFXSlots = $7E07F1     ; Assume future use of this up to $0E bytes, t
                                   ; which item gfx is currently occupying each slot
 OAMBuffer = $7E0800               ; Main OAM buffer sent to OAM. $200 bytes.
 OAMBuffer2 = $7E0A00              ;
+OAMBufferAux = $7E0A20            ; high X-bit and size bit sent to OAM, one byte per sprite
                                   ;
 TransparencyFlag = $7E0ABD        ; Flags transparency effects e.g. in Thieves Town Hellway
                                   ;

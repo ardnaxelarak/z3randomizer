@@ -44,6 +44,7 @@ DungeonMapSwitch_Submodule:
 	LDA.b #$01
 	STA.w $0200
 	STA.w $020D
+	STZ.w $0213
 	STZ.w $021B
 	STZ.w $021C
 	STZ.b $06
@@ -60,7 +61,15 @@ DungeonMapSwitch_Submodule:
 
 SkipMapSprites:
 	STZ.b $00
+
+	LDA.w $0200
+	CMP.b #$04
+	BEQ +
+	JSL DrawEntrances
++
+
 	STZ.b $0E
+	STZ.b $0F
 
 	LDA.w $0200
 	CMP.b #$04
@@ -92,10 +101,12 @@ RestoreCurrentDungeon:
 	RTL
 
 RestoreDungeonMapFloorIndex:
-	STZ.w $020F
+	STZ.w $020F ; first part we wrote over
+
 	LDA.w $021B
 	STA.b $07
 	STZ.b $06
-	LDA.b $0A
+
+	LDA.b $0A ; the rest of what we wrote over
 	AND.b #$08
 	RTL

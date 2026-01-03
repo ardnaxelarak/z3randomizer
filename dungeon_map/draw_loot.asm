@@ -21,11 +21,11 @@ DrawLoot:
 	STZ.b $0E
 
 	LDX.w DungeonID
-	LDA.l $8AF615, X
+	LDA.l DungeonMapRoomPointers, X
 	STA.b $0C
 
 	SEP #$20
-	LDA.l $8AF5E9, X
+	LDA.l DungeonMapFloorCountData, X
 	AND.b #$0F
 	CLC : ADC.w $020E
 	PHA
@@ -55,7 +55,7 @@ DrawSingleFloorLoot:
 	ASL A
 	TAX
 
-	LDA.l $8AF605, X
+	LDA.l DungeonMapFloorToDataOffset, X
 	TAY
 	STZ.b $06
 
