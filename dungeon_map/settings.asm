@@ -1,11 +1,11 @@
 ; $B9F000
 SupertileRoomShapes:
 incsrc data/supertile_shapes.asm
-warnpc $B9F400
+warnpc $B9F800
 padbyte $FF
-pad $B9F400
+pad $B9F800
 
-org $B9F400
+org $B9F800
 DungeonMapData:
 	db $02, $04, $00, $00 ; Sewers
 	db $1A, $00, $00, $00 ; Hyrule Castle
@@ -31,7 +31,7 @@ struct DungeonMapData DungeonMapData
 	.unused: skip 1
 endstruct
 
-; $B9F480
+; $B9F880
 LootTypeIcons:
 dw $0B00, $0B00, $0B00, $0B00 ; 00 - nothing
 dw $2B0E, $6B0E, $2B3E, $6B3E ; 01 - unknown - basic chest
@@ -50,11 +50,11 @@ dw $2B0B, $6B0B, $2B3B, $6B3B ; 0D - triforce piece
 dw $2B0C, $6B0C, $2B3C, $6B3C ; 0E - triforce
 dw $0B00, $0B00, $0B00, $0B00 ; 0F - empty (reserved)
 
-; $B9F500
+; $B9F900
 LootTypeMapping:
 incsrc data/item_mapping.asm
 
-; $B9F600
+; $B9FA00
 ; Room ID mappings to bit to check for presence and address of item drop
 MiscLocations:
 dw $00C8 : db $04 : dl HeartContainer_ArmosKnights
@@ -82,11 +82,11 @@ dw $FFFF : db $FF : dl $FFFFFF ; Moldorm 2? ($004D)
 dw $FFFF : db $FF : dl $FFFFFF ; Aga 2? ($000D)
 dw $FFFF
 
-; $B9F69A
+; $B9FA9A
 MapHUDPalette:
 	dw $0000, $3ED8, $2E54
 
-; $B9F6A0
+; $B9FAA0
 PrizeLocations:
 dw $00C8 : db $02 ; ArmosKnights
 dw $0033 : db $03 ; Lanmolas
@@ -100,14 +100,14 @@ dw $00AC : db $0B ; Blind
 dw $00A4 : db $0C ; Trinexx
 dw $FFFF
 
-; $B9F6C0
+; $B9FAC0
 SupertileEntrances:
 incsrc data/entrance_tiles.asm
-warnpc $B9F700
+warnpc $B9FB00
 padbyte $FF
-pad $B9F700
+pad $B9FB00
 
-; $B9F700
+; $B9FB00
 DungeonLabels:
 dw $2561, $256F ; Sewers
 dw $2564, $255F ; Hyrule Castle
@@ -126,7 +126,7 @@ dw $2563, $2570 ; Ganon's Tower
 dw $25A4, $25A4 ; Reserved
 dw $25A4, $25A4 ; Reserved
 
-; $B9F740
+; $B9FB40
 
 warnpc $B9FF00
 

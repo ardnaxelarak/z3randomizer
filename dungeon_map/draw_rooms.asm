@@ -52,24 +52,17 @@ DrawDungeonMapRoom:
 
 	LDA.b $CA
 	AND.w #$00FF
-	ASL A : ASL A
+	ASL A : ASL A : ASL A
 	TAY
 
 	macro DrawQuadrant(quadrant, writeOffset)
 		?DrawQuadrant:
-		LDA.w SupertileRoomShapes+<quadrant>, Y
-		AND.w #$00FF
-		CMP.w #$00FF : BEQ ?.empty
-		BIT.w #$0080
-		BEQ ?+
-		AND.w #$007F
-		ORA.w #$C000
-	?+
-		CLC : ADC.w #$0340
+		LDA.w SupertileRoomShapes+(2*<quadrant>), Y
+		CMP.w #$FFFF : BEQ ?.empty
 		PHA
 		LDA.b $0E
 		AND.w #1<<(3-<quadrant>)
-		BNE ?.visited 
+		BNE ?.visited
 
 		?.unvisited
 		LDA.b $0A
@@ -102,7 +95,6 @@ DrawDungeonMapRoom:
 		LDA.w #$174F
 
 		?.write
-		EOR.w #(3-<quadrant>)<<14
 		STA.l $7F0000+<writeOffset>, X
 		?.done
 	endmacro

@@ -1,258 +1,258 @@
-db $FF, $65, $FF, $FF ; 00
-db $48, $48, $FF, $FF ; 01
-db $00, $30, $14, $14 ; 02
-db $FF, $FF, $4F, $FF ; 03 - Houlihan
-db $65, $74, $2D, $2E ; 04
-db $FF, $FF, $FF, $FF ; 05 - unused
-db $FF, $FF, $4F, $FF ; 06 - Arrghus
-db $00, $30, $00, $00 ; 07 - Moldorm
-db $FF, $FF, $72, $72 ; 08 - useless fairy entrance
-db $66, $3B, $FF, $FF ; 09
-db $58, $1F, $FF, $FF ; 0A
-db $2E, $67, $2E, $1E ; 0B
-db $31, $31, $14, $14 ; 0C
-db $FF, $FF, $4F, $FF ; 0D - Aga 2
-db $FF, $FF, $D9, $22 ; 0E
-db $FF, $FF, $FF, $FF ; 0F - unused and should never be used, treated as non-id
-db $00, $00, $10, $00 ; 10
-db $00, $30, $00, $10 ; 11
-db $14, $14, $14, $14 ; 12
-db $FF, $77, $FF, $77 ; 13
-db $11, $01, $11, $11 ; 14
-db $34, $00, $01, $00 ; 15
-db $75, $65, $2E, $2E ; 16
-db $30, $30, $00, $00 ; 17
-db $75, $FF, $74, $FF ; 18 - useless fairy drop
-db $FF, $29, $FF, $1B ; 19
-db $6E, $6F, $6D, $75 ; 1A
-db $33, $D9, $21, $FF ; 1B
-db $74, $74, $3E, $2E ; 1C
-db $72, $67, $FF, $FF ; 1D
-db $FF, $F8, $D9, $26 ; 1E
-db $FF, $FF, $20, $D9 ; 1F
-db $FF, $FF, $4F, $FF ; 20
-db $00, $10, $00, $01 ; 21
-db $FF, $FF, $28, $08 ; 22
-db $FF, $FF, $FF, $5B ; 23
-db $10, $10, $01, $10 ; 24
-db $FF, $FF, $FF, $FF ; 25 - unused
-db $00, $3C, $14, $42 ; 26
-db $30, $30, $00, $00 ; 27
-db $65, $FF, $18, $08 ; 28
-db $FF, $FF, $FF, $56 ; 29 - Mothula
-db $10, $12, $10, $5E ; 2A
-db $2A, $FF, $0D, $CD ; 2B
-db $00, $00, $10, $10 ; 2C - hookshot cave back
-db $FF, $FF, $FF, $FF ; 2D - unused
-db $FF, $4F, $FF, $FF ; 2E
-db $74, $FF, $2E, $72 ; 2F - Kakariko well
-db $21, $FF, $DA, $FF ; 30 - inset stairs if possible
-db $2E, $57, $2E, $57 ; 31
-db $14, $14, $44, $44 ; 32
-db $FF, $FF, $4F, $FF ; 33
-db $00, $01, $40, $01 ; 34
-db $4D, $77, $71, $3D ; 35
-db $15, $15, $15, $15 ; 36
-db $77, $4D, $3D, $71 ; 37
-db $6C, $FF, $77, $FF ; 38
-db $FF, $FF, $72, $69 ; 39
-db $64, $64, $14, $14 ; 3A - make bespoke if feasible
-db $65, $FF, $75, $FF ; 3B - inset stairs if feasible
-db $00, $10, $00, $10 ; 3C - hookshot cave front
-db $2E, $2E, $75, $65 ; 3D
-db $FF, $CF, $72, $33 ; 3E
-db $FF, $FF, $D9, $D9 ; 3F
-db $65, $FF, $32, $D9 ; 40 - inset stairs if feasible
-db $00, $30, $14, $14 ; 41
-db $58, $49, $FF, $FF ; 42
-db $72, $2E, $FF, $75 ; 43
-db $CD, $5F, $CD, $5F ; 44
-db $6B, $CF, $24, $DB ; 45
-db $35, $35, $33, $33 ; 46
-db $FF, $FF, $FF, $FF ; 47 - unused
-db $FF, $FF, $FF, $FF ; 48 - unused
-db $72, $2E, $72, $2E ; 49
-db $61, $61, $14, $14 ; 4A
-db $21, $D1, $33, $33 ; 4B
-db $FF, $65, $FF, $77 ; 4C
-db $10, $30, $01, $00 ; 4D
-db $22, $D9, $FF, $FF ; 4E
-db $FF, $56, $CD, $FF ; 4F
-db $FF, $77, $FF, $75 ; 50
-db $14, $14, $44, $44 ; 51
-db $77, $FF, $19, $08 ; 52
-db $65, $75, $2E, $2E ; 53
-db $50, $50, $40, $00 ; 54
-db $00, $00, $10, $00 ; 55
-db $74, $74, $2D, $3D ; 56
-db $2E, $70, $4A, $5B ; 57
-db $00, $00, $11, $10 ; 58 - split
-db $10, $00, $10, $00 ; 59
-db $FF, $FF, $FF, $4F ; 5A - Helmasaur King
-db $FF, $77, $FF, $75 ; 5B
-db $71, $6A, $FF, $74 ; 5C
-db $2E, $67, $75, $FF ; 5D
-db $FF, $F8, $DC, $26 ; 5E
-db $FF, $FF, $7B, $FF ; 5F
-db $FF, $39, $FF, $2A ; 60
-db $47, $45, $16, $16 ; 61
-db $06, $14, $12, $00 ; 62
-db $65, $FF, $75, $FF ; 63
-db $FF, $FF, $D9, $F1 ; 64
-db $FF, $FF, $F1, $69 ; 65
-db $00, $30, $10, $00 ; 66
-db $00, $10, $00, $01 ; 67
-db $00, $10, $01, $00 ; 68
-db $FF, $FF, $FF, $FF ; 69 - unused
-db $FF, $4C, $FF, $0E ; 6A
-db $65, $75, $2E, $2E ; 6B
-db $65, $FF, $2E, $71 ; 6C - Lanmolas 2
-db $75, $FF, $77, $FF ; 6D
-db $FF, $4E, $FF, $FF ; 6E
-db $FF, $FF, $FF, $FF ; 6F - unused
-db $7A, $FF, $FF, $FF ; 70
-db $65, $FF, $2D, $70 ; 71
-db $44, $44, $04, $14 ; 72 - slight cheating I guess...
-db $74, $74, $2E, $4B ; 73
-db $00, $00, $05, $05 ; 74
-db $74, $74, $4A, $75 ; 75
-db $2D, $7C, $2E, $57 ; 76
-db $30, $00, $60, $60 ; 77
-db $FF, $FF, $FF, $FF ; 78 - unused
-db $FF, $FF, $FF, $FF ; 79 - unused
-db $FF, $FF, $FF, $FF ; 7A - unused
-db $1E, $71, $4F, $4D ; 7B
-db $77, $74, $77, $77 ; 7C
-db $2E, $70, $52, $51 ; 7D - warp tiles
-db $FF, $77, $DC, $BA ; 7E
-db $A2, $FF, $CE, $FF ; 7F
-db $67, $70, $FF, $FF ; 80
-db $10, $01, $00, $01 ; 81
-db $5D, $14, $01, $00 ; 82
-db $74, $75, $2D, $2E ; 83
-db $04, $05, $14, $14 ; 84
-db $4B, $72, $2E, $72 ; 85
-db $FF, $FF, $FF, $FF ; 86 - unused
-db $67, $2E, $54, $74 ; 87
-db $FF, $FF, $FF, $FF ; 88 - unused
-db $70, $70, $FF, $FF ; 89
-db $FF, $FF, $FF, $FF ; 8A - unused
-db $2D, $71, $2D, $70 ; 8B
-db $7E, $7F, $7D, $78 ; 8C
-db $71, $2D, $70, $2D ; 8D
-db $FF, $4E, $FF, $FF ; 8E
-db $FF, $FF, $FF, $FF ; 8F - unused
-db $FF, $FF, $4F, $FF ; 90
-db $FF, $65, $FF, $77 ; 91
-db $00, $00, $01, $01 ; 92 - should it be split? idk
-db $2C, $2C, $77, $74 ; 93
-db $FF, $FF, $FF, $FF ; 94 - unused
-db $FF, $77, $FF, $75 ; 95
-db $77, $FF, $2E, $57 ; 96
-db $65, $74, $2E, $2F ; 97
-db $FF, $FF, $72, $57 ; 98
-db $FF, $74, $0A, $18 ; 99
-db $FF, $FF, $FF, $FF ; 9A - unused
-db $72, $1E, $1E, $38 ; 9B
-db $10, $10, $01, $01 ; 9C
-db $1E, $72, $71, $1E ; 9D
-db $FF, $DA, $CD, $79 ; 9E
-db $FF, $FF, $5B, $FF ; 9F
-db $A2, $DC, $FF, $FF ; A0
-db $70, $1D, $FF, $2A ; A1
-db $45, $45, $16, $06 ; A2 - show paths somehow
-db $1A, $FF, $2A, $FF ; A3
-db $FF, $FF, $4E, $FF ; A4
-db $65, $75, $2E, $2E ; A5
-db $00, $30, $00, $00 ; A6
-db $56, $FF, $FF, $FF ; A7 - ToH fairy basement room
-db $DB, $76, $DB, $63 ; A8
-db $17, $17, $16, $16 ; A9
-db $0B, $DB, $1B, $DB ; AA
-db $FF, $FF, $5A, $FF ; AB
-db $FF, $FF, $FF, $4F ; AC - Blind
-db $FF, $FF, $FF, $FF ; AD - unused
-db $FF, $59, $FF, $FF ; AE
-db $5B, $FF, $FF, $FF ; AF
-db $DB, $DC, $DB, $D9 ; B0
-db $0E, $75, $0C, $2D ; B1
-db $1C, $62, $22, $26 ; B2
-db $2D, $FF, $2D, $FF ; B3
-db $10, $00, $44, $44 ; B4
-db $30, $00, $10, $00 ; B5
-db $65, $74, $75, $75 ; B6
-db $74, $FF, $75, $FF ; B7
-db $FF, $4A, $FF, $74 ; B8
-db $2B, $2B, $14, $14 ; B9
-db $73, $70, $FF, $FF ; BA
-db $BA, $24, $32, $24 ; BB
-db $7F, $BA, $A4, $BA ; BC - block off entrances?
-db $FF, $FF, $FF, $FF ; BD - unused
-db $FF, $DA, $FF, $A5 ; BE
-db $FF, $56, $4D, $FF ; BF
-db $32, $DC, $32, $D9 ; C0
-db $DB, $24, $25, $24 ; C1
-db $11, $13, $01, $13 ; C2
-db $13, $00, $03, $00 ; C3 - show layers
-db $44, $44, $00, $01 ; C4
-db $75, $FF, $4A, $FF ; C5
-db $10, $11, $10, $11 ; C6
-db $11, $00, $01, $00 ; C7
-db $FF, $FF, $FF, $4F ; C8 - Armos Knights
-db $14, $14, $14, $14 ; C9
-db $FF, $FF, $FF, $FF ; CA - unused
-db $00, $03, $14, $07 ; CB
-db $13, $10, $07, $14 ; CC
-db $FF, $FF, $FF, $FF ; CD - unused
-db $FF, $78, $FF, $FF ; CE - Kholdstare drop
-db $FF, $FF, $FF, $FF ; CF - unused
-db $32, $DC, $32, $D9 ; D0
-db $4E, $4F, $41, $CD ; D1
-db $FF, $75, $FF, $55 ; D2
-db $FF, $FF, $FF, $FF ; D3 - unused
-db $FF, $FF, $FF, $FF ; D4 - unused
-db $75, $FF, $75, $FF ; D5
-db $75, $75, $74, $75 ; D6
-db $FF, $FF, $FF, $FF ; D7 - unused
-db $FF, $21, $FF, $A2 ; D8
-db $FF, $FF, $20, $20 ; D9
-db $FF, $FF, $5C, $FF ; DA
-db $14, $06, $14, $3F ; DB
-db $06, $14, $03, $00 ; DC
-db $FF, $FF, $FF, $FF ; DD - unused
-db $FF, $56, $FF, $FF ; DE - Kholdstare
-db $FF, $FF, $60, $14 ; DF - paradox top
-db $2E, $67, $75, $FF ; E0
+dw $FFFF, $83A5, $FFFF, $FFFF ; 00
+dw $C388, $8388, $FFFF, $FFFF ; 01
+dw $4348, $034A, $4342, $0342 ; 02
+dw $FFFF, $FFFF, $438F, $FFFF ; 03 - Houlihan
+dw $C3A5, $83B4, $436D, $036E ; 04
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 05 - unused
+dw $FFFF, $FFFF, $438F, $FFFF ; 06 - Arrghus
+dw $C340, $8370, $4340, $0340 ; 07 - Moldorm
+dw $FFFF, $FFFF, $43B2, $03B2 ; 08 - useless fairy entrance
+dw $C3A6, $837B, $FFFF, $FFFF ; 09
+dw $C398, $835F, $FFFF, $FFFF ; 0A
+dw $039B, $439C, $839B, $0381 ; 0B
+dw $C371, $8371, $4354, $0354 ; 0C
+dw $FFFF, $FFFF, $438F, $FFFF ; 0D - Aga 2
+dw $FFFF, $FFFF, $8399, $439B ; 0E
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 0F - unused and should never be used, treated as non-id
+dw $C340, $8340, $4350, $0340 ; 10
+dw $C340, $8370, $4340, $0350 ; 11
+dw $C354, $8354, $4354, $0354 ; 12
+dw $FFFF, $83B7, $FFFF, $03B7 ; 13
+dw $C351, $8341, $4351, $0351 ; 14
+dw $C374, $8340, $4341, $0340 ; 15
+dw $C3B5, $83A5, $436E, $036E ; 16
+dw $C370, $8370, $4340, $0340 ; 17
+dw $C3B5, $FFFF, $43B4, $FFFF ; 18 - useless fairy drop
+dw $FFFF, $8369, $FFFF, $035A ; 19
+dw $C3AE, $83AF, $43AD, $0361 ; 1A
+dw $039B, $439C, $4361, $FFFF ; 1B
+dw $C3B4, $83B4, $437E, $036E ; 1C
+dw $C3B2, $83A7, $FFFF, $FFFF ; 1D
+dw $FFFF, $43B8, $8399, $0366 ; 1E
+dw $FFFF, $FFFF, $4360, $C399 ; 1F
+dw $FFFF, $FFFF, $438F, $FFFF ; 20
+dw $C340, $8350, $4340, $0341 ; 21
+dw $FFFF, $FFFF, $4368, $0348 ; 22
+dw $FFFF, $FFFF, $FFFF, $039B ; 23
+dw $C350, $8350, $4341, $0350 ; 24
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 25 - unused
+dw $C340, $837C, $4354, $0382 ; 26
+dw $C370, $8370, $4340, $0340 ; 27
+dw $C3A5, $FFFF, $4358, $0348 ; 28
+dw $FFFF, $FFFF, $FFFF, $0396 ; 29 - Mothula
+dw $C350, $8352, $4350, $039E ; 2A
+dw $C36A, $FFFF, $434D, $C38D ; 2B
+dw $C340, $8340, $4350, $0350 ; 2C - hookshot cave back
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 2D - unused
+dw $FFFF, $838F, $FFFF, $FFFF ; 2E
+dw $C3B4, $FFFF, $436E, $03B2 ; 2F - Kakariko well
+dw $C361, $FFFF, $839A, $FFFF ; 30 - inset stairs if possible
+dw $43B2, $0397, $839B, $C399 ; 31
+dw $C354, $8354, $4384, $0384 ; 32
+dw $FFFF, $FFFF, $438F, $FFFF ; 33
+dw $4348, $0368, $4349, $8368 ; 34
+dw $C38D, $83B7, $43B1, $037D ; 35
+dw $C355, $8355, $4355, $0355 ; 36
+dw $C3B7, $838D, $437D, $03B1 ; 37
+dw $C3AC, $FFFF, $43B7, $FFFF ; 38
+dw $FFFF, $FFFF, $039B, $03A9 ; 39
+dw $C3A4, $83A4, $4354, $0354 ; 3A - make bespoke if feasible
+dw $C3A5, $FFFF, $43B5, $FFFF ; 3B - inset stairs if feasible
+dw $C340, $8350, $4340, $0350 ; 3C - hookshot cave front
+dw $C36E, $836E, $43B5, $03A5 ; 3D
+dw $FFFF, $438F, $43B2, $0373 ; 3E
+dw $FFFF, $FFFF, $8399, $C399 ; 3F
+dw $C3A5, $FFFF, $4372, $C399 ; 40 - inset stairs if feasible
+dw $C340, $8370, $4354, $0354 ; 41
+dw $C398, $8389, $FFFF, $FFFF ; 42
+dw $C3B2, $836E, $FFFF, $03B5 ; 43
+dw $038D, $839F, $838D, $039F ; 44
+dw $C3AB, $438F, $4364, $C39B ; 45
+dw $C375, $8375, $4373, $0373 ; 46
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 47 - unused
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 48 - unused
+dw $839B, $8372, $039B, $0372 ; 49
+dw $0376, $0377, $0386, $4386 ; 4A
+dw $C361, $4391, $4373, $0373 ; 4B
+dw $FFFF, $83A5, $FFFF, $03B7 ; 4C
+dw $C350, $8370, $4341, $0340 ; 4D
+dw $839B, $4399, $FFFF, $FFFF ; 4E
+dw $FFFF, $8396, $838D, $FFFF ; 4F
+dw $FFFF, $83B7, $FFFF, $03B5 ; 50
+dw $C354, $8354, $4384, $0384 ; 51
+dw $C3B7, $FFFF, $4359, $0348 ; 52
+dw $C3A5, $83B5, $436E, $036E ; 53
+dw $C390, $8390, $4380, $0340 ; 54
+dw $C340, $8340, $4350, $0340 ; 55
+dw $038F, $83B4, $4365, $039F ; 56
+dw $039B, $438D, $0365, $039B ; 57
+dw $C372, $439B, $0383, $0365 ; 58 - split
+dw $838A, $8372, $038A, $0372 ; 59
+dw $FFFF, $FFFF, $FFFF, $038F ; 5A - Helmasaur King
+dw $FFFF, $83B7, $FFFF, $03B5 ; 5B
+dw $C3B1, $83AA, $FFFF, $03B4 ; 5C
+dw $C36E, $83A7, $43B5, $FFFF ; 5D
+dw $FFFF, $43B8, $839C, $0366 ; 5E
+dw $FFFF, $FFFF, $43BB, $FFFF ; 5F
+dw $FFFF, $8379, $FFFF, $036A ; 60
+dw $C387, $8385, $4356, $0356 ; 61
+dw $C346, $8354, $4352, $0340 ; 62
+dw $C3A5, $FFFF, $43B5, $FFFF ; 63
+dw $FFFF, $FFFF, $8399, $C3B1 ; 64
+dw $FFFF, $FFFF, $83B1, $03A9 ; 65
+dw $038F, $039A, $0362, $83B2 ; 66
+dw $83B4, $83B5, $03B7, $039F ; 67
+dw $C340, $8350, $4341, $0340 ; 68
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 69 - unused
+dw $FFFF, $838C, $FFFF, $034E ; 6A
+dw $C3A5, $83B5, $436E, $036E ; 6B
+dw $C3A5, $FFFF, $436E, $03B1 ; 6C - Lanmolas 2
+dw $C3B5, $FFFF, $43B7, $FFFF ; 6D
+dw $FFFF, $838E, $FFFF, $FFFF ; 6E
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 6F - unused
+dw $43BA, $FFFF, $FFFF, $FFFF ; 70
+dw $C3A5, $FFFF, $436D, $03B0 ; 71
+dw $C384, $8384, $4344, $0354 ; 72 - slight cheating I guess...
+dw $C3B4, $83B4, $436E, $038B ; 73
+dw $C340, $8340, $4345, $0345 ; 74
+dw $C3B4, $83B4, $438A, $03B5 ; 75
+dw $C36D, $83BC, $436E, $0397 ; 76
+dw $C370, $8340, $43A0, $03A0 ; 77
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 78 - unused
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 79 - unused
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 7A - unused
+dw $C35E, $83B1, $438F, $038D ; 7B
+dw $C3B7, $83B4, $43B7, $03B7 ; 7C
+dw $C36E, $83B0, $4392, $0391 ; 7D - warp tiles
+dw $FFFF, $83B7, $839C, $C37A ; 7E
+dw $439B, $FFFF, $838E, $FFFF ; 7F
+dw $C3A7, $83B0, $FFFF, $FFFF ; 80
+dw $C350, $8341, $4340, $0341 ; 81
+dw $C39D, $8354, $4341, $0340 ; 82
+dw $C3B4, $83B5, $436D, $036E ; 83
+dw $C344, $8345, $4354, $0354 ; 84
+dw $C38B, $83B2, $436E, $03B2 ; 85
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 86 - unused
+dw $C3A7, $836E, $4394, $03B4 ; 87
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 88 - unused
+dw $C3B0, $83B0, $FFFF, $FFFF ; 89
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 8A - unused
+dw $C36D, $83B1, $436D, $03B0 ; 8B
+dw $83BE, $83BF, $03BD, $03B8 ; 8C
+dw $C3B1, $836D, $43B0, $036D ; 8D
+dw $FFFF, $838E, $FFFF, $FFFF ; 8E
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 8F - unused
+dw $FFFF, $FFFF, $438F, $FFFF ; 90
+dw $FFFF, $83A5, $FFFF, $03B7 ; 91
+dw $C340, $8340, $4341, $0341 ; 92 - should it be split? idk
+dw $C36C, $836C, $43B7, $03B4 ; 93
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 94 - unused
+dw $FFFF, $83B7, $FFFF, $03B5 ; 95
+dw $C3B7, $FFFF, $436E, $0397 ; 96
+dw $C3A5, $83B4, $436E, $036F ; 97
+dw $FFFF, $FFFF, $43B2, $0397 ; 98
+dw $FFFF, $038F, $434A, $0363 ; 99
+dw $FFFF, $FFFF, $FFFF, $FFFF ; 9A - unused
+dw $C3B2, $835E, $435E, $0378 ; 9B
+dw $C350, $8350, $4341, $0341 ; 9C
+dw $C35E, $83B2, $43B1, $035E ; 9D
+dw $FFFF, $439A, $838D, $03B9 ; 9E
+dw $FFFF, $FFFF, $439B, $FFFF ; 9F
+dw $839B, $439C, $FFFF, $FFFF ; A0
+dw $C3B0, $835D, $FFFF, $036A ; A1
+dw $C385, $8385, $4356, $0346 ; A2 - show paths somehow
+dw $C35A, $FFFF, $436A, $FFFF ; A3
+dw $FFFF, $FFFF, $438E, $FFFF ; A4
+dw $C3A5, $83B5, $436E, $036E ; A5
+dw $C340, $8370, $4340, $0340 ; A6
+dw $C396, $FFFF, $FFFF, $FFFF ; A7 - ToH fairy basement room
+dw $039B, $83B6, $839B, $03A3 ; A8
+dw $C357, $8357, $4356, $0356 ; A9
+dw $C34B, $439B, $435B, $C39B ; AA
+dw $FFFF, $FFFF, $439A, $FFFF ; AB
+dw $FFFF, $FFFF, $FFFF, $038F ; AC - Blind
+dw $FFFF, $FFFF, $FFFF, $FFFF ; AD - unused
+dw $FFFF, $8399, $FFFF, $FFFF ; AE
+dw $C39B, $FFFF, $FFFF, $FFFF ; AF
+dw $039B, $439C, $839B, $C399 ; B0
+dw $C34E, $83B5, $434C, $036D ; B1
+dw $C35C, $83A2, $039B, $0366 ; B2
+dw $0365, $FFFF, $0365, $FFFF ; B3
+dw $C350, $8340, $4384, $0384 ; B4
+dw $C370, $8340, $4350, $0340 ; B5
+dw $C3A5, $83B4, $43B5, $03B5 ; B6
+dw $C3B4, $FFFF, $43B5, $FFFF ; B7
+dw $FFFF, $838A, $FFFF, $03B4 ; B8
+dw $C36B, $836B, $4354, $0354 ; B9
+dw $0364, $438D, $FFFF, $FFFF ; BA
+dw $037A, $8364, $4372, $0364 ; BB
+dw $C3BF, $437A, $8364, $C37A ; BC - block off entrances?
+dw $FFFF, $FFFF, $FFFF, $FFFF ; BD - unused
+dw $FFFF, $439A, $FFFF, $C365 ; BE
+dw $FFFF, $8396, $438D, $FFFF ; BF
+dw $C372, $439C, $4372, $C399 ; C0
+dw $039B, $0364, $4365, $8364 ; C1
+dw $C351, $8353, $4341, $0353 ; C2
+dw $C353, $8340, $4343, $0340 ; C3 - show layers
+dw $C384, $8384, $4340, $0341 ; C4
+dw $C3B5, $FFFF, $438A, $FFFF ; C5
+dw $C350, $8351, $4350, $0351 ; C6
+dw $C351, $8340, $4341, $0340 ; C7
+dw $FFFF, $FFFF, $FFFF, $038F ; C8 - Armos Knights
+dw $0367, $4367, $0386, $4386 ; C9
+dw $FFFF, $FFFF, $FFFF, $FFFF ; CA - unused
+dw $C340, $8343, $4354, $0347 ; CB
+dw $C353, $8350, $4347, $0354 ; CC
+dw $FFFF, $FFFF, $FFFF, $FFFF ; CD - unused
+dw $FFFF, $83B8, $FFFF, $FFFF ; CE - Kholdstare drop
+dw $FFFF, $FFFF, $FFFF, $FFFF ; CF - unused
+dw $C372, $439C, $4372, $C399 ; D0
+dw $C38E, $838F, $4381, $C38D ; D1
+dw $FFFF, $83B5, $FFFF, $0395 ; D2
+dw $FFFF, $FFFF, $FFFF, $FFFF ; D3 - unused
+dw $FFFF, $FFFF, $FFFF, $FFFF ; D4 - unused
+dw $C3B5, $FFFF, $43B5, $FFFF ; D5
+dw $C3B5, $83B5, $43B4, $03B5 ; D6
+dw $FFFF, $FFFF, $FFFF, $FFFF ; D7 - unused
+dw $FFFF, $8361, $FFFF, $839B ; D8
+dw $FFFF, $FFFF, $4360, $0360 ; D9
+dw $FFFF, $FFFF, $439C, $FFFF ; DA
+dw $C354, $8346, $4354, $037F ; DB
+dw $C346, $8354, $4343, $0340 ; DC
+dw $FFFF, $FFFF, $FFFF, $FFFF ; DD - unused
+dw $FFFF, $8396, $FFFF, $FFFF ; DE - Kholdstare
+dw $FFFF, $FFFF, $43A0, $0354 ; DF - paradox top
+dw $C36E, $83A7, $43B5, $FFFF ; E0
 
 ; no more dungeon
-db $00, $00, $10, $00 ; E1 - lost woods thieves hideout
-db $00, $00, $00, $10 ; E2 - lumberjack cave
-db $FF, $74, $72, $2E ; E3 - magic bat
-db $00, $02, $10, $02 ; E4 - old man's house front
-db $02, $00, $16, $14 ; E5 - old man's house back
-db $00, $01, $10, $00 ; E6 - death mountain descent left
-db $01, $00, $00, $10 ; E7 - death mountain descent right
-db $30, $30, $40, $10 ; E8 - superbunny top
-db $FF, $FF, $FF, $FF ; E9 - unused
-db $65, $FF, $75, $FF ; EA - spectacle top
-db $FF, $66, $FF, $75 ; EB - bumper top
-db $FF, $FF, $FF, $FF ; EC - unused
-db $30, $30, $00, $10 ; ED - fairy ascension top
-db $00, $50, $00, $10 ; EE - spiral top
-db $FF, $00, $60, $14 ; EF - paradox top
-db $00, $02, $10, $02 ; F0 - old man rescue left
-db $02, $02, $00, $10 ; F1 - old man rescue right
-db $FF, $FF, $FF, $72 ; F2 - Sahasrahla's Kakariko house left
-db $FF, $FF, $72, $FF ; F3 - Sahasrahla's Kakariko house right
-db $FF, $FF, $FF, $72 ; F4 - quarreling brothers left
-db $FF, $FF, $72, $FF ; F5 - quarreling brothers right
-db $FF, $FF, $FF, $FF ; F6 - unused
-db $FF, $FF, $FF, $FF ; F7 - unused
-db $30, $30, $60, $14 ; F8 - superbunny bottom
-db $00, $01, $10, $00 ; F9 - spectacle left
-db $34, $00, $10, $00 ; FA - spectacle bottom
-db $FF, $65, $08, $18 ; FB - bumper bottom
-db $FF, $FF, $FF, $FF ; FC - unused
-db $30, $30, $14, $14 ; FD - fairy ascension bottom
-db $FF, $FF, $74, $75 ; FE - spiral bottom
-db $74, $74, $2E, $2D ; FF - paradox bottom
+dw $C340, $8340, $4350, $0340 ; E1 - lost woods thieves hideout
+dw $C340, $8340, $4340, $0350 ; E2 - lumberjack cave
+dw $FFFF, $83B4, $43B2, $036E ; E3 - magic bat
+dw $C340, $8342, $4350, $0342 ; E4 - old man's house front
+dw $C342, $8340, $4356, $0354 ; E5 - old man's house back
+dw $C340, $8341, $4350, $0340 ; E6 - death mountain descent left
+dw $C341, $8340, $4340, $0350 ; E7 - death mountain descent right
+dw $C370, $8370, $4380, $0350 ; E8 - superbunny top
+dw $FFFF, $FFFF, $FFFF, $FFFF ; E9 - unused
+dw $C3A5, $FFFF, $43B5, $FFFF ; EA - spectacle top
+dw $FFFF, $83A6, $FFFF, $03B5 ; EB - bumper top
+dw $FFFF, $FFFF, $FFFF, $FFFF ; EC - unused
+dw $C370, $8370, $4340, $0350 ; ED - fairy ascension top
+dw $C340, $8390, $4340, $0350 ; EE - spiral top
+dw $FFFF, $8340, $43A0, $0354 ; EF - paradox top
+dw $C340, $8342, $4350, $0342 ; F0 - old man rescue left
+dw $C342, $8342, $4340, $0350 ; F1 - old man rescue right
+dw $FFFF, $FFFF, $FFFF, $03B2 ; F2 - Sahasrahla's Kakariko house left
+dw $FFFF, $FFFF, $43B2, $FFFF ; F3 - Sahasrahla's Kakariko house right
+dw $FFFF, $FFFF, $FFFF, $03B2 ; F4 - quarreling brothers left
+dw $FFFF, $FFFF, $43B2, $FFFF ; F5 - quarreling brothers right
+dw $FFFF, $FFFF, $FFFF, $FFFF ; F6 - unused
+dw $FFFF, $FFFF, $FFFF, $FFFF ; F7 - unused
+dw $C370, $8370, $43A0, $0354 ; F8 - superbunny bottom
+dw $C340, $8341, $4350, $0340 ; F9 - spectacle left
+dw $C374, $8340, $4350, $0340 ; FA - spectacle bottom
+dw $FFFF, $83A5, $4348, $0358 ; FB - bumper bottom
+dw $FFFF, $FFFF, $FFFF, $FFFF ; FC - unused
+dw $C370, $8370, $4354, $0354 ; FD - fairy ascension bottom
+dw $FFFF, $FFFF, $43B4, $03B5 ; FE - spiral bottom
+dw $C3B4, $83B4, $436E, $036D ; FF - paradox bottom
