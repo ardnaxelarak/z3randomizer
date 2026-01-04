@@ -31,30 +31,34 @@ struct DungeonMapData DungeonMapData
 	.unused: skip 1
 endstruct
 
-; $B9F880
+warnpc $B9F880
+org $B9F880
+
 LootTypeIcons:
 dw $0B00, $0B00, $0B00, $0B00 ; 00 - nothing
-dw $2B0E, $6B0E, $2B3E, $6B3E ; 01 - unknown - basic chest
+dw $2F32, $6F32, $AF32, $EF32 ; 01 - unknown - dot
 dw $2B0D, $6B0D, $2B3D, $6B3D ; 02 - junk - pot
 dw $2B07, $6B07, $2B17, $2B18 ; 03 - small key
 dw $2B0B, $6B0B, $2B3B, $6B3B ; 04 - triforce piece
 dw $6B08, $2B08, $EB08, $AB08 ; 05 - safety - plus
-dw $AB3A, $EB3A, $2B3A, $6B3A ; 06 - compass
-dw $2B07, $6B07, $2B17, $2B18 ; 07 - small key
-dw $2B05, $6B05, $2B15, $2B16 ; 08 - big key
-dw $2B09, $2B0A, $2B39, $6B39 ; 09 - pendant
-dw $2B0F, $6B0F, $2B3F, $6B3F ; 0A - inventory item - big chest
-dw $2B09, $2B0A, $2B39, $6B39 ; 0B - also pendant
-dw $6F02, $2B02, $EB02, $AF02 ; 0C - crystal
-dw $2B0B, $6B0B, $2B3B, $6B3B ; 0D - triforce piece
-dw $2B0C, $6B0C, $2B3C, $6B3C ; 0E - triforce
-dw $0B00, $0B00, $0B00, $0B00 ; 0F - empty (reserved)
+dw $2B0E, $6B0E, $2B3E, $6B3E ; 06 - less important item - small chest
+dw $AB3A, $EB3A, $2B3A, $6B3A ; 07 - compass
+dw $2B07, $6B07, $2B17, $2B18 ; 08 - small key
+dw $2B05, $6B05, $2B15, $2B16 ; 09 - big key
+dw $2B09, $2B0A, $2B39, $6B39 ; 0A - pendant
+dw $2B0F, $6B0F, $2B3F, $6B3F ; 0B - important inventory item - big chest
+dw $2B09, $2B0A, $2B39, $6B39 ; 0C - also pendant
+dw $6F02, $2B02, $EB02, $AF02 ; 0D - crystal
+dw $2B0B, $6B0B, $2B3B, $6B3B ; 0E - triforce piece
+dw $2B0C, $6B0C, $2B3C, $6B3C ; 0F - triforce
 
-; $B9F900
+warnpc $B9F900
+org $B9F900
 LootTypeMapping:
 incsrc data/item_mapping.asm
 
-; $B9FA00
+warnpc $B9FA00
+org $B9FA00
 ; Room ID mappings to bit to check for presence and address of item drop
 MiscLocations:
 dw $00C8 : db $04 : dl HeartContainer_ArmosKnights
@@ -82,16 +86,18 @@ dw $FFFF : db $FF : dl $FFFFFF ; Moldorm 2? ($004D)
 dw $FFFF : db $FF : dl $FFFFFF ; Aga 2? ($000D)
 dw $FFFF
 
-; $B9FA9A
+warnpc $B9FA9A
+org $B9FA9A
 MapHUDPalette:
 	dw $0000, $3ED8, $2E54
 
-; $B9FAA0
+warnpc $B9FAA0
+org $B9FAA0
 PrizeLocations:
-dw $00C8 : db $02 ; ArmosKnights
+dw $00C8 : db $02 ; Armos Knights
 dw $0033 : db $03 ; Lanmolas
 dw $0006 : db $05 ; Arrghus
-dw $005A : db $06 ; HelmasaurKing
+dw $005A : db $06 ; Helmasaur King
 dw $0090 : db $07 ; Vitreous
 dw $0029 : db $08 ; Mothula
 dw $00DE : db $09 ; Kholdstare
@@ -100,7 +106,8 @@ dw $00AC : db $0B ; Blind
 dw $00A4 : db $0C ; Trinexx
 dw $FFFF
 
-; $B9FAC0
+warnpc $B9FAC0
+org $B9FAC0
 SupertileEntrances:
 incsrc data/entrance_tiles.asm
 warnpc $B9FB00
@@ -109,8 +116,8 @@ pad $B9FB00
 
 ; $B9FB00
 DungeonLabels:
-dw $2561, $256F ; Sewers
-dw $2564, $255F ; Hyrule Castle
+dw $2550, $2579 ; Sewers
+dw $2550, $2578 ; Hyrule Castle
 dw $2561, $256C ; Eastern Palace
 dw $2560, $256C ; Desert Palace
 dw $255D, $2570 ; Agahnim's Tower
@@ -140,15 +147,16 @@ org $B9FF00
 ; $06 - show fully lit with stairs and holes/internal walls (palette 2)
 ShowRooms:
 .default
-	db $01
+	db $02
 .have_map
-	db $04
+	db $05
 .have_compass
 	db $03
 .visited_tile
-	db $05
+	db $04
 .reserved
 	skip 4
+warnpc $B9FF08
 
 org $B9FF08
 ; $00 - do not show anything
@@ -163,10 +171,9 @@ ShowItems:
 	db $02
 .visited_tile
 	db $01
-.item_is_compass ; NYI
-	db $00
 .reserved
-	skip 3
+	skip 4
+warnpc $B9FF10
 
 org $B9FF10
 ; ---P bepc
@@ -176,4 +183,4 @@ org $B9FF10
 ; p - pots
 ; c - chests
 ItemSources:
-	db $1F
+	db $09

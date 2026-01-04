@@ -21,6 +21,9 @@ endmacro
 %WriteGFXSheetPointer($D5, DungeonMapIcons1)
 %WriteGFXSheetPointer($D6, DungeonMapIcons2)
 
+; TR is such a problem child
+%WriteGFXSheetPointer($A6, DungeonMapIcons2)
+
 %WriteGFXSheetPointer($D4, MapSheetD4)
 
 pullpc

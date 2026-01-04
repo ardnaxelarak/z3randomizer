@@ -12,6 +12,7 @@ DrawDungeonMapRoom:
 	LDX.w DungeonID
 	LDA.l MapField
 	AND.l DungeonMask, X
+	BEQ +
 	LDA.l ShowRooms_have_map
 	AND.w #$00FF
 	CMP.b $0A
@@ -22,6 +23,7 @@ DrawDungeonMapRoom:
 	LDX.w DungeonID
 	LDA.l CompassField
 	AND.l DungeonMask, X
+	BEQ +
 	LDA.l ShowRooms_have_compass
 	AND.w #$00FF
 	CMP.b $0A
@@ -72,6 +74,7 @@ DrawDungeonMapRoom:
 		?.square
 		PLA
 		LDA.b $0C
+		EOR.w #(3-<quadrant>)<<14
 		BRA ?.write
 
 		?.shape
@@ -93,6 +96,7 @@ DrawDungeonMapRoom:
 
 		?.full_square
 		LDA.w #$174F
+		EOR.w #(3-<quadrant>)<<14
 
 		?.write
 		STA.l $7F0000+<writeOffset>, X

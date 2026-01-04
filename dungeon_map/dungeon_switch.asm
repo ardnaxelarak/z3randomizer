@@ -57,7 +57,13 @@ DungeonMapSwitch_Submodule:
 	STA.b $A4
 
 	REP #$20
-	JML $98BC8A
+	STZ.b $E0
+	STZ.b $E2
+	STZ.b $E4
+	STZ.b $E6
+	STZ.b $E8
+	STZ.b $EA
+	JML $98BCA1
 
 SkipMapSprites:
 	STZ.b $00

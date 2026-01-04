@@ -16,6 +16,10 @@ CheckLoot:
 	AND.w #$00FF
 	STA.b $0E
 
+	LDA.b $00
+	ASL A
+	TAX
+
 	LDA.l SaveDataWRAM, X
 	AND.w #$000F
 	BEQ +
@@ -25,7 +29,7 @@ CheckLoot:
 	BCC +
 	STA.b $0E
 
-+	LDA.b DungeonID
++	LDA.w DungeonID
 	TAX
 
 	LDA.l MapField
@@ -233,8 +237,12 @@ CheckPots:
 	BRA .next_pot
 
 .small_key
+	LDA.w #$8000 : STA.b $08
 	LDA.w #$0024
-	BRA .continue
+	PHA
+	PHX
+	INY
+	BRA .mask_set
 .major_item
 	LDA.b [$04], Y
 .continue
@@ -242,13 +250,16 @@ CheckPots:
 	PHX
 	INY
 	TXA : ASL A
-	EOR.w #$FFFF
-	CLC : ADC.w #$001F ; bit mask table is in opposite order of what we want
 	TAX
 	LDA.l DungeonMask, X : STA.b $08
 
+.mask_set
 	LDA.b $00 : ASL A : TAX
+if !FEATURE_FIX_BASEROM
+	LDA.l SpriteDropData, X
+else
 	LDA.l RoomPotData, X
+endif
 	PLX
 	AND.b $08
 	BEQ .not_obtained
@@ -281,6 +292,8 @@ CheckEnemies:
 	LDA.b [$04], Y
 	AND.w #$00FF
 	CMP.w #$00FF : BEQ .done
+	LDA.b [$04], Y
+	BIT.w #$8000 : BNE .overlord
 	INY : INY
 	LDA.b [$04], Y
 	AND.w #$00FF
@@ -288,24 +301,34 @@ CheckEnemies:
 	CMP.w #$00F9 : BEQ .major ; major item in other world
 	CMP.w #$00E4 : BEQ .vanilla_key
 	INY
+	INX
+	BRA .next_enemy
+
+.overlord
+	INY : INY : INY
 	BRA .next_enemy
 
 .vanilla_key
 	DEY : DEY
+	LDA.w #$8000 : STA.b $08
 	LDA.b [$04], Y
+	INY #3
 	AND.w #$00FF
 	CMP.w #$00FD ; big key
 	BEQ .big_key
 	CMP.w #$00FE ; small key
 	BEQ .small_key
-	INY #3 ; false alarm -- probably hera basement key
+	; false alarm -- probably hera basement key
+	INX ; since it's an actual sprite it advances the counter
 	BRA .next_enemy
 .small_key
 	LDA.w #$0024
-	BRA .proceed
+	PHA : PHX
+	BRA .mask_set
 .big_key
 	LDA.w #$0032
-	BRA .proceed
+	PHA : PHX
+	BRA .mask_set
 
 .major
 	DEY : DEY
@@ -313,7 +336,6 @@ CheckEnemies:
 	AND.w #$00FF
 
 .proceed
-	INX
 	INY : INY : INY
 
 	PHA
@@ -322,6 +344,7 @@ CheckEnemies:
 	TAX
 	LDA.l DungeonMask, X : STA.b $08
 
+.mask_set
 	LDA.b $00 : ASL A : TAX
 	LDA.l SpriteDropData, X
 	PLX
@@ -334,7 +357,7 @@ CheckEnemies:
 	PLA
 	AND.w #$00FF
 	JSR GetLootClass
-	BRA .next_enemy
+	JMP .next_enemy
 
 .done
 	RTS
