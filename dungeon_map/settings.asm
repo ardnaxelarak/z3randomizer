@@ -184,3 +184,6 @@ org $B9FF10
 ; c - chests
 ItemSources:
 	db $09
+
+AlwaysShowCompass:
+	db $01

@@ -49,9 +49,7 @@ CheckLoot:
 	CMP.b $0E
 	BCC +
 	STA.b $0E
-
-+	LDA.b $0E
-	BEQ .done
++
 
 	LDA.l ItemSources : BIT.w #$0001 : BEQ +
 	JSR CheckChests
@@ -72,16 +70,6 @@ CheckLoot:
 	LDA.l ItemSources : BIT.w #$0010 : BEQ +
 	JSR CheckPrize
 +
-
-	LDA.b $0E
-	AND.w #$00FF
-	CMP.w #$0001
-	BNE .done
-
-	LDA.b $02
-	BEQ .done
-	LDA.w #$0001
-	STA.b $02
 
 .done
 	PLA : STA.b $0E
@@ -367,10 +355,28 @@ CheckEnemies:
 GetLootClass:
 	PHX
 	TAX
+	CMP.w #$0025 : BEQ .compass
+	AND.w #$00F0
+	CMP.w #$0080 : BNE .not_compass
+
+.compass
+	LDA.l AlwaysShowCompass : BNE .check_value
+
+.not_compass
+	LDA.b $0E
+	BEQ .done
+	CMP.w #$0001
+	BEQ .value_set
+
+.check_value
 	LDA.l LootTypeMapping, X
 	AND.w #$00FF
+
+.value_set
 	CMP.b $02
-	BCC +
+	BCC .done
 	STA.b $02
-+	PLX
+
+.done
+	PLX
 	RTS
