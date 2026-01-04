@@ -24,7 +24,7 @@ dw $0361, $039A, $C3B2, $83B2 ; 16 - gross (add middle section if feasible)
 dw $C370, $8370, $4340, $0340 ; 17
 dw $C3B5, $FFFF, $43B4, $FFFF ; 18 - useless fairy drop
 dw $FFFF, $8369, $FFFF, $035A ; 19
-dw $C3AE, $83AF, $43AD, $0361 ; 1A
+dw $03E7, $03E8, $03F7, $0361 ; 1A
 dw $039B, $439C, $4361, $FFFF ; 1B
 dw $038F, $038F, $037E, $C39B ; 1C
 dw $C3B2, $83A7, $FFFF, $FFFF ; 1D
@@ -36,43 +36,43 @@ dw $FFFF, $FFFF, $4368, $0348 ; 22
 dw $FFFF, $FFFF, $FFFF, $039B ; 23
 dw $4365, $0365, $0364, $0365 ; 24
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 25 - unused
-dw $039B, $037C, $4363, $0382 ; 26
+dw $039B, $03E4, $4363, $0382 ; 26
 dw $C370, $8370, $4340, $0340 ; 27
 dw $C3A5, $FFFF, $4358, $0348 ; 28
 dw $FFFF, $FFFF, $FFFF, $0396 ; 29 - Mothula
-dw $C350, $8352, $4350, $039E ; 2A
-dw $C36A, $FFFF, $434D, $C38D ; 2B
+dw $C350, $8352, $4350, $03F8 ; 2A
+dw $C36A, $FFFF, $03F9, $C38D ; 2B
 dw $C340, $8340, $4350, $0350 ; 2C - hookshot cave back
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 2D - unused
 dw $FFFF, $838F, $FFFF, $FFFF ; 2E
 dw $C3B4, $FFFF, $436E, $03B2 ; 2F - Kakariko well
 dw $C361, $FFFF, $839A, $FFFF ; 30 - inset stairs if possible
 dw $43B2, $0397, $839B, $C399 ; 31
-dw $C354, $8354, $4384, $0384 ; 32
+dw $43C5, $03C5, $43D5, $03D5 ; 32
 dw $FFFF, $FFFF, $438F, $FFFF ; 33
 dw $4348, $0368, $4349, $8368 ; 34
-dw $C38D, $83B7, $43B1, $037D ; 35
+dw $C38D, $039B, $43B1, $037D ; 35
 dw $C355, $8355, $4355, $0355 ; 36
-dw $C3B7, $838D, $437D, $03B1 ; 37
+dw $439B, $838D, $437D, $03B1 ; 37
 dw $C3AC, $FFFF, $43B7, $FFFF ; 38
 dw $FFFF, $FFFF, $039B, $03A9 ; 39
-dw $C3A4, $83A4, $4354, $0354 ; 3A - make bespoke if feasible
+dw $03C2, $03C3, $43D3, $03D3 ; 3A - make bespoke if feasible
 dw $C3A5, $FFFF, $43B5, $FFFF ; 3B - inset stairs if feasible
 dw $C340, $8350, $4340, $0350 ; 3C - hookshot cave front
 dw $039B, $439B, $0361, $838E ; 3D
 dw $FFFF, $438F, $43B2, $0373 ; 3E
 dw $FFFF, $FFFF, $8399, $C399 ; 3F
 dw $C3A5, $FFFF, $4372, $C399 ; 40 - inset stairs if feasible
-dw $C340, $8370, $4354, $0354 ; 41
-dw $C398, $8389, $FFFF, $FFFF ; 42
+dw $03C6, $03C7, $03D6, $03D7 ; 41
+dw $03C8, $03C9, $FFFF, $FFFF ; 42
 dw $C3B2, $03B2, $FFFF, $0361 ; 43
 dw $038D, $839F, $838D, $039F ; 44
-dw $C3AB, $438F, $4364, $C39B ; 45
+dw $C3AB, $83B4, $4364, $43B7 ; 45
 dw $C375, $8375, $4373, $0373 ; 46
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 47 - unused
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 48 - unused
 dw $839B, $8372, $039B, $0372 ; 49
-dw $0376, $0377, $0386, $4386 ; 4A
+dw $03E2, $03E3, $0386, $4386 ; 4A
 dw $C361, $4391, $4373, $0373 ; 4B
 dw $FFFF, $83A5, $FFFF, $03B7 ; 4C
 dw $C350, $8370, $4341, $0340 ; 4D
@@ -83,11 +83,11 @@ dw $C354, $8354, $4384, $0384 ; 51
 dw $C3B7, $FFFF, $4359, $0348 ; 52
 dw $039A, $83B5, $839B, $43B7 ; 53
 dw $C390, $8390, $4380, $0340 ; 54
-dw $C340, $8340, $4350, $0340 ; 55
+dw $C340, $8340, $4350, $0340 ; 55 - secret passage
 dw $038F, $83B4, $4365, $039F ; 56
 dw $039B, $438D, $0365, $039B ; 57
 dw $C372, $439B, $0383, $0365 ; 58 - split
-dw $838A, $8372, $038A, $0372 ; 59
+dw $838A, $8372, $03D1, $0372 ; 59
 dw $FFFF, $FFFF, $FFFF, $038F ; 5A - Helmasaur King
 dw $FFFF, $83B7, $FFFF, $03B5 ; 5B
 dw $C3B1, $83AA, $FFFF, $838F ; 5C
@@ -104,7 +104,7 @@ dw $038F, $039A, $0362, $83B2 ; 66
 dw $83B4, $83B5, $03B7, $039F ; 67
 dw $C340, $8350, $4341, $0340 ; 68
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 69 - unused
-dw $FFFF, $838C, $FFFF, $034E ; 6A
+dw $FFFF, $03E1, $FFFF, $03F1 ; 6A
 dw $039A, $0361, $839B, $C39B ; 6B
 dw $039A, $FFFF, $839B, $0360 ; 6C - Lanmolas 2
 dw $0361, $FFFF, $C39B, $FFFF ; 6D
@@ -112,16 +112,16 @@ dw $FFFF, $838E, $FFFF, $FFFF ; 6E
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 6F - unused
 dw $43BA, $FFFF, $FFFF, $FFFF ; 70
 dw $039A, $FFFF, $4365, $438D ; 71
-dw $437A, $037A, $43A1, $0342 ; 72 - slight cheating I guess...
+dw $437A, $037A, $8386, $0342 ; 72 - slight cheating I guess...
 dw $038F, $038F, $839B, $0366 ; 73
 dw $43B2, $03B2, $43A8, $03A8 ; 74
 dw $038F, $83B4, $0365, $03B5 ; 75
-dw $C36D, $83BC, $436E, $0397 ; 76
+dw $838A, $03F4, $03B7, $C399 ; 76
 dw $C370, $8340, $43A0, $03A0 ; 77
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 78 - unused
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 79 - unused
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 7A - unused
-dw $C35E, $83B1, $438F, $038D ; 7B
+dw $C35E, $83B1, $438F, $4381 ; 7B
 dw $C3B7, $83B4, $43B7, $03B7 ; 7C
 dw $43B2, $835E, $034C, $0391 ; 7D 
 dw $FFFF, $83B7, $4393, $438A ; 7E
@@ -144,7 +144,7 @@ dw $FFFF, $838E, $FFFF, $FFFF ; 8E
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 8F - unused
 dw $FFFF, $FFFF, $438F, $FFFF ; 90
 dw $FFFF, $83A5, $FFFF, $03B7 ; 91
-dw $039B, $C3B7, $0364, $039F ; 92 - should it be split? idk
+dw $03D2, $C3B7, $0364, $039F ; 92
 dw $C36C, $836C, $C39B, $838F ; 93
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 94 - unused
 dw $FFFF, $83B7, $FFFF, $03B5 ; 95
@@ -160,15 +160,15 @@ dw $FFFF, $439A, $838D, $03B9 ; 9E
 dw $FFFF, $FFFF, $439B, $FFFF ; 9F
 dw $839B, $C39C, $FFFF, $FFFF ; A0
 dw $C3B0, $835D, $FFFF, $036A ; A1
-dw $C385, $8385, $4356, $0346 ; A2 - show paths somehow
+dw $03EE, $03EF, $03FE, $03FF ; A2
 dw $C35A, $FFFF, $436A, $FFFF ; A3
 dw $FFFF, $FFFF, $438E, $FFFF ; A4
 dw $039A, $0361, $C3B2, $83B2 ; A5
 dw $C340, $8370, $4340, $0340 ; A6
 dw $C396, $FFFF, $FFFF, $FFFF ; A7 - ToH fairy basement room
-dw $039B, $83B6, $839B, $03A3 ; A8
+dw $039B, $03E5, $839B, $03F5 ; A8
 dw $C357, $8357, $4356, $0356 ; A9
-dw $C34B, $439B, $435B, $C39B ; AA
+dw $03E6, $439B, $03F6, $C39B ; AA
 dw $FFFF, $FFFF, $439A, $FFFF ; AB
 dw $FFFF, $FFFF, $FFFF, $038F ; AC - Blind
 dw $FFFF, $FFFF, $FFFF, $FFFF ; AD - unused
@@ -179,27 +179,27 @@ dw $0391, $83B5, $434C, $438A ; B1
 dw $C35C, $83A2, $039B, $0366 ; B2
 dw $0365, $FFFF, $0365, $FFFF ; B3
 dw $C350, $8340, $4384, $0384 ; B4
-dw $C370, $8340, $4350, $0340 ; B5
+dw $03DD, $83CF, $83DE, $03CF ; B5
 dw $C3A5, $83B4, $43B5, $03B5 ; B6
 dw $C3B4, $FFFF, $43B5, $FFFF ; B7
 dw $FFFF, $838A, $FFFF, $03B4 ; B8
-dw $C36B, $836B, $4354, $0354 ; B9
+dw $43F3, $03F3, $4354, $0354 ; B9
 dw $0364, $438D, $FFFF, $FFFF ; BA
 dw $838A, $8364, $4372, $0364 ; BB
-dw $C3BF, $C38A, $8364, $438A ; BC - block off entrances?
+dw $83BE, $C38A, $03D0, $438A ; BC
 dw $FFFF, $FFFF, $FFFF, $FFFF ; BD - unused
 dw $FFFF, $439A, $FFFF, $C365 ; BE
 dw $FFFF, $8396, $438D, $FFFF ; BF
 dw $C372, $C399, $4372, $C399 ; C0
 dw $039B, $0364, $4365, $8364 ; C1
 dw $C351, $8353, $4341, $0353 ; C2
-dw $C353, $8340, $4343, $0340 ; C3 - show layers
-dw $C384, $8384, $4340, $0341 ; C4
+dw $03E0, $C369, $03F0, $4369 ; C3 - show layers
+dw $43C0, $03C0, $4340, $0341 ; C4
 dw $C3B5, $FFFF, $438A, $FFFF ; C5
-dw $C350, $8351, $4350, $0351 ; C6
-dw $C351, $8340, $4341, $0340 ; C7
+dw $03DE, $03DF, $83DE, $83DF ; C6
+dw $43DF, $83CF, $03CE, $03CF ; C7
 dw $FFFF, $FFFF, $FFFF, $038F ; C8 - Armos Knights
-dw $0367, $4367, $0386, $4386 ; C9
+dw $03F2, $43F2, $0386, $4386 ; C9
 dw $FFFF, $FFFF, $FFFF, $FFFF ; CA - unused
 dw $C340, $8343, $4354, $0347 ; CB
 dw $C353, $8350, $4347, $0354 ; CC

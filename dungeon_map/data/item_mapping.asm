@@ -2,16 +2,16 @@ db $0B ; 00 - Fighter Sword and Shield
 db $0B ; 01 - Master Sword
 db $0B ; 02 - Tempered Sword
 db $0B ; 03 - Butter Sword
-db $05 ; 04 - Fighter Shield
-db $05 ; 05 - Fire Shield
-db $05 ; 06 - Mirror Shield
+db $06 ; 04 - Fighter Shield
+db $06 ; 05 - Fire Shield
+db $06 ; 06 - Mirror Shield
 db $0B ; 07 - Fire Rod
 db $0B ; 08 - Ice Rod
 db $0B ; 09 - Hammer
 db $0B ; 0A - Hookshot
 db $0B ; 0B - Bow
 db $06 ; 0C - Boomerang
-db $0B ; 0D - Powder
+db $06 ; 0D - Powder
 db $02 ; 0E - Bottle Refill (bee)
 db $0B ; 0F - Bombos
 db $0B ; 10 - Ether
@@ -23,7 +23,7 @@ db $0B ; 15 - Somaria
 db $0B ; 16 - Bottle
 db $05 ; 17 - Heartpiece
 db $06 ; 18 - Byrna
-db $0B ; 19 - Cape
+db $06 ; 19 - Cape
 db $0B ; 1A - Mirror
 db $0B ; 1B - Glove
 db $0B ; 1C - Mitts
@@ -32,8 +32,8 @@ db $0B ; 1E - Flippers
 db $0B ; 1F - Pearl
 db $0D ; 20 - Crystal
 db $06 ; 21 - Net
-db $05 ; 22 - Blue Mail
-db $05 ; 23 - Red Mail
+db $06 ; 22 - Blue Mail
+db $06 ; 23 - Red Mail
 db $03 ; 24 - Small Key
 db $07 ; 25 - Compass
 db $05 ; 26 - Heart Container from 4/4
@@ -75,15 +75,15 @@ db $0B ; 49 - Tossed fighter sword
 db $0B ; 4A - Active Flute
 db $0B ; 4B - Boots
 
-db $05 ; 4C - Bomb capacity (50)
-db $05 ; 4D - Arrow capacity (70)
-db $0B ; 4E - 1/2 magic
-db $0B ; 4F - 1/4 magic
+db $06 ; 4C - Bomb capacity (50)
+db $06 ; 4D - Arrow capacity (70)
+db $06 ; 4E - 1/2 magic
+db $06 ; 4F - 1/4 magic
 db $0B ; 50 - Safe master sword
-db $05 ; 51 - Bomb capacity (+5)
-db $05 ; 52 - Bomb capacity (+10)
-db $05 ; 53 - Arrow capacity (+5)
-db $05 ; 54 - Arrow capacity (+10)
+db $06 ; 51 - Bomb capacity (+5)
+db $06 ; 52 - Bomb capacity (+10)
+db $06 ; 53 - Arrow capacity (+5)
+db $06 ; 54 - Arrow capacity (+10)
 db $02 ; 55 - Programmable item 1
 db $02 ; 56 - Programmable item 2
 db $02 ; 57 - Programmable item 3
@@ -94,8 +94,8 @@ db $02 ; 5B - Red clock
 db $02 ; 5C - Blue clock
 db $02 ; 5D - Green clock
 db $0B ; 5E - Progressive sword
-db $05 ; 5F - Progressive shield
-db $05 ; 60 - Progressive armor
+db $06 ; 5F - Progressive shield
+db $06 ; 60 - Progressive armor
 db $0B ; 61 - Progressive glove
 db $02 ; 62 - RNG pool item (single)
 db $02 ; 63 - RNG pool item (multi)

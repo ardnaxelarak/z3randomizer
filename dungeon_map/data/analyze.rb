@@ -23,8 +23,8 @@ File.open("supertile_shapes.asm", "r") do |file|
   end
   puts
 
-  for row in 0...8
-    printf("%Xx", row)
+  for row in 0...0xC
+    printf("%Xx", row + 4)
     for col in 0...16
       printf("%4d", counts[row * 16 + col] || 0)
     end

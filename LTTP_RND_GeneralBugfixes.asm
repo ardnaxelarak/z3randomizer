@@ -315,6 +315,8 @@ DungeonMapIcons1:
 incbin "menu/map_icons_1.3bppc"
 DungeonMapIcons2:
 incbin "menu/map_icons_2.3bppc"
+DungeonMapIcons3:
+incbin "menu/map_icons_3.3bppc"
 MapSheetD4:
 incbin "menu/map_sheet_d4.3bppc"
 
