@@ -64,7 +64,7 @@ dw $FFFF, $438F, $43B2, $0373 ; 3E
 dw $FFFF, $FFFF, $8399, $C399 ; 3F
 dw $C3A5, $FFFF, $4372, $C399 ; 40 - inset stairs if feasible
 dw $03C6, $03C7, $03D6, $03D7 ; 41
-dw $03C8, $03C9, $FFFF, $FFFF ; 42
+dw $03E9, $03EA, $FFFF, $FFFF ; 42
 dw $C3B2, $03B2, $FFFF, $0361 ; 43
 dw $038D, $839F, $838D, $039F ; 44
 dw $C3AB, $83B4, $4364, $43B7 ; 45
@@ -178,8 +178,8 @@ dw $039B, $C399, $839B, $C399 ; B0
 dw $0391, $83B5, $434C, $438A ; B1
 dw $C35C, $83A2, $039B, $0366 ; B2
 dw $0365, $FFFF, $0365, $FFFF ; B3
-dw $03DE, $83CF, $03CC, $03CD ; B4
-dw $03DD, $83CF, $83DE, $03CF ; B5
+dw $03FA, $83FD, $03EC, $03ED ; B4
+dw $03EB, $83FD, $83FA, $03FD ; B5
 dw $C3A5, $83B4, $43B5, $03B5 ; B6
 dw $C3B4, $FFFF, $43B5, $FFFF ; B7
 dw $FFFF, $838A, $FFFF, $03B4 ; B8
@@ -196,8 +196,8 @@ dw $C351, $8353, $4341, $0353 ; C2
 dw $03E0, $C369, $03F0, $4369 ; C3 - show layers
 dw $43C0, $03C0, $4340, $0341 ; C4
 dw $C3B5, $FFFF, $438A, $FFFF ; C5
-dw $03DE, $03DF, $83DE, $83DF ; C6
-dw $43DF, $83CF, $03CE, $03CF ; C7
+dw $03FA, $03FB, $83FA, $83FB ; C6
+dw $43FB, $83FD, $03FC, $03FD ; C7
 dw $FFFF, $FFFF, $FFFF, $038F ; C8 - Armos Knights
 dw $03F2, $43F2, $0386, $4386 ; C9
 dw $FFFF, $FFFF, $FFFF, $FFFF ; CA - unused
