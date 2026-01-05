@@ -7,6 +7,20 @@ RedrawLoot:
 	RTL
 
 FirstDrawLoot:
+	LDA.b #$FF
+	STA.w $0215
+	LDA.b #$80
+	STA.w $0216
+	STA.w $0218
+	LDA.l DRMode
+	BEQ +
+		LDA.w DungeonID
+		ASL A
+		TAX
+		LDA.l DungeonMapData.floor, X
+		STA.b $A4
++
+
 	; what we wrote over
 	LDA.b #$08
 	STA.b $17

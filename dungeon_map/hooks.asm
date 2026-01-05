@@ -25,6 +25,9 @@ db $61, $56, $57, $62
 db $61, $56, $57, $62
 db $61, $56, $57, $62
 
+org $81EAF8
+dw $00F0 ; mark the chest data in GT climb as being part of unused room
+
 ; Dungeon Map Palettes 2-5 left half
 org $9BE544
 dw $0000, $71E7, $7FFF, $3B5F, $0000, $0000, $7EB5, $1CE7
@@ -95,6 +98,14 @@ org $8AEFC5
 org $8AE1EC
 	PLB
 	JML DrawDungeonLabel
+
+org $8AE86A
+	JSL CountFloors
+	NOP #2
+
+org $8AE872
+	JML CheckIfRoomFound
+	NOP
 
 ;================================================================================
 ; Show indicators of what is left in each room

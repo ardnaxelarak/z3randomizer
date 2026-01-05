@@ -68,6 +68,8 @@ DungeonMapSwitch_Submodule:
 SkipMapSprites:
 	STZ.b $00
 
+	LDA.l DRMode
+	BNE +
 	LDA.w $0200
 	CMP.b #$04
 	BEQ +
@@ -81,7 +83,14 @@ SkipMapSprites:
 	CMP.b #$04
 	BNE +
 		JML $8AEAFC
-+	LDA.l $7EC22A
++
+
+	LDA.l DRMode
+	BEQ +
+		JML $8AEAEE
++
+
+	LDA.l $7EC22A
 	CMP.w DungeonID
 	BEQ +
 		JML $8AEAF3
@@ -103,7 +112,7 @@ RestoreCurrentDungeon:
 	LDA.l $7EC22A
 	STA.w DungeonID
 	LDA.l $7EC22B
-	STA.b $4A
+	STA.b $A4
 	RTL
 
 RestoreDungeonMapFloorIndex:
@@ -145,3 +154,20 @@ DrawDungeonLabel:
 
 	INC.w $020D ; what we wrote over
 	RTL
+
+CountFloors:
+	ADC.w $8AF605, Y
+	STA.b $04
+	LDY.w #$0000
+	RTL
+
+CheckIfRoomFound:
+	CPY.w #$0032
+	BCS .not_found
+	LDA.b ($04), Y
+	INY
+	CMP.b $0E
+	JML $8AE877
+
+.not_found
+	JML $8AE8CD

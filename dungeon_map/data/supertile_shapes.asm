@@ -28,7 +28,7 @@ dw $03E7, $03E8, $03F7, $0361 ; 1A
 dw $039B, $439C, $4361, $FFFF ; 1B
 dw $038F, $038F, $037E, $C39B ; 1C
 dw $C3B2, $83A7, $FFFF, $FFFF ; 1D
-dw $FFFF, $43B8, $8399, $0366 ; 1E
+dw $FFFF, $4391, $8399, $0366 ; 1E
 dw $FFFF, $FFFF, $4360, $C399 ; 1F
 dw $FFFF, $FFFF, $438F, $FFFF ; 20
 dw $4348, $0363, $C348, $8368 ; 21
@@ -55,7 +55,7 @@ dw $C38D, $039B, $43B1, $037D ; 35
 dw $C355, $8355, $4355, $0355 ; 36
 dw $439B, $838D, $437D, $03B1 ; 37
 dw $C3AC, $FFFF, $43B7, $FFFF ; 38
-dw $FFFF, $FFFF, $039B, $03A9 ; 39
+dw $FFFF, $FFFF, $039B, $0381 ; 39
 dw $03C2, $03C3, $43D3, $03D3 ; 3A - make bespoke if feasible
 dw $C3A5, $FFFF, $43B5, $FFFF ; 3B - inset stairs if feasible
 dw $C340, $8350, $4340, $0350 ; 3C - hookshot cave front
@@ -92,14 +92,14 @@ dw $FFFF, $FFFF, $FFFF, $038F ; 5A - Helmasaur King
 dw $FFFF, $83B7, $FFFF, $03B5 ; 5B
 dw $C3B1, $83AA, $FFFF, $838F ; 5C
 dw $039B, $C399, $0361, $FFFF ; 5D
-dw $FFFF, $43B8, $839C, $0366 ; 5E
+dw $FFFF, $4391, $839C, $0366 ; 5E
 dw $FFFF, $FFFF, $43BB, $FFFF ; 5F
 dw $FFFF, $8379, $FFFF, $036A ; 60
 dw $C387, $8385, $4356, $0356 ; 61
 dw $C346, $8354, $4352, $0340 ; 62
 dw $039A, $FFFF, $0361, $FFFF ; 63
 dw $FFFF, $FFFF, $8399, $C3B1 ; 64
-dw $FFFF, $FFFF, $83B1, $03A9 ; 65
+dw $FFFF, $FFFF, $83B1, $0381 ; 65
 dw $038F, $039A, $0362, $83B2 ; 66
 dw $83B4, $83B5, $03B7, $039F ; 67
 dw $C340, $8350, $4341, $0340 ; 68
@@ -138,7 +138,7 @@ dw $FFFF, $FFFF, $FFFF, $FFFF ; 88 - unused
 dw $C3B0, $83B0, $FFFF, $FFFF ; 89
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 8A - unused
 dw $838A, $0360, $038A, $438D ; 8B
-dw $83BE, $83BF, $03BD, $03B8 ; 8C
+dw $83BE, $83BF, $03BD, $0391 ; 8C
 dw $0360, $C38A, $038D, $438A ; 8D
 dw $FFFF, $838E, $FFFF, $FFFF ; 8E
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 8F - unused
@@ -178,7 +178,7 @@ dw $039B, $C399, $839B, $C399 ; B0
 dw $0391, $83B5, $434C, $438A ; B1
 dw $C35C, $83A2, $039B, $0366 ; B2
 dw $0365, $FFFF, $0365, $FFFF ; B3
-dw $C350, $8340, $4384, $0384 ; B4
+dw $03DE, $83CF, $03CC, $03CD ; B4
 dw $03DD, $83CF, $83DE, $03CF ; B5
 dw $C3A5, $83B4, $43B5, $03B5 ; B6
 dw $C3B4, $FFFF, $43B5, $FFFF ; B7
@@ -204,7 +204,7 @@ dw $FFFF, $FFFF, $FFFF, $FFFF ; CA - unused
 dw $C340, $8343, $4354, $0347 ; CB
 dw $C353, $8350, $4347, $0354 ; CC
 dw $FFFF, $FFFF, $FFFF, $FFFF ; CD - unused
-dw $FFFF, $83B8, $FFFF, $FFFF ; CE - Kholdstare drop
+dw $FFFF, $8391, $FFFF, $FFFF ; CE - Kholdstare drop
 dw $FFFF, $FFFF, $FFFF, $FFFF ; CF - unused
 dw $C372, $C399, $4372, $C399 ; D0
 dw $C38E, $838F, $4381, $C38D ; D1
