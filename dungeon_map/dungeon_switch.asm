@@ -99,10 +99,24 @@ SkipMapSprites:
 CacheCurrentDungeon:
 	STA.l $7EC206
 	SEP #$20
-	LDA.w DungeonID
-	STA.l $7EC22A
 	LDA.b $A4
 	STA.l $7EC22B
+
+	LDA.w DungeonID
+	STA.l $7EC22A
+
+	LDA.l DRMode
+	BEQ +
+
+	LDA.w DungeonID
+	PHX
+	ASL A
+	TAX
+	LDA.l DungeonMapData.floor, X
+	STA.b $A4
+	PLX
+
++
 	REP #$20
 	RTL
 
