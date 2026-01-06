@@ -34,3 +34,4 @@ incsrc dungeon_switch.asm
 incsrc draw_loot.asm
 incsrc check_loot.asm
 incsrc blink_loot.asm
+incsrc mappable_doors.asm

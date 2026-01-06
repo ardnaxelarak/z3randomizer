@@ -178,7 +178,7 @@ warnpc $B9FF10
 org $B9FF10
 ; ---P bepc
 ; P - dungeon prizes
-; b - bosses (and torches in GT, plus hera basement standing item)
+; b - bosses (and torches in GT and desert, plus hera basement standing item)
 ; e - enemy drops
 ; p - pots
 ; c - chests
@@ -187,3 +187,9 @@ ItemSources:
 
 AlwaysShowCompass:
 	db $01
+
+; $00 - vanilla 5x5 maps
+; $01 - special DR 4x3 maps
+DungeonMapMode:
+	dw $0000
+

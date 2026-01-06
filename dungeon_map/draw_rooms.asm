@@ -1,5 +1,24 @@
+DrawNonexistentRoom:
+	REP #$20
+	LDA.w #$0F00
+	STA.l $7F0000, X
+	STA.l $7F0002, X
+	STA.l $7F0040, X
+	STA.l $7F0042, X
+
+FinishRoom:
+	PHX
+	LDA.l DungeonMapMode
+	ASL A
+	TAX
+	PLA
+	CLC : ADC.l MapDrawingData_column_spacing, X
+	TAX
+	JML $8AE7F6
+
 ; $CA has room_id
 DrawDungeonMapRoom:
+	REP #$20
 	PHB : PHK : PLB ; need to keep this in same bank as data, or else specify bank
 	LDA.b $0A : PHA
 
@@ -111,7 +130,7 @@ DrawDungeonMapRoom:
 .done
 	PLA : STA.b $0A
 	PLB
-	RTL
+	JMP FinishRoom
 
 DrawEntrances:
 	REP #$30

@@ -55,13 +55,20 @@ org $8AEE2B
 ;================================================================================
 ; Overhaul of Dungeon Map Screen
 ;--------------------------------------------------------------------------------
-org $8AE64F
+org $8AE64D
 	PLX
-	JSL DrawDungeonMapRoom
-	JMP.w $8AE7F2
+	JML DrawDungeonMapRoom
+
+org $8AE606
+	PLX
+	JML DrawNonexistentRoom
 
 org $8AE152
 	JSL LoadLastHUDPalette
+
+org $808BD3
+	JSL LoadStripes
+	BRA + : NOP #9 : +
 
 org $8AEAE8 ; vanilla checks number of sprites drawn instead of... counting...
 	LDA.b $0E
@@ -99,13 +106,27 @@ org $8AE1EC
 	PLB
 	JML DrawDungeonLabel
 
-org $8AE86A
-	JSL CountFloors
-	NOP #2
+org $8AE83E
+	JSL StartCurrentRoomSearch
+	BRA + : NOP #6 : +
 
-org $8AE872
-	JML CheckIfRoomFound
-	NOP
+org $8AE86C
+	JML FindCurrentRoom
+	padbyte $EA
+	pad $8AE891
+
+org $8AEBF8
+	LDA.w $0217
+	SEC : SBC.b $0F
+	BMI +
+	CMP.b #$18
+	BCS +
+	skip 7
+	+
+
+org $8AEB9A
+	db -8, 8, -8, 8
+	db -8, -8, 8, 8
 
 ;================================================================================
 ; Show indicators of what is left in each room
@@ -141,3 +162,7 @@ org $8AE2E0
 org $8AE21C
 	JSL DrawMountain
 	BRA + : NOP #9 : +
+
+;================================================================================
+; Custom Door Rando Maps
+;--------------------------------------------------------------------------------

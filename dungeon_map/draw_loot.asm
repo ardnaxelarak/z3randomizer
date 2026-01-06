@@ -54,7 +54,7 @@ DrawLoot:
 
 	LDX.w GFXStripes
 	LDA.b #$FF
-	STA.w GFXStripes+2, X
+	STA.w GFXStripes+$02, X
 
 	LDA.b #$01
 	STA.b NMISTRIPES
@@ -66,34 +66,67 @@ DrawLoot:
 DrawSingleFloorLoot:
 	REP #$20
 	AND.w #$00FF
+	INC A
+	ASL A
+	CLC : ADC.l DungeonMapMode
 	ASL A
 	TAX
 
-	LDA.l DungeonMapFloorToDataOffset, X
+	LDA.l MapDrawingData_floor_data_offset, X
+	DEC A
 	TAY
-	STZ.b $06
+
+	LDA.l DungeonMapMode
+	ASL A
+	TAX
+
+	SEP #$20
+	LDA.l MapDrawingData_column_count, X
+	DEC A
+	STA.b $06
+
+	LDA.l MapDrawingData_row_count, X
+	DEC A
+	STA.b $07
 
 .next_row
 	REP #$20
 	LDA.w GFXStripes
 	TAX
-	CLC : ADC.w #$0030
+	CLC : ADC.w #$0034
 	STA.w GFXStripes
 
+	PHX
+	LDA.l DungeonMapMode
+	ASL A
+	TAX
+
+	SEP #$20
 	LDA.b $07
+	CPX.w #$0002
+	BNE +
+	ASL A
++
+	CLC : ADC.b $07
+	REP #$20
 	AND.w #$00FF
-	XBA
-	LSR A : LSR A
-	CLC : ADC.w #$1092
+	ASL #5
+
+	CLC : ADC.l MapDrawingData_bg1_grid_start, X
 	ADC.b $0E
 	XBA
-	STA.w GFXStripes+2, X
+	PLX
+	STA.w GFXStripes+$02, X
 	CLC : ADC.w #$2000
-	STA.w GFXStripes+$1A, X
-
-	LDA.w #$1300
-	STA.w GFXStripes+$04, X
 	STA.w GFXStripes+$1C, X
+
+	LDA.w #$1500
+	STA.w GFXStripes+$04, X
+	STA.w GFXStripes+$1E, X
+
+	TXA
+	CLC : ADC.w #$0018
+	TAX
 
 .next_room
 	REP #$20
@@ -115,29 +148,59 @@ DrawSingleFloorLoot:
 	TAX
 
 	LDA.l LootTypeIcons+0, X
-	STA.w GFXStripes+$06, Y
+	STA.w GFXStripes+$00, Y
 	LDA.l LootTypeIcons+2, X
-	STA.w GFXStripes+$08, Y
+	STA.w GFXStripes+$02, Y
 	LDA.l LootTypeIcons+4, X
-	STA.w GFXStripes+$1E, Y
+	STA.w GFXStripes+$1A, Y
 	LDA.l LootTypeIcons+6, X
-	STA.w GFXStripes+$20, Y
+	STA.w GFXStripes+$1C, Y
 
 	TYX
 	PLY
-	INY : INX #4
+	DEY : DEX #4
+
+	LDA.l DungeonMapMode
+	CMP.w #$0001
+	BNE +
+	LDA.b $06
+	AND.w #$00FF
+	BEQ +
+
+	; skip a column if in 4x3 mode and it's not the last column
+	LDA.w #$0300
+	STA.w GFXStripes+$02, X
+	STA.w GFXStripes+$1C, X
+	DEX : DEX
++
 
 	SEP #$20
-	INC.b $06
-	LDA.b $06
-	CMP.b #$05
-	BCC .next_room
+	DEC.b $06
+	BPL .next_room
 
-	STZ.b $06
-	INC.b $07
-	LDA.b $07
-	CMP.b #$05
-	BCS .done
+	LDA.l DungeonMapMode
+	CMP.b #$01
+	BEQ +
+	; draw an extra empty tile at the end to make up for width differences between modes
+	LDA.b #$03
+	STZ.w GFXStripes+$02, X
+	STA.w GFXStripes+$03, X
+	STZ.w GFXStripes+$1C, X
+	STA.w GFXStripes+$1D, X
++
+
+	DEC.b $07
+	BMI .done
+
+	LDA.b #$00
+	XBA
+	LDA.l DungeonMapMode
+	ASL A
+	TAX
+	LDA.l MapDrawingData_column_count, X
+	DEC A
+	STA.b $06
+
 	JMP .next_row
 
 .done

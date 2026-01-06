@@ -114,6 +114,8 @@ RoomIndex = $7E00A0               ; Underworld room index. Word length. High byt
                                   ; Not zeroed on exit to overworld.
 PreviousRoom = $7E00A2            ; Stores previous value of RoomIndex
                                   ;
+CurrentFloor = $7E00A4            ; Current floor in dungeos
+                                  ;
 CameraBoundH = $7E00A6            ; Which set of camera boundaries to use.
 CameraBoundV = $7E00A7            ;
                                   ;
@@ -558,6 +560,9 @@ EN_SCRMODXB = $7EC170             ;
 PegColor = $7EC172                ;
                                   ;
 GameOverSongCache = $7EC227       ;
+                                  ;
+CachedDungeonID = $7EC22A         ; Cached while opening dungeon map
+CachedCurrentFloor = $7EC22B      ; to restore when closing
                                   ;
 LastBGSet = $7EC2F8               ; Lists loaded sheets to check for decompression. 4 bytes.
                                   ;

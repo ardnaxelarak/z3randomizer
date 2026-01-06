@@ -29,13 +29,8 @@ CheckSwitchMap:
 	RTL
 
 DungeonMapSwitch_Submodule:
-;	LDA.b $9B
-;	STA.l $7EC229
-
 	JSL $80893D
 	JSL $80833F
-;	LDA.l $7EC229
-;	STA.b $9B
 
 	LDA.b #$09
 	STA.b $14
@@ -51,11 +46,20 @@ DungeonMapSwitch_Submodule:
 	STZ.b $07
 
 	LDA.w DungeonID
+	CMP.l CachedDungeonID
+	BEQ .current_dungeon
+
 	ASL A
 	TAX
 	LDA.l DungeonMapData.floor, X
-	STA.b $A4
+	STA.b CurrentFloor
+	BRA .continue
 
+.current_dungeon
+	LDA.l CachedCurrentFloor
+	STA.b CurrentFloor
+
+.continue
 	REP #$20
 	STZ.b $E0
 	STZ.b $E2
@@ -90,7 +94,7 @@ SkipMapSprites:
 		JML $8AEAEE
 +
 
-	LDA.l $7EC22A
+	LDA.l CachedDungeonID
 	CMP.w DungeonID
 	BEQ +
 		JML $8AEAF3
@@ -100,19 +104,19 @@ CacheCurrentDungeon:
 	STA.l $7EC206
 	SEP #$20
 	LDA.w DungeonID
-	STA.l $7EC22A
-	LDA.b $A4
-	STA.l $7EC22B
+	STA.l CachedDungeonID
+	LDA.b CurrentFloor
+	STA.l CachedCurrentFloor
 	REP #$20
 	RTL
 
 RestoreCurrentDungeon:
 	LDA.b #$F3
 	STA.w $012C ; what we wrote over
-	LDA.l $7EC22A
+	LDA.l CachedDungeonID
 	STA.w DungeonID
-	LDA.l $7EC22B
-	STA.b $A4
+	LDA.l CachedCurrentFloor
+	STA.b CurrentFloor
 	RTL
 
 RestoreDungeonMapFloorIndex:
@@ -155,19 +159,67 @@ DrawDungeonLabel:
 	INC.w $020D ; what we wrote over
 	RTL
 
-CountFloors:
-	ADC.w $8AF605, Y
-	STA.b $04
-	LDY.w #$0000
+StartCurrentRoomSearch:
+	LDA.w $8AF5E9, X ; dungeon map floor count data
+	LSR A : LSR A : LSR A : LSR A
+	STA.b $00
+	LDA.w $8AF5E9, X
+	AND.b #$0F
+	CLC : ADC.b $00
+	ASL A
+	TAY
 	RTL
 
-CheckIfRoomFound:
-	CPY.w #$0032
+FindCurrentRoom:
+	PHX
+	TYA
+	CLC : ADC.l DungeonMapMode
+	ASL A
+	TAX
+	LDA.l MapDrawingData_floor_data_offset, X
+	STA.b $0C
+	LDY.w #$0000
+
+	LDA.l DungeonMapMode
+	ASL A
+	TAX
+
+	SEP #$20
+
+.next_room_check
+	CPY.b $0C
 	BCS .not_found
+
 	LDA.b ($04), Y
 	INY
 	CMP.b $0E
-	JML $8AE877
+	BEQ .found
+
+	LDA.b $00
+	CMP.l MapDrawingData_floor_pixel_column_wrap, X
+	BCS .next_row
+	CLC : ADC.l MapDrawingData_supertile_pixel_spacing, X
+	STA.b $00
+	BRA .next_room_check
+
+.next_row
+	STZ.b $00
+
+	LDA.b $02
+	CMP.l MapDrawingData_floor_pixel_row_wrap, X
+	BCS .next_floor
+	CLC : ADC.l MapDrawingData_supertile_pixel_spacing, X
+	STA.b $02
+	BRA .next_room_check
+
+.next_floor
+	STZ.b $02
+	BRA .next_room_check
+
+.found
+	PLX
+	JML $8AE891
 
 .not_found
+	PLX
 	JML $8AE8CD
