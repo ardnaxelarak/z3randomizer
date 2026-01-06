@@ -48,7 +48,7 @@ dw $FFFF, $838F, $FFFF, $FFFF ; 2E
 dw $C3B4, $FFFF, $436E, $03B2 ; 2F - Kakariko well
 dw $C361, $FFFF, $839A, $FFFF ; 30 - inset stairs if possible
 dw $43B2, $0397, $839B, $C399 ; 31
-dw $43C5, $03C5, $43D5, $03D5 ; 32
+dw $43C4, $03C4, $43D4, $03D4 ; 32
 dw $FFFF, $FFFF, $438F, $FFFF ; 33
 dw $4348, $0368, $4349, $8368 ; 34
 dw $C38D, $039B, $43B1, $037D ; 35
@@ -63,7 +63,7 @@ dw $039B, $439B, $0361, $838E ; 3D
 dw $FFFF, $438F, $43B2, $0373 ; 3E
 dw $FFFF, $FFFF, $8399, $C399 ; 3F
 dw $C3A5, $FFFF, $4372, $C399 ; 40 - inset stairs if feasible
-dw $03C6, $03C7, $03D6, $03D7 ; 41
+dw $03C5, $03C6, $03D5, $03D6 ; 41
 dw $03E9, $03EA, $FFFF, $FFFF ; 42
 dw $C3B2, $03B2, $FFFF, $0361 ; 43
 dw $038D, $839F, $838D, $039F ; 44

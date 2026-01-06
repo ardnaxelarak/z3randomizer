@@ -145,11 +145,18 @@ DrawEntrances:
 	LDA.l DungeonMapFloorCountData, X
 	AND.b #$0F
 	CLC : ADC.w $020E
-	DEC A
 	REP #$20
 	AND.w #$00FF
 
-	JSR DrawBothFloorsEntrances
+	STZ.b $02
+	PHA
+	JSR DrawSingleFloorEntrances
+
+	INC.b $02
+	INC.b $02
+	PLA
+	DEC A
+	JSR DrawSingleFloorEntrances
 
 .done
 	REP #$20
@@ -158,13 +165,20 @@ DrawEntrances:
 	SEP #$30
 	RTL
 
-DrawBothFloorsEntrances:
+DrawSingleFloorEntrances:
 	ASL A
 	TAX
 
-	LDA.l DungeonMapFloorToDataOffset, X
+	CLC : ADC.l DungeonMapMode
+	ASL A
+	TAX
+	LDA.l MapDrawingData_floor_data_offset, X
 	TAY
 	STZ.b $06
+
+	LDA.l DungeonMapMode
+	ASL A
+	TAX
 
 .next_room
 	REP #$20
@@ -173,7 +187,9 @@ DrawBothFloorsEntrances:
 	CMP.w #$000F ; $0F = empty room
 
 	BEQ +
+	PHX
 	JSR DrawSingleRoomEntrances
+	PLX
 +
 
 	INY
@@ -181,51 +197,78 @@ DrawBothFloorsEntrances:
 	SEP #$20
 	INC.b $06
 	LDA.b $06
-	CMP.b #$05
+	CMP.l MapDrawingData_column_count, X
 	BCC .next_room
 
 	STZ.b $06
 -	INC.b $07
 	LDA.b $07
-	CMP.b #$0A
+	CMP.l MapDrawingData_row_count, X
 	BCC .next_room
 
 .done
+	REP #$20
 	RTS
 
 macro DrawSingleEntrance(offset)
-	LDX.b $00
-	STZ.w OAMBufferAux, X ; high x-bit and size bit
-	TXA
+	LDY.b $00
+	LDA.b #$00
+	STA.w OAMBufferAux, Y ; high x-bit and size bit
+	TYA
 	ASL #2
-	TAX
+	TAY
 
 	LDA.b $06
-	ASL #4
-	CLC : ADC.b #$90+<offset>
-	STA.w OAMBuffer+0, X
+	CPX.b #$02
+	BNE ?+
+	ASL A
+?+
+	CLC : ADC.b $06
+	ASL #3
+	CLC : ADC.b #<offset>
+	CLC : ADC.l MapDrawingData_sprite_offset_x_base, X
+	STA.w OAMBuffer+0, Y
 
+	PHX
 	LDA.b $07
-	ASL #4
-	CMP.b #$50
-	BCC ?+
-	CLC : ADC.b #$50
-?+	CLC : ADC.b #$87
+	CPX.b #$02
+	BNE ?+
+	ASL A
+?+
+	CLC : ADC.b $07
+	ASL #3
+	PHA
+
+	LDA.b $02
+	CLC : ADC.l DungeonMapMode
+	ASL A
+	TAX
+
+	PLA
+	CLC : ADC.l MapDrawingData_sprite_offset_y_base, X
+	PLX
+	CLC : ADC.b #$08
 	CLC : ADC.w $0213
 	SEC : SBC.b $E8
-	STA.w OAMBuffer+1, X
+	STA.w OAMBuffer+1, Y
 
 	LDA.b #$33
-	STA.w OAMBuffer+2, X
+	STA.w OAMBuffer+2, Y
 
 	LDA.b #$23
-	STA.w OAMBuffer+3, X
+	STA.w OAMBuffer+3, Y
 
 	INC.b $00
 endmacro
 
 DrawSingleRoomEntrances:
 	STA.b $0E
+	PHY
+
+	LDA.l DungeonMapMode
+	ASL A
+	TAY
+
 	SEP #$10
 
 	LDX.b #$FE
@@ -242,6 +285,7 @@ DrawSingleRoomEntrances:
 
 	SEP #$20
 	LDA.l SupertileEntrances+1, X
+	TYX
 	PHA : PHA
 
 	BIT.b #$40
@@ -263,4 +307,5 @@ DrawSingleRoomEntrances:
 
 .done
 	REP #$30
+	PLY
 	RTS

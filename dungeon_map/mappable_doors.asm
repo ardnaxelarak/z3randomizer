@@ -66,6 +66,9 @@ MapDrawingData:
 	dw $001F, $002F
 	dw $007F, $008F
 
+.entrance_sprite_offset_y_base
+	dw $0087, $0097
+
 .supertile_pixel_spacing
 	dw $0010, $0018
 
@@ -213,7 +216,6 @@ org $8AE652 ; steal some space from the old map-drawing code we're no longer usi
 %Map_LDAY($8AE5F7, floor_data_offset)
 %Map_CMP($8AE5A2, row_count)
 %Map_CMP($8AE7FA, column_count)
-%Map_LDAX($8AE591, row_start_address)
 %Map_ADC($8AE896, sprite_offset_x_base)
 %Map_ADCY($8AE8B5, sprite_offset_y_base)
 %Map_ADC($8AE952, sprite_offset_y_base)
@@ -224,3 +226,120 @@ padbyte $EA
 pad $8AE7F6
 
 pullpc
+
+incsrc data/doors_connections.asm
+
+PrepDrawRow:
+	CLC : ADC.l DungeonMapMode
+	ASL A
+	TAX
+	LDA.l MapDrawingData_row_start_address, X
+	CLC : ADC.b $06
+	AND.w #$0FFF
+	TAX
+
+	LDA.l DungeonMapMode
+	CMP.w #$0001
+	BNE .done
+
+	JSR DrawRowOfRoomConnections
+
+.done
+	RTL
+
+
+TripleTable:
+	dw $0000, $0003, $0006
+
+DrawRowOfRoomConnections:
+	PHB : PHK : PLB
+	PHX
+
+	LDA.b $00
+	ASL A
+	TAY
+	LDA.w TripleTable, Y
+	TAY
+
+	LDA.w $B9FC00, Y
+	AND.w #$00FF
+	JSR DrawHorizontalConnector
+	INY
+	INX #6
+
+	LDA.w $B9FC00, Y
+	AND.w #$00FF
+	JSR DrawHorizontalConnector
+	INY
+	INX #6
+
+	LDA.w $B9FC00, Y
+	AND.w #$00FF
+	JSR DrawHorizontalConnector
+
+	LDA.b $00
+	CMP.w #$0002
+	BCS .done
+
+	PLX : PHX
+	ASL A : ASL A
+	TAY
+
+	LDA.w $B9FC09, Y
+	AND.w #$00FF
+	JSR DrawVerticalConnector
+	INY
+	INX #6
+
+	LDA.w $B9FC09, Y
+	AND.w #$00FF
+	JSR DrawVerticalConnector
+	INY
+	INX #6
+
+	LDA.w $B9FC09, Y
+	AND.w #$00FF
+	JSR DrawVerticalConnector
+	INY
+	INX #6
+
+	LDA.w $B9FC09, Y
+	AND.w #$00FF
+	JSR DrawVerticalConnector
+	INY
+	INX #6
+
+.done
+	PLX
+	PLB
+	RTS
+
+; A = connector index
+; X = address
+DrawHorizontalConnector:
+	PHY
+	ASL A : ASL A
+	TAY
+	LDA.w DoorConnectionTiles_horizontal+0, Y
+	ORA.w #$1400
+	STA.l $7F0004, X
+	LDA.w DoorConnectionTiles_horizontal+2, Y
+	ORA.w #$1400
+	STA.l $7F0044, X
+	PLY
+	RTS
+
+; A = connector index
+; X = address
+DrawVerticalConnector:
+	PHY
+	ASL A : ASL A
+	TAY
+	LDA.w DoorConnectionTiles_vertical+0, Y
+	ORA.w #$1400
+	STA.l $7F0080, X
+	LDA.w DoorConnectionTiles_vertical+2, Y
+	ORA.w #$1400
+	STA.l $7F0082, X
+	PLY
+	RTS
