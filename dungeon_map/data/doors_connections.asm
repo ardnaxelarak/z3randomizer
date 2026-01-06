@@ -25,11 +25,11 @@ DoorConnectionTiles:
 	dw $0300, $0300 ; $00
 	dw $03CA, $0300 ; $01 left -> left
 	dw $83D7, $83DB ; $02 left -> middle
-	dw $83C9, $43C9 ; $03 left -> right
+	dw $C3CF, $03CF ; $03 left -> right
 	dw $03D7, $03DB ; $04 middle -> left
 	dw $03C7, $43C7 ; $05 middle -> middle
 	dw $43DB, $43D7 ; $06 middle -> right
-	dw $03C9, $C3C9 ; $07 right -> left
+	dw $43CF, $83CF ; $07 right -> left
 	dw $C3DB, $C3D7 ; $08 right -> middle
 	dw $0300, $03CA ; $09 right -> right
 	dw $43C8, $43C7 ; $0A left-middle -> left-middle
