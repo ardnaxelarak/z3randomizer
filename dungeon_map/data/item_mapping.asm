@@ -11,7 +11,7 @@ db $0B ; 09 - Hammer
 db $0B ; 0A - Hookshot
 db $0B ; 0B - Bow
 db $06 ; 0C - Boomerang
-db $06 ; 0D - Powder
+db $0B ; 0D - Powder
 db $02 ; 0E - Bottle Refill (bee)
 db $0B ; 0F - Bombos
 db $0B ; 10 - Ether
@@ -23,7 +23,7 @@ db $0B ; 15 - Somaria
 db $0B ; 16 - Bottle
 db $05 ; 17 - Heartpiece
 db $06 ; 18 - Byrna
-db $06 ; 19 - Cape
+db $0B ; 19 - Cape
 db $0B ; 1A - Mirror
 db $0B ; 1B - Glove
 db $0B ; 1C - Mitts

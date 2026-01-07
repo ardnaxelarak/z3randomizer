@@ -25,8 +25,15 @@ db $61, $56, $57, $62
 db $61, $56, $57, $62
 db $61, $56, $57, $62
 
+; unused chest data
+org $81E9A5
+dw $00F0 ; freezor room, second chest (only one chest in supertile)
+
+org $81EA6E
+dw $00F0 ; mire spike room, second chest (only one chest in supertile)
+
 org $81EAF8
-dw $00F0 ; mark the chest data in GT climb as being part of unused room
+dw $00F0 ; GT button/switch/bladetrap room (no chest in supertile)
 
 ; Dungeon Map Palettes 2-5 left half
 org $9BE544
