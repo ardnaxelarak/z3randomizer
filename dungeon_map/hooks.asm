@@ -217,3 +217,7 @@ org $8AE8E4
 
 org $8AE8F9
 	LDA.b [$72], Y
+
+org $8AEBC6
+	JSL GetLocationMarkerLeft
+	NOP

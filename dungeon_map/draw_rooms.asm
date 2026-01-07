@@ -58,6 +58,16 @@ DrawDungeonMapRoom:
 	STA.b $0A
 +
 
+	PLX
+
+	LDA.l DungeonMapMode
+	BEQ +
+	LDA.b $0A
+	CMP.w #$0003
+	BCS +
+	JSL ClearAdjacentConnections
++
+
 	LDA.b $0A : BNE + : LDA.w #$0F00 : BRA ++
 +	DEC A     : BNE + : LDA.w #$174F : BRA ++
 +	DEC A     : BNE + : LDA.w #$174F : BRA ++
@@ -66,8 +76,6 @@ DrawDungeonMapRoom:
 +	DEC A     : BNE + : LDA.w #$0C00 : BRA ++
 +	LDA.w #$0800
 ++	STA.b $0C
-
-	PLX
 
 	LDA.b $CA
 	AND.w #$00FF

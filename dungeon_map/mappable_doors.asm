@@ -305,6 +305,54 @@ PrepDrawRow:
 .done
 	RTL
 
+ClearAdjacentConnections:
+	; Left
+	LDA.b $02
+	BEQ +
+	LDA.b $0E
+	BIT.w #$000A
+	BNE +
+	LDA.w #$0F00
+	STA.l $7F0000-$02, X
+	STA.l $7F0040-$02, X
++
+
+	; Top
+	LDA.b $00
+	BEQ +
+	LDA.b $0E
+	BIT.w #$000C
+	BNE +
+	LDA.w #$0F00
+	STA.l $7F0000-$40, X
+	STA.l $7F0002-$40, X
++
+
+	; Right
+	LDA.b $02
+	CMP.l CustomMapDrawingData_column_wrap
+	BCS +
+	LDA.b $0E
+	BIT.w #$0005
+	BNE +
+	LDA.w #$0F00
+	STA.l $7F0000+$04, X
+	STA.l $7F0040+$04, X
++
+
+	; Bottom
+	LDA.b $00
+	CMP.l CustomMapDrawingData_row_wrap
+	BCS +
+	LDA.b $0E
+	BIT.w #$0003
+	BNE +
+	LDA.w #$0F00
+	STA.l $7F0000+$80, X
+	STA.l $7F0002+$80, X
++
+	RTL
+
 DrawRowOfRoomConnections:
 	PHB : PHK : PLB
 	PHX
@@ -415,3 +463,12 @@ DrawVerticalConnector:
 
 	PLY
 	RTS
+
+GetLocationMarkerLeft:
+	LDA.b LinkQuadrantH
+	BEQ +
+	LDA.b #$F8
++
+	CLC : ADC.w $0215
+	AND.b #$F8
+	RTL
