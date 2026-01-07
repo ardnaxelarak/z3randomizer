@@ -318,8 +318,16 @@ DungeonMapIcons2:
 incbin "menu/map_icons_2.3bppc"
 DungeonMapIcons3:
 incbin "menu/map_icons_3.3bppc"
+DungeonMapIcons4:
+incbin "menu/map_icons_4.3bppc"
+DungeonMapIcons5:
+incbin "menu/map_icons_5.3bppc"
+DungeonMapIcons6:
+incbin "menu/map_icons_6.3bppc"
 DungeonMapDoorConnectors:
 incbin "menu/door_connectors.3bppc"
+MapSheetD4:
+incbin "menu/map_sheet_d4.3bppc"
 
 org $8CD7DF
 incsrc data/playernamecharmap.asm

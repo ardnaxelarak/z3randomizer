@@ -5,7 +5,7 @@ dw $FFFF, $FFFF, $438F, $FFFF ; 03 - Houlihan
 dw $039A, $038F, $4365, $C39B ; 04
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 05 - unused
 dw $FFFF, $FFFF, $438F, $FFFF ; 06 - Arrghus
-dw $C340, $8370, $4340, $0340 ; 07 - Moldorm
+dw $0100, $0101, $4111, $0111 ; 07 - Moldorm
 dw $FFFF, $FFFF, $43B2, $03B2 ; 08 - useless fairy entrance
 dw $C3A6, $837B, $FFFF, $FFFF ; 09
 dw $C398, $835F, $FFFF, $FFFF ; 0A
@@ -20,15 +20,15 @@ dw $C354, $8354, $4354, $0354 ; 12
 dw $FFFF, $83B7, $FFFF, $03B7 ; 13
 dw $C351, $8341, $4351, $0351 ; 14
 dw $C374, $8340, $4341, $0340 ; 15
-dw $0361, $039A, $C3B2, $83B2 ; 16 - gross (add middle section if feasible)
-dw $C370, $8370, $4340, $0340 ; 17
+dw $0108, $0109, $C3B2, $83B2 ; 16 - gross (add middle section if feasible)
+dw $C104, $0103, $4104, $0104 ; 17
 dw $C3B5, $FFFF, $43B4, $FFFF ; 18 - useless fairy drop
 dw $FFFF, $8369, $FFFF, $035A ; 19
 dw $03E7, $03E8, $03F7, $0361 ; 1A
 dw $039B, $439C, $4361, $FFFF ; 1B
 dw $038F, $038F, $037E, $C39B ; 1C
 dw $C3B2, $83A7, $FFFF, $FFFF ; 1D
-dw $FFFF, $4391, $8399, $0366 ; 1E
+dw $FFFF, $4391, $0122, $0123 ; 1E
 dw $FFFF, $FFFF, $4360, $C399 ; 1F
 dw $FFFF, $FFFF, $438F, $FFFF ; 20
 dw $4348, $0363, $C348, $8368 ; 21
@@ -37,7 +37,7 @@ dw $FFFF, $FFFF, $FFFF, $039B ; 23
 dw $4365, $0365, $0364, $0365 ; 24
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 25 - unused
 dw $039B, $03E4, $4363, $0382 ; 26
-dw $C370, $8370, $4340, $0340 ; 27
+dw $C104, $0103, $4104, $0104 ; 27
 dw $C3A5, $FFFF, $4358, $0348 ; 28
 dw $FFFF, $FFFF, $FFFF, $0396 ; 29 - Mothula
 dw $C350, $8352, $4350, $03F8 ; 2A
@@ -47,7 +47,7 @@ dw $FFFF, $FFFF, $FFFF, $FFFF ; 2D - unused
 dw $FFFF, $838F, $FFFF, $FFFF ; 2E
 dw $C3B4, $FFFF, $436E, $03B2 ; 2F - Kakariko well
 dw $C361, $FFFF, $839A, $FFFF ; 30 - inset stairs if possible
-dw $43B2, $0397, $839B, $C399 ; 31
+dw $0124, $0125, $0134, $0135 ; 31
 dw $43C4, $03C4, $43D4, $03D4 ; 32
 dw $FFFF, $FFFF, $438F, $FFFF ; 33
 dw $4348, $0368, $4349, $8368 ; 34
@@ -61,7 +61,7 @@ dw $C3A5, $FFFF, $43B5, $FFFF ; 3B - inset stairs if feasible
 dw $C340, $8350, $4340, $0350 ; 3C - hookshot cave front
 dw $039B, $439B, $0361, $838E ; 3D
 dw $FFFF, $438F, $43B2, $0373 ; 3E
-dw $FFFF, $FFFF, $8399, $C399 ; 3F
+dw $FFFF, $FFFF, $0130, $C399 ; 3F
 dw $C3A5, $FFFF, $4372, $C399 ; 40 - inset stairs if feasible
 dw $03C5, $03C6, $03D5, $03D6 ; 41
 dw $03E9, $03EA, $FFFF, $FFFF ; 42
@@ -75,7 +75,7 @@ dw $839B, $8372, $039B, $0372 ; 49
 dw $03E2, $03E3, $0386, $4386 ; 4A
 dw $C361, $4391, $4373, $0373 ; 4B
 dw $FFFF, $83A5, $FFFF, $03B7 ; 4C
-dw $C350, $8370, $4341, $0340 ; 4D
+dw $0102, $0103, $0112, $0113 ; 4D
 dw $839B, $439C, $FFFF, $FFFF ; 4E
 dw $FFFF, $8396, $838D, $FFFF ; 4F
 dw $FFFF, $83B7, $FFFF, $03B5 ; 50
@@ -92,7 +92,7 @@ dw $FFFF, $FFFF, $FFFF, $038F ; 5A - Helmasaur King
 dw $FFFF, $83B7, $FFFF, $03B5 ; 5B
 dw $C3B1, $83AA, $FFFF, $838F ; 5C
 dw $039B, $C399, $0361, $FFFF ; 5D
-dw $FFFF, $4391, $839C, $0366 ; 5E
+dw $FFFF, $0110, $839C, $0123 ; 5E
 dw $FFFF, $FFFF, $43BB, $FFFF ; 5F
 dw $FFFF, $8379, $FFFF, $036A ; 60
 dw $C387, $8385, $4356, $0356 ; 61
@@ -121,7 +121,7 @@ dw $C370, $8340, $43A0, $03A0 ; 77
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 78 - unused
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 79 - unused
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 7A - unused
-dw $C35E, $83B1, $438F, $4381 ; 7B
+dw $0106, $0107, $438F, $4381 ; 7B
 dw $C3B7, $83B4, $43B7, $03B7 ; 7C
 dw $43B2, $835E, $034C, $0391 ; 7D 
 dw $FFFF, $83B7, $4393, $438A ; 7E
@@ -155,7 +155,7 @@ dw $FFFF, $038F, $434A, $0363 ; 99
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 9A - unused
 dw $839B, $0381, $435E, $0378 ; 9B
 dw $C350, $8350, $4341, $0341 ; 9C
-dw $C35E, $83B2, $43B1, $035E ; 9D
+dw $0116, $83B2, $43B1, $035E ; 9D
 dw $FFFF, $439A, $838D, $03B9 ; 9E
 dw $FFFF, $FFFF, $439B, $FFFF ; 9F
 dw $839B, $C39C, $FFFF, $FFFF ; A0

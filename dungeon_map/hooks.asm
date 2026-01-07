@@ -4,8 +4,8 @@ db $08
 
 ; use AA1 = $1C for map stuff
 org $80E193
-skip 7
-db $D6
+skip 4
+db $61, $62, $62, $D6
 
 org $8AE11D
 LDA.b #$1C

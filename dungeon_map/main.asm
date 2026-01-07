@@ -11,14 +11,18 @@ macro WriteGFXSheetPointer(sheet, location)
 
 	org $80D17E+<sheet>
 	db <location>>>0
-
 	pullpc
 endmacro
 
 %WriteGFXSheetPointer($C9, DungeonMapIcons1)
 %WriteGFXSheetPointer($CA, DungeonMapIcons2)
 %WriteGFXSheetPointer($D5, DungeonMapIcons3)
+%WriteGFXSheetPointer($D4, MapSheetD4)
 %WriteGFXSheetPointer($D6, DungeonMapDoorConnectors)
+
+%WriteGFXSheetPointer($61, DungeonMapIcons4)
+%WriteGFXSheetPointer($62, DungeonMapIcons5)
+%WriteGFXSheetPointer($63, DungeonMapIcons6)
 
 pullpc
 
