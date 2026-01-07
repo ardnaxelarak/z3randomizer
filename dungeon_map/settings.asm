@@ -31,6 +31,18 @@ struct DungeonMapData DungeonMapData
 	.unused: skip 1
 endstruct
 
+warnpc $B9F840
+org $B9F840
+
+DoorConnectionPointers:
+skip $20
+
+warnpc $B9F860
+org $B9F860
+
+CustomMapPointers:
+skip $20
+
 warnpc $B9F880
 org $B9F880
 

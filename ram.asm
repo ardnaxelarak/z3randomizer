@@ -196,6 +196,8 @@ BottleMenuCounter = $7E0205       ; Step counter for opening bottle menu
 MenuFrameCounter = $7E0206        ; Incremented every menu frame. Never read.
 MenuBlink = $7E0207               ; Incremented every frame and masked with $10 to blink cursor
                                   ;
+DungeonMapCurrentFloor = $7E020E  ;
+                                  ;
 RaceGameFlag = $7E021B            ;
                                   ;
 MessageJunk = $7E0223             ; Zeroed but never used (?)

@@ -138,13 +138,13 @@ DrawEntrances:
 	LDA.b $06 : PHA
 
 	LDX.w DungeonID
-	LDA.l DungeonMapRoomPointers, X
-	STA.b $0C
+	JSL LoadDungeonMapRoomPointer
+	STA.b $72
 
 	SEP #$20
 	LDA.l DungeonMapFloorCountData, X
 	AND.b #$0F
-	CLC : ADC.w $020E
+	CLC : ADC.w DungeonMapCurrentFloor
 	REP #$20
 	AND.w #$00FF
 
@@ -182,7 +182,7 @@ DrawSingleFloorEntrances:
 
 .next_room
 	REP #$20
-	LDA.b ($0C), Y ; get room id
+	LDA.b [$72], Y ; get room id
 	AND.w #$00FF
 	CMP.w #$000F ; $0F = empty room
 

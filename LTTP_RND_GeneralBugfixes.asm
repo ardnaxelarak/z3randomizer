@@ -210,7 +210,8 @@ incsrc special_weapons.asm
 incsrc variable_ganon_vulnerability.asm
 incsrc pseudoflute.asm
 incsrc dungeon_map/main.asm
-warnpc $B9F000
+
+warnpc $B9E000 ; $E000 - EFFF reserved for custom door rando map data
 
 org $B9F000
 incsrc dungeon_map/settings.asm

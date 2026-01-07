@@ -160,10 +160,10 @@ DrawDungeonLabel:
 	RTL
 
 StartCurrentRoomSearch:
-	LDA.w $8AF5E9, X ; dungeon map floor count data
+	LDA.w DungeonMapFloorCountData, X
 	LSR A : LSR A : LSR A : LSR A
 	STA.b $00
-	LDA.w $8AF5E9, X
+	LDA.w DungeonMapFloorCountData, X
 	AND.b #$0F
 	CLC : ADC.b $00
 	ASL A
@@ -190,7 +190,7 @@ FindCurrentRoom:
 	CPY.b $0C
 	BCS .not_found
 
-	LDA.b ($04), Y
+	LDA.b [$72], Y
 	INY
 	CMP.b $0E
 	BEQ .found

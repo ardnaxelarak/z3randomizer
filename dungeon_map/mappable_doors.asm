@@ -78,6 +78,31 @@ MapDrawingData:
 .floor_pixel_row_wrap
 	dw $0040, $0030
 
+CustomMapDrawingData:
+.column_wrap
+	dw $0003
+.column_count
+	dw $0004
+.row_wrap
+	dw $0002
+
+.floor_connection_data_offset
+	dw $0000
+	dw $0011
+	dw $0022
+	dw $0033
+	dw $0044
+	dw $0055
+	dw $0066
+	dw $0077
+	dw $0088
+
+.row_connection_data_offset
+	dw $0000
+	dw $0007
+	dw $000E
+	dw $0015
+
 macro Map_LDA(addr, label)
 	pushpc
 	org <addr>
@@ -206,6 +231,10 @@ JSR ADC_Y_sprite_offset_y_base
 
 org $8AE652 ; steal some space from the old map-drawing code we're no longer using
 
+LoadDungeonMapRoomPointer_0A:
+	JSL LoadDungeonMapRoomPointer
+	RTS
+
 %Map_LDAY($8AE45F, corner_tile_address)
 %Map_LDAY($8AE489, row_tile_address)
 %Map_CMP($8AE4B0, row_tile_length)
@@ -229,6 +258,20 @@ pullpc
 
 incsrc data/doors_connections.asm
 
+LoadDungeonMapRoomPointer:
+	LDA.l DungeonMapMode
+	BEQ .normal
+	LDA.w #bank(CustomMapPointers)
+	STA.b $74
+	LDA.l CustomMapPointers, X
+	RTL
+
+.normal
+	LDA.w #bank(DungeonMapRoomPointers)
+	STA.b $74
+	LDA.l DungeonMapRoomPointers, X
+	RTL
+
 PrepDrawRow:
 	CLC : ADC.l DungeonMapMode
 	ASL A
@@ -247,67 +290,66 @@ PrepDrawRow:
 .done
 	RTL
 
-
-TripleTable:
-	dw $0000, $0003, $0006
-
 DrawRowOfRoomConnections:
 	PHB : PHK : PLB
 	PHX
 
+	LDX.w DungeonID
+	LDA.l DoorConnectionPointers, X
+	STA.b $04
+
+	LDA.l DungeonMapFloorCountData, X
+	AND.w #$000F
+	CLC : ADC.w DungeonMapCurrentFloor
+	ASL A
+	TAX
+	LDA.l CustomMapDrawingData_floor_connection_data_offset, X
+	CLC : ADC.b $04
+	STA.b $04
+
 	LDA.b $00
 	ASL A
-	TAY
-	LDA.w TripleTable, Y
-	TAY
+	TAX
+	LDA.l CustomMapDrawingData_row_connection_data_offset, X
+	CLC : ADC.b $04
+	STA.b $04
 
-	LDA.w $B9FC00, Y
+	STZ.b $02
+
+	PLX : PHX
+	LDY.w #$0000
+
+.next_horizontal
+	LDA.b ($04), Y
 	AND.w #$00FF
 	JSR DrawHorizontalConnector
 	INY
 	INX #6
 
-	LDA.w $B9FC00, Y
-	AND.w #$00FF
-	JSR DrawHorizontalConnector
-	INY
-	INX #6
-
-	LDA.w $B9FC00, Y
-	AND.w #$00FF
-	JSR DrawHorizontalConnector
+	INC.b $02
+	LDA.b $02
+	CMP.l CustomMapDrawingData_column_wrap
+	BCC .next_horizontal
 
 	LDA.b $00
-	CMP.w #$0002
+	CMP.l CustomMapDrawingData_row_wrap
 	BCS .done
 
 	PLX : PHX
-	ASL A : ASL A
-	TAY
 
-	LDA.w $B9FC09, Y
+	STZ.b $02
+
+.next_vertical
+	LDA.b ($04), Y
 	AND.w #$00FF
 	JSR DrawVerticalConnector
 	INY
 	INX #6
 
-	LDA.w $B9FC09, Y
-	AND.w #$00FF
-	JSR DrawVerticalConnector
-	INY
-	INX #6
-
-	LDA.w $B9FC09, Y
-	AND.w #$00FF
-	JSR DrawVerticalConnector
-	INY
-	INX #6
-
-	LDA.w $B9FC09, Y
-	AND.w #$00FF
-	JSR DrawVerticalConnector
-	INY
-	INX #6
+	INC.b $02
+	LDA.b $02
+	CMP.l CustomMapDrawingData_column_count
+	BCC .next_vertical
 
 .done
 	PLX
@@ -320,12 +362,19 @@ DrawHorizontalConnector:
 	PHY
 	ASL A : ASL A
 	TAY
-	LDA.w DoorConnectionTiles_horizontal+0, Y
-	ORA.w #$1400
+
+	LDA.w DoorConnectionTiles+0, Y
+	BEQ +
+	ORA.w #$1404
 	STA.l $7F0004, X
-	LDA.w DoorConnectionTiles_horizontal+2, Y
-	ORA.w #$1400
++
+
+	LDA.w DoorConnectionTiles+2, Y
+	BEQ +
+	ORA.w #$1404
 	STA.l $7F0044, X
++
+
 	PLY
 	RTS
 
@@ -335,11 +384,18 @@ DrawVerticalConnector:
 	PHY
 	ASL A : ASL A
 	TAY
-	LDA.w DoorConnectionTiles_vertical+0, Y
+
+	LDA.w DoorConnectionTiles+0, Y
+	BEQ +
 	ORA.w #$1400
 	STA.l $7F0080, X
-	LDA.w DoorConnectionTiles_vertical+2, Y
++
+
+	LDA.w DoorConnectionTiles+2, Y
+	BEQ +
 	ORA.w #$1400
 	STA.l $7F0082, X
++
+
 	PLY
 	RTS
