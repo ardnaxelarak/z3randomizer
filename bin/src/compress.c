@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 
 const int MAXLENGTH = 0x300;
@@ -149,8 +150,13 @@ int write_section(struct section section, char data[], char buf[], int loc) {
 
 int main(int argc, char *argv[]) {
     if (argc < 3) {
-        printf("Usage: %s infile outfile\n", argv[0]);
+        printf("Usage: %s infile outfile [start [length]]\n", argv[0]);
         return 1;
+    }
+
+    off_t seek = 0;
+    if (argc > 3) {
+        seek = strtol(argv[3], NULL, 0);
     }
 
     FILE *inptr;
@@ -170,9 +176,14 @@ int main(int argc, char *argv[]) {
         printf("Error stating file: %s\n", argv[1]);
         return 1;
     }
-    off_t size = buf.st_size;
+    off_t size = buf.st_size - seek;
 
+    if (argc > 4) {
+        size = strtol(argv[4], NULL, 0);
+    }
     char inbuf[size];
+
+    fseek(inptr, seek, SEEK_SET);
 
     if (fread(inbuf, 1, size, inptr) < size) {
         printf("Error reading file: %s\n", argv[1]);
@@ -180,7 +191,6 @@ int main(int argc, char *argv[]) {
     }
 
     fclose(inptr);
-
 
     char outbuf[size * 2];
     char m0data[MAXLENGTH];
