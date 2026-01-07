@@ -48,21 +48,21 @@ org $B9F880
 
 LootTypeIcons:
 dw $0B00, $0B00, $0B00, $0B00 ; 00 - nothing
-dw $2F32, $6F32, $AF32, $EF32 ; 01 - unknown - dot
-dw $2B0D, $6B0D, $2B3D, $6B3D ; 02 - junk - pot
-dw $2B07, $6B07, $2B17, $2B18 ; 03 - small key
-dw $2B0B, $6B0B, $2B3B, $6B3B ; 04 - triforce piece
-dw $6B08, $2B08, $EB08, $AB08 ; 05 - safety - plus
-dw $2B0E, $6B0E, $2B3E, $6B3E ; 06 - less important item - small chest
-dw $AB3A, $EB3A, $2B3A, $6B3A ; 07 - compass
-dw $2B07, $6B07, $2B17, $2B18 ; 08 - small key
-dw $2B05, $6B05, $2B15, $2B16 ; 09 - big key
-dw $2B09, $2B0A, $2B39, $6B39 ; 0A - pendant
-dw $2B0F, $6B0F, $2B3F, $6B3F ; 0B - important inventory item - big chest
-dw $2B09, $2B0A, $2B39, $6B39 ; 0C - also pendant
-dw $6F02, $2B02, $EB02, $AF02 ; 0D - crystal
-dw $2B0B, $6B0B, $2B3B, $6B3B ; 0E - triforce piece
-dw $2B0C, $6B0C, $2B3C, $6B3C ; 0F - triforce
+dw $2DCB, $6DCB, $ADCB, $EDCB ; 01 - unknown - dot
+dw $29EB, $69EB, $29FB, $69FB ; 02 - junk - pot
+dw $29CA, $69CA, $29DA, $29DB ; 03 - small key
+dw $29E9, $69E9, $29F9, $69F9 ; 04 - triforce piece
+dw $29DD, $69DD, $A9DD, $E9DD ; 05 - safety - plus
+dw $29EC, $69EC, $29FC, $69FC ; 06 - less important item - small chest
+dw $29E8, $69E8, $29F8, $69F8 ; 07 - compass
+dw $29CA, $69CA, $29DA, $29DB ; 08 - small key
+dw $29C8, $69C8, $29D8, $29D9 ; 09 - big key
+dw $29CC, $29CD, $29DC, $69DC ; 0A - pendant
+dw $29ED, $69ED, $29FD, $69FD ; 0B - important inventory item - big chest
+dw $29CC, $29CD, $29DC, $69DC ; 0C - pendant
+dw $2DC9, $69C9, $A9C9, $EDC9 ; 0D - crystal
+dw $29E9, $69E9, $29F9, $69F9 ; 0E - triforce piece
+dw $29EA, $69EA, $29EB, $69EB ; 0F - triforce
 
 warnpc $B9F900
 org $B9F900
