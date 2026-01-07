@@ -68,17 +68,13 @@ DrawSingleFloorLoot:
 	AND.w #$00FF
 	INC A
 	ASL A
-	CLC : ADC.l DungeonMapMode
-	ASL A
-	TAX
+	%ADD_MapMode()
 
 	LDA.l MapDrawingData_floor_data_offset, X
 	DEC A
 	TAY
 
-	LDA.l DungeonMapMode
-	ASL A
-	TAX
+	%LDX_MapMode()
 
 	SEP #$20
 	LDA.l MapDrawingData_column_count, X
@@ -97,9 +93,7 @@ DrawSingleFloorLoot:
 	STA.w GFXStripes
 
 	PHX
-	LDA.l DungeonMapMode
-	ASL A
-	TAX
+	%LDX_MapMode()
 
 	SEP #$20
 	LDA.b $07
@@ -161,8 +155,7 @@ DrawSingleFloorLoot:
 	DEY : DEX #4
 
 	LDA.l DungeonMapMode
-	CMP.w #$0001
-	BNE +
+	BEQ +
 	LDA.b $06
 	AND.w #$00FF
 	BEQ +
@@ -179,8 +172,7 @@ DrawSingleFloorLoot:
 	BPL .next_room
 
 	LDA.l DungeonMapMode
-	CMP.b #$01
-	BEQ +
+	BNE +
 	; draw an extra empty tile at the end to make up for width differences between modes
 	LDA.b #$03
 	STZ.w GFXStripes+$02, X
@@ -194,9 +186,7 @@ DrawSingleFloorLoot:
 
 	LDA.b #$00
 	XBA
-	LDA.l DungeonMapMode
-	ASL A
-	TAX
+	%LDX_MapMode()
 	LDA.l MapDrawingData_column_count, X
 	DEC A
 	STA.b $06

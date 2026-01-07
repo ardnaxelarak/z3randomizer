@@ -103,20 +103,42 @@ CustomMapDrawingData:
 	dw $000E
 	dw $0015
 
+macro LDA_MapMode()
+	LDA.l DungeonMapMode
+	ASL A
+endmacro
+
+macro LDX_MapMode()
+	%LDA_MapMode()
+	TAX
+endmacro
+
+macro LDY_MapMode()
+	%LDA_MapMode()
+	TAY
+endmacro
+
+macro ADD_MapMode()
+	CLC : ADC.l DungeonMapMode
+	ASL A
+	TAX
+endmacro
+
 macro Map_LDA(addr, label)
 	pushpc
 	org <addr>
 	JSR LDA_<label>
 	pullpc
 
-	LDA_<label>:
-		PHX
-		LDA.l DungeonMapMode
-		ASL A
-		TAX
-		LDA.l MapDrawingData_<label>, X
-		PLX
-		RTS
+	if not(defined("LDA_<label>"))
+		!LDA_<label> = 1
+		LDA_<label>:
+			PHX
+			%LDX_MapMode()
+			LDA.l MapDrawingData_<label>, X
+			PLX
+			RTS
+	endif
 endmacro
 
 macro Map_LDAY(addr, label)
@@ -130,9 +152,7 @@ macro Map_LDAY(addr, label)
 		LDA_Y_<label>:
 			PHX
 			TYA
-			CLC : ADC.l DungeonMapMode
-			ASL A
-			TAX
+			%ADD_MapMode()
 			LDA.l MapDrawingData_<label>, X
 			PLX
 			RTS
@@ -145,15 +165,16 @@ macro Map_LDAX(addr, label)
 	JSR LDA_X_<label>
 	pullpc
 
-	LDA_X_<label>:
-		PHX
-		TXA
-		CLC : ADC.l DungeonMapMode
-		ASL A
-		TAX
-		LDA.l MapDrawingData_<label>, X
-		PLX
-		RTS
+	if not(defined("LDA_X_<label>"))
+		!LDA_X_<label> = 1
+		LDA_X_<label>:
+			PHX
+			TXA
+			%ADD_MapMode()
+			LDA.l MapDrawingData_<label>, X
+			PLX
+			RTS
+	endif
 endmacro
 
 macro Map_CMP(addr, label)
@@ -162,58 +183,58 @@ macro Map_CMP(addr, label)
 	JSR CMP_<label>
 	pullpc
 
-	CMP_<label>:
-		PHX
-		PHA
-		LDA.l DungeonMapMode
-		ASL A
-		TAX
-		PLA
-		CMP.l MapDrawingData_<label>, X
-		BEQ .z_flag_set
-	.z_flag_clear
-		PLX
-		REP #$02
-		RTS
-	.z_flag_set
-		PLX
-		SEP #$02
-		RTS
+	if not(defined("CMP_<label>"))
+		!CMP_<label> = 1
+		CMP_<label>:
+			PHX
+			PHA
+			%LDX_MapMode()
+			PLA
+			CMP.l MapDrawingData_<label>, X
+			BEQ .z_flag_set
+		.z_flag_clear
+			PLX
+			REP #$02
+			RTS
+		.z_flag_set
+			PLX
+			SEP #$02
+			RTS
+	endif
 endmacro
 
-macro Map_ADC(addr, label)
+macro Map_ADD(addr, label)
 	pushpc
 	org <addr>
-	JSR ADC_<label>
+	JSR ADD_<label>
 	pullpc
 
-	ADC_<label>:
-		PHX
-		PHA
-		LDA.l DungeonMapMode
-		ASL A
-		TAX
-		PLA
-		CLC : ADC.l MapDrawingData_<label>, X
-		PLX
-		RTS
+	if not(defined("ADD_<label>"))
+		!ADD_<label> = 1
+		ADD_<label>:
+			PHX
+			PHA
+			%LDX_MapMode()
+			PLA
+			CLC : ADC.l MapDrawingData_<label>, X
+			PLX
+			RTS
+	endif
 endmacro
 
-macro Map_ADCY(addr, label)
+macro Map_ADDY(addr, label)
 	pushpc
 	org <addr>
-	JSR ADC_Y_<label>
+	JSR ADD_Y_<label>
 	pullpc
 
-	if not(defined("ADC_Y_<label>"))
-		!ADC_Y_<label> = 1
-		ADC_Y_<label>:
+	if not(defined("ADD_Y_<label>"))
+		!ADD_Y_<label> = 1
+		ADD_Y_<label>:
 			PHX
 			PHA
 			TYA
-			CLC : ADC.l DungeonMapMode
-			ASL A
-			TAX
+			%ADD_MapMode()
 			PLA
 			CLC : ADC.l MapDrawingData_<label>, X
 			PLX
@@ -225,9 +246,6 @@ pushpc
 
 org $8AE5DA
 	ADC.b $02 ; swap position of load and add for ease
-
-org $8AEBDB
-JSR ADC_Y_sprite_offset_y_base
 
 org $8AE652 ; steal some space from the old map-drawing code we're no longer using
 
@@ -245,10 +263,10 @@ LoadDungeonMapRoomPointer_0A:
 %Map_LDAY($8AE5F7, floor_data_offset)
 %Map_CMP($8AE5A2, row_count)
 %Map_CMP($8AE7FA, column_count)
-%Map_ADC($8AE896, sprite_offset_x_base)
-%Map_ADCY($8AE8B5, sprite_offset_y_base)
-%Map_ADC($8AE952, sprite_offset_y_base)
-%Map_ADCY($8AEBDB, sprite_offset_y_base)
+%Map_ADD($8AE896, sprite_offset_x_base)
+%Map_ADDY($8AE8B5, sprite_offset_y_base)
+%Map_ADD($8AE952, sprite_offset_y_base)
+%Map_ADDY($8AEBDB, sprite_offset_y_base)
 
 warnpc $8AE7F6
 padbyte $EA
@@ -273,17 +291,14 @@ LoadDungeonMapRoomPointer:
 	RTL
 
 PrepDrawRow:
-	CLC : ADC.l DungeonMapMode
-	ASL A
-	TAX
+	%ADD_MapMode()
 	LDA.l MapDrawingData_row_start_address, X
 	CLC : ADC.b $06
 	AND.w #$0FFF
 	TAX
 
 	LDA.l DungeonMapMode
-	CMP.w #$0001
-	BNE .done
+	BEQ .done
 
 	JSR DrawRowOfRoomConnections
 
@@ -301,6 +316,7 @@ DrawRowOfRoomConnections:
 	LDA.l DungeonMapFloorCountData, X
 	AND.w #$000F
 	CLC : ADC.w DungeonMapCurrentFloor
+	AND.w #$00FF
 	ASL A
 	TAX
 	LDA.l CustomMapDrawingData_floor_connection_data_offset, X

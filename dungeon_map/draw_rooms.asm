@@ -8,9 +8,7 @@ DrawNonexistentRoom:
 
 FinishRoom:
 	PHX
-	LDA.l DungeonMapMode
-	ASL A
-	TAX
+	%LDX_MapMode()
 	PLA
 	CLC : ADC.l MapDrawingData_column_spacing, X
 	TAX
@@ -169,16 +167,12 @@ DrawSingleFloorEntrances:
 	ASL A
 	TAX
 
-	CLC : ADC.l DungeonMapMode
-	ASL A
-	TAX
+	%ADD_MapMode()
 	LDA.l MapDrawingData_floor_data_offset, X
 	TAY
 	STZ.b $06
 
-	LDA.l DungeonMapMode
-	ASL A
-	TAX
+	%LDX_MapMode()
 
 .next_room
 	REP #$20
@@ -240,9 +234,7 @@ macro DrawSingleEntrance(offset)
 	PHA
 
 	LDA.b $02
-	CLC : ADC.l DungeonMapMode
-	ASL A
-	TAX
+	%ADD_MapMode()
 
 	PLA
 	CLC : ADC.l MapDrawingData_sprite_offset_y_base, X
@@ -265,9 +257,7 @@ DrawSingleRoomEntrances:
 	STA.b $0E
 	PHY
 
-	LDA.l DungeonMapMode
-	ASL A
-	TAY
+	%LDY_MapMode()
 
 	SEP #$10
 

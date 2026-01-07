@@ -173,16 +173,12 @@ StartCurrentRoomSearch:
 FindCurrentRoom:
 	PHX
 	TYA
-	CLC : ADC.l DungeonMapMode
-	ASL A
-	TAX
+	%ADD_MapMode()
 	LDA.l MapDrawingData_floor_data_offset, X
 	STA.b $0C
 	LDY.w #$0000
 
-	LDA.l DungeonMapMode
-	ASL A
-	TAX
+	%LDX_MapMode()
 
 	SEP #$20
 

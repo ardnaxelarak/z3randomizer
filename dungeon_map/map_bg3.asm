@@ -12,8 +12,7 @@ LoadStripes:
 
 .dungeon_map
 	LDA.l DungeonMapMode
-	CMP.b #$01
-	BEQ .doors
+	BNE .doors
 
 .not_doors
 	LDA.b #BG3DungeonMapStripes>>0
