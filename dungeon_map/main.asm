@@ -20,11 +20,6 @@ endmacro
 %WriteGFXSheetPointer($D5, DungeonMapIcons3)
 %WriteGFXSheetPointer($D6, DungeonMapDoorConnectors)
 
-; TR is such a problem child
-; %WriteGFXSheetPointer($A6, DungeonMapIcons2)
-
-%WriteGFXSheetPointer($D4, MapSheetD4)
-
 pullpc
 
 incsrc mappable_doors.asm
