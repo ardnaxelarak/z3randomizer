@@ -23,7 +23,7 @@ CheckSwitchMap:
 	STA.w DungeonID
 
 	LDA.b #$04
-	STA.w $0200
+	STA.w SubModuleInterface
 	REP #$20
 	LDA.w #$0000
 	RTL
@@ -37,7 +37,7 @@ DungeonMapSwitch_Submodule:
 	STA.w $0710
 
 	LDA.b #$01
-	STA.w $0200
+	STA.w SubModuleInterface
 	STA.w $020D
 	STZ.w $0213
 	STZ.w $021B
@@ -78,7 +78,7 @@ SkipMapSprites:
 
 	LDA.l DRMode
 	BNE +
-	LDA.w $0200
+	LDA.w SubModuleInterface
 	CMP.b #$04
 	BEQ +
 	JSL DrawEntrances
@@ -91,7 +91,7 @@ SkipMapSprites:
 	STZ.b $0E
 	STZ.b $0F
 
-	LDA.w $0200
+	LDA.w SubModuleInterface
 	CMP.b #$04
 	BNE +
 		JML $8AEAFC

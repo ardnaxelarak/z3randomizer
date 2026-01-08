@@ -45,10 +45,10 @@ DRHUD_BossIndicator:
 	LDA.w CompassField : AND.l DungeonMask, x
 	SEP #$20
 	BEQ .draw_indicator
-    LDA.l CompassBossIndicator, x : CMP.b RoomIndex : BNE .draw_indicator
-    LDY.w #!RedSquare
+	LDA.l CompassBossIndicator, x : CMP.b RoomIndex : BNE .draw_indicator
+	LDY.w #!RedSquare
 .draw_indicator
-    STY.w HUDMultiIndicator
+	STY.w HUDMultiIndicator
 	BRA DRHUD_DrawCurrentDungeonIndicator
 
 DRHUD_EnemyDropIndicator:
@@ -59,12 +59,20 @@ DRHUD_EnemyDropIndicator:
 	SEP #$10 : TAX : REP #$10
 
 DRHUD_DrawCurrentDungeonIndicator: ; mX
-    LDA.l DRMode : BIT.b #$02 : BEQ DRHUD_Finished
-    LDY.w #!BlankTile
-    LDA.w CurrentHealth : BEQ .draw_indicator
+	LDA.l DRMode : BIT.b #$02 : BNE + : JMP DRHUD_Finished : +
+	LDY.w #!BlankTile
+	LDA.w CurrentHealth : BEQ .draw_indicator
 
-    REP #$20 : LDA.l DungeonReminderTable,X : TAY
-    SEP #$20
+	LDA.b GameMode
+	CMP.b #$0E : BNE .get_indicator
+	LDA.b GameSubMode
+	CMP.b #$03 : BNE .get_indicator
+	LDA.w SubModuleInterface
+	CMP.b #$06 : BEQ .draw_indicator
+
+.get_indicator
+	REP #$20 : LDA.l DungeonReminderTable,X : TAY
+	SEP #$20
 .draw_indicator
 	STY.w HUDCurrentDungeonWorld
 
