@@ -8,7 +8,7 @@ BlinkLoot:
 	BNE .hide
 
 	LDA.b FrameCounter
-	AND.b #$10
+	AND.b #$20
 	BEQ .show
 .hide
 	LDA.b #$01

@@ -72,6 +72,10 @@ DungeonMapSwitch_Submodule:
 SkipMapSprites:
 	STZ.b $00
 
+	LDA.b $02 : PHA
+	LDA.b $03 : PHA
+	LDA.b $04 : PHA
+
 	LDA.l DRMode
 	BNE +
 	LDA.w $0200
@@ -79,6 +83,10 @@ SkipMapSprites:
 	BEQ +
 	JSL DrawEntrances
 +
+
+	PLA : STA.b $04
+	PLA : STA.b $03
+	PLA : STA.b $02
 
 	STZ.b $0E
 	STZ.b $0F

@@ -18,10 +18,10 @@ dw $C340, $8340, $4350, $0340 ; 10
 dw $83B7, $C3AC, $03B7, $438A ; 11
 dw $C354, $8354, $4354, $0354 ; 12
 dw $FFFF, $83B7, $FFFF, $03B7 ; 13
-dw $C351, $8341, $4351, $0351 ; 14
+dw $012E, $012F, $013E, $013F ; 14
 dw $C374, $8340, $4341, $0340 ; 15
-dw $0108, $0109, $C3B2, $83B2 ; 16 - gross (add middle section if feasible)
-dw $C104, $0103, $4104, $0104 ; 17
+dw $0108, $0109, $436B, $036B ; 16
+dw $C114, $0104, $4114, $0114 ; 17
 dw $C3B5, $FFFF, $43B4, $FFFF ; 18 - useless fairy drop
 dw $FFFF, $8369, $FFFF, $035A ; 19
 dw $03E7, $03E8, $03F7, $0361 ; 1A
@@ -37,7 +37,7 @@ dw $FFFF, $FFFF, $FFFF, $039B ; 23
 dw $4365, $0365, $0364, $0365 ; 24
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 25 - unused
 dw $039B, $03E4, $4363, $0382 ; 26
-dw $C104, $0103, $4104, $0104 ; 27
+dw $C114, $0104, $4114, $0114 ; 27
 dw $C3A5, $FFFF, $4358, $0348 ; 28
 dw $FFFF, $FFFF, $FFFF, $0396 ; 29 - Mothula
 dw $C350, $8352, $4350, $03F8 ; 2A
@@ -117,7 +117,7 @@ dw $038F, $038F, $839B, $0366 ; 73
 dw $43B2, $03B2, $43A8, $03A8 ; 74
 dw $038F, $83B4, $0365, $03B5 ; 75
 dw $838A, $03F4, $03B7, $C399 ; 76
-dw $C370, $8340, $43A0, $03A0 ; 77
+dw $0126, $0127, $4137, $0137 ; 77
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 78 - unused
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 79 - unused
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 7A - unused
@@ -133,7 +133,7 @@ dw $038F, $83B5, $4365, $43B7 ; 83
 dw $C344, $8345, $4354, $0354 ; 84
 dw $C38B, $C39B, $03B7, $439B ; 85
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 86 - unused
-dw $8399, $439B, $4394, $838F ; 87
+dw $0136, $0117, $4394, $838F ; 87
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 88 - unused
 dw $C3B0, $83B0, $FFFF, $FFFF ; 89
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 8A - unused
