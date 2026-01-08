@@ -34,7 +34,7 @@ dw $FFFF, $FFFF, $438F, $FFFF ; 20
 dw $4348, $0363, $C348, $8368 ; 21
 dw $FFFF, $FFFF, $4368, $0348 ; 22
 dw $FFFF, $FFFF, $FFFF, $039B ; 23
-dw $4365, $0365, $0364, $0365 ; 24
+dw $4365, $0365, $0132, $0133 ; 24
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 25 - unused
 dw $039B, $03E4, $4363, $0382 ; 26
 dw $C114, $0104, $4114, $0114 ; 27
@@ -50,9 +50,9 @@ dw $C361, $FFFF, $839A, $FFFF ; 30 - inset stairs if possible
 dw $0124, $0125, $0134, $0135 ; 31
 dw $43C4, $03C4, $43D4, $03D4 ; 32
 dw $FFFF, $FFFF, $438F, $FFFF ; 33
-dw $4348, $0368, $4349, $8368 ; 34
+dw $0129, $012A, $0139, $013A ; 34
 dw $C38D, $039B, $43B1, $037D ; 35
-dw $C355, $8355, $4355, $0355 ; 36
+dw $0118, $0119, $0128, $4128 ; 36
 dw $439B, $838D, $437D, $03B1 ; 37
 dw $C3AC, $FFFF, $43B7, $FFFF ; 38
 dw $FFFF, $FFFF, $039B, $0381 ; 39
@@ -116,7 +116,7 @@ dw $437A, $037A, $8386, $0342 ; 72 - slight cheating I guess...
 dw $038F, $038F, $839B, $0366 ; 73
 dw $43B2, $03B2, $43A8, $03A8 ; 74
 dw $038F, $83B4, $0365, $03B5 ; 75
-dw $838A, $03F4, $03B7, $C399 ; 76
+dw $010D, $010E, $011D, $011E ; 76
 dw $0126, $0127, $4137, $0137 ; 77
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 78 - unused
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 79 - unused
@@ -148,7 +148,7 @@ dw $03D2, $C3B7, $0364, $039F ; 92
 dw $C36C, $836C, $C39B, $838F ; 93
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 94 - unused
 dw $FFFF, $83B7, $FFFF, $03B5 ; 95
-dw $C3B7, $FFFF, $03B7, $C39C ; 96
+dw $010F, $FFFF, $011F, $C39C ; 96
 dw $039A, $83B4, $839B, $036F ; 97
 dw $FFFF, $FFFF, $43B2, $0397 ; 98
 dw $FFFF, $038F, $434A, $0363 ; 99
@@ -180,7 +180,7 @@ dw $C35C, $83A2, $039B, $0366 ; B2
 dw $0365, $FFFF, $0365, $FFFF ; B3
 dw $03FA, $83FD, $03EC, $03ED ; B4
 dw $03EB, $83FD, $83FA, $03FD ; B5
-dw $C3A5, $83B4, $43B5, $03B5 ; B6
+dw $039A, $038F, $0361, $0361 ; B6
 dw $C3B4, $FFFF, $43B5, $FFFF ; B7
 dw $FFFF, $838A, $FFFF, $03B4 ; B8
 dw $43F3, $03F3, $4354, $0354 ; B9
@@ -189,7 +189,7 @@ dw $838A, $8364, $4372, $0364 ; BB
 dw $83BE, $C38A, $03D0, $438A ; BC
 dw $FFFF, $FFFF, $FFFF, $FFFF ; BD - unused
 dw $FFFF, $439A, $FFFF, $C365 ; BE
-dw $FFFF, $8396, $438D, $FFFF ; BF
+dw $FFFF, $FFFF, $438D, $FFFF ; BF
 dw $C372, $C399, $4372, $C399 ; C0
 dw $039B, $0364, $4365, $8364 ; C1
 dw $C351, $8353, $4341, $0353 ; C2
@@ -212,7 +212,7 @@ dw $FFFF, $83B5, $FFFF, $0395 ; D2
 dw $FFFF, $FFFF, $FFFF, $FFFF ; D3 - unused
 dw $FFFF, $FFFF, $FFFF, $FFFF ; D4 - unused
 dw $C3B5, $FFFF, $43B5, $FFFF ; D5
-dw $C3B5, $83B5, $43B4, $03B5 ; D6
+dw $C3B5, $010A, $43B4, $011A ; D6
 dw $FFFF, $FFFF, $FFFF, $FFFF ; D7 - unused
 dw $FFFF, $8361, $FFFF, $839B ; D8
 dw $FFFF, $FFFF, $4360, $0360 ; D9
