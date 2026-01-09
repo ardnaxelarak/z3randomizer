@@ -1,4 +1,14 @@
 CheckSwitchMap:
+	LDA.l DRMode
+	BEQ +
+	LDA.l DungeonMapMode
+	BNE +
+
+	; fancy door map, will figure out later
+	LDA.w #$0002 ; ignore input! nothing to see here!
+	RTL
+
++
 	SEP #$20
 	LDA.b $F6
 	AND.b #$30
@@ -6,7 +16,7 @@ CheckSwitchMap:
 
 	; what we wrote over
 	REP #$20
-	LDA.w $8AF5E9, X
+	LDA.w DungeonMapFloorCountData, X
 	AND.w #$000F
 	CLC : ADC.b $00
 	RTL
@@ -99,7 +109,11 @@ SkipMapSprites:
 
 	LDA.l DRMode
 	BEQ +
-		JML $8AEAEE
+	LDA.l DungeonMapMode
+	BEQ .draw_none
+		JML $8AEADE
+	.draw_none
+		JML $8AEAFC
 +
 
 	LDA.l CachedDungeonID

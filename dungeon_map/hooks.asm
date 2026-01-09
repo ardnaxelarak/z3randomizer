@@ -38,13 +38,13 @@ db $61, $56, $57, $62
 
 ; unused chest data
 org $81E9A5
-dw $00F0 ; freezor room, second chest (only one chest in supertile)
+dw $000F ; freezor room, second chest (only one chest in supertile)
 
 org $81EA6E
-dw $00F0 ; mire spike room, second chest (only one chest in supertile)
+dw $000F ; mire spike room, second chest (only one chest in supertile)
 
 org $81EAF8
-dw $00F0 ; GT button/switch/bladetrap room (no chest in supertile)
+dw $000F ; GT button/switch/bladetrap room (no chest in supertile)
 
 ; Dungeon Map Palettes 2-5 left half
 org $9BE544
@@ -75,7 +75,7 @@ org $8AEE2B
 ;--------------------------------------------------------------------------------
 org $8AE64D
 	PLX
-	JML DrawDungeonMapRoom
+	JML NormalDrawDungeonMapRoom
 
 org $8AE606
 	PLX
@@ -221,3 +221,53 @@ org $8AE8F9
 org $8AEBC6
 	JSL GetLocationMarkerLeft
 	NOP
+
+;================================================================================
+; Draw Wacky Door Rando Layouts
+;--------------------------------------------------------------------------------
+org $8AE3D7
+	LDA.l DungeonMapMode
+	BNE .normal
+	LDA.l DRMode
+	BEQ .normal
+
+	JSL DrawWackyDoorRandoStuff
+	JMP.w $8AE422
+	NOP
+
+	.normal
+warnpc $8AE3EB
+
+org $8AE439
+	dw $0F19, $4F19, $8F19, $CF19
+
+org $8AE449
+	dw $0F1A, $8F1A
+
+org $8AE451
+	dw $0F1B, $4F1B
+
+org $8AE473
+	NOP #2
+
+org $8AE4A4
+	NOP #2
+
+org $8AE4DC
+	NOP #2
+
+org $8AE4F9
+	dw $0F1E, $0F1F, $0F20, $0F21
+	dw $0F22, $0F23, $0F24, $0F25
+
+org $8AE539
+	LDA.w #$0F1C
+
+org $8AE573
+	LDA.w #$0F1D
+
+org $8AE555
+	NOP #2
+
+org $8AE576
+	NOP #2

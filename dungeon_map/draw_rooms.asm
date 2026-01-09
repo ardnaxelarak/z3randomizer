@@ -14,7 +14,13 @@ FinishRoom:
 	TAX
 	JML $8AE7F6
 
+NormalDrawDungeonMapRoom:
+	JSL DrawDungeonMapRoom
+	JMP FinishRoom
+
 ; $CA has room_id
+; $0E has quadrant flags
+; X has address to draw at
 DrawDungeonMapRoom:
 	REP #$20
 	PHB : PHK : PLB ; need to keep this in same bank as data, or else specify bank
@@ -136,7 +142,7 @@ DrawDungeonMapRoom:
 .done
 	PLA : STA.b $0A
 	PLB
-	JMP FinishRoom
+	RTL
 
 DrawEntrances:
 	REP #$30

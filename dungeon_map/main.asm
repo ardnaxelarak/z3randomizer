@@ -27,9 +27,11 @@ endmacro
 pullpc
 
 incsrc mappable_doors.asm
+incsrc current_room_map.asm
 incsrc draw_rooms.asm
 incsrc map_bg3.asm
 incsrc dungeon_switch.asm
 incsrc draw_loot.asm
 incsrc check_loot.asm
 incsrc blink_loot.asm
+incsrc data/doors_display.asm

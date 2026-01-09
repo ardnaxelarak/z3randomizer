@@ -197,11 +197,12 @@ org $B9FF10
 ItemSources:
 	db $09
 
+; $B9FF11
 AlwaysShowCompass:
 	db $01
 
-; $00 - vanilla 5x5 maps
-; $01 - special DR 4x3 maps
+; $B9FF12
+; $0000 - vanilla 5x5 maps
+; $0001 - special DR 4x3 maps
 DungeonMapMode:
 	dw $0000
-
