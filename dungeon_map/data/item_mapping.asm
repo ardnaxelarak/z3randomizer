@@ -20,7 +20,7 @@ db $0B ; 12 - Lamp
 db $06 ; 13 - Shovel
 db $0B ; 14 - Flute
 db $0B ; 15 - Somaria
-db $0B ; 16 - Bottle
+db $06 ; 16 - Bottle
 db $05 ; 17 - Heartpiece
 db $06 ; 18 - Byrna
 db $06 ; 19 - Cape
@@ -41,9 +41,9 @@ db $02 ; 27 - Bomb
 db $02 ; 28 - 3 bombs
 db $06 ; 29 - Mushroom
 db $06 ; 2A - Red boomerang
-db $0B ; 2B - Full bottle (red)
-db $0B ; 2C - Full bottle (green)
-db $0B ; 2D - Full bottle (blue)
+db $06 ; 2B - Full bottle (red)
+db $06 ; 2C - Full bottle (green)
+db $06 ; 2D - Full bottle (blue)
 db $05 ; 2E - Potion refill (red)
 db $05 ; 2F - Potion refill (green)
 db $05 ; 30 - Potion refill (blue)
@@ -58,8 +58,8 @@ db $0A ; 38 - Blue pendant
 db $0A ; 39 - Red pendant
 db $0B ; 3A - Tossed bow
 db $0B ; 3B - Silvers
-db $0B ; 3C - Full bottle (bee)
-db $0B ; 3D - Full bottle (fairy)
+db $06 ; 3C - Full bottle (bee)
+db $06 ; 3D - Full bottle (fairy)
 db $05 ; 3E - Boss heart
 db $05 ; 3F - Sanc heart
 db $02 ; 40 - 100 rupees
@@ -70,7 +70,7 @@ db $02 ; 44 - 10 arrows
 db $02 ; 45 - Small magic
 db $02 ; 46 - 300 rupees
 db $02 ; 47 - 20 rupees green
-db $0B ; 48 - Full bottle (good bee)
+db $06 ; 48 - Full bottle (good bee)
 db $0B ; 49 - Tossed fighter sword
 db $0B ; 4A - Active Flute
 db $0B ; 4B - Boots
