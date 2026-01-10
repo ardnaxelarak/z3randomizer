@@ -38,13 +38,13 @@ db $61, $56, $57, $62
 
 ; unused chest data
 org $81E9A5
-dw $00F0 ; freezor room, second chest (only one chest in supertile)
+dw $000F ; freezor room, second chest (only one chest in supertile)
 
 org $81EA6E
-dw $00F0 ; mire spike room, second chest (only one chest in supertile)
+dw $000F ; mire spike room, second chest (only one chest in supertile)
 
 org $81EAF8
-dw $00F0 ; GT button/switch/bladetrap room (no chest in supertile)
+dw $000F ; GT button/switch/bladetrap room (no chest in supertile)
 
 ; Dungeon Map Palettes 2-5 left half
 org $9BE544
