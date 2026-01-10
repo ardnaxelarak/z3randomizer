@@ -110,9 +110,10 @@ SkipMapSprites:
 	LDA.l DRMode
 	BEQ +
 	LDA.l DungeonMapMode
-	BEQ .draw_none
+	BEQ .no_vanilla_draw
 		JML $8AEADE
-	.draw_none
+	.no_vanilla_draw
+		JSL DrawBlinkerFancyMode
 		JML $8AEAFC
 +
 

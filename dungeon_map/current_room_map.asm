@@ -1,5 +1,5 @@
 !CenterTile = $036A
-!ConnectorPalette = $0800
+!ConnectorPalette = $1000
 
 DrawWackyDoorRandoStuff:
 	JSL DrawBorder
@@ -10,6 +10,8 @@ DrawWackyDoorRandoStuff:
 	STA.b $CA
 	LDX.w #!CenterTile
 	JSL DrawFullRoomTile
+
+	JSL ClearDoorSlotsTable
 
 	; multiply room id by 24 to get index in doors table
 	LDA.l CurrentDisplayedRoom
@@ -23,6 +25,24 @@ DrawWackyDoorRandoStuff:
 	STA.l DisplayedRoomDoorIndex
 
 	JSL DrawConnectedRooms
+	RTL
+
+ClearDoorSlotsTable:
+	LDX.w #$0026
+	LDA.w #$FF0F
+-	STA.l DoorSlots, X
+	DEX : DEX
+	BPL -
+	RTL
+
+ClearDoorSlotScratch:
+	PHX
+	LDX.w #$0006
+	LDA.w #$FF0F
+-	STA.l DoorSlotScratch, X
+	DEX : DEX
+	BPL -
+	PLX
 	RTL
 
 DrawFullRoomTile:
@@ -54,52 +74,127 @@ DrawConnectedRooms:
 	PLB
 	RTL
 
+CheckEdgesTable:
+	LDA.b $00
+	ASL A
+	CLC : ADC.b $00
+	ADC.b $02
+	XBA
+	ORA.l CurrentDisplayedRoom
+	STA.b $0C
+
+	PHX
+	LDX.w #$0000
+-
+	LDA.w EdgeConnectionIndices, X
+	BMI .done
+	CMP.b $0C
+	BEQ .match
+	INX #4
+	BRA -
+
+.match
+	INX #2
+	LDA.w EdgeConnectionIndices, X
+	TAX
+	LDA.l NorthOpenEdge, X
+
+.done
+	PLX
+	RTS
+
+GetConnection:
+	LDA.l DoorTable, X
+.found
+	STA.b $08
+	AND.w #$00FF
+	CMP.w #$0003
+	BEQ .not_found
+
+	STA.b $0C
+	LDA.b $08
+	JSR GetWhichDoorPosition
+	XBA
+	ORA.b $0C
+	RTS
+
+.not_found
+	JSR CheckEdgesTable
+	CMP.w #$0000
+	BPL .found
+	LDA.w #$FF0F
+	RTS
+
 print "DrawSide: ", pc
 ; $00 - Side
 ; $02 - Door position number on side
+; $03 - Door index number on side
 ; $04 - Target door position
 ; $06 - Number of doors on side
 ; $08 - Room Drawn Address
-; $0A - Door Index on side
 DrawSide:
+	JSL ClearDoorSlotScratch
+
 	STZ.b $06
+	STZ.b $02
 	LDY.w #$0002
 
 -
-	LDA.l DoorTable, X
-	AND.w #$00FF
-	CMP.w #$0003
-	BEQ +
+	JSR GetConnection
+	BMI +
 	INC.b $06
-+	INX : INX
+	PHX
+	PHA
+	LDA.b $02
+	ASL A
+	TAX
+	PLA
+	STA.l DoorSlotScratch, X
+	PLX
++
+	INX : INX
+	INC.b $02
 	DEY
 	BPL -
 
+	PHX
+
 	LDY.b $06
-	LDA.w DoorsCurrentRoomOffsets_offsets, Y
+	LDA.w DoorSlotOffsets, Y
 	AND.w #$00FF
 	STA.b $02
 
 	LDY.b $00
-	LDA.w DoorsCurrentRoomOffsets_index, Y
+	LDA.w DoorSlotSides, Y
 	AND.w #$00FF
 	CLC : ADC.b $02
 	TAY
 
-	DEX #6
 	STZ.b $02
-	STZ.b $0A
-
 -
-	LDA.l DoorTable, X
+	LDA.b $02
 	AND.w #$00FF
-	CMP.w #$0003
-	BEQ +
+	ASL A
+	TAX
+	LDA.l DoorSlotScratch, X
+	BPL .present
+.missing
+	LDA.b $06
+	CMP.w #$0002
+	BNE +
+	JSR DrawDoubleConnectorRoot
+	BRA +
+
+.present
+	TYX
+	STA.l DoorSlots, X
 	JSR DrawSingleConnectedRoom
+	INC.b $03
+	INY : INY
 +
-	INX : INX
 	INC.b $02
 	LDA.b $02
+	AND.w #$00FF
 	CMP.w #$0003
 	BCC -
 
@@ -107,41 +202,39 @@ DrawSide:
 	CMP.w #$0002
 	BEQ .two
 	BCS .three
-
-.other
-	RTS
+	BRA .done
 
 .two
-	PHX
 	JSR DrawDoubleConnector
-	PLX
-	RTS
+	BRA .done
 
 .three
-	PHX
 	JSR DrawTripleConnector
+
+.done
 	PLX
 	RTS
 
+
 DrawSingleConnectedRoom:
+	STA.b $0A
+	AND.w #$00FF
 	STA.b $CA
-	PHX
-	LDA.w DoorsCurrentRoomOffsets, Y
+	LDA.w DoorSlotsBG2, Y
 	CLC : ADC.w #!CenterTile
 	STA.b $08
 	TAX
 	JSL DrawFullRoomTile
-	INY : INY
-	PLX
 
 	PHY
-
 	LDA.b $06
 	BEQ ++
 	CMP.w #$0001
 	BEQ .single
 
-	JSR GetWhichDoorPosition
+	TYX
+	LDA.l DoorSlots+1, X
+	AND.w #$00FF
 	STA.b $04
 	BRA .draw
 
@@ -151,7 +244,9 @@ DrawSingleConnectedRoom:
 	CLC : ADC.b $02
 	STA.b $04
 
-	JSR GetWhichDoorPosition
+	TYX
+	LDA.l DoorSlots+1, X
+	AND.w #$00FF
 	CLC : ADC.b $04
 	STA.b $04
 	ASL A
@@ -169,11 +264,9 @@ DrawSingleConnectedRoom:
 
 	PLY
 .done
-	INC.b $0A
 	RTS
 
 GetWhichDoorPosition:
-	LDA.l DoorTable, X
 	BMI .edge
 	AND.w #$0300
 	XBA
@@ -246,7 +339,6 @@ macro Draw2x3Connector(offset, label)
 endmacro
 
 macro Draw2TileConnector(offset1, offset2, flip, sublabel)
-	LDX.b $08
 	LDA.w DoorConnectionTiles_<sublabel>, Y
 	BEQ ?+
 	ORA.w #!ConnectorPalette
@@ -263,7 +355,9 @@ macro Draw2TileConnector(offset1, offset2, flip, sublabel)
 endmacro
 
 GetConnectorIndex:
-+	LDY.b $0A
+	LDA.b $03
+	AND.w #$00FF
+	TAY
 	LDA.b $06
 	CMP.w #$0002
 	BEQ +
@@ -276,6 +370,25 @@ GetConnectorIndex:
 	TAY
 	RTS
 
+DrawDoubleConnectorRoot:
+	LDA.b $02
+	AND.w #$00FF
+	EOR.w #$FFFF
+	CLC : ADC.w #$0010
+	ASL A : ASL A
+	PHY
+	TAY
+	LDX.w #!CenterTile
+	LDA.b $00
+	BNE + : %Draw2TileConnector(-$40, -$3E, $0000, vertical) : BRA ++
++	DEC A : BNE + : %Draw2TileConnector(-$02, $3E, $0000, horizontal) : BRA ++
++	DEC A : BNE + : %Draw2TileConnector($80, $82, $8000, vertical) : BRA ++
++	DEC A : BNE + : %Draw2TileConnector($04, $44, $4000, horizontal) : BRA ++
++
+++
+	PLY
+	RTS
+
 DrawEastConnectors:
 	LDA.b $06 : DEC A
 	BNE +
@@ -284,6 +397,7 @@ DrawEastConnectors:
 
 +	JSR GetConnectorIndex
 	PHX
+	LDX.b $08
 	%Draw2TileConnector(-$02, $3E, $4000, horizontal)
 	PLX
 	RTS
@@ -297,6 +411,7 @@ DrawWestConnectors:
 
 +	JSR GetConnectorIndex
 	PHX
+	LDX.b $08
 	%Draw2TileConnector($04, $44, $0000, horizontal)
 	PLX
 	RTS
@@ -310,6 +425,7 @@ DrawNorthConnectors:
 
 +	JSR GetConnectorIndex
 	PHX
+	LDX.b $08
 	%Draw2TileConnector($80, $82, $0000, vertical)
 	PLX
 	RTS
@@ -322,6 +438,7 @@ DrawSouthConnectors:
 
 +	JSR GetConnectorIndex
 	PHX
+	LDX.b $08
 	%Draw2TileConnector(-$40, -$3E, $8000, vertical)
 	PLX
 	RTS
@@ -395,3 +512,38 @@ DrawDoubleConnector:
 
 DrawTripleConnector:
 	RTS
+
+DrawBlinkerFancyMode:
+	LDX.b $00
+	STZ.w OAMBufferAux, X
+	TXA
+	ASL A : ASL A
+	TAX
+
+	REP #$20
+	LDA.b LinkPosX
+	AND.w #$01E0
+	ASL A : ASL A : ASL A
+	XBA
+	CLC : ADC.w #$00A4
+	STA.w OAMBuffer, X
+
+	LDA.b LinkPosY
+	AND.w #$01E0
+	ASL A : ASL A : ASL A
+	XBA
+	CLC : ADC.w #$0064
+	STA.w OAMBuffer+1, X
+
+	SEP #$20
+	LDA.b FrameCounter
+	AND.b #$0C
+	LSR A : LSR A
+	TAY
+
+	LDA.w $8AEB50
+	STA.w OAMBuffer+2, X
+
+	LDA.w $8AEB58, Y
+	STA.w OAMBuffer+3, X
+	RTL

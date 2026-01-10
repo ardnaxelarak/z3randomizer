@@ -1,36 +1,22 @@
-DoorsCurrentRoomOffsets:
-.north
-..3
+DoorSlotsBG2:
+; north
 	dw $FEBA, $FEC0, $FEC6
-..2
 	dw $FEBC, $FEC4
-..1
-	dw $FEC0
-.west
-..3
+; west
 	dw $FF36, $FFF6, $00B6
-..2
 	dw $FF76, $0076
-..1
-	dw $FFF6
-.south
-..3
+; south
 	dw $013A, $0140, $0146
-..2
 	dw $013C, $0144
-..1
-	dw $0140
-.east
-..3
+; east
 	dw $FF4A, $000A, $00CA
-..2
 	dw $FF8A, $008A
-..1
-	dw $000A
-.index
-	db $00, $0C, $18, $24
-.offsets
-	db $00, $0A, $06, $00
+
+DoorSlotSides:
+	db $00, $0A, $14, $1E
+
+DoorSlotOffsets:
+	db $02, $02, $06, $00
 
 SingleEdgeCurrentRoomConnectors:
 .north
@@ -125,3 +111,54 @@ EdgePositions:
 	db $00 ; Desert East Wing
 	db $00, $02 ; TT Triple
 	db $02 ; TT Big Key Chest
+
+EdgeConnectionIndices:
+; North
+	dw $0182, $0000
+	dw $0082, $0003
+	dw $0283, $0006
+	dw $0084, $0009
+	dw $0184, $000C
+	dw $0284, $000F
+	dw $0085, $0012
+	dw $01DB, $0015
+	dw $02DB, $0018
+	dw $00DC, $001B
+	dw $01DC, $001E
+
+; South
+	dw $0772, $0021
+	dw $0672, $0024
+	dw $0873, $0027
+	dw $0674, $002A
+	dw $0774, $002D
+	dw $0874, $0030
+	dw $0675, $0033
+	dw $07CB, $0036
+	dw $08CB, $0039
+	dw $06CC, $003C
+	dw $07CC, $003F
+
+; West
+	dw $0565, $0042
+	dw $0574, $0045
+	dw $0575, $0048
+	dw $0582, $004B
+	dw $0382, $004E
+	dw $0385, $0051
+	dw $03CC, $0054
+	dw $05CC, $0057
+	dw $05DC, $005A
+
+; East
+	dw $0B64, $005D
+	dw $0B73, $0060
+	dw $0B74, $0063
+	dw $0B81, $0066
+	dw $0981, $0069
+	dw $0984, $006C
+	dw $09CB, $006F
+	dw $0BCB, $0072
+	dw $0BDB, $0075
+
+	dw $FFFF
