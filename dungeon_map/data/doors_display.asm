@@ -93,6 +93,7 @@ MultiConnectorTiles:
 ..two
 	dw $FF7E, $FFBC, $00BE, $FFC6
 ..three
+	dw $FF7C, $FF7C, $00BC, $FF86
 .increment
 	db $02, $40
 

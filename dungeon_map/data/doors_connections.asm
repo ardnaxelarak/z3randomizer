@@ -23,7 +23,7 @@ DoorConnectionTiles:
 .horizontal
 	dw $0300, $0300 ; $00
 	dw $01C4, $0300 ; $01 top -> top
-	dw $C1D5, $C1D4 ; $02 top -> middle
+	dw $C1D4, $C1D5 ; $02 top -> middle
 	dw $81C7, $41C7 ; $03 top -> bottom
 	dw $81D4, $81D5 ; $04 middle -> top
 	dw $01C5, $41C5 ; $05 middle -> middle
@@ -40,4 +40,4 @@ DoorConnectionTiles:
 	dw $C1D7, $01D7 ; $10 middle-bottom -> top-middle
 	dw $81D4, $C1D6 ; $11 middle-bottom -> top-bottom
 	dw $01C5, $01C6 ; $12 middle-bottom -> middle-bottom
-	dw $41C6, $01C6 ; $13 triple -> triple
+	dw $81C6, $01C6 ; $13 triple -> triple

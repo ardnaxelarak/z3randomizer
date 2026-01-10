@@ -209,6 +209,7 @@ DrawSide:
 	BRA .done
 
 .three
+	JSR DrawTripleConnectorRoot
 	JSR DrawTripleConnector
 
 .done
@@ -270,6 +271,10 @@ GetWhichDoorPosition:
 	BMI .edge
 	AND.w #$0300
 	XBA
+	CMP.w #$0003
+	BNE +
+	LDA.w #$0002
++
 	RTS
 
 .edge
@@ -375,6 +380,22 @@ DrawDoubleConnectorRoot:
 	AND.w #$00FF
 	EOR.w #$FFFF
 	CLC : ADC.w #$0010
+	ASL A : ASL A
+	PHY
+	TAY
+	LDX.w #!CenterTile
+	LDA.b $00
+	BNE + : %Draw2TileConnector(-$40, -$3E, $0000, vertical) : BRA ++
++	DEC A : BNE + : %Draw2TileConnector(-$02, $3E, $0000, horizontal) : BRA ++
++	DEC A : BNE + : %Draw2TileConnector($80, $82, $8000, vertical) : BRA ++
++	DEC A : BNE + : %Draw2TileConnector($04, $44, $4000, horizontal) : BRA ++
++
+++
+	PLY
+	RTS
+
+DrawTripleConnectorRoot:
+	LDA.w #$0013
 	ASL A : ASL A
 	PHY
 	TAY
@@ -511,6 +532,38 @@ DrawDoubleConnector:
 	RTS
 
 DrawTripleConnector:
+	LDA.b $00
+	AND.w #$0001
+	TAY
+	LDA.w MultiConnectorTiles_increment, Y
+	AND.w #$00FF
+	STA.b $0C
+
+	LDA.b $00
+	ASL A
+	TAY
+	LDA.w MultiConnectorTiles_start_offset_three, Y
+	CLC : ADC.w #!CenterTile
+	TAX
+
+	LDY.b $00
+	LDA.w MultiConnectorTiles_direction_index, Y
+	AND.w #$00FF
+	TAY
+
+	LDA.w #$0005
+	STA.b $0E
+-
+	LDA.w MultiConnectorTiles+8, Y
+	ORA.w #!ConnectorPalette
+	STA.l $7F0000, X
+	TXA
+	CLC : ADC.b $0C
+	TAX
+	INY : INY
+	DEC.b $0E
+	BPL -
+
 	RTS
 
 DrawBlinkerFancyMode:
