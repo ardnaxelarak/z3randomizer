@@ -115,6 +115,19 @@ CacheCurrentDungeon:
 	STA.l CachedDungeonID
 	LDA.b CurrentFloor
 	STA.l CachedCurrentFloor
+
+	LDA.l DRMode
+	BEQ +
+
+	LDA.w DungeonID
+	PHX
+	ASL A
+	TAX
+	LDA.l DungeonMapData.floor, X
+	STA.b $A4
+	PLX
+
++
 	REP #$20
 	RTL
 
