@@ -242,3 +242,14 @@ EdgeConnectionIndices:
 	dw $0BDB, $0075
 
 	dw $FFFF
+
+InRoomConnectionIndices:
+	dw $020B, $0000
+	dw $081B, $0002
+	dw $023F, $0004
+	dw $081F, $0006
+	dw $007E, $0008
+	dw $065E, $000A
+	dw $0296, $000C
+	dw $083D, $000E
+	dw $FFFF

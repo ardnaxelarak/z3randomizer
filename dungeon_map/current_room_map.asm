@@ -78,6 +78,28 @@ DrawFullRoomTile:
 	JSL DrawDungeonMapRoom
 	PLY
 
+	LDA.b $CA
+	CMP.w #$003F : BEQ .top_right
+	CMP.w #$0096 : BEQ .top_right
+	CMP.w #$007E : BEQ .top_left
+	CMP.w #$001B : BEQ .bottom_right
+	BRA +
+
+.top_right
+	LDA.w #$01C0|!ConnectorPalette
+	STA.l $7F0002, X
+	BRA +
+
+.top_left
+	LDA.w #$01C0|!ConnectorPalette
+	STA.l $7F0000, X
+	BRA +
+
+.bottom_right
+	LDA.w #$01C0|!ConnectorPalette
+	STA.l $7F0042, X
+
++
 	LDA.b $00 : PHA
 	LDA.b $02 : PHA
 	LDA.b $06 : PHA
@@ -176,6 +198,35 @@ CheckEdgesTable:
 	PLX
 	RTS
 
+CheckInRoomTable:
+	LDA.b $00
+	ASL A
+	CLC : ADC.b $00
+	ADC.b $02
+	XBA
+	ORA.l CurrentDisplayedRoom
+	STA.b $0C
+
+	PHX
+	LDX.w #$0000
+-
+	LDA.w InRoomConnectionIndices, X
+	BMI .done
+	CMP.b $0C
+	BEQ .match
+	INX #4
+	BRA -
+
+.match
+	INX #2
+	LDA.w InRoomConnectionIndices, X
+	TAX
+	LDA.l InroomStairsTable, X
+
+.done
+	PLX
+	RTS
+
 GetConnection:
 	LDA.l DoorTable, X
 .found
@@ -193,8 +244,11 @@ GetConnection:
 
 .not_found
 	JSR CheckEdgesTable
-	CMP.w #$0000
-	BPL .found
+	CMP.w #$FFFF
+	BNE .found
+	JSR CheckInRoomTable
+	CMP.w #$FFFF
+	BNE .found
 	LDA.w #$FF0F
 	RTS
 
@@ -301,26 +355,33 @@ DrawSingleConnectedRoom:
 	JSL DrawFullRoomTile
 
 	PHY
-	LDA.b $06
-	BEQ ++
-	CMP.w #$0001
-	BEQ .single
 
 	TYX
 	LDA.l DoorSlots+1, X
 	AND.w #$00FF
+	CMP.w #$0003
+	BNE +
+	LDA.l DoorSlots, X
+	AND.w #$00FF
+	CMP.w #$005E : BEQ .left
+	CMP.w #$007E : BEQ .left
+.right
+	LDA.w #$0002
+	BRA +
+.left
+	LDA.w #$0000
++
 	STA.b $04
-	BRA .draw
+
+	LDA.b $06
+	BEQ ++
+	CMP.w #$0001
+	BNE .draw
 
 .single
 	LDA.b $02
 	ASL A
 	CLC : ADC.b $02
-	STA.b $04
-
-	TYX
-	LDA.l DoorSlots+1, X
-	AND.w #$00FF
 	CLC : ADC.b $04
 	STA.b $04
 	ASL A
@@ -344,10 +405,6 @@ GetWhichDoorPosition:
 	BMI .edge
 	AND.w #$0300
 	XBA
-	CMP.w #$0003
-	BNE +
-	LDA.w #$0002
-+
 	RTS
 
 .edge
