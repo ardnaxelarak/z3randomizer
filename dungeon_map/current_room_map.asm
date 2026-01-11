@@ -155,6 +155,33 @@ DrawSingleRoomLoot:
 
 DrawConnectedRooms:
 	PHB : PHK : PLB
+
+	LDA.l ShowRooms_default
+	AND.w #$00FF
+	STA.b $0A
+
+	LDX.w DungeonID
+	LDA.l MapField
+	AND.l DungeonMask, X
+	BEQ +
+	LDA.l ShowRooms_have_map
+	AND.w #$00FF
+	CMP.b $0A
+	BCC +
+	STA.b $0A
++
+
+	LDX.w DungeonID
+	LDA.l CompassField
+	AND.l DungeonMask, X
+	BEQ +
+	LDA.l ShowRooms_have_compass
+	AND.w #$00FF
+	CMP.b $0A
+	BCC +
+	STA.b $0A
++
+
 	LDA.l DisplayedRoomDoorIndex
 	TAX
 	STZ.b $00
@@ -228,6 +255,8 @@ CheckInRoomTable:
 	RTS
 
 GetConnection:
+	LDA.b $02
+	STA.b $04
 	LDA.l DoorTable, X
 .found
 	STA.b $08
@@ -240,6 +269,10 @@ GetConnection:
 	JSR GetWhichDoorPosition
 	XBA
 	ORA.b $0C
+	STA.b $0C
+	JSR CheckCanSeeConnector
+	BCC .nope
+	LDA.b $0C
 	RTS
 
 .not_found
@@ -248,9 +281,105 @@ GetConnection:
 	BNE .found
 	JSR CheckInRoomTable
 	CMP.w #$FFFF
-	BNE .found
+	BEQ .nope
+	LDA.w #$0003
+	STA.b $04
+	BRA .found
+
+.nope
 	LDA.w #$FF0F
 	RTS
+
+CheckCanSeeConnector:
+	LDA.b $0C : PHA
+
+	LDA.b $0A
+	CMP.w #$0003
+	BCS .yep
+
+	PHX
+	LDA.b $0C
+	AND.w #$00FF
+	ASL A
+	TAX
+	LDA.l SaveDataWRAM, X
+	AND.w #$00FF
+	XBA
+	ORA.b $00
+	EOR.w #$0002
+	XBA
+	STA.b $0E
+	PLX
+
+	JSR GetQuadrantMask
+	AND.b $0E
+	BEQ .nope
+
+	LDA.l CurrentDisplayedRoom
+	XBA
+	ORA.b $04
+	XBA
+	STA.b $0C
+
+	PHX
+	LDA.l CurrentDisplayedRoom
+	ASL A
+	TAX
+	LDA.l SaveDataWRAM, X
+	AND.w #$00FF
+	XBA
+	ORA.b $00
+	XBA
+	STA.b $0E
+	PLX
+
+	JSR GetQuadrantMask
+	AND.b $0E
+	BEQ .nope
+
+.yep
+	PLA : STA.b $0C
+	SEC
+	RTS
+.nope
+	PLA : STA.b $0C
+	CLC
+	RTS
+
+; $0C - room id
+; $0D - room connection position
+; $0F - side
+GetQuadrantMask:
+	LDA.b $0D
+	AND.w #$0003
+	CMP.w #$0003
+	BNE .normal
+	LDA.b $0C
+	AND.w #$00FF
+	CMP.w #$005E : BEQ .bottom_left
+	CMP.w #$007E : BEQ .bottom_left
+	CMP.w #$000B : BEQ .top_right
+	CMP.w #$001B : BEQ .top_right
+.bottom_right
+	LDA.w #$0001
+	RTS
+.bottom_left
+	LDA.w #$0002
+	RTS
+.top_right
+	LDA.w #$0004
+	RTS
+.normal
+	SEP #$20
+	CLC : ADC.b $0F : ADC.b $0F : ADC.b $0F
+	REP #$20
+	ASL A
+	PHX
+	TAX
+	LDA.l QuadrantMasks, X
+	PLX
+	RTS
+
 
 print "DrawSide: ", pc
 ; $00 - Side
@@ -345,7 +474,6 @@ DrawSide:
 
 
 DrawSingleConnectedRoom:
-	STA.b $0A
 	AND.w #$00FF
 	STA.b $CA
 	LDA.w DoorSlotsBG2, Y

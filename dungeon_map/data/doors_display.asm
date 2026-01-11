@@ -139,6 +139,16 @@ SingleEdgeCurrentRoomConnectors:
 	dw $0300, $41D5, $01C5, $01C4, $41D4, $81C5 ; bottom -> middle
 	dw $0300, $0300, $0300, $01C4, $01C4, $01C4 ; bottom -> bottom
 
+QuadrantMasks:
+; north
+	dw $0008, $000C, $0004
+; west
+	dw $0008, $000A, $0002
+; south
+	dw $0002, $0003, $0001
+; east
+	dw $0004, $0005, $0001
+
 MultiConnectorMapping:
 .two
 	db $02, $00
