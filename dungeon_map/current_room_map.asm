@@ -703,6 +703,22 @@ DrawDoorsMapSprites:
 	JSR DrawDoorsMapBlinker
 +
 	JSR DrawDoorsMapCursor
+
+	REP #$20
+	LDX.w DungeonID
+	LDA.l DungeonMask, X
+	AND.l CompassField
+	BEQ +
+	LDA.l DungeonMapBossRooms, X
+	ASL A
+	TAX
+	LDA.l SaveDataWRAM, X
+	AND.w #$8000
+	BNE +
+	JSR DrawDoorsMapBossRoom
+	JSR DrawDoorsMapBossIcon
++
+	SEP #$20
 	RTL
 
 DrawDoorsMapBlinker:
@@ -738,6 +754,68 @@ DrawDoorsMapBlinker:
 
 	LDA.w $8AEB58, Y
 	STA.w OAMBuffer+3, X
+
+	INC.b $00
+	RTS
+
+DrawDoorsMapBossRoom:
+	LDX.w DungeonID
+	LDA.l DungeonMapBossRooms, X
+	STA.b $0E
+
+	LDX.b #$28
+-
+	LDA.l DoorSlots, X
+	AND.w #$00FF
+	CMP.b $0E
+	BEQ .found
+	DEX : DEX
+	BPL -
+	RTS
+
+.found
+	SEP #$20
+	LDA.b FrameCounter
+	AND.b #$10
+	BNE .draw
+	REP #$20
+	RTS
+
+.draw
+	LDY.b $00
+	LDA.b #$00
+	STA.w OAMBufferAux, Y
+	TYA
+	ASL A : ASL A
+	TAY
+
+	REP #$20
+	LDA.l DoorSlotsSprites, X
+	LDX.w DungeonID
+	CLC : ADC.l $8AEE6D, X
+	STA.w OAMBuffer, Y
+
+	LDA.w #$3331
+	STA.w OAMBuffer+2, Y
+
+	INC.b $00
+	RTS
+
+DrawDoorsMapBossIcon:
+	SEP #$20
+	LDY.b $00
+	LDA.b #$02
+	STA.w OAMBufferAux, Y
+	TYA
+	ASL A : ASL A
+	TAY
+
+	REP #$20
+	LDA.w #$3048
+	STA.w OAMBuffer, Y
+
+	LDA.w #$3103
+	STA.w OAMBuffer+2, Y
 
 	INC.b $00
 	RTS

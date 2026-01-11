@@ -187,7 +187,7 @@ EdgePositions:
 .east_west
 	db $02 ; TT Attic
 	db $02, $02 ; Desert North Hall
-	db $02, $00 ; HC Basement
+	db $00, $02 ; HC Basement
 	db $00 ; Desert East Wing
 	db $00, $02 ; TT Triple
 	db $02 ; TT Big Key Chest
@@ -223,8 +223,8 @@ EdgeConnectionIndices:
 	dw $0565, $0042
 	dw $0574, $0045
 	dw $0575, $0048
-	dw $0582, $004B
-	dw $0382, $004E
+	dw $0382, $004B
+	dw $0582, $004E
 	dw $0385, $0051
 	dw $03CC, $0054
 	dw $05CC, $0057
@@ -234,8 +234,8 @@ EdgeConnectionIndices:
 	dw $0B64, $005D
 	dw $0B73, $0060
 	dw $0B74, $0063
-	dw $0B81, $0066
-	dw $0981, $0069
+	dw $0981, $0066
+	dw $0B81, $0069
 	dw $0984, $006C
 	dw $09CB, $006F
 	dw $0BCB, $0072

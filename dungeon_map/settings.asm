@@ -129,7 +129,7 @@ pad $B9FB00
 ; $B9FB00
 DungeonLabels:
 dw $2550, $2579 ; Sewers
-dw $2550, $2578 ; Hyrule Castle
+dw $2564, $255F ; Hyrule Castle
 dw $2561, $256C ; Eastern Palace
 dw $2560, $256C ; Desert Palace
 dw $255D, $2570 ; Agahnim's Tower
