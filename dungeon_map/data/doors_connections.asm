@@ -26,7 +26,7 @@ DoorConnectionTiles:
 	dw $C1D4, $C1D5 ; $02 top -> middle
 	dw $81C7, $41C7 ; $03 top -> bottom
 	dw $81D4, $81D5 ; $04 middle -> top
-	dw $01C5, $41C5 ; $05 middle -> middle
+	dw $01C5, $81C5 ; $05 middle -> middle
 	dw $01D5, $01D4 ; $06 middle -> bottom
 	dw $C1C7, $01C7 ; $07 bottom -> top
 	dw $41D5, $41D4 ; $08 bottom -> middle

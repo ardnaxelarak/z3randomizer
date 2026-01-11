@@ -569,8 +569,9 @@ CachedCurrentFloor = $7EC22B      ; to restore when closing
 CurrentDisplayedRoom = $7EC22C    ; 2 bytes, used by dungeon map
 DisplayedRoomDoorIndex = $7EC22E  ; 2 bytes, used by dungeon map
                                   ;
-DoorSlotScratch = $7EC230         ; 8 bytes, used by dungeon map
-DoorSlots = $7EC238               ; $28 bytes, used by dungeon map
+DoorSlots = $7EC230               ; $2A bytes, used by dungeon map
+DoorSlotScratch = $7EC25A         ; 6 bytes, used by dungeon map
+DoorSlotCursor = $7EC260          ; 2 bytes, used by dungeon map
                                   ;
 LastBGSet = $7EC2F8               ; Lists loaded sheets to check for decompression. 4 bytes.
                                   ;

@@ -1,4 +1,22 @@
+DoorSlotsSprites:
+; center
+	dw $68A8
+; north
+	dw $4090, $40A8, $40C0
+	dw $4098, $40B8
+; west
+	dw $5080, $6880, $8080
+	dw $5880, $7880
+; south
+	dw $9090, $90A8, $90C0
+	dw $9098, $90B8
+; east
+	dw $50D0, $68D0, $80D0
+	dw $58D0, $78D0
+
 DoorSlotsBG2:
+; center
+	dw $0000
 ; north
 	dw $FEBA, $FEC0, $FEC6
 	dw $FEBC, $FEC4
@@ -13,10 +31,55 @@ DoorSlotsBG2:
 	dw $FF8A, $008A
 
 DoorSlotSides:
-	db $00, $0A, $14, $1E
+	db $02, $0C, $16, $20
 
 DoorSlotOffsets:
 	db $02, $02, $06, $00
+
+; up, left, down, right
+NextCursorSlot:
+	db $80, $81, $82, $83
+; top
+	db $FF, $C1, $00, $04
+	db $FF, $04, $00, $05
+	db $FF, $05, $00, $C3
+	db $FF, $01, $00, $02
+	db $FF, $02, $00, $03
+; left
+	db $C0, $FF, $09, $00
+	db $09, $FF, $0A, $00
+	db $0A, $FF, $C2, $00
+	db $06, $FF, $07, $00
+	db $07, $FF, $08, $00
+; bottom
+	db $00, $E1, $FF, $0E
+	db $00, $0E, $FF, $0F
+	db $00, $0F, $FF, $E3
+	db $00, $0B, $FF, $0C
+	db $00, $0C, $FF, $0D
+; right
+	db $E0, $00, $13, $FF
+	db $13, $00, $14, $FF
+	db $14, $00, $E2, $FF
+	db $10, $00, $11, $FF
+	db $11, $00, $12, $FF
+
+NextCursorSpecial:
+.center
+	db $02, $04, $05, $01, $03, $FF
+	db $07, $09, $0A, $06, $08, $FF
+	db $0C, $0E, $0F, $0B, $0D, $FF
+	db $11, $13, $14, $10, $12, $FF
+.center_offset
+	db $00, $06, $0C, $12
+.start_index
+	db $01, $06, $0B, $10
+.start_direction
+	db $03, $02, $03, $02
+.end_index
+	db $03, $08, $0D, $12
+.end_direction
+	db $01, $00, $01, $00
 
 SingleEdgeCurrentRoomConnectors:
 .north

@@ -1,14 +1,39 @@
 CheckSwitchMap:
 	LDA.l DRMode
-	BEQ +
+	BEQ .not_fancy_door_map
 	LDA.l DungeonMapMode
-	BNE +
+	BNE .not_fancy_door_map
 
-	; fancy door map, will figure out later
+	; fancy door map
+	SEP #$20
+	LDA.b $F6
+	BIT.b #$80
+	BNE .select_new_room
+	LDA.b $F4
+	BIT.b #$80
+	BNE .select_new_room
+
+	AND.b #$0F
+	BEQ .doors_done
+	BIT.b #$08 : BEQ + : LDA.b #$00 : BRA .doors_move_cursor : +
+	BIT.b #$04 : BEQ + : LDA.b #$02 : BRA .doors_move_cursor : +
+	BIT.b #$02 : BEQ + : LDA.b #$01 : BRA .doors_move_cursor : +
+	LDA.b #$03
+
+.doors_move_cursor
+	STA.b $00
+	JSL MoveDoorsMapCursor
+	BRA .doors_done
+
+.select_new_room
+	JSL DoorsMapSelectCursor
+
+.doors_done
+	REP #$20
 	LDA.w #$0002 ; ignore input! nothing to see here!
 	RTL
 
-+
+.not_fancy_door_map
 	SEP #$20
 	LDA.b $F6
 	AND.b #$30
@@ -113,7 +138,7 @@ SkipMapSprites:
 	BEQ .no_vanilla_draw
 		JML $8AEADE
 	.no_vanilla_draw
-		JSL DrawBlinkerFancyMode
+		JSL DrawDoorsMapSprites
 		JML $8AEAFC
 +
 

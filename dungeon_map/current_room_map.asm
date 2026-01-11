@@ -7,11 +7,19 @@ DrawWackyDoorRandoStuff:
 	LDA.b RoomIndex
 	AND.w #$00FF
 	STA.l CurrentDisplayedRoom
+
+DrawCurrentSupertile:
+	LDA.w #$0000
+	STA.l DoorSlotCursor
+
+	LDA.l CurrentDisplayedRoom
 	STA.b $CA
 	LDX.w #!CenterTile
 	JSL DrawFullRoomTile
 
 	JSL ClearDoorSlotsTable
+	LDA.l CurrentDisplayedRoom
+	STA.l DoorSlots
 
 	; multiply room id by 24 to get index in doors table
 	LDA.l CurrentDisplayedRoom
@@ -28,7 +36,7 @@ DrawWackyDoorRandoStuff:
 	RTL
 
 ClearDoorSlotsTable:
-	LDX.w #$0026
+	LDX.w #$0028
 	LDA.w #$FF0F
 -	STA.l DoorSlots, X
 	DEX : DEX
@@ -37,7 +45,7 @@ ClearDoorSlotsTable:
 
 ClearDoorSlotScratch:
 	PHX
-	LDX.w #$0006
+	LDX.w #$0004
 	LDA.w #$FF0F
 -	STA.l DoorSlotScratch, X
 	DEX : DEX
@@ -566,7 +574,16 @@ DrawTripleConnector:
 
 	RTS
 
-DrawBlinkerFancyMode:
+DrawDoorsMapSprites:
+	LDA.l CurrentDisplayedRoom
+	CMP.b RoomIndex
+	BNE +
+	JSR DrawDoorsMapBlinker
++
+	JSR DrawDoorsMapCursor
+	RTL
+
+DrawDoorsMapBlinker:
 	LDX.b $00
 	STZ.w OAMBufferAux, X
 	TXA
@@ -599,4 +616,188 @@ DrawBlinkerFancyMode:
 
 	LDA.w $8AEB58, Y
 	STA.w OAMBuffer+3, X
+
+	INC.b $00
+	RTS
+
+DrawDoorsMapCursor:
+	LDA.l DoorSlotCursor
+	ASL A
+	TAX
+	LDA.l DoorSlotsSprites, X
+	STA.b $0E
+	LDA.l DoorSlotsSprites+1, X
+	STA.b $0F
+
+	LDY.b #$03
+
+.next_object
+	LDX.b $00
+	LDA.b #$02
+	STA.w OAMBufferAux, X
+	TXA
+	ASL A : ASL A
+	TAX
+
+	LDA.b $0E
+	CLC : ADC.w $8AEB9A, Y
+	STA.w OAMBuffer, X
+
+	LDA.b $0F
+	CLC : ADC.w $8AEB9E, Y
+	DEC A
+	STA.w OAMBuffer+1, X
+
+	STZ.w OAMBuffer+2, X
+
+	LDA.b FrameCounter
+	AND.b #$04
+	BNE +
+	LDA.b #$05
++
+	ASL A
+	ORA.w $8AEBA2, Y
+	STA.w OAMBuffer+3, X
+
+	INC.b $00
+	DEY
+	BPL .next_object
+
+	RTS
+
+; $00 - direction to move
+; $01 - current spot
+MoveDoorsMapCursor:
+	PHP
+	SEP #$30
+	LDA.l DoorSlotCursor
+	STA.b $01
+
+.move_again
+	LDA.b $01
+	ASL A : ASL A
+	CLC : ADC.b $00
+	TAX
+	LDA.l NextCursorSlot, X
+	BPL .easy
+	CMP.b #$FF
+	BEQ .no_move
+	BIT.b #$40
+	BNE .almost_easy
+
+	LDA.b $00
+	TAX
+	LDA.l NextCursorSpecial_center_offset, X
+	TAX
+	DEX
+.try_next
+	INX
+	LDA.l NextCursorSpecial_center, X
+	BMI .no_move
+	PHX
+	ASL A
+	TAX
+	LDA.l DoorSlots+1, X
+	PLX
+	CMP.b #$00
+	BMI .try_next
+	LDA.l NextCursorSpecial_center, X
+	STA.b $01
+	BRA .write
+
+.almost_easy
+	BIT.b #$20
+	BNE .from_end
+
+.from_start
+	AND.b #$03
+	TAX
+	LDA.l NextCursorSpecial_start_direction, X
+	STA.b $00
+	LDA.l NextCursorSpecial_start_index, X
+	BRA .easy
+
+.from_end
+	AND.b #$03
+	TAX
+	LDA.l NextCursorSpecial_end_direction, X
+	STA.b $00
+	LDA.l NextCursorSpecial_end_index, X
+	BRA .easy
+
+.easy
+	STA.b $01
+
+.check
+	LDA.b $01
+	ASL A
+	TAX
+	LDA.l DoorSlots+1, X
+	BMI .move_again
+
+.write
+	LDA.b $01
+	STA.l DoorSlotCursor
+	LDA.b #$20
+	STA.w $012F
+	BRA .done
+
+.no_move
+	LDA.b #$3C
+	STA.w $012E
+
+.done
+	PLP
+	RTL
+
+DoorsMapSelectCursor:
+	PHP
+	SEP #$30
+
+	LDA.l DoorSlotCursor
+	BEQ .done
+
+	ASL A
+	TAX
+	LDA.l DoorSlots, X
+
+	STA.l CurrentDisplayedRoom
+	REP #$30
+	JSL ClearDoorsMapBG2
+	JSL DrawCurrentSupertile
+
+	SEP #$30
+
+	LDA.b #$08
+	STA.b $17
+
+	LDA.b #$20
+	STA.w $012F
+
+.done
+	PLP
+	RTL
+
+ClearDoorsMapBG2:
+	LDX.w #$0220
+	LDA.w #$000B
+	STA.b $00
+	STA.b $02
+	LDA.w #$0300
+.next
+	STA.l $7F0000, X
+	INX : INX
+	DEC.b $02
+	BPL .next
+
+	LDA.w #$000B
+	STA.b $02
+	TXA
+	CLC : ADC.w #$0028
+	TAX
+
+	LDA.w #$0300
+	DEC.b $00
+	BPL .next
+
 	RTL
