@@ -148,24 +148,24 @@ MultiConnectorMapping:
 MultiConnectorTiles:
 .north
 ..two
-	dw $41CF, $81CF, $C1CF, $01CF
+	dw $41C7, $81C7, $C1C7, $01C7
 ..three
-	dw $41CF, $01C4, $81EF, $C1EF, $01C4, $01CF
+	dw $41C7, $01C4, $81F7, $C1F7, $01C4, $01C7
 .west
 ..two
-	dw $81CF, $41CF, $C1CF, $01CF
+	dw $81C7, $41C7, $C1C7, $01C7
 ..three
-	dw $81CF, $01C0, $41DF, $C1DF, $01C0, $01CF
+	dw $81C7, $01C0, $41E7, $C1E7, $01C0, $01C7
 .south
 ..two
-	dw $C1CF, $01CF, $41CF, $81CF
+	dw $C1C7, $01C7, $41C7, $81C7
 ..three
-	dw $C1CF, $01C4, $01EF, $41EF, $01C4, $81CF
+	dw $C1C7, $01C4, $01F7, $41F7, $01C4, $81C7
 .east
 ..two
-	dw $C1CF, $01CF, $81CF, $41CF
+	dw $C1C7, $01C7, $81C7, $41C7
 ..three
-	dw $C1CF, $01C0, $01DF, $81DF, $01C0, $41CF
+	dw $C1C7, $01C0, $01E7, $81E7, $01C0, $41C7
 .direction_index
 	db $00, $14, $28, $3C
 .start_offset
