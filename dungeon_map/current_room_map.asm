@@ -4,6 +4,8 @@
 DrawWackyDoorRandoStuff:
 	JSL DrawBorder
 
+	STZ.w GFXStripes
+
 	LDA.b RoomIndex
 	AND.w #$00FF
 	STA.l CurrentDisplayedRoom
@@ -15,6 +17,7 @@ DrawCurrentSupertile:
 	LDA.l CurrentDisplayedRoom
 	STA.b $CA
 	LDX.w #!CenterTile
+	LDY.w #$0000
 	JSL DrawFullRoomTile
 
 	JSL ClearDoorSlotsTable
@@ -33,6 +36,16 @@ DrawCurrentSupertile:
 	STA.l DisplayedRoomDoorIndex
 
 	JSL DrawConnectedRooms
+
+	SEP #$20
+	LDX.w GFXStripes
+	LDA.b #$FF
+	STA.w GFXStripes+2, X
+
+	LDA.b #$01
+	STA.b NMISTRIPES
+	REP #$20
+
 	RTL
 
 ClearDoorSlotsTable:
@@ -64,6 +77,58 @@ DrawFullRoomTile:
 	PHY
 	JSL DrawDungeonMapRoom
 	PLY
+
+	LDA.b $00 : PHA
+	LDA.b $02 : PHA
+	LDA.b $06 : PHA
+	LDA.b $0E : PHA
+	JSL DrawSingleRoomLoot
+	PLA : STA.b $0E
+	PLA : STA.b $06
+	PLA : STA.b $02
+	PLA : STA.b $00
+
+	RTL
+
+DrawSingleRoomLoot:
+	PHX : PHY
+
+	TYX
+
+	LDA.w GFXStripes
+	TAY
+	CLC : ADC.w #$0010
+	STA.w GFXStripes
+
+	LDA.l DoorSlotsBG1, X
+	XBA
+	STA.w GFXStripes+$02, Y
+	XBA
+	CLC : ADC.w #$0020
+	XBA
+	STA.w GFXStripes+$0A, Y
+
+	LDA.w #$0300
+	STA.w GFXStripes+$04, Y
+	STA.w GFXStripes+$0C, Y
+
+	LDA.b $CA
+	JSL CheckLoot
+
+	ASL A : ASL A : ASL A
+
+	TAX
+
+	LDA.l LootTypeIcons+0, X
+	STA.w GFXStripes+$06, Y
+	LDA.l LootTypeIcons+2, X
+	STA.w GFXStripes+$08, Y
+	LDA.l LootTypeIcons+4, X
+	STA.w GFXStripes+$0E, Y
+	LDA.l LootTypeIcons+6, X
+	STA.w GFXStripes+$10, Y
+
+	PLY : PLX
 	RTL
 
 DrawConnectedRooms:
@@ -763,6 +828,8 @@ DoorsMapSelectCursor:
 
 	STA.l CurrentDisplayedRoom
 	REP #$30
+	STZ.w GFXStripes
+	JSL ClearDoorsMapBG1
 	JSL ClearDoorsMapBG2
 	JSL DrawCurrentSupertile
 
@@ -776,6 +843,34 @@ DoorsMapSelectCursor:
 
 .done
 	PLP
+	RTL
+
+ClearDoorsMapBG1:
+	LDA.w #$000B
+	STA.b $00
+	LDA.w #$1110
+	STA.b $02
+	LDA.w GFXStripes
+	TAY
+	CLC : ADC.w #$0048
+	STA.w GFXStripes
+
+.next_row
+	LDA.b $02
+	XBA
+	STA.w GFXStripes+2, Y
+	LDA.w #$1640
+	STA.w GFXStripes+4, Y
+	LDA.w #$0300
+	STA.w GFXStripes+6, Y
+
+	LDA.b $02
+	CLC : ADC.w #$0020
+	STA.b $02
+	INY #6
+	DEC.b $00
+	BPL .next_row
+
 	RTL
 
 ClearDoorsMapBG2:

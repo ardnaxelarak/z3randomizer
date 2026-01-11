@@ -14,6 +14,22 @@ DoorSlotsSprites:
 	dw $50D0, $68D0, $80D0
 	dw $58D0, $78D0
 
+DoorSlotsBG1:
+; center
+	dw $11B5
+; north
+	dw $1112, $1115, $1118
+	dw $1113, $1117
+; west
+	dw $1150, $11B0, $1210
+	dw $1170, $15F0
+; south
+	dw $1252, $1255, $1258
+	dw $1253, $1257
+; east
+	dw $115A, $11BA, $121A
+	dw $117A, $11FA
+
 DoorSlotsBG2:
 ; center
 	dw $0000
