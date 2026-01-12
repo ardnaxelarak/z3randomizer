@@ -169,6 +169,11 @@ QuadrantMasks:
 ; east
 	dw $0004, $0005, $0001
 
+EntranceQuadrantMasks:
+	dw $0002
+	dw $0003
+	dw $0001
+
 MultiConnectorMapping:
 .two
 	db $02, $00

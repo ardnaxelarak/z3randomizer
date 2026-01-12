@@ -541,6 +541,10 @@ DrawStairs:
 	RTS
 
 GetCurrentRoomVisibility:
+	LDA.l CurrentDisplayedRoom
+	STA.b $CA
+
+GetSpecificRoomVisibility:
 	PHX
 	LDA.l ShowRooms_default
 	AND.w #$00FF
@@ -568,7 +572,7 @@ GetCurrentRoomVisibility:
 	STA.b $0A
 +
 
-	LDA.l CurrentDisplayedRoom
+	LDA.b $CA
 	AND.w #$00FF
 	ASL A
 	TAX
@@ -1064,6 +1068,7 @@ DrawDoorsMapSprites:
 +
 	JSR DrawDoorsStairs
 	JSR DrawDoorsMapCursor
+	JSR DrawDoorsEntrances
 
 	REP #$20
 	LDX.w DungeonID
@@ -1431,6 +1436,110 @@ ClearDoorsMapBG2:
 	STA.l $7F05F6
 
 	RTL
+
+GetRoomEntrance:
+	PHX : PHY
+	LDY.w #$0085
+-
+	DEY
+	BMI .not_found
+
+	TYX
+	LDA.l $02D1EF, X
+	AND.w #$00FF
+	CMP.w DungeonID
+	BNE -
+
+	TYA
+	ASL A
+	TAX
+	LDA.l $02C577, X
+	CMP.w $CA
+	BNE -
+
+	LDA.l $02CDC7, X
+	AND.w #$01FF
+	CMP.w #$00B9
+	BCC .left
+	CMP.w #$0149
+	BCC .middle
+
+.right
+	LDA.w #$0004
+	BRA .done
+
+.middle
+	LDA.w #$0002
+	BRA .done
+
+.left
+	LDA.w #$0000
+	BRA .done
+
+.not_found
+	LDA.w #$FFFF
+
+.done
+	PLY : PLX
+	RTS
+
+DrawDoorsEntrances:
+	REP #$30
+	LDX.w #!DoorSlotCount*2
+
+.next_room
+	DEX : DEX
+	BMI .done
+
+	LDA.l DoorSlots, X
+	BMI .next_room
+
+	AND.w #$00FF
+	STA.b $CA
+
+	JSR GetRoomEntrance
+	STA.b $02
+	CMP.w #$0000
+	BMI .next_room
+
+	JSR GetSpecificRoomVisibility
+	BNE .draw
+
+	PHX
+	LDA.b $02
+	TAX
+	LDA.l EntranceQuadrantMasks, X
+	PLX
+	AND.b $0E
+	BEQ .next_room
+
+.draw
+	SEP #$30
+	LDY.b $00
+	LDA.b #$00
+	STA.w OAMBufferAux, Y
+	TYA
+	ASL A : ASL A
+	TAY
+
+	LDA.l DoorSlotsSprites, X
+	CLC : ADC.b $02 : ADC.b $02
+	STA.w OAMBuffer, Y
+
+	LDA.l DoorSlotsSprites+1, X
+	CLC : ADC.b #$07
+	STA.w OAMBuffer+1, Y
+
+	REP #$30
+	LDA.w #$2333
+	STA.w OAMBuffer+2, Y
+	INC.b $00
+
+	BRA .next_room
+
+.done
+	SEP #$30
+	RTS
 
 DrawDoorsStairs:
 	LDA.l CurrentDisplayedRoom
