@@ -80,11 +80,11 @@ NextCursorSlot:
 	db $06, $FF, $07, $00
 	db $07, $FF, $08, $00
 ; bottom
-	db $00, $E1, $C4, $0E
-	db $00, $0E, $C4, $0F
-	db $00, $0F, $C4, $E3
-	db $00, $0B, $C4, $0C
-	db $00, $0C, $C4, $0D
+	db $00, $E1, $85, $0E
+	db $00, $0E, $85, $0F
+	db $00, $0F, $85, $E3
+	db $00, $0B, $85, $0C
+	db $00, $0C, $85, $0D
 ; right
 	db $E0, $00, $13, $FF
 	db $13, $00, $14, $FF
@@ -105,8 +105,9 @@ NextCursorSpecial:
 	db $0C, $0E, $0F, $0B, $0D, $15, $16, $17, $18, $FF
 	db $11, $13, $14, $10, $12, $FF
 	db $0C, $0E, $0F, $0B, $0D, $00, $FF
+	db $17, $16, $15, $18, $FF
 .center_offset
-	db $00, $06, $0C, $16, $1C
+	db $00, $06, $0C, $16, $1C, $23
 .start_index
 	db $01, $06, $0B, $10, $15
 .start_direction
@@ -206,19 +207,33 @@ MultiConnectorTiles:
 	db $02, $40
 
 EdgePositions:
-.north_south
+.north
 	db $01, $00 ; HC Basement
 	db $02 ; Desert West Wing
 	db $00, $01, $02 ; Desert Lobby
 	db $00 ; Desert East Wing
 	db $01, $02 ; TT
 	db $00, $01 ; different TT
-.east_west
+.west
+	db $02 ; TT Attic
+	db $02, $02 ; Desert North Hall
+	db $02, $00 ; HC Basement
+	db $00 ; Desert East Wing
+	db $02, $00 ; TT Triple
+	db $02 ; TT Big Key Chest
+.south
+	db $01, $00 ; HC Basement
+	db $02 ; Desert West Wing
+	db $00, $01, $02 ; Desert Lobby
+	db $00 ; Desert East Wing
+	db $01, $02 ; TT
+	db $00, $01 ; different TT
+.east
 	db $02 ; TT Attic
 	db $02, $02 ; Desert North Hall
 	db $00, $02 ; HC Basement
 	db $00 ; Desert East Wing
-	db $00, $02 ; TT Triple
+	db $02, $00 ; TT Triple
 	db $02 ; TT Big Key Chest
 
 EdgeConnectionIndices:
@@ -266,8 +281,8 @@ EdgeConnectionIndices:
 	dw $0981, $0066
 	dw $0B81, $0069
 	dw $0984, $006C
-	dw $09CB, $006F
-	dw $0BCB, $0072
+	dw $0BCB, $006F
+	dw $09CB, $0072
 	dw $0BDB, $0075
 
 	dw $FFFF

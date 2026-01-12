@@ -301,7 +301,7 @@ CheckCanSeeConnector:
 	LDA.b $0C : PHA
 
 	LDA.b $0A
-	CMP.w #$0003
+	CMP.w #$0001
 	BCS .yep
 
 	PHX
@@ -670,21 +670,29 @@ GetWhichDoorPosition:
 	XBA
 	PHX
 	PHA
+	PLX
 
 	LDA.b $00
-	BIT.w #$0001
-	BEQ .north_south
+	BEQ .north
+	DEC A : BEQ .west
+	DEC A : BEQ .south
 
-.east_west
-	PLX
-	LDA.l EdgePositions_east_west, X
-	AND.w #$00FF
-	PLX
-	RTS
+.east
+	LDA.l EdgePositions_east, X
+	BRA .done
 
-.north_south
-	PLX
-	LDA.l EdgePositions_north_south, X
+.north
+	LDA.l EdgePositions_north, X
+	BRA .done
+
+.west
+	LDA.l EdgePositions_west, X
+	BRA .done
+
+.south
+	LDA.l EdgePositions_south, X
+
+.done
 	AND.w #$00FF
 	PLX
 	RTS
@@ -1100,6 +1108,7 @@ DrawDoorsMapBossRoom:
 	LDX.w DungeonID
 	XBA
 	CLC : ADC.l $8AEE6D, X
+	DEC A
 	XBA
 	STA.w OAMBuffer, Y
 
