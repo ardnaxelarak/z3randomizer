@@ -298,58 +298,35 @@ GetConnection:
 	RTS
 
 CheckCanSeeConnector:
-	LDA.b $0C : PHA
-
 	LDA.b $0A
 	CMP.w #$0001
 	BCS .yep
 
 	PHX
+
 	LDA.b $0C
 	AND.w #$00FF
 	ASL A
 	TAX
 	LDA.l SaveDataWRAM, X
-	AND.w #$00FF
-	XBA
-	ORA.b $00
-	EOR.w #$0002
-	XBA
-	STA.b $0E
-	PLX
+	AND.w #$000F
+	BEQ .plx_nope
 
-	JSR GetQuadrantMask
-	AND.b $0E
-	BEQ .nope
-
-	LDA.l CurrentDisplayedRoom
-	XBA
-	ORA.b $04
-	XBA
-	STA.b $0C
-
-	PHX
 	LDA.l CurrentDisplayedRoom
 	ASL A
 	TAX
 	LDA.l SaveDataWRAM, X
-	AND.w #$00FF
-	XBA
-	ORA.b $00
-	XBA
-	STA.b $0E
+	AND.w #$000F
+	BEQ .plx_nope
+
 	PLX
 
-	JSR GetQuadrantMask
-	AND.b $0E
-	BEQ .nope
-
 .yep
-	PLA : STA.b $0C
 	SEC
 	RTS
-.nope
-	PLA : STA.b $0C
+
+.plx_nope
+	PLX
 	CLC
 	RTS
 
