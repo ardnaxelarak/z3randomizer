@@ -209,31 +209,38 @@ dw $2263, $0100, $A100
 dw $2363, $0E40, $A101
 dw $2B63, $0100, $E100
 
-; right side border
-dw $CE60, $0100, $2100
-dw $CF60, $1A40, $2101
-dw $DD60, $0100, $6100
-dw $EE60, $1AC0, $2110
-dw $FD60, $1AC0, $6110
-dw $AE62, $0100, $A100
-dw $AF62, $1A40, $A101
-dw $BD62, $0100, $E100
+; right side top area border
+dw $4E60, $0100, $2100
+dw $4F60, $1A40, $2101
+dw $5D60, $0100, $6100
+dw $6E60, $1AC0, $2110
+dw $7D60, $1AC0, $6110
+dw $2E62, $0100, $A100
+dw $2F62, $1A40, $A101
+dw $3D62, $0100, $E100
 
-; blank above and below
-dw $4E60, $1E40, $2111
-dw $6E60, $1E40, $2111
-dw $8E60, $1E40, $2111
-dw $AE60, $1E40, $2111
+; right side bottom area border
+dw $8E62, $0100, $2100
+dw $8F62, $1A40, $2101
+dw $9D62, $0100, $6100
+dw $AE62, $06C0, $2110
+dw $BD62, $06C0, $6110
+dw $2E63, $0100, $A100
+dw $2F63, $1A40, $A101
+dw $3D63, $0100, $E100
 
-dw $CE62, $1E40, $2111
-dw $EE62, $1E40, $2111
-dw $0E63, $1E40, $2111
-dw $2E63, $1E40, $2111
+; blank between right side areas
+dw $4E62, $1E40, $2111
+dw $6E62, $1E40, $2111
 
 dw $4063, $4640, $2111
 dw $6063, $4640, $2111
 
-; horizontal borders
+; map area inside top area
+dw $6F60, $1A40, $1D11
+dw $8F60, $1A40, $1D11
+dw $AF60, $1A40, $1D11
+dw $CF60, $1A40, $1D11
 dw $EF60, $1A40, $1D11
 dw $0F61, $1A40, $1D11
 dw $2F61, $1A40, $1D11
@@ -244,57 +251,23 @@ dw $AF61, $1A40, $1D11
 dw $CF61, $1A40, $1D11
 dw $EF61, $1A40, $1D11
 dw $0F62, $1A40, $1D11
-dw $2F62, $1A40, $1D11
-dw $4F62, $1A40, $1D11
-dw $6F62, $1A40, $1D11
-dw $8F62, $1A40, $1D11
 
-dw $B561, $0300
+; center square
+dw $3561, $0300
 dw $5D4C, $1D4C
 
-dw $D561, $0300
+dw $5561, $0300
 dw $DD4C, $9D4C
 
-; ; horizontal borders
-; dw $B160, $1440, $1D11
-; dw $1161, $1440, $1D11
-; dw $7161, $1440, $1D11
-; dw $D161, $1440, $1D11
-; dw $3162, $1440, $1D11
-; dw $9162, $1440, $1D11
-; dw $F162, $1440, $1D11
-; dw $5163, $1440, $1D11
-; 
-; ; vertical borders
-; dw $B060, $12C0, $1D11
-; dw $BC60, $12C0, $1D11
-; dw $3062, $12C0, $1D11
-; dw $3C62, $12C0, $1D11
-; 
-; macro TopOfDoorSquares(start)
-; 	; silly Big Endian
-; 	db <start>>>8, <start>, $00, $15
-; 	dw $5D4C, $1D4C, $1D11, $5D4C, $1D4C, $1D11, $5D4C, $1D4C, $1D11, $5D4C, $1D4C
-; endmacro
-; 
-; macro BottomOfDoorSquares(start)
-; 	; silly Big Endian
-; 	db <start>>>8, <start>, $00, $15
-; 	dw $DD4C, $9D4C, $1D11, $DD4C, $9D4C, $1D11, $DD4C, $9D4C, $1D11, $DD4C, $9D4C
-; endmacro
-; 
-; macro FullDoorRow(start)
-; 	%TopOfDoorSquares(<start>)
-; 	%BottomOfDoorSquares(<start>+$20)
-; endmacro
-; 
-; ; top grid
-; %FullDoorRow($60D1)
-; %FullDoorRow($6131)
-; %FullDoorRow($6191)
-; 
-; %FullDoorRow($6251)
-; %FullDoorRow($62B1)
-; %FullDoorRow($6311)
+; map area inside bottom area
+dw $AF62, $1A40, $1D11
+
+dw $CF62, $1B00
+dw $1D11, $5D4C, $1D4C, $1D11, $5D4C, $1D4C, $1D11, $5D4C, $1D4C, $1D11, $1D11, $5D4C, $1D4C, $1D11
+
+dw $EF62, $1B00
+dw $1D11, $DD4C, $9D4C, $1D11, $DD4C, $9D4C, $1D11, $DD4C, $9D4C, $1D11, $1D11, $DD4C, $9D4C, $1D11
+
+dw $0F63, $1A40, $1D11
 
 db $FF

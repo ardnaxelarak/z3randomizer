@@ -1,8 +1,10 @@
-!CenterTile = $036A
+!CenterTile = $026A
 !ConnectorPalette = $1000
+!DoorSlotCount = 25
 
 DrawWackyDoorRandoStuff:
-	JSL DrawBorder
+	JSL DrawTopAreaBorder
+	JSL DrawBottomAreaBorder
 
 	STZ.w GFXStripes
 
@@ -49,7 +51,7 @@ DrawCurrentSupertile:
 	RTL
 
 ClearDoorSlotsTable:
-	LDX.w #$0028
+	LDX.w #2*!DoorSlotCount-2
 	LDA.w #$FF0F
 -	STA.l DoorSlots, X
 	DEX : DEX
@@ -192,6 +194,9 @@ DrawConnectedRooms:
 	LDA.b $00
 	CMP.w #$0004
 	BCC .next_side
+
+	JSR DrawStairs
+	JSR DrawDropOrWarp
 
 	PLB
 	RTL
@@ -472,6 +477,129 @@ DrawSide:
 	PLX
 	RTS
 
+DrawStairs:
+	PHX
+	LDA.l CurrentDisplayedRoom
+	TAX
+	LDA.w SpiralPropsIndex, X
+	AND.w #$00FF
+	TAY
+	LDA.l SpiralOffset, X
+	AND.w #$00FF
+	ASL A : ASL A
+	STA.b $00
+
+	LDA.w SpiralProps, Y
+	AND.w #$00FF
+	STA.b $06
+	BEQ .done
+
+	STZ.b $02
+	INY
+
+.next_room
+	LDA.w SpiralProps, Y
+	AND.w #$00FF
+	ASL A : ASL A
+	CLC : ADC.b $00
+	TAX
+
+	PHY
+	LDA.b $02
+	CLC : ADC.w #$0015
+	ASL A
+	TAY
+
+	LDA.l SpiralTable, X
+	AND.w #$00FF
+	TYX
+	STA.l DoorSlots, X
+	STA.b $CA
+
+	LDA.w DoorSlotsBG2, Y
+	CLC : ADC.w #!CenterTile
+	TAX
+
+	LDA.b $02
+	ASL A
+	CLC : ADC.w #$0DF0
+	STA.l $7F0000-$40, X
+	INC A
+	STA.l $7F0002-$40, X
+	JSL DrawFullRoomTile
+	PLY
+
+	INY : INY
+	INC.b $02
+	DEC.b $06
+	BNE .next_room
+
+.done
+	PLX
+	RTS
+
+DrawDropOrWarp:
+	PHX
+	LDA.l CurrentDisplayedRoom
+	STA.b $00
+
+	LDX.w #$0000
+.check_next_drop
+	LDA.l FallTable, X
+	AND.w #$00FF
+	CMP.w #$00FF
+	BEQ .no_drop
+	CMP.b $00
+	BEQ .found_drop
+	INX : INX
+	BRA .check_next_drop
+
+.no_drop
+	LDX.w #$0000
+.check_next_warp
+	LDA.l WarpTable, X
+	AND.w #$00FF
+	CMP.w #$00FF
+	BEQ .done
+	CMP.b $00
+	BEQ .found_warp
+	INX : INX
+	BRA .check_next_warp
+
+.found_drop
+	LDA.w #$0DE0
+	STA.l $7F0574
+	INC A
+	STA.l $7F0576
+	LDA.l FallTable+1, X
+	AND.w #$00FF
+	BRA .draw_room
+
+.found_warp
+	LDA.w #$0DE2
+	STA.l $7F0574
+	INC A
+	STA.l $7F0576
+	LDA.l WarpTable+1, X
+	AND.w #$00FF
+
+.draw_room
+	PHY
+	LDX.w #$0030
+	TXY
+	STA.l DoorSlots, X
+	STA.b $CA
+
+	LDA.w DoorSlotsBG2, X
+	CLC : ADC.w #!CenterTile
+	TAX
+
+	JSL DrawFullRoomTile
+	PLY
+
+.done
+	PLX
+	RTS
 
 DrawSingleConnectedRoom:
 	AND.w #$00FF
@@ -722,31 +850,78 @@ DrawSouthConnectors:
 	PLX
 	RTS
 
-DrawBorder:
+DrawTopAreaBorder:
 	LDA.w #$0F19
-	STA.l $7F01DE
+	STA.l $7F00DE
 	LDA.w #$4F19
-	STA.l $7F01F8
+	STA.l $7F00F8
 	LDA.w #$8F19
-	STA.l $7F051E
+	STA.l $7F041E
 	LDA.w #$CF19
-	STA.l $7F0538
+	STA.l $7F0438
 
 	LDX.w #$0016
 -
 	LDA.w #$0F1A
-	STA.l $7F01E0, X
+	STA.l $7F00E0, X
 	LDA.w #$8F1A
-	STA.l $7F0520, X
+	STA.l $7F0420, X
 	DEX : DEX
 	BPL -
 
 	LDX.w #$02C0
 -
 	LDA.w #$0F1B
-	STA.l $7F021E, X
+	STA.l $7F011E, X
 	LDA.w #$4F1B
-	STA.l $7F0238, X
+	STA.l $7F0138, X
+	TXA
+	SEC : SBC.w #$0040
+	TAX
+	BPL -
+
+	RTL
+
+DrawBottomAreaBorder:
+	LDA.w #$0DE4
+	STA.l $7F055E
+	STA.l $7F0572
+	LDA.w #$4DE4
+	STA.l $7F0570
+	STA.l $7F0578
+	LDA.w #$8DE4
+	STA.l $7F061E
+	STA.l $7F0632
+	LDA.w #$CDE4
+	STA.l $7F0630
+	STA.l $7F0638
+
+	LDX.w #$000E
+-
+	LDA.w #$0DE5
+	STA.l $7F0560, X
+	LDA.w #$8DE5
+	STA.l $7F0620, X
+	DEX : DEX
+	BPL -
+
+	LDX.w #$0002
+-
+	LDA.w #$0DE5
+	STA.l $7F0574, X
+	LDA.w #$8DE5
+	STA.l $7F0634, X
+	DEX : DEX
+	BPL -
+
+	LDX.w #$0040
+-
+	LDA.w #$0DE6
+	STA.l $7F059E, X
+	STA.l $7F05B2, X
+	LDA.w #$4DE6
+	STA.l $7F05B0, X
+	STA.l $7F05B8, X
 	TXA
 	SEC : SBC.w #$0040
 	TAX
@@ -830,6 +1005,7 @@ DrawDoorsMapSprites:
 	BNE +
 	JSR DrawDoorsMapBlinker
 +
+	JSR DrawDoorsStairs
 	JSR DrawDoorsMapCursor
 
 	REP #$20
@@ -868,7 +1044,7 @@ DrawDoorsMapBlinker:
 	AND.w #$01E0
 	ASL A : ASL A : ASL A
 	XBA
-	CLC : ADC.w #$0064
+	CLC : ADC.w #$0044
 	STA.w OAMBuffer+1, X
 
 	SEP #$20
@@ -891,7 +1067,7 @@ DrawDoorsMapBossRoom:
 	LDA.l DungeonMapBossRooms, X
 	STA.b $0E
 
-	LDX.b #$28
+	LDX.b #!DoorSlotCount*2-2
 -
 	LDA.l DoorSlots, X
 	AND.w #$00FF
@@ -939,7 +1115,7 @@ DrawDoorsMapBossIcon:
 	TAY
 
 	REP #$20
-	LDA.w #$3048
+	LDA.w #$4830
 	STA.w OAMBuffer, Y
 
 	LDA.w #$3103
@@ -1038,7 +1214,7 @@ MoveDoorsMapCursor:
 	BNE .from_end
 
 .from_start
-	AND.b #$03
+	AND.b #$0F
 	TAX
 	LDA.l NextCursorSpecial_start_direction, X
 	STA.b $00
@@ -1046,7 +1222,7 @@ MoveDoorsMapCursor:
 	BRA .easy
 
 .from_end
-	AND.b #$03
+	AND.b #$0F
 	TAX
 	LDA.l NextCursorSpecial_end_direction, X
 	STA.b $00
@@ -1111,11 +1287,11 @@ DoorsMapSelectCursor:
 ClearDoorsMapBG1:
 	LDA.w #$000B
 	STA.b $00
-	LDA.w #$1110
+	LDA.w #$1090
 	STA.b $02
 	LDA.w GFXStripes
 	TAY
-	CLC : ADC.w #$0048
+	CLC : ADC.w #$0054
 	STA.w GFXStripes
 
 .next_row
@@ -1134,19 +1310,30 @@ ClearDoorsMapBG1:
 	DEC.b $00
 	BPL .next_row
 
+	LDA.w #$D012
+	STA.w GFXStripes+2, Y
+	LDA.w #$F012
+	STA.w GFXStripes+8, Y
+	LDA.w #$1640
+	STA.w GFXStripes+4, Y
+	STA.w GFXStripes+10, Y
+	LDA.w #$0300
+	STA.w GFXStripes+6, Y
+	STA.w GFXStripes+12, Y
 	RTL
 
 ClearDoorsMapBG2:
-	LDX.w #$0220
+; main area
+	LDX.w #$0120
 	LDA.w #$000B
 	STA.b $00
 	STA.b $02
 	LDA.w #$0300
-.next
+.next_main
 	STA.l $7F0000, X
 	INX : INX
 	DEC.b $02
-	BPL .next
+	BPL .next_main
 
 	LDA.w #$000B
 	STA.b $02
@@ -1156,6 +1343,79 @@ ClearDoorsMapBG2:
 
 	LDA.w #$0300
 	DEC.b $00
-	BPL .next
+	BPL .next_main
+
+; stairs area
+	LDX.w #$0560
+	LDA.w #$0007
+	STA.b $02
+.next_stairs
+	LDA.w #$0DE5
+	STA.l $7F0000, X
+	LDA.w #$0300
+	STA.l $7F0040, X
+	STA.l $7F0080, X
+	INX : INX
+	DEC.b $02
+	BPL .next_stairs
+
+; drop area
+	LDX.w #$0574
+	LDA.w #$0DE5
+	STA.l $7F0574
+	STA.l $7F0576
+	LDA.w #$0300
+	STA.l $7F05B4
+	STA.l $7F05B6
+	STA.l $7F05F4
+	STA.l $7F05F6
 
 	RTL
+
+DrawDoorsStairs:
+	LDA.l CurrentDisplayedRoom
+	TAX
+	LDA.l SpiralPropsIndex, X
+	TAX
+	LDA.l SpiralProps, X
+	STA.b $0E
+	STZ.b $0F
+	BEQ .done
+
+.next_sprite
+	LDY.b $00
+	LDA.b #$00
+	STA.w OAMBufferAux, Y
+	TYA
+	ASL A : ASL A
+	TAY
+
+	INX : INX
+	LDA.l SpiralProps, X
+
+	PHX
+	ASL A
+	TAX
+
+	LDA.l DoorSlotsSprites
+	CLC : ADC.l SpiralLabelOffsets, X
+	STA.w OAMBuffer, Y
+
+	LDA.l DoorSlotsSprites+1
+	CLC : ADC.l SpiralLabelOffsets+1, X
+	STA.w OAMBuffer+1, Y
+	PLX
+
+	LDA.b #$39
+	CLC : ADC.b $0F
+	STA.w OAMBuffer+2, Y
+
+	LDA.b #$33
+	STA.w OAMBuffer+3, Y
+	INC.b $00
+	INC.b $0F
+	DEC.b $0E
+	BNE .next_sprite
+
+.done
+	RTS

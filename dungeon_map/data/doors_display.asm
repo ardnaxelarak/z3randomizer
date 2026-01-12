@@ -1,34 +1,42 @@
 DoorSlotsSprites:
 ; center
-	dw $68A8
+	dw $48A8
 ; north
-	dw $4090, $40A8, $40C0
-	dw $4098, $40B8
+	dw $2090, $20A8, $20C0
+	dw $2098, $20B8
 ; west
-	dw $5080, $6880, $8080
-	dw $5880, $7880
+	dw $3080, $4880, $6080
+	dw $3880, $5880
 ; south
-	dw $9090, $90A8, $90C0
-	dw $9098, $90B8
+	dw $7090, $70A8, $70C0
+	dw $7098, $70B8
 ; east
-	dw $50D0, $68D0, $80D0
-	dw $58D0, $78D0
+	dw $30D0, $48D0, $60D0
+	dw $38D0, $58D0
+; stairs
+	dw $B080, $B098, $B0B0
+; drop/warp
+	dw $B0D0
 
 DoorSlotsBG1:
 ; center
-	dw $11B5
+	dw $1135
 ; north
-	dw $1112, $1115, $1118
-	dw $1113, $1117
+	dw $1092, $1095, $1098
+	dw $1093, $1097
 ; west
-	dw $1150, $11B0, $1210
-	dw $1170, $15F0
+	dw $10D0, $1130, $1190
+	dw $10F0, $1170
 ; south
-	dw $1252, $1255, $1258
-	dw $1253, $1257
+	dw $11D2, $11D5, $11D8
+	dw $11D3, $11D7
 ; east
-	dw $115A, $11BA, $121A
-	dw $117A, $11FA
+	dw $10DA, $113A, $119A
+	dw $10FA, $117A
+; stairs
+	dw $12D0, $12D3, $12D6
+; drop/warp
+	dw $12DA
 
 DoorSlotsBG2:
 ; center
@@ -45,6 +53,10 @@ DoorSlotsBG2:
 ; east
 	dw $FF4A, $000A, $00CA
 	dw $FF8A, $008A
+; stairs
+	dw $0336, $033C, $0342
+; drop/warp
+	dw $034A
 
 DoorSlotSides:
 	db $02, $0C, $16, $20
@@ -68,34 +80,40 @@ NextCursorSlot:
 	db $06, $FF, $07, $00
 	db $07, $FF, $08, $00
 ; bottom
-	db $00, $E1, $FF, $0E
-	db $00, $0E, $FF, $0F
-	db $00, $0F, $FF, $E3
-	db $00, $0B, $FF, $0C
-	db $00, $0C, $FF, $0D
+	db $00, $E1, $C4, $0E
+	db $00, $0E, $C4, $0F
+	db $00, $0F, $C4, $E3
+	db $00, $0B, $C4, $0C
+	db $00, $0C, $C4, $0D
 ; right
 	db $E0, $00, $13, $FF
 	db $13, $00, $14, $FF
 	db $14, $00, $E2, $FF
 	db $10, $00, $11, $FF
 	db $11, $00, $12, $FF
+; stairs
+	db $C2, $E1, $FF, $16
+	db $C2, $15, $FF, $17
+	db $C2, $16, $FF, $18
+; drop/warp
+	db $C2, $17, $FF, $E3
 
 NextCursorSpecial:
 .center
 	db $02, $04, $05, $01, $03, $FF
 	db $07, $09, $0A, $06, $08, $FF
-	db $0C, $0E, $0F, $0B, $0D, $FF
+	db $0C, $0E, $0F, $0B, $0D, $15, $16, $17, $18, $FF
 	db $11, $13, $14, $10, $12, $FF
 .center_offset
-	db $00, $06, $0C, $12
+	db $00, $06, $0C, $16
 .start_index
-	db $01, $06, $0B, $10
+	db $01, $06, $0B, $10, $15
 .start_direction
-	db $03, $02, $03, $02
+	db $03, $02, $03, $02, $03
 .end_index
-	db $03, $08, $0D, $12
+	db $03, $08, $0D, $12, $18
 .end_direction
-	db $01, $00, $01, $00
+	db $01, $00, $01, $00, $01
 
 SingleEdgeCurrentRoomConnectors:
 .north
@@ -233,8 +251,8 @@ EdgeConnectionIndices:
 	dw $0565, $0042
 	dw $0574, $0045
 	dw $0575, $0048
-	dw $0382, $004B
-	dw $0582, $004E
+	dw $0582, $004B
+	dw $0382, $004E
 	dw $0385, $0051
 	dw $03CC, $0054
 	dw $05CC, $0057
