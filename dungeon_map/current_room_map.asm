@@ -540,6 +540,53 @@ DrawStairs:
 	PLX
 	RTS
 
+GetCurrentRoomVisibility:
+	PHX
+	LDA.l ShowRooms_default
+	AND.w #$00FF
+	STA.b $0A
+
+	LDX.w DungeonID
+	LDA.l MapField
+	AND.l DungeonMask, X
+	BEQ +
+	LDA.l ShowRooms_have_map
+	AND.w #$00FF
+	CMP.b $0A
+	BCC +
+	STA.b $0A
++
+
+	LDX.w DungeonID
+	LDA.l CompassField
+	AND.l DungeonMask, X
+	BEQ +
+	LDA.l ShowRooms_have_compass
+	AND.w #$00FF
+	CMP.b $0A
+	BCC +
+	STA.b $0A
++
+
+	LDA.l CurrentDisplayedRoom
+	AND.w #$00FF
+	ASL A
+	TAX
+	LDA.l SaveDataWRAM, X
+	AND.w #$000F
+	STA.b $0E
+	BEQ +
+	LDA.l ShowRooms_visited_tile
+	AND.w #$00FF
+	CMP.b $0A
+	BCC +
+	STA.b $0A
++
+
+	PLX
+	LDA.b $0A
+	RTS
+
 DrawDropOrWarp:
 	PHX
 	LDA.l CurrentDisplayedRoom
@@ -1391,24 +1438,38 @@ DrawDoorsStairs:
 	LDA.l SpiralPropsIndex, X
 	TAX
 	LDA.l SpiralProps, X
-	STA.b $0E
-	STZ.b $0F
 	BEQ .done
 
-.next_sprite
-	LDY.b $00
-	LDA.b #$00
-	STA.w OAMBufferAux, Y
-	TYA
-	ASL A : ASL A
-	TAY
+	STA.b $0C
+	STZ.b $0D
 
+	REP #$30
+	JSR GetCurrentRoomVisibility
+	SEP #$30
+
+.next_sprite
 	INX : INX
 	LDA.l SpiralProps, X
 
 	PHX
 	ASL A
 	TAX
+
+	LDA.b $0A
+	CMP.b #$04
+	BCS .draw
+
+	LDA.l SpiralLabelQuadrantMasks, X
+	AND.b $0E
+	BEQ .skip
+
+.draw
+	LDY.b $00
+	LDA.b #$00
+	STA.w OAMBufferAux, Y
+	TYA
+	ASL A : ASL A
+	TAY
 
 	LDA.l DoorSlotsSprites
 	CLC : ADC.l SpiralLabelOffsets, X
@@ -1417,17 +1478,19 @@ DrawDoorsStairs:
 	LDA.l DoorSlotsSprites+1
 	CLC : ADC.l SpiralLabelOffsets+1, X
 	STA.w OAMBuffer+1, Y
-	PLX
 
 	LDA.b #$39
-	CLC : ADC.b $0F
+	CLC : ADC.b $0D
 	STA.w OAMBuffer+2, Y
 
 	LDA.b #$33
 	STA.w OAMBuffer+3, Y
 	INC.b $00
-	INC.b $0F
-	DEC.b $0E
+
+.skip
+	PLX
+	INC.b $0D
+	DEC.b $0C
 	BNE .next_sprite
 
 .done

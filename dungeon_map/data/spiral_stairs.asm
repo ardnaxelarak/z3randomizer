@@ -43,7 +43,7 @@ db $02, $00, $01, $01, $0B ; ($53) Pod Rupees
 db $01, $00, $04 ; ($58) Ice Gators
 db $02, $01, $0A, $02, $01 ; ($5B) HC Tiny (first value placeholder)
 db $03, $00, $01, $01, $0B, $02, $09 ; ($60) Swamp Sunken
-db $03, $01, $00, $02, $09, $03, $08 ; ($67) Hera Entrance (first value unused)
+db $03, $01, $00, $03, $08, $02, $09 ; ($67) Hera Entrance (first value unused)
 db $01, $00, $08 ; ($6E) Ice Hookshot
 db $02, $01, $00, $03, $08 ; ($71) Hera Basement (first and third values unused)
 db $03, $01, $00, $00, $02, $03, $08 ; ($76) GT Circle (third value unused)
@@ -68,3 +68,19 @@ db -3, -9
 db 13, -9
 db -3, -1
 db 13, -1
+
+SpiralLabelQuadrantMasks:
+dw $0008
+dw $000C
+dw $0004
+dw $0008
+dw $0004
+dw $0002
+dw $0003
+dw $0001
+dw $0002
+dw $0001
+dw $0008
+dw $0004
+dw $0002
+dw $0001
