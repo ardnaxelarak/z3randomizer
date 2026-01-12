@@ -54,9 +54,9 @@ db $02, $00, $02, $02, $09 ; ($8A) Tower Dark1 (2nd value unused)
 db $01, $00, $09 ; ($8F) Mire2
 
 SpiralLabelOffsets:
-db 1, -8
-db 5, -8
-db 9, -8
+db 1, -9
+db 5, -9
+db 9, -9
 db -6, -1
 db 15, -1
 db 1, 0

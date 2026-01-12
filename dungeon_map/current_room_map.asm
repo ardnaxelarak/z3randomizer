@@ -287,8 +287,10 @@ GetConnection:
 	JSR CheckInRoomTable
 	CMP.w #$FFFF
 	BEQ .nope
+	PHA
 	LDA.w #$0003
 	STA.b $04
+	PLA
 	BRA .found
 
 .nope
@@ -1096,7 +1098,9 @@ DrawDoorsMapBossRoom:
 	REP #$20
 	LDA.l DoorSlotsSprites, X
 	LDX.w DungeonID
+	XBA
 	CLC : ADC.l $8AEE6D, X
+	XBA
 	STA.w OAMBuffer, Y
 
 	LDA.w #$3331
@@ -1189,7 +1193,7 @@ MoveDoorsMapCursor:
 	BIT.b #$40
 	BNE .almost_easy
 
-	LDA.b $00
+	AND.b #$0F
 	TAX
 	LDA.l NextCursorSpecial_center_offset, X
 	TAX

@@ -92,11 +92,11 @@ NextCursorSlot:
 	db $10, $00, $11, $FF
 	db $11, $00, $12, $FF
 ; stairs
-	db $C2, $E1, $FF, $16
-	db $C2, $15, $FF, $17
-	db $C2, $16, $FF, $18
+	db $84, $18, $FF, $16
+	db $84, $15, $FF, $17
+	db $84, $16, $FF, $18
 ; drop/warp
-	db $C2, $17, $FF, $E3
+	db $84, $17, $FF, $15
 
 NextCursorSpecial:
 .center
@@ -104,8 +104,9 @@ NextCursorSpecial:
 	db $07, $09, $0A, $06, $08, $FF
 	db $0C, $0E, $0F, $0B, $0D, $15, $16, $17, $18, $FF
 	db $11, $13, $14, $10, $12, $FF
+	db $0C, $0E, $0F, $0B, $0D, $00, $FF
 .center_offset
-	db $00, $06, $0C, $16
+	db $00, $06, $0C, $16, $1C
 .start_index
 	db $01, $06, $0B, $10, $15
 .start_direction
@@ -254,8 +255,8 @@ EdgeConnectionIndices:
 	dw $0582, $004B
 	dw $0382, $004E
 	dw $0385, $0051
-	dw $03CC, $0054
-	dw $05CC, $0057
+	dw $05CC, $0054
+	dw $03CC, $0057
 	dw $05DC, $005A
 
 ; East
