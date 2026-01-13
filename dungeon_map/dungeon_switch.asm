@@ -13,6 +13,9 @@ CheckSwitchMap:
 	BIT.b #$80
 	BNE .select_new_room
 
+	BIT.b #$20
+	BNE .next_entrance
+
 	AND.b #$0F
 	BEQ .doors_done
 	BIT.b #$08 : BEQ + : LDA.b #$00 : BRA .doors_move_cursor : +
@@ -27,6 +30,10 @@ CheckSwitchMap:
 
 .select_new_room
 	JSL DoorsMapSelectCursor
+	BRA .doors_done
+
+.next_entrance
+	JSL DoorsMapNextEntrance
 
 .doors_done
 	REP #$20

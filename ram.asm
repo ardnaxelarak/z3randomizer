@@ -572,6 +572,7 @@ DisplayedRoomDoorIndex = $7EC22E  ; 2 bytes, used by dungeon map
 DoorSlots = $7EC230               ; $32 bytes, used by dungeon map
 DoorSlotScratch = $7EC262         ; 6 bytes, used by dungeon map
 DoorSlotCursor = $7EC268          ; 2 bytes, used by dungeon map
+CurrentDoorEntrance = $7EC26A     ; 2 bytes, used by dungeon map
                                   ;
 LastBGSet = $7EC2F8               ; Lists loaded sheets to check for decompression. 4 bytes.
                                   ;

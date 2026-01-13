@@ -174,6 +174,11 @@ EntranceQuadrantMasks:
 	dw $0003
 	dw $0001
 
+DropdownQuadrantMasks:
+	dw $0008
+	dw $000C
+	dw $0004
+
 MultiConnectorMapping:
 .two
 	db $02, $00

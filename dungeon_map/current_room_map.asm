@@ -8,6 +8,9 @@ DrawWackyDoorRandoStuff:
 
 	STZ.w GFXStripes
 
+	LDA.w EntranceIndex
+	STA.l CurrentDoorEntrance
+
 	JSL DetectLinksSection
 	INC A
 	XBA
@@ -345,6 +348,7 @@ CheckCanSeeConnector:
 	BEQ .plx_nope
 
 	LDA.l CurrentDisplayedRoom
+	AND.w #$00FF
 	ASL A
 	TAX
 	LDA.l SaveDataWRAM, X
@@ -548,7 +552,12 @@ DrawStairs:
 	XBA
 	ORA.b $CA
 	STA.b $CA
+
+	JSR GetSpecificRoomVisibility
+	BEQ .ply_skip
+
 	TYX
+	LDA.b $CA
 	STA.l DoorSlots, X
 
 	LDA.w DoorSlotsBG2, Y
@@ -562,6 +571,7 @@ DrawStairs:
 	INC A
 	STA.l $7F0002-$40, X
 	JSL DrawFullRoomTile
+.ply_skip
 	PLY
 
 .skip
@@ -1384,6 +1394,96 @@ DoorsMapSelectCursor:
 	PLP
 	RTL
 
+DoorsMapNextEntrance:
+	PHP
+	REP #$30
+	LDA.l CurrentDoorEntrance
+	TAY
+
+.check_next
+	INY
+	CPY.w #$0085
+	BCC +
+	LDY.w #$0000
++
+	TYA
+	CMP.l CurrentDoorEntrance
+	BEQ .done
+
+	TYX
+	LDA.l $82D1EF, X
+	AND.w #$00FF
+	CMP.w DungeonID
+
+	BNE .check_next
+
+	TYA
+	ASL A
+	TAX
+	LDA.l EntranceData_room_id, X
+	STA.b $CA
+
+	JSR GetSpecificRoomVisibility
+	BNE .acceptable
+
+	LDA.w #$0001
+	STA.b $00
+
+	LDA.l EntranceData_x_coordinate, X
+	LSR A
+	AND.w #$00FF
+	CMP.w #$0080
+	BCS +
+	LDA.b $00
+	ASL A
+	STA.b $00
++
+
+	LDA.l EntranceData_y_coordinate, X
+	LSR A
+	AND.w #$00FF
+	CMP.w #$0080
+	BCS +
+	LDA.b $00
+	ASL A
+	ASL A
+	STA.b $00
++
+
+	LDA.b $00
+	AND.b $0E
+	BEQ .check_next
+
+.acceptable
+	PHX
+	JSL DetectEntranceSection
+	PLX
+	INC A
+	ASL A : ASL A : ASL A : ASL A
+	XBA
+	ORA.l EntranceData_room_id, X
+	STA.l CurrentDisplayedRoom
+
+	TYA
+	STA.l CurrentDoorEntrance
+
+	STZ.w GFXStripes
+	JSL ClearDoorsMapBG1
+	JSL ClearDoorsMapBG2
+	JSL DrawCurrentSupertile
+
+	SEP #$30
+
+	LDA.b #$08
+	STA.b $17
+
+	LDA.b #$20
+	STA.w $012F
+
+.done
+	PLP
+	RTL
+
 ClearDoorsMapBG1:
 	LDA.w #$000B
 	STA.b $00
@@ -1480,7 +1580,7 @@ GetRoomEntrance:
 	BMI .not_found
 
 	TYX
-	LDA.l $02D1EF, X
+	LDA.l EntranceData_dungeon_id, X
 	AND.w #$00FF
 	CMP.w DungeonID
 	BNE -
@@ -1488,11 +1588,58 @@ GetRoomEntrance:
 	TYA
 	ASL A
 	TAX
-	LDA.l $02C577, X
+	LDA.l EntranceData_room_id, X
 	CMP.w $CA
 	BNE -
 
-	LDA.l $02CDC7, X
+	LDA.l EntranceData_x_coordinate, X
+	AND.w #$01FF
+	CMP.w #$00B9
+	BCC .left
+	CMP.w #$0149
+	BCC .middle
+
+.right
+	LDA.w #$0004
+	BRA .done
+
+.middle
+	LDA.w #$0002
+	BRA .done
+
+.left
+	LDA.w #$0000
+	BRA .done
+
+.not_found
+	LDA.w #$FFFF
+
+.done
+	PLY : PLX
+	RTS
+
+GetRoomDropdown:
+	PHX : PHY
+	LDY.w #$0083 ; entrance IDs 76 - 82 are dropdowns
+-
+	DEY
+	CPY.w #$0076
+	BCC .not_found
+
+	TYX
+	LDA.l EntranceData_dungeon_id, X
+	AND.w #$00FF
+	CMP.w DungeonID
+	BNE -
+
+	TYA
+	ASL A
+	TAX
+	LDA.l EntranceData_room_id, X
+	CMP.w $CA
+	BNE -
+
+	LDA.l EntranceData_x_coordinate, X
 	AND.w #$01FF
 	CMP.w #$00B9
 	BCC .left
@@ -1524,7 +1671,9 @@ DrawDoorsEntrances:
 
 .next_room
 	DEX : DEX
-	BMI .done
+	BPL +
+	JMP .done
++
 
 	LDA.l DoorSlots, X
 	BMI .next_room
@@ -1535,10 +1684,10 @@ DrawDoorsEntrances:
 	JSR GetRoomEntrance
 	STA.b $02
 	CMP.w #$0000
-	BMI .next_room
+	BMI .check_dropdown
 
 	JSR GetSpecificRoomVisibility
-	BNE .draw
+	BNE .draw_entrance
 
 	PHX
 	LDA.b $02
@@ -1546,9 +1695,9 @@ DrawDoorsEntrances:
 	LDA.l EntranceQuadrantMasks, X
 	PLX
 	AND.b $0E
-	BEQ .next_room
+	BEQ .check_dropdown
 
-.draw
+.draw_entrance
 	SEP #$30
 	LDY.b $00
 	LDA.b #$00
@@ -1570,7 +1719,45 @@ DrawDoorsEntrances:
 	STA.w OAMBuffer+2, Y
 	INC.b $00
 
-	BRA .next_room
+.check_dropdown
+	JSR GetRoomDropdown
+	STA.b $02
+	CMP.w #$0000
+	BMI .next_room
+
+	JSR GetSpecificRoomVisibility
+	BNE .draw_dropdown
+
+	PHX
+	LDA.b $02
+	TAX
+	LDA.l DropdownQuadrantMasks, X
+	PLX
+	AND.b $0E
+	BEQ .next_room
+
+.draw_dropdown
+	SEP #$30
+	LDY.b $00
+	LDA.b #$00
+	STA.w OAMBufferAux, Y
+	TYA
+	ASL A : ASL A
+	TAY
+
+	LDA.l DoorSlotsSprites, X
+	CLC : ADC.b $02 : ADC.b $02
+	STA.w OAMBuffer, Y
+
+	LDA.l DoorSlotsSprites+1, X
+	STA.w OAMBuffer+1, Y
+
+	REP #$30
+	LDA.w #$A333
+	STA.w OAMBuffer+2, Y
+	INC.b $00
+
+	JMP .next_room
 
 .done
 	SEP #$30
@@ -1582,7 +1769,9 @@ DrawDoorsStairs:
 	LDA.l SpiralPropsIndex, X
 	TAX
 	LDA.l SpiralProps, X
-	BEQ .done
+	BNE +
+	JMP .done
++
 
 	STA.b $0C
 	STZ.b $0D
@@ -1595,9 +1784,20 @@ DrawDoorsStairs:
 	INX : INX
 	LDA.l SpiralProps, X
 
+
 	PHX
 	ASL A
 	TAX
+
+	PHX
+	LDA.b $0D
+	CLC : ADC.b #$15
+	ASL A
+	TAX
+	LDA.l DoorSlots, X
+	PLX
+	CMP.b #$0F
+	BEQ .skip
 
 	REP #$30
 	LDA.l CurrentDisplayedRoom
@@ -1658,7 +1858,9 @@ DetectLinksSection:
 	LDA.l SplitRooms, X
 	AND.w #$00FF
 	STA.b $00
-	BEQ .done
+	BNE +
+	RTL
++
 
 	LDA.b LinkPosX
 	LSR A
@@ -1677,6 +1879,7 @@ DetectLinksSection:
 	INC A
 	STA.b $06
 
+DetectSection:
 	INX
 .next_section
 	PHX
@@ -1732,3 +1935,48 @@ DetectLinksSection:
 .done
 	LDA.b $00
 	RTL
+
+DetectEntranceSection:
+	TYA
+	ASL A
+	TAX
+	LDA.l EntranceData_room_id, X
+
+	ASL A
+	TAX
+	LDA.l SplitRooms, X
+	TAX
+	LDA.l SplitRooms, X
+	AND.w #$00FF
+	STA.b $00
+	BNE +
+	RTL
++
+
+	PHX
+	TYA
+	ASL A
+	TAX
+	LDA.l EntranceData_x_coordinate, X
+	LSR A
+	AND.w #$00FF
+	INC A
+	STA.b $02
+
+	TYA
+	ASL A
+	TAX
+	LDA.l EntranceData_y_coordinate, X
+	LSR A
+	AND.w #$00FF
+	INC A
+	STA.b $04
+
+	TYX
+	LDA.l EntranceData_layer, X
+	AND.w #$00FF
+	INC A
+	STA.b $06
+
+	PLX
+	JMP DetectSection
