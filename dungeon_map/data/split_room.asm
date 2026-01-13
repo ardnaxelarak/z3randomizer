@@ -33,7 +33,7 @@ SplitRooms:
 %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
 %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
 
-%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
+%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.57)
 %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
 
 %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
@@ -172,6 +172,27 @@ db $00
 db $FF
 ..enemies
 db $02, $03
+db $FF
+
+.57 ; SW pot cage (2) // middle section (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(..chests) : %d(..pots) : %d(..enemies)
+..areas
+db $03, $80, $FF, $80, $FF
+db $FF
+..doors
+db $08, $0B
+db $FF
+..chests
+db $01
+db $FF
+..pots
+db $02, $03, $04, $05
+db $FF
+..enemies
+db $08, $09, $0A, $0B
 db $FF
 
 .6a ; pre-helmasaur-king (2) // PoD rupee basement (1)
