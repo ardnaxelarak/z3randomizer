@@ -8,6 +8,11 @@ DrawWackyDoorRandoStuff:
 
 	STZ.w GFXStripes
 
+	LDA.l CachedDungeonID
+	AND.w #$00FF
+	CMP.w DungeonID
+	BNE .different_dungeon
+
 	LDA.w EntranceIndex
 	STA.l CurrentDoorEntrance
 
@@ -16,6 +21,24 @@ DrawWackyDoorRandoStuff:
 	XBA
 	ASL A : ASL A : ASL A : ASL A
 	ORA.b RoomIndex
+	STA.l CurrentDisplayedRoom
+	BRA DrawCurrentSupertile
+
+.different_dungeon
+	JSL FindFirstEntrance
+	TYA
+	STA.l CurrentDoorEntrance
+
+	ASL A
+	TAX
+	LDA.l EntranceData_room_id, X
+	STA.l CurrentDisplayedRoom
+
+	JSL DetectEntranceSection
+	INC A
+	XBA
+	ASL A : ASL A : ASL A : ASL A
+	ORA.l CurrentDisplayedRoom
 	STA.l CurrentDisplayedRoom
 
 DrawCurrentSupertile:
@@ -1479,6 +1502,101 @@ DoorsMapNextEntrance:
 
 	LDA.b #$20
 	STA.w $012F
+
+.done
+	PLP
+	RTL
+
+FindFirstEntrance:
+	PHP
+	REP #$30
+	LDY.w #$0000
+
+.check_next
+	INY
+	CPY.w #$0085
+	BCC +
+	LDY.w #$FFFF
+	PLP
+	RTL
++
+
+	TYX
+	LDA.l $82D1EF, X
+	AND.w #$00FF
+	CMP.w DungeonID
+
+	BNE .check_next
+
+	TYA
+	ASL A
+	TAX
+	LDA.l EntranceData_room_id, X
+	STA.b $CA
+
+	JSR GetSpecificRoomVisibility
+	BNE .acceptable
+
+	LDA.w #$0001
+	STA.b $00
+
+	LDA.l EntranceData_x_coordinate, X
+	LSR A
+	AND.w #$00FF
+	CMP.w #$0080
+	BCS +
+	LDA.b $00
+	ASL A
+	STA.b $00
++
+
+	LDA.l EntranceData_y_coordinate, X
+	LSR A
+	AND.w #$00FF
+	CMP.w #$0080
+	BCS +
+	LDA.b $00
+	ASL A
+	ASL A
+	STA.b $00
++
+
+	LDA.b $00
+	AND.b $0E
+	BEQ .check_next
+
+.acceptable
+	PLP
+	RTL
+
+DoorsMapChangeDungeon:
+	PHP
+	SEP #$30
+	LDA.w DungeonID
+	STA.b $00
+
+.next
+	LDA.w DungeonID
+	ASL A
+	TAX
+
+	LDA.b $F6
+	BIT.b #$20
+	BNE +
+	INX
++	LDA.l DungeonMapData.prev, X
+	CMP.b $00
+	BEQ .done
+
+	STA.w DungeonID
+	JSL FindFirstEntrance
+	CPY.b #$FF
+	BEQ .next
+
+	LDA.b #$04
+	STA.w SubModuleInterface
+	REP #$20
+	LDA.w #$0000
 
 .done
 	PLP

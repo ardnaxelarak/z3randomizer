@@ -7,8 +7,12 @@ CheckSwitchMap:
 	; fancy door map
 	SEP #$20
 	LDA.b $F6
+	BIT.b #$30
+	BNE .change_dungeon
+
 	BIT.b #$80
 	BNE .select_new_room
+
 	LDA.b $F4
 	BIT.b #$80
 	BNE .select_new_room
@@ -34,6 +38,11 @@ CheckSwitchMap:
 
 .next_entrance
 	JSL DoorsMapNextEntrance
+	BRA .doors_done
+
+.change_dungeon
+	JSL DoorsMapChangeDungeon
+	BRA .doors_done
 
 .doors_done
 	REP #$20
