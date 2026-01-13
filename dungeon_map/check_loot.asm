@@ -128,6 +128,18 @@ CheckChests:
 	RTS
 
 CheckBoss:
+	; we assume all bosses are in section 1 of split sections
+	; mainly to simplify hera cage key and GT torch
+	; which use the same flow
+	; and bosses are always in their own section anyway
+	LDA.b $CA
+	AND.w #$FF00
+	XBA
+	CMP.w #$0002
+	BCC +
+	RTS
+
++
 	LDA.b $CA
 	AND.w #$00FF
 	STA.b $04

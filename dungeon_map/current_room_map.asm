@@ -628,30 +628,27 @@ GetSpecificRoomVisibility:
 DrawDropOrWarp:
 	PHX
 	LDA.l CurrentDisplayedRoom
-	AND.w #$00FF
 	STA.b $00
 
 	LDX.w #$0000
 .check_next_drop
 	LDA.l FallTable, X
-	AND.w #$00FF
-	CMP.w #$00FF
+	CMP.w #$FFFF
 	BEQ .no_drop
 	CMP.b $00
 	BEQ .found_drop
-	INX : INX
+	INX : INX : INX : INX
 	BRA .check_next_drop
 
 .no_drop
 	LDX.w #$0000
 .check_next_warp
 	LDA.l WarpTable, X
-	AND.w #$00FF
-	CMP.w #$00FF
+	CMP.w #$FFFF
 	BEQ .done
 	CMP.b $00
 	BEQ .found_warp
-	INX : INX
+	INX : INX : INX : INX
 	BRA .check_next_warp
 
 .found_drop
@@ -659,8 +656,7 @@ DrawDropOrWarp:
 	STA.l $7F0574
 	INC A
 	STA.l $7F0576
-	LDA.l FallTable+1, X
-	AND.w #$00FF
+	LDA.l FallTable+2, X
 	BRA .draw_room
 
 .found_warp
@@ -668,8 +664,7 @@ DrawDropOrWarp:
 	STA.l $7F0574
 	INC A
 	STA.l $7F0576
-	LDA.l WarpTable+1, X
-	AND.w #$00FF
+	LDA.l WarpTable+2, X
 
 .draw_room
 	PHY
@@ -1161,6 +1156,10 @@ DrawDoorsMapBlinker:
 DrawDoorsMapBossRoom:
 	LDX.w DungeonID
 	LDA.l DungeonMapBossRooms, X
+	CMP.w #$000F
+	BNE +
+	RTS
++
 	STA.b $0E
 
 	LDX.b #!DoorSlotCount*2-2
