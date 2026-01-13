@@ -8,8 +8,11 @@ DrawWackyDoorRandoStuff:
 
 	STZ.w GFXStripes
 
-	LDA.b RoomIndex
-	AND.w #$00FF
+	JSL DetectLinksSection
+	INC A
+	XBA
+	ASL A : ASL A : ASL A : ASL A
+	ORA.b RoomIndex
 	STA.l CurrentDisplayedRoom
 
 DrawCurrentSupertile:
@@ -28,6 +31,7 @@ DrawCurrentSupertile:
 
 	; multiply room id by 24 to get index in doors table
 	LDA.l CurrentDisplayedRoom
+	AND.w #$00FF
 	TAX
 	LDA.l DoorOffset, X
 	AND.w #$00FF
@@ -70,6 +74,7 @@ ClearDoorSlotScratch:
 
 DrawFullRoomTile:
 	LDA.b $CA
+	AND.w #$00FF
 	PHX
 	ASL A
 	TAX
@@ -81,6 +86,8 @@ DrawFullRoomTile:
 	PLY
 
 	LDA.b $CA
+	AND.w #$0FFF
+
 	CMP.w #$003F : BEQ .top_right
 	CMP.w #$0096 : BEQ .top_right
 	CMP.w #$007E : BEQ .top_left
@@ -207,7 +214,10 @@ CheckEdgesTable:
 	CLC : ADC.b $00
 	ADC.b $02
 	XBA
-	ORA.l CurrentDisplayedRoom
+	STA.b $0C
+	LDA.l CurrentDisplayedRoom
+	AND.w #$00FF
+	ORA.b $0C
 	STA.b $0C
 
 	PHX
@@ -236,7 +246,10 @@ CheckInRoomTable:
 	CLC : ADC.b $00
 	ADC.b $02
 	XBA
-	ORA.l CurrentDisplayedRoom
+	STA.b $0C
+	LDA.l CurrentDisplayedRoom
+	AND.w #$00FF
+	ORA.b $0C
 	STA.b $0C
 
 	PHX
@@ -270,13 +283,32 @@ GetConnection:
 	BEQ .not_found
 
 	STA.b $0C
+	STA.b $CA
 	LDA.b $08
 	JSR GetWhichDoorPosition
+	PHA
 	XBA
 	ORA.b $0C
 	STA.b $0C
+
+	PLA
+	CLC : ADC.b $00 : ADC.b $00 : ADC.b $00
+	PHX
+	TAX
+	LDA.l IncomingDoorMap, X
+	AND.w #$00FF
+	PLX
+	STA.b $CC
+	JSR GetDoorSection
+	INC A
+	ASL A : ASL A : ASL A : ASL A
+	XBA
+	ORA.b $0C
+	STA.b $0C
+
 	JSR CheckCanSeeConnector
 	BCC .nope
+
 	LDA.b $0C
 	RTS
 
@@ -380,6 +412,15 @@ DrawSide:
 	LDY.w #$0002
 
 -
+	LDA.l CurrentDisplayedRoom
+	STA.b $CA
+	LDA.b $00
+	ASL A
+	CLC : ADC.b $00
+	ADC.b $02
+	JSR CheckDoorSection
+	BCC +
+
 	JSR GetConnection
 	BMI +
 	INC.b $06
@@ -459,6 +500,7 @@ DrawSide:
 DrawStairs:
 	PHX
 	LDA.l CurrentDisplayedRoom
+	AND.w #$00FF
 	TAX
 	LDA.w SpiralPropsIndex, X
 	AND.w #$00FF
@@ -571,6 +613,7 @@ GetSpecificRoomVisibility:
 DrawDropOrWarp:
 	PHX
 	LDA.l CurrentDisplayedRoom
+	AND.w #$00FF
 	STA.b $00
 
 	LDX.w #$0000
@@ -644,7 +687,7 @@ DrawSingleConnectedRoom:
 
 	TYX
 	LDA.l DoorSlots+1, X
-	AND.w #$00FF
+	AND.w #$000F
 	CMP.w #$0003
 	BNE +
 	LDA.l DoorSlots, X
@@ -1305,10 +1348,12 @@ DoorsMapSelectCursor:
 
 	ASL A
 	TAX
-	LDA.l DoorSlots, X
 
-	STA.l CurrentDisplayedRoom
 	REP #$30
+
+	LDA.l DoorSlots, X
+	AND.w #$F0FF
+	STA.l CurrentDisplayedRoom
 	STZ.w GFXStripes
 	JSL ClearDoorsMapBG1
 	JSL ClearDoorsMapBG2
@@ -1416,7 +1461,7 @@ ClearDoorsMapBG2:
 
 GetRoomEntrance:
 	PHX : PHY
-	LDY.w #$0085
+	LDY.w #$0076 ; entrance IDs 76 - 82 are dropdowns, handle those later
 -
 	DEY
 	BMI .not_found
@@ -1581,3 +1626,87 @@ DrawDoorsStairs:
 
 .done
 	RTS
+
+DetectLinksSection:
+	LDA.b RoomIndex
+	ASL A
+	TAX
+	LDA.l SplitRooms, X
+	TAX
+	LDA.l SplitRooms, X
+	AND.w #$00FF
+	STA.b $00
+	BEQ .done
+
+	LDA.b LinkPosX
+	LSR A
+	AND.w #$00FF
+	INC A
+	STA.b $02
+
+	LDA.b LinkPosY
+	LSR A
+	AND.w #$00FF
+	INC A
+	STA.b $04
+
+	LDA.b LinkLayer
+	AND.w #$00FF
+	INC A
+	STA.b $06
+
+	INX
+.next_section
+	PHX
+	LDA.l SplitRooms, X
+	TAX
+.next_area
+	LDA.l SplitRooms, X
+	AND.w #$00FF
+	CMP.w #$00FF
+	BEQ .not_this_section
+
+	AND.w $06
+	BEQ .not_this_area
+
+	LDA.l SplitRooms+1, X ; x minimum
+	AND.w #$00FF
+	CMP.b $02
+	BCS .not_this_area
+
+	LDA.l SplitRooms+2, X ; x maximum
+	AND.w #$00FF
+	INC A
+	CMP.b $02
+	BCC .not_this_area
+
+	LDA.l SplitRooms+3, X ; y minimum
+	AND.w #$00FF
+	CMP.b $04
+	BCS .not_this_area
+
+	LDA.l SplitRooms+4, X ; y maximum
+	AND.w #$00FF
+	INC A
+	CMP.b $04
+	BCC .not_this_area
+
+	BRA .found
+
+.not_this_area
+	INX #5
+	BRA .next_area
+
+.not_this_section
+	PLX
+	TXA : CLC : ADC.w #$000A : TAX
+	DEC.b $00
+	BNE .next_section
+	BRA .done
+
+.found
+	PLX
+
+.done
+	LDA.b $00
+	RTL

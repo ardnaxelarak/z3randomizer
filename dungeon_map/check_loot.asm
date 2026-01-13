@@ -5,7 +5,7 @@ CheckLoot:
 	REP #$30
 	PHB : PHX : PHY
 
-	STA.b $00
+	STA.b $CA
 
 	LDA.b $06 : PHA
 	LDA.b $0E : PHA
@@ -16,7 +16,8 @@ CheckLoot:
 	AND.w #$00FF
 	STA.b $0E
 
-	LDA.b $00
+	LDA.b $CA
+	AND.w #$00FF
 	ASL A
 	TAX
 
@@ -80,7 +81,9 @@ CheckLoot:
 	RTL
 
 CheckChests:
-	LDA.b $00
+	LDA.b $CA
+	AND.w #$00FF
+	STA.b $00
 	ASL A
 	TAX
 
@@ -90,6 +93,7 @@ CheckChests:
 
 	LDA.w #$0008
 	STA.b $04
+	STZ.b $06
 
 	LDY.w #$FFFD
 .increment_mask
@@ -106,6 +110,10 @@ CheckChests:
 	CMP.b $00
 	BNE .next_chest
 
+	JSR CheckChestSection
+	INC.b $06
+	BCC .increment_mask
+
 	LDA.l SaveDataWRAM, X
 	AND.b $04
 	BNE .increment_mask ; already got item
@@ -119,6 +127,10 @@ CheckChests:
 	RTS
 
 CheckBoss:
+	LDA.b $CA
+	AND.w #$00FF
+	STA.b $04
+
 	LDX.w #$FFFA
 .next_boss
 	INX #6
@@ -127,7 +139,7 @@ CheckBoss:
 	RTS
 
 .check
-	CMP.b $00
+	CMP.b $04
 	BNE .next_boss
 
 	TXY
@@ -170,6 +182,10 @@ CheckBoss:
 	BRA .next_boss
 
 CheckPrize:
+	LDA.b $CA
+	AND.w #$00FF
+	STA.b $04
+
 	LDX.w #$FFFD
 .next_prize
 	INX #3
@@ -178,7 +194,7 @@ CheckPrize:
 	RTS
 
 .check
-	CMP.b $00
+	CMP.b $04
 	BNE .next_prize
 
 	TXY
@@ -202,7 +218,8 @@ CheckPrize:
 	BRA .next_prize
 
 CheckPots:
-	LDA.b $00
+	LDA.b $CA
+	AND.w #$00FF
 	ASL A
 	TAX
 
@@ -242,7 +259,18 @@ CheckPots:
 	LDA.l DungeonMask, X : STA.b $08
 
 .mask_set
-	LDA.b $00 : ASL A : TAX
+	TXA
+	JSR CheckPotSection
+	BCS +
+		PLX
+		PLA
+		BRA .next_pot
++
+
+	LDA.b $CA
+	AND.w #$00FF
+	ASL A
+	TAX
 if !FEATURE_FIX_BASEROM
 	LDA.l SpriteDropData, X
 else
@@ -264,7 +292,8 @@ endif
 	RTS
 
 CheckEnemies:
-	LDA.b $00
+	LDA.b $CA
+	AND.w #$00FF
 	ASL A
 	TAX
 
@@ -279,7 +308,10 @@ CheckEnemies:
 .next_enemy
 	LDA.b [$04], Y
 	AND.w #$00FF
-	CMP.w #$00FF : BEQ .done
+	CMP.w #$00FF
+	BNE +
+		JMP .done
+	+
 	LDA.b [$04], Y
 	BIT.w #$8000 : BNE .overlord
 	INY : INY
@@ -333,13 +365,25 @@ CheckEnemies:
 	LDA.l DungeonMask, X : STA.b $08
 
 .mask_set
-	LDA.b $00 : ASL A : TAX
+	TXA
+	JSR CheckEnemySection
+	BCS +
+		PLX
+		PLA
+		BRA .next_enemy
++
+
+	LDA.b $CA
+	AND.w #$00FF
+	ASL A
+	TAX
+
 	LDA.l SpriteDropData, X
 	PLX
 	AND.b $08
 	BEQ .not_obtained
 	PLA
-	BRA .next_enemy
+	JMP .next_enemy
 
 .not_obtained
 	PLA
@@ -380,3 +424,86 @@ GetLootClass:
 .done
 	PLX
 	RTS
+
+macro DefineGetFooSection(type, offset)
+Get<type>Section:
+	PHX
+	LDA.b $CA
+	AND.w #$00FF
+	ASL A
+	TAX
+	LDA.l SplitRooms, X
+	TAX
+
+	LDA.l SplitRooms, X
+	AND.w #$00FF
+	STA.b $CE
+	BEQ .found
+
+	INX
+.check_next_section
+	PHX
+	LDA.l SplitRooms+<offset>, X
+	TAX
+-
+	LDA.l SplitRooms, X
+	AND.w #$00FF
+	CMP.w #$00FF
+	BEQ .not_this_section
+	CMP.b $CC
+	BEQ .plx_found
+
+	INX
+	BRA -
+
+.not_this_section
+	PLX
+	TXA : CLC : ADC.w #$000A : TAX
+	DEC.b $CE
+	BNE .check_next_section
+	BRA .found
+
+.plx_found
+	PLX
+
+.found
+	PLX
+	LDA.b $CE
+	RTS
+endmacro
+
+macro DefineCheckFooSection(type)
+Check<type>Section:
+	STA.b $CC
+
+	LDA.b $CB
+	AND.w #$00FF
+	BEQ .yes
+
+	JSR Get<type>Section
+
+	LDA.b $CB
+	AND.w #$00FF
+	LSR A : LSR A : LSR A : LSR A
+	DEC A
+	CMP.b $CE
+	BEQ .yes
+
+.no
+	CLC
+	RTS
+
+.yes
+	SEC
+	RTS
+endmacro
+
+%DefineGetFooSection(Door, 2)
+%DefineGetFooSection(Chest, 4)
+%DefineGetFooSection(Pot, 6)
+%DefineGetFooSection(Enemy, 8)
+
+%DefineCheckFooSection(Door)
+%DefineCheckFooSection(Chest)
+%DefineCheckFooSection(Pot)
+%DefineCheckFooSection(Enemy)

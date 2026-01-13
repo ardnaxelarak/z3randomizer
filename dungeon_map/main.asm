@@ -37,3 +37,4 @@ incsrc blink_loot.asm
 incsrc data/doors_display.asm
 incsrc data/spiral_stairs.asm
 incsrc data/fall_warps.asm
+incsrc data/split_room.asm
