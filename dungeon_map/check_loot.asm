@@ -110,6 +110,7 @@ CheckChests:
 	CMP.b $00
 	BNE .next_chest
 
+	LDA.b $06
 	JSR CheckChestSection
 	INC.b $06
 	BCC .increment_mask
@@ -257,6 +258,7 @@ CheckPots:
 	TXA : ASL A
 	TAX
 	LDA.l DungeonMask, X : STA.b $08
+	TXA : LSR A : TAX
 
 .mask_set
 	TXA
@@ -363,6 +365,7 @@ CheckEnemies:
 	TXA : ASL A
 	TAX
 	LDA.l DungeonMask, X : STA.b $08
+	TXA : LSR A : TAX
 
 .mask_set
 	TXA
@@ -458,7 +461,7 @@ Get<type>Section:
 
 .not_this_section
 	PLX
-	TXA : CLC : ADC.w #$000A : TAX
+	TXA : CLC : ADC.w #$000D : TAX
 	DEC.b $CE
 	BNE .check_next_section
 	BRA .found
@@ -498,12 +501,51 @@ Check<type>Section:
 	RTS
 endmacro
 
-%DefineGetFooSection(Door, 2)
-%DefineGetFooSection(Chest, 4)
-%DefineGetFooSection(Pot, 6)
-%DefineGetFooSection(Enemy, 8)
+%DefineGetFooSection(Door, 3)
+%DefineGetFooSection(Stair, 5)
+%DefineGetFooSection(Chest, 7)
+%DefineGetFooSection(Pot, 9)
+%DefineGetFooSection(Enemy, 11)
 
 %DefineCheckFooSection(Door)
+%DefineCheckFooSection(Stair)
 %DefineCheckFooSection(Chest)
 %DefineCheckFooSection(Pot)
 %DefineCheckFooSection(Enemy)
+
+GetIncomingStairSection:
+	PHX
+	AND.w #$0300
+	XBA
+	ASL A
+	TAX
+	LDA.l $8098D8, X
+	STA.b $CC
+
+	LDA.b $CA
+	AND.w #$00FF
+	ASL A
+	TAX
+	LDA.l SplitRooms, X
+	TAX
+
+	LDA.l SplitRooms, X
+	AND.w #$00FF
+	STA.b $CE
+	BEQ .found
+
+	INX
+.check_next_section
+	LDA.l SplitRooms+0, X
+	AND.w #$00FF
+	AND.b $CC
+	BNE .found
+	TXA : CLC : ADC.w #$000D : TAX
+	DEC.b $CE
+	BNE .check_next_section
+	BRA .found
+
+.found
+	PLX
+	LDA.b $CE
+	RTS

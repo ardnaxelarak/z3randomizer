@@ -525,6 +525,12 @@ DrawStairs:
 	CLC : ADC.b $00
 	TAX
 
+	LDA.l CurrentDisplayedRoom
+	STA.b $CA
+	LDA.b $02
+	JSR CheckStairSection
+	BCC .skip
+
 	PHY
 	LDA.b $02
 	CLC : ADC.w #$0015
@@ -533,9 +539,17 @@ DrawStairs:
 
 	LDA.l SpiralTable, X
 	AND.w #$00FF
+	STA.b $CA
+
+	LDA.l SpiralTable, X
+	JSR GetIncomingStairSection
+	INC A
+	ASL A : ASL A : ASL A : ASL A
+	XBA
+	ORA.b $CA
+	STA.b $CA
 	TYX
 	STA.l DoorSlots, X
-	STA.b $CA
 
 	LDA.w DoorSlotsBG2, Y
 	CLC : ADC.w #!CenterTile
@@ -550,6 +564,7 @@ DrawStairs:
 	JSL DrawFullRoomTile
 	PLY
 
+.skip
 	INY : INY
 	INC.b $02
 	DEC.b $06
@@ -675,7 +690,6 @@ DrawDropOrWarp:
 	RTS
 
 DrawSingleConnectedRoom:
-	AND.w #$00FF
 	STA.b $CA
 	LDA.w DoorSlotsBG2, Y
 	CLC : ADC.w #!CenterTile
@@ -1586,6 +1600,15 @@ DrawDoorsStairs:
 	ASL A
 	TAX
 
+	REP #$30
+	LDA.l CurrentDisplayedRoom
+	STA.b $CA
+	LDA.b $0D
+	AND.w #$00FF
+	JSR CheckStairSection
+	SEP #$30
+	BCC .skip
+
 	LDA.b $0A
 	CMP.b #$04
 	BCS .draw
@@ -1658,7 +1681,7 @@ DetectLinksSection:
 	INX
 .next_section
 	PHX
-	LDA.l SplitRooms, X
+	LDA.l SplitRooms+1, X
 	TAX
 .next_area
 	LDA.l SplitRooms, X
@@ -1699,7 +1722,7 @@ DetectLinksSection:
 
 .not_this_section
 	PLX
-	TXA : CLC : ADC.w #$000A : TAX
+	TXA : CLC : ADC.w #$000D : TAX
 	DEC.b $00
 	BNE .next_section
 	BRA .done

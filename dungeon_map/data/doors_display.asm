@@ -222,7 +222,7 @@ EdgePositions:
 .west
 	db $02 ; TT Attic
 	db $02, $02 ; Desert North Hall
-	db $02, $00 ; HC Basement
+	db $00, $02 ; HC Basement
 	db $00 ; Desert East Wing
 	db $02, $00 ; TT Triple
 	db $02 ; TT Big Key Chest
@@ -236,7 +236,7 @@ EdgePositions:
 .east
 	db $02 ; TT Attic
 	db $02, $02 ; Desert North Hall
-	db $00, $02 ; HC Basement
+	db $02, $00 ; HC Basement
 	db $00 ; Desert East Wing
 	db $02, $00 ; TT Triple
 	db $02 ; TT Big Key Chest
