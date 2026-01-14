@@ -138,9 +138,11 @@ DrawFullRoomTile:
 	LDA.b $00 : PHA
 	LDA.b $02 : PHA
 	LDA.b $06 : PHA
+	LDA.b $08 : PHA
 	LDA.b $0E : PHA
 	JSL DrawSingleRoomLoot
 	PLA : STA.b $0E
+	PLA : STA.b $08
 	PLA : STA.b $06
 	PLA : STA.b $02
 	PLA : STA.b $00
@@ -577,7 +579,12 @@ DrawStairs:
 	STA.b $CA
 
 	JSR GetSpecificRoomVisibility
-	BEQ .ply_skip
+	BNE +
+	LDA.b $0E
+	AND.w #$000F
+	BNE +
+	BRA .ply_skip
++
 
 	TYX
 	LDA.b $CA
@@ -686,32 +693,42 @@ DrawDropOrWarp:
 
 .found_drop
 	LDA.w #$0DE0
-	STA.l $7F0574
-	INC A
-	STA.l $7F0576
+	PHA
 	LDA.l FallTable+2, X
 	BRA .draw_room
 
 .found_warp
 	LDA.w #$0DE2
-	STA.l $7F0574
-	INC A
-	STA.l $7F0576
+	PHA
 	LDA.l WarpTable+2, X
 
 .draw_room
-	PHY
-	LDX.w #$0030
-	TXY
-	STA.l DoorSlots, X
 	STA.b $CA
+
+	JSR GetSpecificRoomVisibility
+	BNE +
+	LDA.b $0E
+	AND.w #$000F
+	BNE +
+
+	PLA
+	BRA .done
+
++
+	PLA
+	STA.l $7F0574
+	INC A
+	STA.l $7F0576
+
+	LDX.w #$0030
+	LDA.b $CA
+	STA.l DoorSlots, X
 
 	LDA.w DoorSlotsBG2, X
 	CLC : ADC.w #!CenterTile
 	TAX
 
 	JSL DrawFullRoomTile
-	PLY
 
 .done
 	PLX
