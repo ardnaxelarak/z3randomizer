@@ -27,7 +27,7 @@ SplitRooms:
 %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
 %d(.no) : %d(.no) : %d(.2a) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
 
-%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.35) : %d(.no) : %d(.37)
+%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.35) : %d(.36) : %d(.37)
 %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
 
 %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
@@ -55,7 +55,7 @@ SplitRooms:
 %d(.no) : %d(.no) : %d(.b2) : %d(.no) : %d(.no) : %d(.no) : %d(.b6) : %d(.no)
 %d(.no) : %d(.b9) : %d(.no) : %d(.no) : %d(.bc) : %d(.no) : %d(.no) : %d(.no)
 
-%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
+%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.c7)
 %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
 
 %d(.no) : %d(.d1) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.d6) : %d(.no)
@@ -101,11 +101,11 @@ db $FF
 db $03, $06, $09
 db $FF
 ..areas2
-db $03, $00, $30, $B8, $D8
-db $03, $D0, $FF, $B8, $D8
+db $03, $B0, $D0, $D0, $FF
+db $03, $30, $50, $00, $28
 db $FF
 ..doors2
-db $05, $0B
+db $00, $08
 db $FF
 
 .1a ; PoD Big Chest (2) // Falling bridge and such (1)
@@ -154,6 +154,21 @@ db $00
 db $FF
 ..pots
 db $01, $02, $03, $04, $05
+db $FF
+
+.36 ; Swamp Big Lobby (1) // Tiny Top-Right Blocked Corner (2)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(..pots) : %d(.no_items)
+..areas
+db $03, $D4, $FF, $00, $48
+db $FF
+..doors
+db $09
+db $FF
+..pots
+db $00, $01
 db $FF
 
 .37 ; Swamp Second Chest (2) // Swamp first trench (1)
@@ -416,6 +431,7 @@ db $01
 %d(..areas) : %d(..doors) : %d(.no_items) : %d(.no_items) : %d(.no_items) : %d(.no_items)
 ..areas
 db $02, $00, $80, $00, $FF
+db $01, $34, $D4, $B8, $FF
 db $FF
 ..doors
 db $03, $06
@@ -482,6 +498,21 @@ db $06
 db $FF
 ..pots
 db $0C, $0D
+db $FF
+
+.c7 ; TR Torch Maze (1) // Tiny Bottom-Left Blocked Corner (2)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(..pots) : %d(.no_items)
+..areas
+db $03, $00, $1C, $A8, $FF
+db $FF
+..doors
+db $05
+db $FF
+..pots
+db $02, $03
 db $FF
 
 .d1

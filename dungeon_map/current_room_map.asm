@@ -726,6 +726,7 @@ DrawDropOrWarp:
 
 	LDA.w DoorSlotsBG2, X
 	CLC : ADC.w #!CenterTile
+	TXY
 	TAX
 
 	JSL DrawFullRoomTile
@@ -1254,6 +1255,13 @@ DrawDoorsMapBossRoom:
 	RTS
 
 DrawDoorsMapBossIcon:
+	LDX.w DungeonID
+	LDA.l DungeonMapBossRooms, X
+	CMP.w #$000F
+	BNE +
+	RTS
++
+
 	SEP #$20
 	LDY.b $00
 	LDA.b #$02

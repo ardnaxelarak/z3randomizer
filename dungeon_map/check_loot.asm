@@ -133,9 +133,9 @@ CheckBoss:
 	; which use the same flow
 	; and bosses are always in their own section anyway
 	LDA.b $CA
-	AND.w #$FF00
+	AND.w #$F000
 	XBA
-	CMP.w #$0002
+	CMP.w #$0020
 	BCC +
 	RTS
 
