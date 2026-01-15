@@ -1,35 +1,37 @@
 SelectFirstFluteSpot:
 	LDA.l FluteBitfield
+	CMP.b #$FF
 	BNE +
 	RTL
 +	LDA.b #$07
-	STA.w $1AF0
+	STA.w FluteSelection
 .try_next
-	LDA.w $1AF0
+	LDA.w FluteSelection
 	INC A
 	AND.b #$07
-	STA.w $1AF0
+	STA.w FluteSelection
 	TAX
 
 	LDA.l FluteBitfield
-	AND.l $8AB7A3, X
-	BEQ .try_next
+	AND.l FluteMenuNumbers_bits, X
+	BNE .try_next
 RTL
 
 SelectFluteNext:
 	LDA.l FluteBitfield
+	CMP.b #$FF
 	BEQ InvalidBeep
 
 .try_next
-	LDA.w $1AF0
+	LDA.w FluteSelection
 	INC A
 	AND.b #$07
-	STA.w $1AF0
+	STA.w FluteSelection
 	TAX
 
 	LDA.l FluteBitfield
-	AND.l $8AB7A3, X
-	BEQ .try_next
+	AND.l FluteMenuNumbers_bits, X
+	BNE .try_next
 
 	LDA.b #$20
 	STA.w $012F
@@ -37,18 +39,19 @@ RTL
 
 SelectFlutePrev:
 	LDA.l FluteBitfield
+	CMP.b #$FF
 	BEQ InvalidBeep
 
 .try_next
-	LDA.w $1AF0
+	LDA.w FluteSelection
 	DEC A
 	AND.b #$07
-	STA.w $1AF0
+	STA.w FluteSelection
 	TAX
 
 	LDA.l FluteBitfield
-	AND.l $8AB7A3, X
-	BEQ .try_next
+	AND.l FluteMenuNumbers_bits, X
+	BNE .try_next
 
 	LDA.b #$20
 	STA.w $012F
@@ -62,8 +65,8 @@ RTL
 SetFluteSpotPalette:
 	XBA
 	LDA.l FluteBitfield
-	AND.l $8AB7A3, X
-	BEQ .disabled
+	AND.l FluteMenuNumbers_bits, X
+	BNE .disabled
 .enabled
 	XBA
 	STA.b $0C
@@ -93,8 +96,9 @@ MaybeMarkFluteSpotVisited:
 	TXA
 	LSR A
 	TAX
-	LDA.l FluteBitfield
-	ORA.l $8AB7A3, X
+	LDA.l FluteMenuNumbers_bits, X
+	EOR.b #$FF
+	AND.l FluteBitfield
 	STA.l FluteBitfield
 
 .done
@@ -113,33 +117,9 @@ CheckTransitionOverworld:
 	STA.w $040A ; what we wrote over
 	JML MaybeMarkFluteSpotVisited
 
-DrawFluteIcon:
-	AND.w #$00FF
-	CMP.w #$0002
-	BCC .write
+CheckFlute:
 	LDA.l FluteBitfield
 	AND.w #$00FF
-	CMP.w #$00FF
-	BNE .pseudo
-.real
-	LDA.w #$0003
-	BRA .write
-.pseudo
-	LDA.w #$0002
-.write
-	STA.b $02
-	RTL
-
-CheckFluteInHUD:
-	LDA.l $7EF33F, X
-	AND.w #$00FF ; what we wrote over
-	CPX.w #$000D
-	BNE .done
-	CMP.w #$0002
-	BCC .done
-	LDA.l FluteBitfield
-	AND.w #$00FF
-	CMP.w #$00FF
 	BNE .pseudo
 .real
 	LDA.w #$0003
@@ -147,4 +127,24 @@ CheckFluteInHUD:
 .pseudo
 	LDA.w #$0002
 .done
+	RTS
+
+DrawFluteIcon:
+	AND.w #$00FF
+	CMP.w #$0002
+	BCC +
+	JSR CheckFlute
++
+	STA.b $02
+	RTL
+
+CheckFluteInHUD:
+	LDA.l EquipmentWRAM-1, X
+	AND.w #$00FF ; what we wrote over
+	CPX.w #$000D
+	BNE +
+	CMP.w #$0002
+	BCC +
+	JSR CheckFlute
++
 	RTL

@@ -283,6 +283,7 @@ EntranceData_song                                          = $82D592
 SpawnPointData_room_id                                     = $82D8D2
 Overworld_CheckForSpecialOverworldTrigger_Direction        = $84E879
 Sprite_ShowSolicitedMessage_Direction                      = $85E1A3
+FluteMenuNumbers_bits                                      = $8AB7A3
 WorldMap_RedXChars                                         = $8ABF70
 WorldMap_CalculateOAMCoordinates                           = $8AC3B1
 WorldMap_HandleSpriteBlink                                 = $8AC52E

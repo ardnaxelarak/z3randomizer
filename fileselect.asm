@@ -248,7 +248,7 @@ DrawPlayerFileShared:
 
 	; Flute
 	LDA.l InventoryTrackingSRAM : AND.w #$0003 : BEQ +
-	LDA.l $7003C2 : AND.w #$00FF : CMP.w #$00FF : BNE .pseudo
+	LDA.l $7003C2 : AND.w #$00FF : BNE .pseudo
 		%fs_drawItem(7,16,FileSelectItems_flute)
 		BRA ++
 	.pseudo

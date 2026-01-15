@@ -468,6 +468,8 @@ RoomStripes = $7E1100             ; Used for room drawing.
                                   ;
 MirrorPortalPosXH = $7E1ACF       ; Mirror portal position. (High byte of X coordinate)
                                   ;
+FluteSelection = $7E1AF0          ; Currently selected flute spot (zero-indexed)
+                                  ;
 IrisPtr = $7E1B00                 ; Spotlight pointers for HDMA. $1C0 bytes (?).
                                   ;
 MessageSubModule = $7E1CD8        ;
