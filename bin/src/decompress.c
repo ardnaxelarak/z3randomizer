@@ -1,21 +1,20 @@
 #include <stdio.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 
 struct section {
     int mode;
     int length;
-    char data[2];
+    unsigned char data[2];
     int datalength;
 };
 
-int read_section(char buf[], int loc, struct section *out) {
+int read_section(unsigned char buf[], int loc, struct section *out) {
     int nloc = loc;
-    char header = buf[nloc++];
+    unsigned char header = buf[nloc++];
 
-    printf("%x: ", header & 0xff);
-
-    if (header == -1) {
+    if (header == 0xFF) {
       return -1;
     }
 
@@ -30,8 +29,6 @@ int read_section(char buf[], int loc, struct section *out) {
       result.mode = (header & 0xE0) >> 5;
       result.length = (header & 0x1F) + 1;
     }
-
-    printf("%d: %x\n", result.mode, result.length);
 
     switch (result.mode) {
       case 0:
@@ -61,8 +58,13 @@ int read_section(char buf[], int loc, struct section *out) {
 
 int main(int argc, char *argv[]) {
     if (argc < 3) {
-        printf("Usage: %s infile outfile\n", argv[0]);
+        printf("Usage: %s infile outfile [start [length]]\n", argv[0]);
         return 1;
+    }
+
+    off_t seek = 0;
+    if (argc > 3) {
+        seek = strtol(argv[3], NULL, 0);
     }
 
     FILE *inptr;
@@ -82,9 +84,15 @@ int main(int argc, char *argv[]) {
         printf("Error stating file: %s\n", argv[1]);
         return 1;
     }
-    off_t size = buf.st_size;
 
-    char inbuf[size];
+    off_t size = buf.st_size - seek;
+
+    if (argc > 4) {
+        size = strtol(argv[4], NULL, 0);
+    }
+
+    fseek(inptr, seek, SEEK_SET);
+    unsigned char inbuf[size];
 
     if (fread(inbuf, 1, size, inptr) < size) {
         printf("Error reading file: %s\n", argv[1]);
@@ -93,7 +101,7 @@ int main(int argc, char *argv[]) {
 
     fclose(inptr);
 
-    char outbuf[size * 256];
+    unsigned char outbuf[size * 256];
 
     int oloc = 0;
     struct section section;
@@ -141,7 +149,7 @@ int main(int argc, char *argv[]) {
     }
 
     fclose(outptr);
-    printf("Input file: %X bytes. Decompressed: %X bytes.\n", size, oloc);
+    printf("Input file: %lX bytes. Decompressed: %X bytes.\n", size, oloc);
 
     return 0;
 }

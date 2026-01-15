@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 
 const int MAXLENGTH = 0x300;
@@ -7,11 +8,11 @@ const int MAXLENGTH = 0x300;
 struct section {
     int mode;
     int length;
-    char data[2];
+    unsigned char data[2];
     int datalength;
 };
 
-int find_duplicate(off_t loc, off_t size, char buf[], struct section *out) {
+int find_duplicate(off_t loc, off_t size, unsigned char buf[], struct section *out) {
     int i, j;
     struct section result;
     result.mode = 4;
@@ -39,7 +40,7 @@ int find_duplicate(off_t loc, off_t size, char buf[], struct section *out) {
     return 0;
 }
 
-int find_repeat_byte(off_t loc, off_t size, char buf[], struct section *out) {
+int find_repeat_byte(off_t loc, off_t size, unsigned char buf[], struct section *out) {
     int i;
     for (i = 0; i < MAXLENGTH && loc + i < size; i++) {
         if (buf[loc + i] != buf[loc]) {
@@ -58,7 +59,7 @@ int find_repeat_byte(off_t loc, off_t size, char buf[], struct section *out) {
     return -1;
 }
 
-int find_repeat_word(off_t loc, off_t size, char buf[], struct section *out) {
+int find_repeat_word(off_t loc, off_t size, unsigned char buf[], struct section *out) {
     int i;
     for (i = 0; i < MAXLENGTH && loc + i + 1 < size; i += 1) {
         if (buf[loc + i] != buf[loc + (i & 1)]) {
@@ -78,7 +79,7 @@ int find_repeat_word(off_t loc, off_t size, char buf[], struct section *out) {
     return -1;
 }
 
-int find_incrementing_byte(off_t loc, off_t size, char buf[], struct section *out) {
+int find_incrementing_byte(off_t loc, off_t size, unsigned char buf[], struct section *out) {
     int i;
     for (i = 0; i < MAXLENGTH && loc + i < size; i++) {
         if (buf[loc] + i < i) {
@@ -100,7 +101,7 @@ int find_incrementing_byte(off_t loc, off_t size, char buf[], struct section *ou
     return -1;
 }
 
-int get_section(off_t loc, off_t size, char buf[], struct section *out) {
+int get_section(off_t loc, off_t size, unsigned char buf[], struct section *out) {
     struct section best, current;
     best.length = 0;
     if (!find_repeat_byte(loc, size, buf, &current)) {
@@ -132,7 +133,7 @@ int get_section(off_t loc, off_t size, char buf[], struct section *out) {
     }
 }
 
-int write_section(struct section section, char data[], char buf[], int loc) {
+int write_section(struct section section, unsigned char data[], unsigned char buf[], int loc) {
     int nloc = loc;
     int len = section.length - 1;
     if (len > 0x1F) {
@@ -149,8 +150,13 @@ int write_section(struct section section, char data[], char buf[], int loc) {
 
 int main(int argc, char *argv[]) {
     if (argc < 3) {
-        printf("Usage: %s infile outfile\n", argv[0]);
+        printf("Usage: %s infile outfile [start [length]]\n", argv[0]);
         return 1;
+    }
+
+    off_t seek = 0;
+    if (argc > 3) {
+        seek = strtol(argv[3], NULL, 0);
     }
 
     FILE *inptr;
@@ -170,9 +176,14 @@ int main(int argc, char *argv[]) {
         printf("Error stating file: %s\n", argv[1]);
         return 1;
     }
-    off_t size = buf.st_size;
+    off_t size = buf.st_size - seek;
 
-    char inbuf[size];
+    if (argc > 4) {
+        size = strtol(argv[4], NULL, 0);
+    }
+    unsigned char inbuf[size];
+
+    fseek(inptr, seek, SEEK_SET);
 
     if (fread(inbuf, 1, size, inptr) < size) {
         printf("Error reading file: %s\n", argv[1]);
@@ -181,9 +192,8 @@ int main(int argc, char *argv[]) {
 
     fclose(inptr);
 
-
-    char outbuf[size * 2];
-    char m0data[MAXLENGTH];
+    unsigned char outbuf[size * 2];
+    unsigned char m0data[MAXLENGTH];
 
     int oloc = 0;
     struct section m0;
@@ -233,7 +243,7 @@ int main(int argc, char *argv[]) {
     }
 
     fclose(outptr);
-    printf("Input file: %X bytes. Compressed: %X bytes.\n", size, oloc);
+    printf("Input file: %lX bytes. Compressed: %X bytes.\n", size, oloc);
 
     return 0;
 }
