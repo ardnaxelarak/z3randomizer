@@ -37,7 +37,7 @@ db $01, $00, $05 ; ($3D) Ice Hamlift
 db $01, $00, $07 ; ($40) Aga Guards
 db $02, $01, $00, $00, $02 ; ($43) Pod Entrance
 db $01, $00, $08 ; ($48) Swamp Attic
-db $03, $03, $0C, $04, $06 ; ($4B) Ice U (1st three values unused)
+db $02, $03, $0C, $04, $06 ; ($4B) Ice U (1st three values unused)
 db $01, $00, $05 ; ($50) TT Attic Left
 db $02, $00, $01, $01, $0B ; ($53) Pod Rupees
 db $01, $00, $04 ; ($58) Ice Gators

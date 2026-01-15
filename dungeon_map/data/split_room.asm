@@ -537,11 +537,14 @@ db $FF
 db $01
 %sq($00)
 %d(..areas) : %d(..doors) : %d(.no_items)
-%d(.no_items) : %d(.no_items) : %d(..enemies)
+%d(..chests) : %d(.no_items) : %d(..enemies)
 ..areas
 db $03, $00, $80, $00, $FF
 db $FF
 ..doors
+db $00
+db $FF
+..chests
 db $00
 db $FF
 ..enemies

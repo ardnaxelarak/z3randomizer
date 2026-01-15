@@ -1786,7 +1786,7 @@ GetRoomDropdown:
 	AND.w #$01FF
 	CMP.w #$00B9
 	BCC .left
-	CMP.w #$0149
+	CMP.w #$0140
 	BCC .middle
 
 .right
