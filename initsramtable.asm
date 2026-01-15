@@ -115,7 +115,7 @@ InitInventoryTracking: skip 2           ; PC 0x18338C \ Need to set bits here fo
 InitBowTracking: skip 2                 ; PC 0x18338E / boomerangs, powder/mushroom, etc 
 InitItemLimitCounts: skip 16            ; PC 0x183390
 skip 34                                 ;
-InitFluteBitfield: db $FF               ;
+InitFluteBitfield: db $00               ;
 InitSpecialWeaponLevel: db $00          ;
 InitItemOnB: db $00                     ;
 InitProgressIndicator: db $02           ; PC 0x1833C5 - Set to $80 for instant post-aga with standard
