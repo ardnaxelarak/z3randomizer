@@ -311,7 +311,8 @@ db $FF
 .7d ; GT warp maze (section next to rando room)
 db $01
 %sq($00)
-%d(..areas) : %d(..doors) : %d(.no_items) : %d(.no_items) : %d(..pots) : %d(..enemies)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(..chests) : %d(..pots) : %d(..enemies)
 ..areas
 db $03, $00, $FF, $00, $80
 db $03, $00, $80, $80, $FF
@@ -319,6 +320,9 @@ db $03, $CA, $DA, $9A, $A6
 db $FF
 ..doors
 db $05
+db $FF
+..chests
+db $00
 db $FF
 ..pots
 db $00, $01, $02, $03
