@@ -1442,6 +1442,33 @@ DoorsMapSelectCursor:
 	PLP
 	RTL
 
+DoorsMapCurrentRoom:
+	PHP
+	REP #$30
+
+	JSL DetectLinksSection
+	INC A
+	XBA
+	ASL A : ASL A : ASL A : ASL A
+	ORA.b RoomIndex
+	STA.l CurrentDisplayedRoom
+
+	STZ.w GFXStripes
+	JSL ClearDoorsMapBG1
+	JSL ClearDoorsMapBG2
+	JSL DrawCurrentSupertile
+
+	SEP #$30
+
+	LDA.b #$08
+	STA.b $17
+
+	LDA.b #$20
+	STA.w $012F
+
+	PLP
+	RTL
+
 DoorsMapNextEntrance:
 	PHP
 	REP #$30
@@ -1456,8 +1483,19 @@ DoorsMapNextEntrance:
 +
 	TYA
 	CMP.l CurrentDoorEntrance
+	BNE +
+
+	TYA
+	ASL A
+	TAX
+	LDA.l EntranceData_room_id, X
+	STA.b $CA
+
+	JSR GetSpecificRoomVisibility
+	BNE .acceptable
 	BEQ .done
 
++
 	TYX
 	LDA.l $82D1EF, X
 	AND.w #$00FF

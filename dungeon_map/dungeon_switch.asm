@@ -20,6 +20,9 @@ CheckSwitchMap:
 	BIT.b #$20
 	BNE .next_entrance
 
+	BIT.b #$40
+	BNE .current_room
+
 	AND.b #$0F
 	BEQ .doors_done
 	BIT.b #$08 : BEQ + : LDA.b #$00 : BRA .doors_move_cursor : +
@@ -42,6 +45,13 @@ CheckSwitchMap:
 
 .change_dungeon
 	JSL DoorsMapChangeDungeon
+	BRA .doors_done
+
+.current_room
+	LDA.l CachedDungeonID
+	CMP.w DungeonID
+	BNE .doors_done
+	JSL DoorsMapCurrentRoom
 	BRA .doors_done
 
 .doors_done
@@ -204,6 +214,7 @@ DrawDungeonLabel:
 	LDY.b #$20
 +
 
+	; Dungeon Label
 	REP #$20
 	LDA.w #$E660
 	STA.w GFXStripes+$02, Y
@@ -214,9 +225,110 @@ DrawDungeonLabel:
 	STA.w GFXStripes+$06, Y
 	LDA.l DungeonLabels+2, X
 	STA.w GFXStripes+$08, Y
+
+	TYA
+	CLC : ADC.w #$0008
+	TAY
+
+	; L/R switch indicators
+	LDA.w #$E310
+	STA.w GFXStripes+$02, Y
+	LDA.w #$E910
+	STA.w GFXStripes+$0A, Y
+	LDA.w #$E318
+	STA.w GFXStripes+$12, Y
+	LDA.w #$E918
+	STA.w GFXStripes+$1A, Y
+
+	LDA.w #$0300
+	STA.w GFXStripes+$04, Y
+	STA.w GFXStripes+$0C, Y
+	STA.w GFXStripes+$14, Y
+	STA.w GFXStripes+$1C, Y
+
+	LDA.w #$49AF
+	STA.w GFXStripes+$06, Y
+	STA.w GFXStripes+$16, Y
+	LDA.w #$099E
+	STA.w GFXStripes+$08, Y
+	STA.w GFXStripes+$18, Y
+
+	LDA.w #$099F
+	STA.w GFXStripes+$0E, Y
+	STA.w GFXStripes+$1E, Y
+	LDA.w #$09AF
+	STA.w GFXStripes+$10, Y
+	STA.w GFXStripes+$20, Y
+
+	TYA
+	CLC : ADC.w #$0020
+	TAY
+
+	LDA.l DRMode
+	BEQ .not_doors
+	LDA.l DungeonMapMode
+	BEQ .doors
+.not_doors
+	JMP .skip_doors
+
+.doors
+	; Select for Next Entrance indicator
+	LDA.w #$E311
+	STA.w GFXStripes+$02, Y
+	LDA.w #$E319
+	STA.w GFXStripes+$16, Y
+
+	LDA.w #$0F00
+	STA.w GFXStripes+$04, Y
+	STA.w GFXStripes+$18, Y
+
+	LDA.w #$09B8
+	LDX.b #$07
+-
+	STA.w GFXStripes+$06, Y
+	STA.w GFXStripes+$1A, Y
+	INC A
+	INY : INY
+	DEX
+	BPL -
+
+	TYA
+	CLC : ADC.w #$0018
+	TAY
+
+	LDA.l CachedDungeonID
+	AND.w #$00FF
+	CMP.w DungeonID
+	BNE .skip_doors
+
+	; Y for Current Location indicator
+	LDA.w #$A411
+	STA.w GFXStripes+$02, Y
+	LDA.w #$A419
+	STA.w GFXStripes+$12, Y
+
+	LDA.w #$0B00
+	STA.w GFXStripes+$04, Y
+	STA.w GFXStripes+$14, Y
+
+	LDA.w #$09A9
+	LDX.b #$05
+-
+	STA.w GFXStripes+$06, Y
+	STA.w GFXStripes+$16, Y
+	INC A
+	INY : INY
+	DEX
+	BPL -
+
+	TYA
+	CLC : ADC.w #$0014
+	TAY
+
+.skip_doors
 	SEP #$20
 	LDA.b #$FF
-	STA.w GFXStripes+$0A, Y
+	STA.w GFXStripes+$02, Y
 	LDA.b #$01
 	STA.b NMISTRIPES
 
