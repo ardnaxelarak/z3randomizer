@@ -327,7 +327,9 @@ CheckEnemies:
 		JMP .done
 	+
 	LDA.b [$04], Y
-	BIT.w #$8000 : BNE .overlord
+	AND.w #$E000
+	CMP.w #$E000
+	BEQ .overlord
 	INY : INY
 	LDA.b [$04], Y
 	AND.w #$00FF
@@ -385,7 +387,7 @@ CheckEnemies:
 	BCS +
 		PLX
 		PLA
-		BRA .next_enemy
+		JMP .next_enemy
 +
 
 	LDA.b $CA
