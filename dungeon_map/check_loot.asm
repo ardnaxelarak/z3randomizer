@@ -251,6 +251,10 @@ CheckPots:
 	LDA.b [$04], Y
 	AND.w #$00FF
 	CMP.w #$0008 : BEQ .small_key
+	LDA.l PotCountMode
+	BEQ +
+		JSR CheckJunkPot
+	+
 	INY
 	BRA .next_pot
 
@@ -261,9 +265,9 @@ CheckPots:
 	PHX
 	INY
 	BRA .mask_set
+
 .major_item
 	LDA.b [$04], Y
-.continue
 	PHA
 	PHX
 	INY
@@ -303,6 +307,47 @@ endif
 	BRA .next_pot
 
 .done
+	RTS
+
+CheckJunkPot:
+	LDA.b [$04], Y
+	PHA
+	PHX
+	TXA : ASL A : TAX
+	LDA.l DungeonMask, X : STA.b $08
+	TXA : LSR A
+	JSR CheckPotSection
+	BCS +
+		PLX
+		PLA
+		RTS
+	+
+
+	LDA.b $CA
+	AND.w #$00FF
+	ASL A
+	TAX
+	LDA.l PotCollectionRateTable, X
+	AND.b $08
+	BEQ .not_important
+
+if !FEATURE_FIX_BASEROM
+	LDA.l SpriteDropData, X
+else
+	LDA.l RoomPotData, X
+endif
+	AND.b $08
+	BNE .not_important
+
+	PLX
+	PLA
+	AND.w #$00FF
+	JSR GetPotJunkClass
+	RTS
+
+.not_important
+	PLX
+	PLA
 	RTS
 
 CheckEnemies:
@@ -432,6 +477,29 @@ GetLootClass:
 .check_value
 	LDA.l LootTypeMapping, X
 	AND.w #$00FF
+
+.value_set
+	CMP.b $02
+	BCC .done
+	STA.b $02
+
+.done
+	PLX
+	RTS
+
+; A = item id
+; updates "best loot" value if better
+GetPotJunkClass:
+	PHX
+	TAX
+
+	LDA.b $0E
+	BEQ .done
+	CMP.w #$0001
+	BEQ .value_set
+
+	; hardcode as junk for now
+	LDA.w #$0002
 
 .value_set
 	CMP.b $02
