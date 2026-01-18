@@ -1,5 +1,5 @@
 pushpc
-incsrc hooks.asm
+incsrc dungeon_map_hooks.asm
 
 macro WriteGFXSheetPointer(sheet, location)
 	pushpc
@@ -26,7 +26,7 @@ endmacro
 
 pullpc
 
-incsrc current_room_map.asm
+incsrc doors_dungeon_map.asm
 incsrc draw_rooms.asm
 incsrc map_bg3.asm
 incsrc dungeon_switch.asm
@@ -38,4 +38,3 @@ incsrc data/spiral_stairs.asm
 incsrc data/fall_warps.asm
 incsrc data/split_room.asm
 incsrc data/doors_connections.asm
-

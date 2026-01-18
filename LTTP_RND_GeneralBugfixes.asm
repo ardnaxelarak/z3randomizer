@@ -203,19 +203,21 @@ incsrc menu/hudalpha.asm
 warnpc $A38000
 
 org $B98000
-incsrc crystalswitchbook.asm
-incsrc mimicdash.asm
-incsrc gloom.asm
-incsrc special_weapons.asm
-incsrc variable_ganon_vulnerability.asm
-incsrc pseudoflute.asm
-incsrc dungeon_map/main.asm
+incsrc gk/crystalswitchbook.asm
+incsrc gk/mimicdash.asm
+incsrc gk/gloom.asm
+incsrc gk/special_weapons.asm
+incsrc gk/variable_ganon_vulnerability.asm
+incsrc gk/pseudoflute.asm
+incsrc gk/dungeon_maps.asm
 print "End of B9: ", pc
 
-warnpc $B9E000 ; $E000 - EFFF reserved for custom door rando map data
+warnpc $B9EE00
+org $B9EE00
+incsrc gk_meta.asm
 
 org $B9F000
-incsrc dungeon_map/settings.asm
+incsrc gk/settings.asm
 
 org $A38000
 incsrc stats/credits.asm ; Statically mapped

@@ -284,7 +284,7 @@ SetItemRiseTimer:
 		RTL
 
 	.not_from_chest
-	JSL.l ItemIsJunk
+	JSL ItemIsJunk
 	BEQ .default
 
 	.junk

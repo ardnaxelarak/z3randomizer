@@ -1,4 +1,4 @@
-; $B9F000
+org $B9F000
 SupertileRoomShapes:
 incsrc data/supertile_shapes.asm
 warnpc $B9F800
