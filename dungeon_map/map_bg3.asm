@@ -12,23 +12,34 @@ LoadStripes:
 
 .dungeon_map
 	LDA.l DungeonMapMode
-	BNE .doors
+	BNE .4x3
+	LDA.l DRMode
+	BNE .6x6
 
-.not_doors
-	LDA.b #BG3DungeonMapStripes>>0
+.5x5
+	LDA.b #BG3DungeonMap5x5Stripes>>0
 	STA.b $00
-	LDA.b #BG3DungeonMapStripes>>8
+	LDA.b #BG3DungeonMap5x5Stripes>>8
 	STA.b $01
-	LDA.b #BG3DungeonMapStripes>>16
+	LDA.b #BG3DungeonMap5x5Stripes>>16
 	STA.b $02
 	RTL
 
-.doors
-	LDA.b #BG3DungeonMapDoorStripes>>0
+.4x3
+	LDA.b #BG3DungeonMap4x3Stripes>>0
 	STA.b $00
-	LDA.b #BG3DungeonMapDoorStripes>>8
+	LDA.b #BG3DungeonMap4x3Stripes>>8
 	STA.b $01
-	LDA.b #BG3DungeonMapDoorStripes>>16
+	LDA.b #BG3DungeonMap4x3Stripes>>16
+	STA.b $02
+	RTL
+
+.6x6
+	LDA.b #BG3DungeonMap6x6Stripes>>0
+	STA.b $00
+	LDA.b #BG3DungeonMap6x6Stripes>>8
+	STA.b $01
+	LDA.b #BG3DungeonMap6x6Stripes>>16
 	STA.b $02
 	RTL
 
@@ -71,7 +82,7 @@ macro VanillaCommonMapStripes()
 endmacro
 
 
-BG3DungeonMapStripes:
+BG3DungeonMap5x5Stripes:
 %VanillaCommonMapStripes()
 ; left edge of map border, from vanilla
 dw $4E60, $0100, $2100
@@ -122,7 +133,7 @@ endmacro
 
 db $FF
 
-BG3DungeonMapDoorStripes:
+BG3DungeonMap4x3Stripes:
 %VanillaCommonMapStripes()
 ; left edge of map border, adjusted from vanilla
 dw $4D60, $0100, $2100
@@ -172,5 +183,98 @@ endmacro
 %FullDoorRow($6251)
 %FullDoorRow($62B1)
 %FullDoorRow($6311)
+
+db $FF
+
+BG3DungeonMap6x6Stripes:
+; vanilla
+dw $4260, $0100, $2100
+dw $4360, $0E40, $2101
+dw $4B60, $0100, $6100
+dw $8460, $0B00, $2102, $2103, $2104, $2105, $2106, $2107
+dw $A460, $0B00, $2112, $2113, $2114, $2115, $2116, $2117
+dw $0060, $7E40, $2111
+dw $8063, $3E41, $2111
+dw $0060, $3EC0, $2111
+dw $0160, $3EC0, $2111
+dw $0C60, $3EC0, $2111
+dw $0D60, $3EC0, $2111
+dw $1E60, $3EC0, $2111
+dw $1F60, $3EC0, $2111
+
+; left side border
+dw $6260, $1AC0, $2110
+dw $6B60, $1AC0, $6110
+dw $2262, $0100, $A100
+dw $2362, $0E40, $A101
+dw $2B62, $0100, $E100
+
+; right side top area border
+dw $4E60, $0100, $2100
+dw $4F60, $1A40, $2101
+dw $5D60, $0100, $6100
+dw $6E60, $1AC0, $2110
+dw $7D60, $1AC0, $6110
+dw $2E62, $0100, $A100
+dw $2F62, $1A40, $A101
+dw $3D62, $0100, $E100
+
+; right side bottom area border
+dw $8E62, $0100, $2100
+dw $8F62, $1A40, $2101
+dw $9D62, $0100, $6100
+dw $AE62, $06C0, $2110
+dw $BD62, $06C0, $6110
+dw $2E63, $0100, $A100
+dw $2F63, $1A40, $A101
+dw $3D63, $0100, $E100
+
+; blank below left side
+dw $4262, $4440, $2111
+dw $6262, $4440, $2111
+
+dw $8262, $1240, $2111
+dw $A262, $1240, $2111
+dw $C262, $1240, $2111
+dw $E262, $1240, $2111
+dw $0263, $1240, $2111
+dw $2263, $1240, $2111
+
+dw $4263, $4440, $2111
+dw $6263, $4440, $2111
+
+; map area inside top area
+dw $6F60, $1A40, $1D11
+dw $8F60, $1A40, $1D11
+dw $AF60, $1A40, $1D11
+dw $CF60, $1A40, $1D11
+dw $EF60, $1A40, $1D11
+dw $0F61, $1A40, $1D11
+dw $2F61, $1A40, $1D11
+dw $4F61, $1A40, $1D11
+dw $6F61, $1A40, $1D11
+dw $8F61, $1A40, $1D11
+dw $AF61, $1A40, $1D11
+dw $CF61, $1A40, $1D11
+dw $EF61, $1A40, $1D11
+dw $0F62, $1A40, $1D11
+
+; center square
+dw $3561, $0300
+dw $5D4C, $1D4C
+
+dw $5561, $0300
+dw $DD4C, $9D4C
+
+; map area inside bottom area
+dw $AF62, $1A40, $1D11
+
+dw $CF62, $1B00
+dw $1D11, $5D4C, $1D4C, $1D11, $5D4C, $1D4C, $1D11, $5D4C, $1D4C, $1D11, $1D11, $5D4C, $1D4C, $1D11
+
+dw $EF62, $1B00
+dw $1D11, $DD4C, $9D4C, $1D11, $DD4C, $9D4C, $1D11, $DD4C, $9D4C, $1D11, $1D11, $DD4C, $9D4C, $1D11
+
+dw $0F63, $1A40, $1D11
 
 db $FF

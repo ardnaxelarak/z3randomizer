@@ -5,17 +5,13 @@ db $08
 ; use AA1 = $1C for map stuff
 org $80E193
 skip 4
-db $61, $62, $62, $D6
+db $61, $62, $63, $D6
 
 org $8AE11D
 LDA.b #$1C
 
 org $8AE12B
 LDA.b #$20
-
-; change dungeon map subsheet gfx in TR
-; org $80DDC9
-; db $57
 
 ; dungeon map sheets
 org $80DD97
@@ -75,7 +71,7 @@ org $8AEE2B
 ;--------------------------------------------------------------------------------
 org $8AE64D
 	PLX
-	JML DrawDungeonMapRoom
+	JML NormalDrawDungeonMapRoom
 
 org $8AE606
 	PLX
@@ -221,3 +217,53 @@ org $8AE8F9
 org $8AEBC6
 	JSL GetLocationMarkerLeft
 	NOP
+
+;================================================================================
+; Draw Wacky Door Rando Layouts
+;--------------------------------------------------------------------------------
+org $8AE3D7
+	LDA.l DungeonMapMode
+	BNE .normal
+	LDA.l DRMode
+	BEQ .normal
+
+	JSL DrawWackyDoorRandoStuff
+	JMP.w $8AE422
+	NOP
+
+	.normal
+warnpc $8AE3EB
+
+org $8AE439
+	dw $0F19, $4F19, $8F19, $CF19
+
+org $8AE449
+	dw $0F1A, $8F1A
+
+org $8AE451
+	dw $0F1B, $4F1B
+
+org $8AE473
+	NOP #2
+
+org $8AE4A4
+	NOP #2
+
+org $8AE4DC
+	NOP #2
+
+org $8AE4F9
+	dw $0F1E, $0F1F, $0F20, $0F21
+	dw $0F22, $0F23, $0F24, $0F25
+
+org $8AE539
+	LDA.w #$0F1C
+
+org $8AE573
+	LDA.w #$0F1D
+
+org $8AE555
+	NOP #2
+
+org $8AE576
+	NOP #2

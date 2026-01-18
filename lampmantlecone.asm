@@ -34,16 +34,20 @@ RTL
 ; Output: 0 locked, 1 open
 ;--------------------------------------------------------------------------------
 CheckForZelda:
-        LDA.l ProgressIndicator : CMP.b #$02 : !BLT + ; Skip if rain is falling
-                LDA.b #$01 ; pretend we have zelda anyway
-                RTL
-        +
-        LDA.l FollowerIndicator
+	LDA.l ProgressIndicator : CMP.b #$02 : !BLT + ; Skip if rain is falling
+		LDA.b #$01 ; pretend we have zelda anyway
+		RTL
+	+
+	LDA.l FollowerIndicator
 RTL
 ;================================================================================
 SetOverlayIfLamp:
-        JSL LampCheck
-        STA.b SUBDESQ ; write it directly to the overlay, this isn't a terrible idea at all
+	JSL LampCheck
+	CMP.b #$00
+	BEQ +
+	LDA.b #$01
++
+	STA.b SUBDESQ ; write it directly to the overlay, this isn't a terrible idea at all
 RTL
 ;================================================================================
 ; Mantle Object Changes

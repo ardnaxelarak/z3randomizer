@@ -21,7 +21,7 @@ dw $FFFF, $83B7, $FFFF, $03B7 ; 13
 dw $012E, $012F, $013E, $013F ; 14
 dw $C374, $8340, $4341, $0340 ; 15
 dw $0108, $0109, $436B, $036B ; 16
-dw $C114, $0104, $4114, $0114 ; 17
+dw $4104, $0104, $4114, $0114 ; 17
 dw $C3B5, $FFFF, $43B4, $FFFF ; 18 - useless fairy drop
 dw $FFFF, $8369, $FFFF, $035A ; 19
 dw $03E7, $03E8, $03F7, $0361 ; 1A
@@ -37,7 +37,7 @@ dw $FFFF, $FFFF, $FFFF, $039B ; 23
 dw $4365, $0365, $0132, $0133 ; 24
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 25 - unused
 dw $039B, $03E4, $4363, $0382 ; 26
-dw $C114, $0104, $4114, $0114 ; 27
+dw $4104, $0104, $4114, $0114 ; 27
 dw $C3A5, $FFFF, $4358, $0348 ; 28
 dw $FFFF, $FFFF, $FFFF, $0396 ; 29 - Mothula
 dw $C350, $8352, $4350, $03F8 ; 2A
@@ -98,8 +98,8 @@ dw $FFFF, $8379, $FFFF, $036A ; 60
 dw $C387, $8385, $4356, $0356 ; 61
 dw $C346, $8354, $4352, $0340 ; 62
 dw $039A, $FFFF, $0361, $FFFF ; 63
-dw $FFFF, $FFFF, $8399, $C3B1 ; 64
-dw $FFFF, $FFFF, $83B1, $0381 ; 65
+dw $FFFF, $FFFF, $8399, $0367 ; 64
+dw $FFFF, $FFFF, $0367, $0381 ; 65
 dw $038F, $039A, $0362, $83B2 ; 66
 dw $83B4, $83B5, $03B7, $039F ; 67
 dw $C340, $8350, $4341, $0340 ; 68
@@ -162,7 +162,7 @@ dw $839B, $C39C, $FFFF, $FFFF ; A0
 dw $C3B0, $835D, $FFFF, $036A ; A1
 dw $03EE, $03EF, $03FE, $03FF ; A2
 dw $C35A, $FFFF, $436A, $FFFF ; A3
-dw $FFFF, $FFFF, $438E, $FFFF ; A4
+dw $FFFF, $FFFF, $438F, $FFFF ; A4
 dw $039A, $0361, $C3B2, $83B2 ; A5
 dw $C340, $8370, $4340, $0340 ; A6
 dw $C396, $FFFF, $FFFF, $FFFF ; A7 - ToH fairy basement room

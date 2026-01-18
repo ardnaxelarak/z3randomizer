@@ -5,7 +5,7 @@ CheckLoot:
 	REP #$30
 	PHB : PHX : PHY
 
-	STA.b $00
+	STA.b $CA
 
 	LDA.b $06 : PHA
 	LDA.b $0E : PHA
@@ -16,7 +16,8 @@ CheckLoot:
 	AND.w #$00FF
 	STA.b $0E
 
-	LDA.b $00
+	LDA.b $CA
+	AND.w #$00FF
 	ASL A
 	TAX
 
@@ -80,7 +81,9 @@ CheckLoot:
 	RTL
 
 CheckChests:
-	LDA.b $00
+	LDA.b $CA
+	AND.w #$00FF
+	STA.b $00
 	ASL A
 	TAX
 
@@ -90,6 +93,7 @@ CheckChests:
 
 	LDA.w #$0008
 	STA.b $04
+	STZ.b $06
 
 	LDY.w #$FFFD
 .increment_mask
@@ -106,6 +110,11 @@ CheckChests:
 	CMP.b $00
 	BNE .next_chest
 
+	LDA.b $06
+	JSR CheckChestSection
+	INC.b $06
+	BCC .increment_mask
+
 	LDA.l SaveDataWRAM, X
 	AND.b $04
 	BNE .increment_mask ; already got item
@@ -119,6 +128,22 @@ CheckChests:
 	RTS
 
 CheckBoss:
+	; we assume all bosses are in section 1 of split sections
+	; mainly to simplify hera cage key and GT torch
+	; which use the same flow
+	; and bosses are always in their own section anyway
+	LDA.b $CA
+	AND.w #$F000
+	XBA
+	CMP.w #$0020
+	BCC +
+	RTS
+
++
+	LDA.b $CA
+	AND.w #$00FF
+	STA.b $04
+
 	LDX.w #$FFFA
 .next_boss
 	INX #6
@@ -127,7 +152,7 @@ CheckBoss:
 	RTS
 
 .check
-	CMP.b $00
+	CMP.b $04
 	BNE .next_boss
 
 	TXY
@@ -170,6 +195,10 @@ CheckBoss:
 	BRA .next_boss
 
 CheckPrize:
+	LDA.b $CA
+	AND.w #$00FF
+	STA.b $04
+
 	LDX.w #$FFFD
 .next_prize
 	INX #3
@@ -178,7 +207,7 @@ CheckPrize:
 	RTS
 
 .check
-	CMP.b $00
+	CMP.b $04
 	BNE .next_prize
 
 	TXY
@@ -202,7 +231,8 @@ CheckPrize:
 	BRA .next_prize
 
 CheckPots:
-	LDA.b $00
+	LDA.b $CA
+	AND.w #$00FF
 	ASL A
 	TAX
 
@@ -221,6 +251,10 @@ CheckPots:
 	LDA.b [$04], Y
 	AND.w #$00FF
 	CMP.w #$0008 : BEQ .small_key
+	LDA.l PotCountMode
+	BEQ +
+		JSR CheckJunkPot
+	+
 	INY
 	BRA .next_pot
 
@@ -231,18 +265,30 @@ CheckPots:
 	PHX
 	INY
 	BRA .mask_set
+
 .major_item
 	LDA.b [$04], Y
-.continue
 	PHA
 	PHX
 	INY
 	TXA : ASL A
 	TAX
 	LDA.l DungeonMask, X : STA.b $08
+	TXA : LSR A : TAX
 
 .mask_set
-	LDA.b $00 : ASL A : TAX
+	TXA
+	JSR CheckPotSection
+	BCS +
+		PLX
+		PLA
+		BRA .next_pot
++
+
+	LDA.b $CA
+	AND.w #$00FF
+	ASL A
+	TAX
 if !FEATURE_FIX_BASEROM
 	LDA.l SpriteDropData, X
 else
@@ -263,8 +309,50 @@ endif
 .done
 	RTS
 
+CheckJunkPot:
+	LDA.b [$04], Y
+	PHA
+	PHX
+	TXA : ASL A : TAX
+	LDA.l DungeonMask, X : STA.b $08
+	TXA : LSR A
+	JSR CheckPotSection
+	BCS +
+		PLX
+		PLA
+		RTS
+	+
+
+	LDA.b $CA
+	AND.w #$00FF
+	ASL A
+	TAX
+	LDA.l PotCollectionRateTable, X
+	AND.b $08
+	BEQ .not_important
+
+if !FEATURE_FIX_BASEROM
+	LDA.l SpriteDropData, X
+else
+	LDA.l RoomPotData, X
+endif
+	AND.b $08
+	BNE .not_important
+
+	PLX
+	PLA
+	AND.w #$00FF
+	JSR GetPotJunkClass
+	RTS
+
+.not_important
+	PLX
+	PLA
+	RTS
+
 CheckEnemies:
-	LDA.b $00
+	LDA.b $CA
+	AND.w #$00FF
 	ASL A
 	TAX
 
@@ -279,9 +367,14 @@ CheckEnemies:
 .next_enemy
 	LDA.b [$04], Y
 	AND.w #$00FF
-	CMP.w #$00FF : BEQ .done
+	CMP.w #$00FF
+	BNE +
+		JMP .done
+	+
 	LDA.b [$04], Y
-	BIT.w #$8000 : BNE .overlord
+	AND.w #$E000
+	CMP.w #$E000
+	BEQ .overlord
 	INY : INY
 	LDA.b [$04], Y
 	AND.w #$00FF
@@ -331,15 +424,28 @@ CheckEnemies:
 	TXA : ASL A
 	TAX
 	LDA.l DungeonMask, X : STA.b $08
+	TXA : LSR A : TAX
 
 .mask_set
-	LDA.b $00 : ASL A : TAX
+	TXA
+	JSR CheckEnemySection
+	BCS +
+		PLX
+		PLA
+		JMP .next_enemy
++
+
+	LDA.b $CA
+	AND.w #$00FF
+	ASL A
+	TAX
+
 	LDA.l SpriteDropData, X
 	PLX
 	AND.b $08
 	BEQ .not_obtained
 	PLA
-	BRA .next_enemy
+	JMP .next_enemy
 
 .not_obtained
 	PLA
@@ -379,4 +485,149 @@ GetLootClass:
 
 .done
 	PLX
+	RTS
+
+; A = item id
+; updates "best loot" value if better
+GetPotJunkClass:
+	PHX
+	TAX
+
+	LDA.b $0E
+	BEQ .done
+	CMP.w #$0001
+	BEQ .value_set
+
+	; hardcode as junk for now
+	LDA.w #$0002
+
+.value_set
+	CMP.b $02
+	BCC .done
+	STA.b $02
+
+.done
+	PLX
+	RTS
+
+macro DefineGetFooSection(type, offset)
+Get<type>Section:
+	PHX
+	LDA.b $CA
+	AND.w #$00FF
+	ASL A
+	TAX
+	LDA.l SplitRooms, X
+	TAX
+
+	LDA.l SplitRooms, X
+	AND.w #$00FF
+	STA.b $CE
+	BEQ .found
+
+	INX
+.check_next_section
+	PHX
+	LDA.l SplitRooms+<offset>, X
+	TAX
+-
+	LDA.l SplitRooms, X
+	AND.w #$00FF
+	CMP.w #$00FF
+	BEQ .not_this_section
+	CMP.b $CC
+	BEQ .plx_found
+
+	INX
+	BRA -
+
+.not_this_section
+	PLX
+	TXA : CLC : ADC.w #$000D : TAX
+	DEC.b $CE
+	BNE .check_next_section
+	BRA .found
+
+.plx_found
+	PLX
+
+.found
+	PLX
+	LDA.b $CE
+	RTS
+endmacro
+
+macro DefineCheckFooSection(type)
+Check<type>Section:
+	STA.b $CC
+
+	LDA.b $CB
+	AND.w #$00FF
+	BEQ .yes
+
+	JSR Get<type>Section
+
+	LDA.b $CB
+	AND.w #$00FF
+	LSR A : LSR A : LSR A : LSR A
+	DEC A
+	CMP.b $CE
+	BEQ .yes
+
+.no
+	CLC
+	RTS
+
+.yes
+	SEC
+	RTS
+endmacro
+
+%DefineGetFooSection(Door, 3)
+%DefineGetFooSection(Stair, 5)
+%DefineGetFooSection(Chest, 7)
+%DefineGetFooSection(Pot, 9)
+%DefineGetFooSection(Enemy, 11)
+
+%DefineCheckFooSection(Door)
+%DefineCheckFooSection(Stair)
+%DefineCheckFooSection(Chest)
+%DefineCheckFooSection(Pot)
+%DefineCheckFooSection(Enemy)
+
+GetIncomingStairSection:
+	PHX
+	AND.w #$0300
+	XBA
+	ASL A
+	TAX
+	LDA.l $8098D8, X
+	STA.b $CC
+
+	LDA.b $CA
+	AND.w #$00FF
+	ASL A
+	TAX
+	LDA.l SplitRooms, X
+	TAX
+
+	LDA.l SplitRooms, X
+	AND.w #$00FF
+	STA.b $CE
+	BEQ .found
+
+	INX
+.check_next_section
+	LDA.l SplitRooms+0, X
+	AND.w #$00FF
+	AND.b $CC
+	BNE .found
+	TXA : CLC : ADC.w #$000D : TAX
+	DEC.b $CE
+	BNE .check_next_section
+	BRA .found
+
+.found
+	PLX
+	LDA.b $CE
 	RTS

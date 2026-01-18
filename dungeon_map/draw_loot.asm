@@ -29,6 +29,12 @@ DrawLoot:
 	LDA.b $07
 	STA.w $021B
 
+	LDA.l DRMode
+	BEQ +
+	LDA.l DungeonMapMode
+	BNE +
+	BRA .skip
++
 	REP #$30
 	PHX : PHY
 
@@ -60,6 +66,7 @@ DrawLoot:
 	STA.b NMISTRIPES
 
 	PLY : PLX
+.skip
 	LDA.b #$00
 	RTL
 

@@ -320,7 +320,7 @@ OWLightWorldOrCrossed:
 
 OWFluteCancel:
 {
-    lda.l FluteBitfield : beq +
+    lda.l FluteBitfield : cmp.b #$FF : beq +
     lda.l OWFlags+1 : and.b #$01 : bne +
         jsl FluteMenu_LoadTransport : rtl
     + lda.w RandoOverworldTargetEdge : bne +
@@ -332,7 +332,7 @@ OWFluteCancel2:
     lda.b Joy1B_All : ora.b Joy1A_All : and.b #$c0 : bne +
         jml FluteMenu_HandleSelection_NoSelection
     + inc.w SubModuleInterface
-    lda.l FluteBitfield : beq .cancel
+    lda.l FluteBitfield : cmp.b #$FF : beq .cancel
     lda.l OWFlags+1 : and.b #$01 : beq +
     lda.b Joy1B_All : cmp.b #$40 : bne +
         .cancel
