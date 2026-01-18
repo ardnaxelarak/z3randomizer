@@ -62,7 +62,7 @@ dw $29ED, $69ED, $29FD, $69FD ; 0B - important inventory item - big chest
 dw $29CC, $29CD, $29DC, $69DC ; 0C - pendant
 dw $2DC9, $69C9, $A9C9, $EDC9 ; 0D - crystal
 dw $29E9, $69E9, $29F9, $69F9 ; 0E - triforce piece
-dw $29EA, $69EA, $29EB, $69EB ; 0F - triforce
+dw $29EA, $69EA, $29FA, $69FA ; 0F - triforce
 
 warnpc $B9F900
 org $B9F900

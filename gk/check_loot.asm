@@ -247,6 +247,7 @@ CheckPots:
 	LDA.b [$04], Y
 	CMP.w #$FFFF : BEQ .done
 	INX : INY : INY
+	BIT.w #$4000 : BNE .multi_item ; marked as multi item
 	BIT.w #$8000 : BNE .major_item ; marked as major item
 	LDA.b [$04], Y
 	AND.w #$00FF
@@ -266,8 +267,19 @@ CheckPots:
 	INY
 	BRA .mask_set
 
+.multi_item
+	LDA.b [$04], Y
+	PHX
+	AND.w #$00FF
+	ASL A
+	TAX
+	LDA.l PotMultiWorldTable, X
+	PLX
+	BRA .item_id_set
+
 .major_item
 	LDA.b [$04], Y
+.item_id_set
 	PHA
 	PHX
 	INY
