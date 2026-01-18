@@ -172,13 +172,11 @@ org $8AE21C
 ;--------------------------------------------------------------------------------
 org $8AE3D7
 	LDA.l DRMode
-	BEQ .normal
-
-	JSL DrawWackyDoorRandoStuff
-	JMP.w $8AE422
-	NOP
-
-	.normal
+	BEQ +
+		JSL DrawWackyDoorRandoStuff
+		JMP.w $8AE422
+		NOP
+	+
 warnpc $8AE3EB
 
 org $8AE439

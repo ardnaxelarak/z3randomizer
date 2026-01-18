@@ -792,45 +792,13 @@ RTL
 }
 ;--------------------------------------------------------------------------------
 MaybePlaySelectSFX:
-        LDA.w DungeonID : BMI .not_dungeon
-                .play
-		LDA.b #$20 : STA.w SFX3 ; menu select sound
-                RTL
-        .not_dungeon
-        LDA.l HUDDungeonItems : BIT.b #$13 : BEQ .dont_play
-                                BIT.b #$0C : BEQ .dont_play
-                BRA .play
-        .dont_play
-RTL
-;--------------------------------------------------------------------------------
-; A = item id being collected
-ItemGetAlternateSFX:
-PEA.w $C567 ; SNES to RTS to in bank 08
-LDA.w AncillaGet, X : CMP.b #$4A : BNE +
-	; collecting pre-activated flute
-	LDA.b #$13 : JML Ancilla_SFX2_Near
-+ ; not pre-activated flute
-	JSL.l ItemIsJunk : BEQ .normal
-
-.junk
-LDA.b #$3B : JML Ancilla_SFX3_Near ; what we wrote over
-
-.normal
-LDA.b #$0F : JML Ancilla_SFX3_Near ; what we wrote over
-
-; A = item id being collected
-ItemGetOverworldAlternateSFX:
-CPY.b #$4A : BNE +
-	JSL Sound_SetSfxPanWithPlayerCoords : ORA.b #$13 : STA.w SFX2
+	LDA.w DungeonID : BMI .not_dungeon
+.play
+	LDA.b #$20 : STA.w SFX3 ; menu select sound
 	RTL
-+ ; normal itemget sfx
-	JSL.l ItemIsJunk : BEQ .normal
-
-.junk
-JSL Sound_SetSfxPanWithPlayerCoords : ORA.b #$3B : STA.w SFX3
+.not_dungeon
+	LDA.l HUDDungeonItems : BIT.b #$13 : BEQ .dont_play
+                            BIT.b #$0C : BEQ .dont_play
+	BRA .play
+.dont_play
 RTL
-
-.normal
-JSL Sound_SetSfxPanWithPlayerCoords : ORA.b #$0F : STA.w SFX3 ; what we wrote over
-RTL
-;--------------------------------------------------------------------------------

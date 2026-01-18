@@ -147,8 +147,12 @@ dw $25A4, $25A4 ; Reserved
 
 ; $B9FB40
 
-warnpc $B9FF00
+warnpc $B9FE00
+org $B9FE00
+JunkTable:
+incsrc data/junk_items.asm
 
+warnpc $B9FF00
 org $B9FF00
 ; $00 - do not show anything
 ; $01 - show presence of supertile as dark square

@@ -209,6 +209,7 @@ incsrc gk/gloom.asm
 incsrc gk/special_weapons.asm
 incsrc gk/variable_ganon_vulnerability.asm
 incsrc gk/pseudoflute.asm
+incsrc gk/fast_junk.asm
 incsrc gk/dungeon_maps.asm
 print "End of B9: ", pc
 
