@@ -426,7 +426,6 @@ GetQuadrantMask:
 	RTS
 
 
-print "DrawSide: ", pc
 ; $00 - Side
 ; $02 - Door position number on side
 ; $03 - Door index number on side

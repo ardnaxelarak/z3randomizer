@@ -13,10 +13,6 @@ LDA.b #$1C
 org $8AE12B
 LDA.b #$20
 
-; change dungeon map subsheet gfx in TR
-; org $80DDC9
-; db $57
-
 ; dungeon map sheets
 org $80DD97
 db $61, $56, $57, $62
