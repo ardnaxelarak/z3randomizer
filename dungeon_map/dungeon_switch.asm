@@ -1,8 +1,6 @@
 CheckSwitchMap:
 	LDA.l DRMode
 	BEQ .not_fancy_door_map
-	LDA.l DungeonMapMode
-	BNE .not_fancy_door_map
 
 	; fancy door map
 	SEP #$20
@@ -160,10 +158,6 @@ SkipMapSprites:
 
 	LDA.l DRMode
 	BEQ +
-	LDA.l DungeonMapMode
-	BEQ .no_vanilla_draw
-		JML $8AEADE
-	.no_vanilla_draw
 		JSL DrawDoorsMapSprites
 		JML $8AEAFC
 +
@@ -265,10 +259,7 @@ DrawDungeonLabel:
 	TAY
 
 	LDA.l DRMode
-	BEQ .not_doors
-	LDA.l DungeonMapMode
-	BEQ .doors
-.not_doors
+	BNE .doors
 	JMP .skip_doors
 
 .doors
@@ -347,30 +338,25 @@ StartCurrentRoomSearch:
 	RTL
 
 FindCurrentRoom:
-	PHX
-	TYA
-	%ADD_MapMode()
-	LDA.l MapDrawingData_floor_data_offset, X
+	LDA.w DungeonMapFloorToDataOffset, Y
 	STA.b $0C
 	LDY.w #$0000
-
-	%LDX_MapMode()
-
 	SEP #$20
 
 .next_room_check
 	CPY.b $0C
 	BCS .not_found
 
-	LDA.b [$72], Y
+	LDA.b ($04), Y
 	INY
 	CMP.b $0E
 	BEQ .found
 
 	LDA.b $00
-	CMP.l MapDrawingData_floor_pixel_column_wrap, X
+	CMP.b #$40
 	BCS .next_row
-	CLC : ADC.l MapDrawingData_supertile_pixel_spacing, X
+
+	CLC : ADC.b #$10
 	STA.b $00
 	BRA .next_room_check
 
@@ -378,9 +364,9 @@ FindCurrentRoom:
 	STZ.b $00
 
 	LDA.b $02
-	CMP.l MapDrawingData_floor_pixel_row_wrap, X
+	CMP.b #$40
 	BCS .next_floor
-	CLC : ADC.l MapDrawingData_supertile_pixel_spacing, X
+	CLC : ADC.b #$10
 	STA.b $02
 	BRA .next_room_check
 
@@ -389,9 +375,7 @@ FindCurrentRoom:
 	BRA .next_room_check
 
 .found
-	PLX
 	JML $8AE891
 
 .not_found
-	PLX
 	JML $8AE8CD

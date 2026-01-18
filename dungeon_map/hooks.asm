@@ -178,52 +178,9 @@ org $8AE21C
 	BRA + : NOP #9 : +
 
 ;================================================================================
-; Custom Door Rando Maps
-;--------------------------------------------------------------------------------
-org $8AE590
-	JSL PrepDrawRow
-	BRA + : NOP #5 : +
-
-org $8AE5F2
-	JSR LoadDungeonMapRoomPointer_0A
-	STA.b $72
-
-org $8AE600
-	LDA.b [$72], Y
-
-org $8AE634
-	JSR LoadDungeonMapRoomPointer_0A
-	STA.b $72
-
-org $8AE63B
-	LDA.b [$72], Y
-
-org $8AE867
-	JSR LoadDungeonMapRoomPointer_0A
-	STA.b $72
-
-org $8AE872
-	LDA.b [$72], Y
-
-org $8AE8DD
-	JSR LoadDungeonMapRoomPointer_0A
-
-org $8AE8E4
-	STA.b $72
-
-org $8AE8F9
-	LDA.b [$72], Y
-
-org $8AEBC6
-	JSL GetLocationMarkerLeft
-	NOP
-
-;================================================================================
 ; Draw Wacky Door Rando Layouts
 ;--------------------------------------------------------------------------------
 org $8AE3D7
-	LDA.l DungeonMapMode
-	BNE .normal
 	LDA.l DRMode
 	BEQ .normal
 

@@ -200,9 +200,3 @@ ItemSources:
 ; $B9FF11
 AlwaysShowCompass:
 	db $01
-
-; $B9FF12
-; $0000 - vanilla 5x5 maps
-; $0001 - special DR 4x3 maps
-DungeonMapMode:
-	dw $0000

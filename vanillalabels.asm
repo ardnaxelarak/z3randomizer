@@ -295,6 +295,7 @@ WorldMap_CalculateOAMCoordinates                           = $8AC3B1
 WorldMap_HandleSpriteBlink                                 = $8AC52E
 WorldMapIcon_AdjustCoordinate                              = $8AC59B
 WorldMap_DarkWorldTilemap                                  = $8AD739
+DungeonMapRoomMarkerYBase                                  = $8AE803
 DungeonMapBossRooms                                        = $8AE817
 DungeonMapFloorCountData                                   = $8AF5E9
 DungeonMapFloorToDataOffset                                = $8AF605

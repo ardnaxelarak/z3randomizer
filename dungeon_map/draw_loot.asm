@@ -30,18 +30,15 @@ DrawLoot:
 	STA.w $021B
 
 	LDA.l DRMode
-	BEQ +
-	LDA.l DungeonMapMode
-	BNE +
-	BRA .skip
-+
+	BNE .skip
+
 	REP #$30
 	PHX : PHY
 
 	STZ.b $0E
 
 	LDX.w DungeonID
-	JSL LoadDungeonMapRoomPointer
+	LDA.l DungeonMapRoomPointers, X
 	STA.b $72
 
 	SEP #$20
@@ -73,65 +70,52 @@ DrawLoot:
 DrawSingleFloorLoot:
 	REP #$20
 	AND.w #$00FF
-	INC A
 	ASL A
-	%ADD_MapMode()
+	TAX
 
-	LDA.l MapDrawingData_floor_data_offset, X
-	DEC A
+	LDA.l DungeonMapFloorToDataOffset, X
+	CLC : ADC.w #$0018 ; get to end of floor
 	TAY
 
-	%LDX_MapMode()
-
 	SEP #$20
-	LDA.l MapDrawingData_column_count, X
-	DEC A
+	LDA.b #$04
 	STA.b $06
 
-	LDA.l MapDrawingData_row_count, X
-	DEC A
+	LDA.b #$04
 	STA.b $07
 
 .next_row
 	REP #$20
 	LDA.w GFXStripes
 	TAX
-	CLC : ADC.w #$0034
+	CLC : ADC.w #$0030
 	STA.w GFXStripes
-
-	PHX
-	%LDX_MapMode()
 
 	SEP #$20
 	LDA.b $07
-	CPX.w #$0002
-	BNE +
-	ASL A
-+
 	CLC : ADC.b $07
 	REP #$20
 	AND.w #$00FF
 	ASL #5
 
-	CLC : ADC.l MapDrawingData_bg1_grid_start, X
+	CLC : ADC.w #$1092
 	ADC.b $0E
 	XBA
-	PLX
 	STA.w GFXStripes+$02, X
 	CLC : ADC.w #$2000
+	STA.w GFXStripes+$1A, X
+
+	LDA.w #$1300
+	STA.w GFXStripes+$04, X
 	STA.w GFXStripes+$1C, X
 
-	LDA.w #$1500
-	STA.w GFXStripes+$04, X
-	STA.w GFXStripes+$1E, X
-
 	TXA
-	CLC : ADC.w #$0018
+	CLC : ADC.w #$0016
 	TAX
 
 .next_room
 	REP #$20
-	LDA.b [$72], Y ; get room id
+	LDA.b ($72), Y ; get room id
 	PHY
 
 	AND.w #$00FF
@@ -153,49 +137,24 @@ DrawSingleFloorLoot:
 	LDA.l LootTypeIcons+2, X
 	STA.w GFXStripes+$02, Y
 	LDA.l LootTypeIcons+4, X
-	STA.w GFXStripes+$1A, Y
+	STA.w GFXStripes+$18, Y
 	LDA.l LootTypeIcons+6, X
-	STA.w GFXStripes+$1C, Y
+	STA.w GFXStripes+$1A, Y
 
 	TYX
 	PLY
 	DEY : DEX #4
 
-	LDA.l DungeonMapMode
-	BEQ +
-	LDA.b $06
-	AND.w #$00FF
-	BEQ +
-
-	; skip a column if in 4x3 mode and it's not the last column
-	LDA.w #$0300
-	STA.w GFXStripes+$02, X
-	STA.w GFXStripes+$1C, X
-	DEX : DEX
-+
-
 	SEP #$20
 	DEC.b $06
 	BPL .next_room
-
-	LDA.l DungeonMapMode
-	BNE +
-	; draw an extra empty tile at the end to make up for width differences between modes
-	LDA.b #$03
-	STZ.w GFXStripes+$02, X
-	STA.w GFXStripes+$03, X
-	STZ.w GFXStripes+$1C, X
-	STA.w GFXStripes+$1D, X
-+
 
 	DEC.b $07
 	BMI .done
 
 	LDA.b #$00
 	XBA
-	%LDX_MapMode()
-	LDA.l MapDrawingData_column_count, X
-	DEC A
+	LDA.b #$04
 	STA.b $06
 
 	JMP .next_row

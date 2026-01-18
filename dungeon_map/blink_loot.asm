@@ -22,8 +22,6 @@ StartDoubleWrite:
 	; what we wrote over
 	LDA.l DRMode
 	BEQ .draw
-	LDA.l DungeonMapMode
-	BNE .draw
 
 	INC.w $020D ; next subsubmode
 	PLA : PLA : PLA ; pull our jump to here off the stack

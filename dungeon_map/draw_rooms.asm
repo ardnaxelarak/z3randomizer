@@ -5,18 +5,11 @@ DrawNonexistentRoom:
 	STA.l $7F0002, X
 	STA.l $7F0040, X
 	STA.l $7F0042, X
-
-FinishRoom:
-	PHX
-	%LDX_MapMode()
-	PLA
-	CLC : ADC.l MapDrawingData_column_spacing, X
-	TAX
-	JML $8AE7F6
+	JML $8AE7F2
 
 NormalDrawDungeonMapRoom:
 	JSL DrawDungeonMapRoom
-	JMP FinishRoom
+	JML $8AE7F2
 
 ; $CA has room_id
 ; $0E has quadrant flags
@@ -65,14 +58,6 @@ DrawDungeonMapRoom:
 +
 
 	PLX
-
-	LDA.l DungeonMapMode
-	BEQ +
-	LDA.b $0A
-	CMP.w #$0003
-	BCS +
-	JSL ClearAdjacentConnections
-+
 
 	LDA.b $0A : BNE + : LDA.w #$0F00 : BRA ++
 +	DEC A     : BNE + : LDA.w #$174F : BRA ++
@@ -150,7 +135,7 @@ DrawEntrances:
 	LDA.b $06 : PHA
 
 	LDX.w DungeonID
-	JSL LoadDungeonMapRoomPointer
+	LDA.l DungeonMapRoomPointers, X
 	STA.b $72
 
 	SEP #$20
@@ -181,23 +166,18 @@ DrawSingleFloorEntrances:
 	ASL A
 	TAX
 
-	%ADD_MapMode()
-	LDA.l MapDrawingData_floor_data_offset, X
+	LDA.l DungeonMapFloorToDataOffset, X
 	TAY
 	STZ.b $06
 
-	%LDX_MapMode()
-
 .next_room
 	REP #$20
-	LDA.b [$72], Y ; get room id
+	LDA.b ($72), Y ; get room id
 	AND.w #$00FF
 	CMP.w #$000F ; $0F = empty room
 
 	BEQ +
-	PHX
 	JSR DrawSingleRoomEntrances
-	PLX
 +
 
 	INY
@@ -205,13 +185,13 @@ DrawSingleFloorEntrances:
 	SEP #$20
 	INC.b $06
 	LDA.b $06
-	CMP.l MapDrawingData_column_count, X
+	CMP.b #$05
 	BCC .next_room
 
 	STZ.b $06
 -	INC.b $07
 	LDA.b $07
-	CMP.l MapDrawingData_row_count, X
+	CMP.b #$05
 	BCC .next_room
 
 .done
@@ -233,8 +213,7 @@ macro DrawSingleEntrance(offset)
 ?+
 	CLC : ADC.b $06
 	ASL #3
-	CLC : ADC.b #<offset>
-	CLC : ADC.l MapDrawingData_sprite_offset_x_base, X
+	CLC : ADC.b #$90+<offset>
 	STA.w OAMBuffer+0, Y
 
 	PHX
@@ -245,13 +224,10 @@ macro DrawSingleEntrance(offset)
 ?+
 	CLC : ADC.b $07
 	ASL #3
-	PHA
 
-	LDA.b $02
-	%ADD_MapMode()
+	LDX.b $02
 
-	PLA
-	CLC : ADC.l MapDrawingData_sprite_offset_y_base, X
+	CLC : ADC.l DungeonMapRoomMarkerYBase, X
 	PLX
 	CLC : ADC.b #$08
 	CLC : ADC.w $0213
@@ -270,8 +246,6 @@ endmacro
 DrawSingleRoomEntrances:
 	STA.b $0E
 	PHY
-
-	%LDY_MapMode()
 
 	SEP #$10
 
