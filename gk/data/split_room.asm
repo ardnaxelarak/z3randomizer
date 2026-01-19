@@ -39,7 +39,7 @@ SplitRooms:
 %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
 %d(.no) : %d(.no) : %d(.6a) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
 
-%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.75) : %d(.no) : %d(.no)
+%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.74) : %d(.75) : %d(.no) : %d(.no)
 %d(.no) : %d(.no) : %d(.no) : %d(.7b) : %d(.7c) : %d(.7d) : %d(.no) : %d(.no)
 
 ;  0/8       1/9       2/A       3/B       4/C       5/D       6/E       7/F

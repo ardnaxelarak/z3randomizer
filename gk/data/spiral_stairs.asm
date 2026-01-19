@@ -26,7 +26,7 @@ db $01, $00, $05 ; ($0A) Single Staircase at Top of Bottom Left Quadrant
 db $01, $00, $04 ; ($0D) Moldorm
 db $02, $01, $00, $00, $02 ; ($10) Pod Basement
 db $03, $01, $0A, $02, $01, $00, $0B ; ($15) GT Entrance
-db $02, $00, $03, $01, $04 ; ($1C) Hera Below Moldorm
+db $02, $01, $03, $00, $04 ; ($1C) Hera Below Moldorm
 db $02, $00, $01, $01, $0B ; ($21) PoD Bridge
 db $01, $00, $08 ; ($26) GT Ice Armos
 db $03, $00, $01, $01, $0B, $02, $09 ; ($29) Swamp Statue
