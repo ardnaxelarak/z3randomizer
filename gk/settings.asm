@@ -171,7 +171,9 @@ ShowRooms:
 .visited_tile
 	db $04
 .reserved
-	skip 4
+	skip 3
+.dark_room_cap
+	db $01
 warnpc $B9FF08
 
 org $B9FF08

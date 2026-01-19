@@ -541,7 +541,9 @@ DrawStairs:
 	LDA.w SpiralProps, Y
 	AND.w #$00FF
 	STA.b $06
-	BEQ .done
+	BNE +
+	JMP .done
++
 
 	STZ.b $02
 	INY
@@ -578,11 +580,14 @@ DrawStairs:
 	STA.b $CA
 
 	JSR GetSpecificRoomVisibility
+	AND.w #$00FF
 	BNE +
 	LDA.b $0E
 	AND.w #$000F
-	BNE +
-	BRA .ply_skip
+	BEQ .ply_skip
+	LDA.b $0B
+	AND.w #$00FF
+	BEQ .ply_skip
 +
 
 	TYX
@@ -619,32 +624,70 @@ GetCurrentRoomVisibility:
 
 GetSpecificRoomVisibility:
 	PHX
-	LDA.l ShowRooms_default
+
+	; figure out if room is dark without lamp
+	LDA.b $CA
 	AND.w #$00FF
+	ASL A
+	TAX
+	LDA.l RoomHeaderPointers, X
+	TAX
+	LDA.l bank(RoomHeaders)<<16, X
+	AND.w #$0001
+	BEQ .not_dark
+
+	SEP #$20
+	JSL LampCheck
+	REP #$20
+	BNE .not_dark
+
+	LDA.l LampCone
+	BIT.w #$0020 ; all rooms are lit
+	BNE .not_dark
+
+	LDA.l ShowRooms_dark_room_cap
+	AND.w #$00FF
+	CMP.w #$0006
+	BCS .not_dark
+
+	XBA
+	STA.b $0A
+	BRA .check_visibility
+
+.not_dark
+	LDA.w #$0600
 	STA.b $0A
 
+.check_visibility
+	SEP #$20
+	LDA.l ShowRooms_default
+	STA.b $0A
+
+	REP #$20
 	LDX.w DungeonID
 	LDA.l MapField
 	AND.l DungeonMask, X
 	BEQ +
+	SEP #$20
 	LDA.l ShowRooms_have_map
-	AND.w #$00FF
 	CMP.b $0A
 	BCC +
 	STA.b $0A
 +
 
+	REP #$20
 	LDX.w DungeonID
 	LDA.l CompassField
 	AND.l DungeonMask, X
 	BEQ +
+	SEP #$20
 	LDA.l ShowRooms_have_compass
-	AND.w #$00FF
 	CMP.b $0A
 	BCC +
 	STA.b $0A
 +
 
+	REP #$20
 	LDA.b $CA
 	AND.w #$00FF
 	ASL A
@@ -653,13 +696,20 @@ GetSpecificRoomVisibility:
 	AND.w #$000F
 	STA.b $0E
 	BEQ +
+	SEP #$20
 	LDA.l ShowRooms_visited_tile
-	AND.w #$00FF
 	CMP.b $0A
 	BCC +
+	CMP.b $0B
+	BCS .too_dark
+	STA.b $0A
+	BRA +
+.too_dark
+	LDA.b $0B
 	STA.b $0A
 +
 
+	REP #$20
 	PLX
 	LDA.b $0A
 	RTS
@@ -705,6 +755,7 @@ DrawDropOrWarp:
 	STA.b $CA
 
 	JSR GetSpecificRoomVisibility
+	AND.w #$00FF
 	BNE +
 	LDA.b $0E
 	AND.w #$000F
@@ -1491,8 +1542,9 @@ DoorsMapNextEntrance:
 	STA.b $CA
 
 	JSR GetSpecificRoomVisibility
+	AND.w #$00FF
 	BNE .acceptable
-	BEQ .done
+	JMP .done
 
 +
 	TYX
@@ -1509,6 +1561,7 @@ DoorsMapNextEntrance:
 	STA.b $CA
 
 	JSR GetSpecificRoomVisibility
+	AND.w #$00FF
 	BNE .acceptable
 
 	LDA.w #$0001
@@ -1537,6 +1590,9 @@ DoorsMapNextEntrance:
 
 	LDA.b $00
 	AND.b $0E
+	BEQ .check_next
+	LDA.b $0B
+	AND.w #$00FF
 	BEQ .check_next
 
 .acceptable
@@ -1597,6 +1653,7 @@ FindFirstEntrance:
 	STA.b $CA
 
 	JSR GetSpecificRoomVisibility
+	AND.w #$00FF
 	BNE .acceptable
 
 	LDA.w #$0001
@@ -1625,6 +1682,9 @@ FindFirstEntrance:
 
 	LDA.b $00
 	AND.b $0E
+	BEQ .check_next
+	LDA.b $0B
+	AND.w #$00FF
 	BEQ .check_next
 
 .acceptable
@@ -1867,6 +1927,7 @@ DrawDoorsEntrances:
 	BMI .check_dropdown
 
 	JSR GetSpecificRoomVisibility
+	AND.w #$00FF
 	BNE .draw_entrance
 
 	PHX
@@ -1875,6 +1936,9 @@ DrawDoorsEntrances:
 	LDA.l EntranceQuadrantMasks, X
 	PLX
 	AND.b $0E
+	BEQ .check_dropdown
+	LDA.b $0B
+	AND.w #$00FF
 	BEQ .check_dropdown
 
 .draw_entrance
@@ -1906,6 +1970,7 @@ DrawDoorsEntrances:
 	BMI .next_room
 
 	JSR GetSpecificRoomVisibility
+	AND.w #$00FF
 	BNE .draw_dropdown
 
 	PHX
@@ -1914,7 +1979,13 @@ DrawDoorsEntrances:
 	LDA.l DropdownQuadrantMasks, X
 	PLX
 	AND.b $0E
-	BEQ .next_room
+	BEQ .goto_next_room
+	LDA.b $0B
+	AND.w #$00FF
+	BNE .draw_dropdown
+
+.goto_next_room
+	JMP .next_room
 
 .draw_dropdown
 	SEP #$30
@@ -1964,7 +2035,6 @@ DrawDoorsStairs:
 	INX : INX
 	LDA.l SpiralProps, X
 
-
 	PHX
 	ASL A
 	TAX
@@ -1995,6 +2065,10 @@ DrawDoorsStairs:
 	LDA.l SpiralLabelQuadrantMasks, X
 	AND.b $0E
 	BEQ .skip
+
+	LDA.b $0B
+	CMP.b #$04
+	BCC .skip
 
 .draw
 	LDY.b $00

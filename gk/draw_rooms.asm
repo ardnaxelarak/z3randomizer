@@ -7,6 +7,44 @@ DrawNonexistentRoom:
 	STA.l $7F0042, X
 	JML $8AE7F2
 
+GetVisibilityProps:
+	PHX
+	ASL A : ASL A
+	TAX
+	LDA.b $0C
+	AND.l .visibility_props, X
+	ORA.l .visibility_props+2, X
+	STA.b $0C
+	PLX
+	RTS
+
+.visibility_props:
+	dw $0000, $0F00
+	dw $C000, $174F
+	dw $C000, $174F
+	dw $0000, $1400
+	dw $0000, $1000
+	dw $0000, $0C00
+	dw $0000, $0800
+
+; A = room shape
+; $0C = visibility props
+GetQuadrantTile:
+	PHA
+
+	LDA.b $0C
+	AND.w #$03FF
+	BNE .square
+
+	PLA
+	ORA.b $0C
+	RTS
+
+.square
+	PLA
+	LDA.b $0C
+	RTS
+
 NormalDrawDungeonMapRoom:
 	JSL DrawDungeonMapRoom
 	JML $8AE7F2
@@ -19,54 +57,7 @@ DrawDungeonMapRoom:
 	PHB : PHK : PLB ; need to keep this in same bank as data, or else specify bank
 	LDA.b $0A : PHA
 
-	LDA.l ShowRooms_default
-	AND.w #$00FF
-	STA.b $0A
-
-	PHX
-
-	LDX.w DungeonID
-	LDA.l MapField
-	AND.l DungeonMask, X
-	BEQ +
-	LDA.l ShowRooms_have_map
-	AND.w #$00FF
-	CMP.b $0A
-	BCC +
-	STA.b $0A
-+
-
-	LDX.w DungeonID
-	LDA.l CompassField
-	AND.l DungeonMask, X
-	BEQ +
-	LDA.l ShowRooms_have_compass
-	AND.w #$00FF
-	CMP.b $0A
-	BCC +
-	STA.b $0A
-+
-
-	LDA.b $0E
-	AND.w #$000F
-	BEQ +
-	LDA.l ShowRooms_visited_tile
-	AND.w #$00FF
-	CMP.b $0A
-	BCC +
-	STA.b $0A
-+
-
-	PLX
-
-	LDA.b $0A : BNE + : LDA.w #$0F00 : BRA ++
-+	DEC A     : BNE + : LDA.w #$174F : BRA ++
-+	DEC A     : BNE + : LDA.w #$174F : BRA ++
-+	DEC A     : BNE + : LDA.w #$1400 : BRA ++
-+	DEC A     : BNE + : LDA.w #$1000 : BRA ++
-+	DEC A     : BNE + : LDA.w #$0C00 : BRA ++
-+	LDA.w #$0800
-++	STA.b $0C
+	JSR GetSpecificRoomVisibility
 
 	LDA.b $CA
 	AND.w #$00FF
@@ -74,49 +65,44 @@ DrawDungeonMapRoom:
 	TAY
 
 	macro DrawQuadrant(quadrant, writeOffset)
-		?DrawQuadrant:
-		LDA.w SupertileRoomShapes+(2*<quadrant>), Y
-		CMP.w #$FFFF : BEQ ?.empty
-		PHA
-		LDA.b $0E
-		AND.w #1<<(3-<quadrant>)
-		BNE ?.visited
+		.draw_quadrant_<quadrant>:
+			LDA.w #(3-<quadrant>)<<14
+			STA.b $0C
 
-		?.unvisited
-		LDA.b $0A
-		CMP.w #$0003
-		BCS ?.shape
+			LDA.b $0E
+			BIT.w #1<<(3-<quadrant>)
+			BNE ..visited
 
-		?.square
-		PLA
-		LDA.b $0C
-		EOR.w #(3-<quadrant>)<<14
-		BRA ?.write
+			LDA.b $0A
+			BRA ..continue
 
-		?.shape
-		PLA
-		ORA.b $0C
-		BRA ?.write
+		..visited
+			LDA.b $0B
 
-		?.visited
-		PLA
-		ORA.w #$0800
-		BRA ?.write
+		..continue
+			AND.w #$00FF
+			JSR GetVisibilityProps
 
-		?.empty
-		LDA.b $0A
-		CMP.w #$0001
-		BEQ ?.full_square
-		LDA.w #$0F00
-		BRA ?.write
+			LDA.w SupertileRoomShapes+(2*<quadrant>), Y
+			CMP.w #$FFFF : BNE ..get_quadrant
+			LDA.b $0A
+			AND.w #$00FF
+			CMP.w #$0001
+			BNE ..empty
 
-		?.full_square
-		LDA.w #$174F
-		EOR.w #(3-<quadrant>)<<14
+		..full_square
+			LDA.b $0C
+			BRA ..write
 
-		?.write
-		STA.l $7F0000+<writeOffset>, X
-		?.done
+		..get_quadrant
+			JSR GetQuadrantTile
+			BRA ..write
+
+		..empty
+			LDA.w #$0F00
+
+		..write
+			STA.l $7F0000+<writeOffset>, X
 	endmacro
 
 	%DrawQuadrant(0, $00)

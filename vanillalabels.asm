@@ -288,6 +288,7 @@ EntranceData_layer                                         = $82D2F9
 EntranceData_song                                          = $82D592
 SpawnPointData_room_id                                     = $82D8D2
 Overworld_CheckForSpecialOverworldTrigger_Direction        = $84E879
+RoomHeaderPointers                                         = $84F1E2
 Sprite_ShowSolicitedMessage_Direction                      = $85E1A3
 FluteMenuNumbers_bits                                      = $8AB7A3
 WorldMap_RedXChars                                         = $8ABF70
