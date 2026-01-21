@@ -40,14 +40,14 @@ RTL
 	dw .crystals
 	dw .pendant_bosses
 	dw .crystal_bosses
-	dw .bosses
+	dw .prize_bosses
 	dw .agahnim_defeated
 	dw .agahnim2_defeated
 	dw .goal_item
 	dw .collection_rate
 	dw .custom_goal
 	dw .bingo
-	dw .success
+	dw .all_bosses
 	dw .success
 	dw .success
 	dw .success
@@ -70,19 +70,24 @@ RTL
 		CMP.b #$07 : RTS
 .pendant_bosses
 	PHP
-	LDA.b #$02
+	LDA.b #$20
 	JSR CheckForBossesDefeated : PLP : BCC +
 		CMP.b #$03 : RTS
 .crystal_bosses
 	PHP
-	LDA.b #$01
+	LDA.b #$10
 	JSR CheckForBossesDefeated : PLP : BCC +
 		CMP.b #$07 : RTS
-.bosses
+.all_bosses
+	PHP
+	LDA.b #$30
+	JSR CheckForBossesDefeated : PLP : BCC +
+		CMP.b #$10 : RTS
+.prize_bosses
 	PHP
 	LDA.b #$00
 	JSR CheckForBossesDefeated : PLP : BCC +
-		CMP.b #$10 : RTS
+		CMP.b #$0A : RTS
 	+ CMP.b [Scrap00], Y : INY : RTS
 .agahnim_defeated
 	LDA.l ProgressIndicator : CMP.b #$03 : RTS
@@ -346,7 +351,7 @@ CheckTowerOpen:
 ;---------------------------------------------------------------------------------------------------
 CheckAgaForPed:
         REP #$20
-		; seems light_speed option to force blue balls is unused for now
+        ; seems light_speed option to force blue balls is unused for now
         BRA .vanilla
 
 .light_speed
@@ -368,12 +373,38 @@ CheckAgaForPed:
         RTL
 
 ;---------------------------------------------------------------------------------------------------
+BossPrizeFlags:
+	; $00 = all prize bosses
+	db $00
+	db $01, $01, $01, $01, $01, $01, $01 ; crystals
+	db $01, $01, $01 ; pendants
+	db $00, $00, $00, $00, $00 ; padding
+	; $10 = all crystal bosses
+	db $00
+	db $01, $01, $01, $01, $01, $01, $01 ; crystals
+	db $00, $00, $00 ; pendants
+	db $00, $00, $00, $00, $00 ; padding
+	; $20 = all pendant bosses
+	db $00
+	db $00, $00, $00, $00, $00, $00, $00 ; crystals
+	db $01, $01, $01 ; pendants
+	db $00, $00, $00, $00, $00 ; padding
+	; $30 = all bosses
+	db $01 ; agas
+	db $01, $01, $01, $01, $01, $01, $01 ; crystals
+	db $01, $01, $01 ; pendants
+	db $00, $00, $00, $00, $00 ; padding
+
 CheckForBossesDefeated:
 	PHB : PHX : PHY
 
-	STA.b Scrap04 ; 0 = check all, 1 = check crystals, 2 = check pendants
+	; $00 = check prize bosses
+	; $10 = check crystal bosses
+	; $20 = check pendant bosses
+	; $30 = check all bosses
+	STA.b Scrap04
 	
-	LDA.b #CrystalPendantFlags_3>>16
+	LDA.b #bank(CrystalPendantFlags_3)
 	PHA : PLB
 
 	STZ.b Scrap03 ; count of number of bosses killed
@@ -381,22 +412,22 @@ CheckForBossesDefeated:
 
 	REP #$30
 
-	LDY.w #10
+	LDY.w #11
 
 .next_check
-	LDA.w CrystalPendantFlags_3+2,Y : AND.w #$00FF : BEQ .skip
-	CMP.w #$0008 ; C set = pendant, C clear = crystal
-	LDA.b Scrap04 : BEQ .proceed
-		PHP : ROR : BCC +
-			PLP : BCS .skip : BRA .proceed
-		+ PLP : BCC .skip
+	SEP #$30
+	LDA.w CrystalPendantFlags_3+2, Y
+	CLC : ADC.b Scrap04
+	TAX
+	LDA.l BossPrizeFlags, X
+	REP #$30
+	BEQ .skip
 
-	.proceed
-	TYA : ASL : TAX
+	TYA : ASL A : TAX
 
-	LDA.l DungeonMapBossRooms+4,X
-	ASL : TAX
-	LDA.l RoomDataWRAM.l,X
+	LDA.l DungeonMapBossRooms+4, X
+	ASL A : TAX
+	LDA.l RoomDataWRAM.l, X
 
 	AND.w #$0800 : BEQ .skip
 		INC.b Scrap03

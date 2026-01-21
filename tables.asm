@@ -2664,7 +2664,7 @@ db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00,
 ;--------------------------------------------------------------------------------
 org $B0EFE0 ; PC 0x186FE0-0x186FEF
 CrystalPendantFlags_3:
-    db $00 ; Sewers
+	db $00 ; Sewers
 	db $00 ; Hyrule Castle
 	db $08 ; Eastern Palace
 	db $09 ; Desert Palace
@@ -2672,7 +2672,7 @@ CrystalPendantFlags_3:
 	db $02 ; Swamp Palace
 	db $01 ; Palace of Darkness
 	db $06 ; Misery Mire
-    db $03 ; Skull Woods
+	db $03 ; Skull Woods
 	db $05 ; Ice Palace
 	db $0A ; Tower of Hera
 	db $04 ; Thieves' Town
