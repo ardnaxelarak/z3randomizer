@@ -125,101 +125,102 @@ dw $0000, $0000, $0000, $0000, $000a, $000a, $000a, $0014, $000a, $0014, $0000, 
 
 DrHudDungeonItemsAdditions:
 {
-    jsl DrawHUDDungeonItems
-    lda.l DRMode : cmp.b #$02 : beq + : rtl : +
+	jsl DrawHUDDungeonItems
+	lda.l DRMode : cmp.b #$02 : beq + : rtl : +
 
-    phx : phy : php
-    rep #$30
+	phx : phy : php
+	rep #$30
 
-    lda.w #$24f5 : sta.w $1606 : sta.w $1610 : sta.w $161a : sta.w $1624
-    sta.w $1644 : sta.w $164a : sta.w $1652 : sta.w $1662 : sta.w $1684 : sta.w $16c4
-    ldx.w #$0000
-    - sta.w $1704, x : sta.w $170e, x : sta.w $1718, x
-    inx #2 : cpx.w #$0008 : !BLT -
+	lda.w #$24f5 : sta.w $1606 : sta.w $1610 : sta.w $161a : sta.w $1624
+	sta.w $1644 : sta.w $164a : sta.w $1652 : sta.w $1662 : sta.w $1684 : sta.w $16c4
+	ldx.w #$0000
+	- sta.w $1704, x : sta.w $170e, x : sta.w $1718, x
+	inx #2 : cpx.w #$0008 : !BLT -
 
-    lda.l HudFlag : and.w #$0020 : beq + : JMP ++ : +
-    lda.l HUDDungeonItems : and.w #$0007 : bne + : JMP ++ : +
-    	; bk symbols
+	lda.l HudFlag : and.w #$0020 : beq + : JMP ++ : +
+	lda.l HUDDungeonItems : and.w #$001F : bne + : JMP ++ : +
+		; bk symbols
 		lda.w #$2811 : sta.w $1606 : sta.w $1610 : sta.w $161a : sta.w $1624
 		; sm symbols
 		lda.w #$2810 : sta.w $160a : sta.w $1614 : sta.w $161e : sta.w $16e4
-    	; blank out stuff
-    	lda.w #$24f5 : sta.w $1724
+		; blank out stuff
+		lda.w #$24f5 : sta.w $1724
 
-        ldx.w #$0002
-        	- lda.w #$0000 : !ADD.l RowOffsets,x : !ADD.l ColumnOffsets, x : tay
-        	lda.l DungeonReminderTable, x : sta.w $1644, y : iny #2
-        	lda.w #$24f5 : sta.w $1644, y
-        	lda.l MapField : and.l DungeonMask, x : beq + ; must have map
-        		jsr BkStatus : sta.w $1644, y : bra .smallKey ; big key status
-        	+ lda.l BigKeyField : and.l DungeonMask, x : beq .smallKey
-        		lda.w #$2826 : sta.w $1644, y
-        	.smallKey
-        	+ iny #2
+		ldx.w #$0002
+			- lda.w #$0000 : !ADD.l RowOffsets,x : !ADD.l ColumnOffsets, x : tay
+			JSR BossStatus : STA.w $1644, Y
+			INY #2
+			lda.w #$24f5 : sta.w $1644, y
+			lda.l MapField : and.l DungeonMask, x : beq + ; must have map
+				jsr BkStatus : sta.w $1644, y : bra .smallKey ; big key status
+			+ lda.l BigKeyField : and.l DungeonMask, x : beq .smallKey
+				lda.w #$2826 : sta.w $1644, y
+			.smallKey
+			+ iny #2
 			cpx.w #$001a : bne +
 				tya : !ADD.w #$003c : tay
-        	+ stx.b Scrap00
-        		txa : lsr : tax
-        		lda.w #$24f5 : sta.w $1644, y
-        		lda.l GenericKeys : and.w #$00FF : bne +
-        		lda.l DungeonKeys, x : and.w #$00FF : beq +
-        			jsr ConvertToDisplay2 : sta.w $1644, y
-        		+ iny #2 : lda.w #$24f5 : sta.w $1644, y
-        		phx : ldx.b Scrap00
+			+ stx.b Scrap00
+				txa : lsr : tax
+				lda.w #$24f5 : sta.w $1644, y
+				lda.l GenericKeys : and.w #$00FF : bne +
+				lda.l DungeonKeys, x : and.w #$00FF : beq +
+					jsr ConvertToDisplay2 : sta.w $1644, y
+				+ iny #2 : lda.w #$24f5 : sta.w $1644, y
+				phx : ldx.b Scrap00
 						LDA.l CompassMode : BIT.w #$0002 : BNE .skip_map_check
 					 	LDA.l MapField : AND.l DungeonMask, x : BEQ .key_info_done ; must have map
 					.skip_map_check
 						plx : sep #$30 : lda.l ChestKeys, x : sta.b Scrap02
-        		lda.l GenericKeys : bne +++
-        			lda.b Scrap02 : !SUB.l DungeonCollectedKeys, x : sta.b Scrap02
-        		+++ lda.b Scrap02
-        		rep #$30
-        		jsr ConvertToDisplay2 : sta.w $1644, y ; small key totals
-        		bra .skipStack
+				lda.l GenericKeys : bne +++
+					lda.b Scrap02 : !SUB.l DungeonCollectedKeys, x : sta.b Scrap02
+				+++ lda.b Scrap02
+				rep #$30
+				jsr ConvertToDisplay2 : sta.w $1644, y ; small key totals
+				bra .skipStack
 					.key_info_done
-        		 plx
-        	.skipStack iny #2
-        		cpx.w #$000d : beq +
-        			lda.w #$24f5 : sta.w $1644, y
-        		+
-        	ldx.b Scrap00
-            + inx #2 : cpx.w #$001b : bcs ++ : JMP -
-    ++
-    lda.l HudFlag : and.w #$0020 : bne + : JMP ++ : +
-        ; map symbols
-        lda.w #$2821 : sta.w $1606 : sta.w $1610 : sta.w $161a
-        ; compass symbols
-        lda.w #$2c20 : sta.w $160a : sta.w $1614 : sta.w $161e : sta.w $16e4
-        ; blank out a couple thing from old hud
-        lda.w #$24f5 : sta.w $1624 : sta.w $1724
-        ldx.w #$0002
-        	- lda.w #$0000 ; start of hud area
-        	!ADD.l RowOffsets, x : !ADD.l ColumnOffsets, x : tay
-        	lda.l DungeonReminderTable, x : sta.w $1644, y
-        	iny #2
-        	lda.w #$24f5 : sta.w $1644, y ; blank out map spot
-        	lda.l MapField : ora.l MapCountDisplay : ora.l MapOverlay
-        	and.l DungeonMask, x : beq + ; must have map
-        		JSR MapIndicatorShort : STA.w $1644, Y
+				 plx
+			.skipStack iny #2
+				cpx.w #$000d : beq +
+					lda.w #$24f5 : sta.w $1644, y
+				+
+			ldx.b Scrap00
+			+ inx #2 : cpx.w #$001b : bcs ++ : JMP -
+	++
+	lda.l HudFlag : and.w #$0020 : bne + : JMP ++ : +
+		; map symbols
+		lda.w #$2821 : sta.w $1606 : sta.w $1610 : sta.w $161a
+		; compass symbols
+		lda.w #$2c20 : sta.w $160a : sta.w $1614 : sta.w $161e : sta.w $16e4
+		; blank out a couple thing from old hud
+		lda.w #$24f5 : sta.w $1624 : sta.w $1724
+		ldx.w #$0002
+			- lda.w #$0000 ; start of hud area
+			!ADD.l RowOffsets, x : !ADD.l ColumnOffsets, x : tay
+			JSR BossStatus : STA.w $1644, Y
+			INY #2
+			lda.w #$24f5 : sta.w $1644, y ; blank out map spot
+			lda.l MapField : ora.l MapCountDisplay : ora.l MapOverlay
+			and.l DungeonMask, x : beq + ; must have map
+				JSR MapIndicatorShort : STA.w $1644, Y
 			+ iny #2
-            cpx.w #$001a : bne +
+			cpx.w #$001a : bne +
 				tya : !ADD.w #$003c : tay
 			+ lda.l CompassField : ora.l CompassCountDisplay
 			and.l DungeonMask, x : beq + ; must have compass
-                phx ; total chest counts
-                    LDA.l CompassTotalsWRAM, x : !SUB.l DungeonLocationsChecked, x
-                    SEP #$30 : JSR HudHexToDec2DigitCopy : REP #$30
-                    lda.b Scrap06 : jsr ConvertToDisplay2 : sta.w $1644, y : iny #2
-                    lda.b Scrap07 : jsr ConvertToDisplay2 : sta.w $1644, y
-                plx
-                bra .skipBlanks
+				phx ; total chest counts
+					LDA.l CompassTotalsWRAM, x : !SUB.l DungeonLocationsChecked, x
+					SEP #$30 : JSR HudHexToDec2DigitCopy : REP #$30
+					lda.b Scrap06 : jsr ConvertToDisplay2 : sta.w $1644, y : iny #2
+					lda.b Scrap07 : jsr ConvertToDisplay2 : sta.w $1644, y
+				plx
+				bra .skipBlanks
 			+ lda.w #$24f5 : sta.w $1644, y : iny #2 : sta.w $1644, y
-            .skipBlanks iny #2
-            cpx.w #$001a : beq +
+			.skipBlanks iny #2
+			cpx.w #$001a : beq +
 				lda.w #$24f5 : sta.w $1644, y ; blank out spot
-            + inx #2 : cpx.w #$001b : !BGE ++ : JMP -
-    ++
-    plp : ply : plx : rtl
+			+ inx #2 : cpx.w #$001b : !BGE ++ : JMP -
+	++
+	plp : ply : plx : rtl
 }
 
 MapIndicatorLong:
@@ -258,6 +259,40 @@ BkStatus:
             lda.w #$2420 : rts ; symbol for BnC
     + lda.w #$24f5 : rts ; black otherwise
     +++ lda.w #$2826 : rts ; check mark
+
+BossStatus:
+	LDA.l HUDDungeonItems : BIT.w #$0010 : BEQ .normal
+	PHX
+	LDA.l DungeonMapBossRooms, X
+	CMP.w #$000F
+	BEQ .no_boss
+	ASL A
+	TAX
+	LDA.l SaveDataWRAM, X
+	PLX
+	BIT.w #$0800
+	BEQ .boss_alive
+
+.boss_dead
+	LDA.l HudFlag : BIT.w #$0020 : BNE .skull
+	; palette 3 - white
+	LDA.l DungeonReminderTable, X : AND.w #$E3FF : ORA.w #$0C00 : RTS
+
+.skull
+	LDA.w #$280F : RTS
+
+.no_boss
+	PLX
+	; palette 0 - light gray
+	LDA.l DungeonReminderTable, X : AND.w #$E3FF : RTS
+
+.boss_alive
+	; palette 4 - gray
+	LDA.l DungeonReminderTable, X : AND.w #$E3FF : ORA.w #$1000 : RTS
+
+.normal
+	; default palette 3 - white
+	LDA.l DungeonReminderTable, X : RTS
 
 ConvertToDisplay:
     and.w #$00ff : cmp.w #$000a : !BLT +
