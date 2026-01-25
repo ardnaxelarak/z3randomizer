@@ -115,7 +115,9 @@ RTL
 CheckTransitionOverworld:
 	STA.b $8A
 	STA.w $040A ; what we wrote over
-	JML MaybeMarkFluteSpotVisited
+	JSL MaybeMarkFluteSpotVisited
+	LDA.b $8A
+	RTL
 
 CheckFlute:
 	LDA.l FluteBitfield

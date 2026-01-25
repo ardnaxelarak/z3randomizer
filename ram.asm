@@ -114,6 +114,8 @@ RoomIndex = $7E00A0               ; Underworld room index. Word length. High byt
                                   ; Not zeroed on exit to overworld.
 PreviousRoom = $7E00A2            ; Stores previous value of RoomIndex
                                   ;
+CurrentFloor = $7E00A4            ; Current floor in dungeos
+                                  ;
 CameraBoundH = $7E00A6            ; Which set of camera boundaries to use.
 CameraBoundV = $7E00A7            ;
                                   ;
@@ -193,6 +195,8 @@ ItemCursor = $7E0202              ; Current location of the item menu cursor.
 BottleMenuCounter = $7E0205       ; Step counter for opening bottle menu
 MenuFrameCounter = $7E0206        ; Incremented every menu frame. Never read.
 MenuBlink = $7E0207               ; Incremented every frame and masked with $10 to blink cursor
+                                  ;
+DungeonMapCurrentFloor = $7E020E  ;
                                   ;
 RaceGameFlag = $7E021B            ;
                                   ;
@@ -347,6 +351,7 @@ DynamicDropGFXSlots = $7E07F1     ; Assume future use of this up to $0E bytes, t
                                   ; which item gfx is currently occupying each slot
 OAMBuffer = $7E0800               ; Main OAM buffer sent to OAM. $200 bytes.
 OAMBuffer2 = $7E0A00              ;
+OAMBufferAux = $7E0A20            ; high X-bit and size bit sent to OAM, one byte per sprite
                                   ;
 TransparencyFlag = $7E0ABD        ; Flags transparency effects e.g. in Thieves Town Hellway
                                   ;
@@ -559,6 +564,17 @@ EN_SCRMODXB = $7EC170             ;
 PegColor = $7EC172                ;
                                   ;
 GameOverSongCache = $7EC227       ;
+                                  ;
+CachedDungeonID = $7EC22A         ; Cached while opening dungeon map
+CachedCurrentFloor = $7EC22B      ; to restore when closing
+                                  ;
+CurrentDisplayedRoom = $7EC22C    ; 2 bytes, used by dungeon map
+DisplayedRoomDoorIndex = $7EC22E  ; 2 bytes, used by dungeon map
+                                  ;
+DoorSlots = $7EC230               ; $32 bytes, used by dungeon map
+DoorSlotScratch = $7EC262         ; 6 bytes, used by dungeon map
+DoorSlotCursor = $7EC268          ; 2 bytes, used by dungeon map
+CurrentDoorEntrance = $7EC26A     ; 2 bytes, used by dungeon map
                                   ;
 LastBGSet = $7EC2F8               ; Lists loaded sheets to check for decompression. 4 bytes.
                                   ;

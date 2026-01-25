@@ -1,10 +1,6 @@
 LoadUnderworldSprites:
 	STA.b Scrap00  ; part one of what we replaced
-	if !FEATURE_FIX_BASEROM
-		LDA.w #$89
-	else
-		LDA.w #UWSpritesData>>16 ; set the bank to 28 for now
-	endif
+	LDA.w #UWSpritesData>>16 ; set the bank to 28 for now
 	STA.b Scrap02
 	LDA.w $048E
 RTL

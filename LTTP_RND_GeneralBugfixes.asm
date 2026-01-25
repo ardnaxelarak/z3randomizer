@@ -179,7 +179,7 @@ incsrc toast.asm
 incsrc fastcredits.asm
 incsrc msu.asm
 incsrc menu/overworldmap.asm ; Overwrites some code in bank $8A
-incsrc dungeonmap.asm
+incsrc bossicons.asm
 incsrc hextodec.asm
 incsrc multiworld.asm
 incsrc textrenderer.asm
@@ -203,13 +203,22 @@ incsrc menu/hudalpha.asm
 warnpc $A38000
 
 org $B98000
-incsrc crystalswitchbook.asm
-incsrc mimicdash.asm
-incsrc gloom.asm
-incsrc special_weapons.asm
-incsrc variable_ganon_vulnerability.asm
-incsrc pseudoflute.asm
-warnpc $BA8000
+incsrc gk/crystalswitchbook.asm
+incsrc gk/mimicdash.asm
+incsrc gk/gloom.asm
+incsrc gk/special_weapons.asm
+incsrc gk/variable_ganon_vulnerability.asm
+incsrc gk/pseudoflute.asm
+incsrc gk/fast_junk.asm
+incsrc gk/dungeon_maps.asm
+print "End of B9: ", pc
+
+warnpc $B9EE00
+org $B9EE00
+incsrc gk_meta.asm
+
+org $B9F000
+incsrc gk/settings.asm
 
 org $A38000
 incsrc stats/credits.asm ; Statically mapped
@@ -253,7 +262,7 @@ warnpc $B1A000
 
 org $B1A000
 GFX_HUD_Items:
-incbin "menu/drsheetdc.2bppc"
+incbin "menu/dr_sheet_dc.2bppc"
 warnpc $B1A800
 
 org $B1A800
@@ -306,6 +315,24 @@ NewFontInverted:
 incbin "data/newfont_inverted.bin"
 SmallCharacters:
 incbin "data/smallchars.2bpp"
+
+DungeonMapIcons1:
+incbin "menu/map_icons_1.3bppc"
+DungeonMapIcons2:
+incbin "menu/map_icons_2.3bppc"
+DungeonMapIcons3:
+incbin "menu/map_icons_3.3bppc"
+DungeonMapIcons4:
+incbin "menu/map_icons_4.3bppc"
+DungeonMapIcons5:
+incbin "menu/map_icons_5.3bppc"
+DungeonMapIcons6:
+incbin "menu/map_icons_6.3bppc"
+DungeonMapDoorConnectors:
+incbin "menu/door_connectors.3bppc"
+MapSheetD4:
+incbin "menu/map_sheet_d4.3bppc"
+
 org $8CD7DF
 incsrc data/playernamecharmap.asm
 org $8CE73D

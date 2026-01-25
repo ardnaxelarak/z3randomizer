@@ -152,14 +152,23 @@ NewHUD_DrawDungeonCounters:
 
 ;================================================================================
 NewHUD_DrawPrizeIcon:
-        REP #$10
-        SEP #$20
+	REP #$10
+	SEP #$20
 	LDA.b GameMode
-        CMP.b #$12 : BEQ .no_prize
-        CMP.b #$0E : BEQ +
-        LDA.l UpdateHUDFlag : BEQ NewHUD_DrawItemCounter
-	+
-        LDA.w DungeonID
+	CMP.b #$12 : BEQ .no_prize
+	CMP.b #$0E : BNE .check_hud_flag
+	LDA.b GameSubMode
+	CMP.b #$03 : BNE .check_dungeon
+	LDA.w SubModuleInterface
+	CMP.b #$06 : BNE .check_hud_flag
+	LDA.l $7EC22A
+	BRA .know_dungeon
+
+.check_hud_flag
+	LDA.l UpdateHUDFlag : BEQ NewHUD_DrawItemCounter
+.check_dungeon
+	LDA.w DungeonID
+.know_dungeon
 	CMP.b #$1A : BCS .no_prize
 	CMP.b #$04 : BCC .no_prize
 	CMP.b #$08 : BNE .dungeon
@@ -176,19 +185,19 @@ NewHUD_DrawPrizeIcon:
 	LDA.l MapMode
 
 	REP #$30
-        BEQ .prize
+	BEQ .prize
 
 	LDA.w MapField
 	AND.l DungeonItemMasks,X
 	BEQ .no_prize
 
-        .prize
-        TYX
-        LDA.l CrystalPendantFlags_3,X : AND.w #$00FF
-        ASL : TAX
-        LDA.l PrizeIconTiles_Transparent,X : BEQ .no_icon
-        TAY
-        BRA .draw_prize
+	.prize
+	TYX
+	LDA.l CrystalPendantFlags_3,X : AND.w #$00FF
+	ASL : TAX
+	LDA.l PrizeIconTiles_Transparent,X : BEQ .no_icon
+	TAY
+	BRA .draw_prize
 
 .pendant
 	LDY.w #!PTile

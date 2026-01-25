@@ -840,10 +840,10 @@ JSL LoadModifiedIceFloorValue_a01 : NOP
 org $83FC16 ; <- 1FC16 ($A8, $B8, $3D, $D0, $B8, $3D)
 db $B1, $C6, $F9, $C9, $C6, $F9 ; data insert - 2 chests, fat fairy room
 
-; unused item receipts
+; unused item receipts - moved to pyramid fairy
 org $81E97E
-dw $0116 : db $08
-dw $0116 : db $25
+dw $0116 : db $5E
+dw $0116 : db $64
 ;--------------------------------------------------------------------------------
 org $86B489 ; <- 33489 - sprite_smithy_bros.asm : 473 (LDA $7EF359 : CMP.b #$03 : BCS .tempered_sword_or_better)
 JML GetSmithSword : NOP #4

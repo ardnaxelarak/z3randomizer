@@ -464,10 +464,9 @@ db $00 ; #$00 = Original Behavior (default) - #$01 = Book can flip crystal switc
 ; 0x1800A7 - 0x1800AE (unused)
 ;--------------------------------------------------------------------------------
 ; 0x1800AF
-; mtff ffff
+; m-ff ffff
 ;
 ;  m - 0 = only shorten timer on multiworld items, 1 = shorten all items
-;  t - 0 = triforce pieces considered important, 1 = triforce pieces considered junk
 ;  f - number of frames to show items
 ;--------------------------------------------------------------------------------
 org $B080AF ; PC 0x1800AF
@@ -1585,6 +1584,7 @@ dw $0000
 ; STAIRS3
 ; STAIRS4
 ;--------------------------------------------------------------------------------
+org $B0DA00
 RoomHeaders:
 org $B0DA00 : RoomHeader_0000: ; pc 0x185A00
 db $41, $21, $13, $22, $07, $3D, $00, $00, $00, $10, $C0, $00, $00, $04
@@ -2664,7 +2664,7 @@ db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00,
 ;--------------------------------------------------------------------------------
 org $B0EFE0 ; PC 0x186FE0-0x186FEF
 CrystalPendantFlags_3:
-    db $00 ; Sewers
+	db $00 ; Sewers
 	db $00 ; Hyrule Castle
 	db $08 ; Eastern Palace
 	db $09 ; Desert Palace
@@ -2672,7 +2672,7 @@ CrystalPendantFlags_3:
 	db $02 ; Swamp Palace
 	db $01 ; Palace of Darkness
 	db $06 ; Misery Mire
-    db $03 ; Skull Woods
+	db $03 ; Skull Woods
 	db $05 ; Ice Palace
 	db $0A ; Tower of Hera
 	db $04 ; Thieves' Town
