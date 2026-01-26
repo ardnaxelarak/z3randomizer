@@ -368,7 +368,13 @@ CheckEnemies:
 	ASL A
 	TAX
 
-	LDA.l UWSpritesPointers, X
+
+	; get sprite pointer table
+	LDA.l $89C298 : STA.b $04
+	LDA.w #$0089 : STA.b $06
+	TXY
+	; get sprite pointer for room
+	LDA.b [$04], Y
 	INC A ; skip the layered/unlayered indicator
 	STA.b $04
 	LDA.w #bank(UWSpritesData)
