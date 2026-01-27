@@ -558,6 +558,7 @@ MoveLinkMapSprite:
 {
     STA.l $7EC10A ; what we overwrote
     SEP #$20
+    STZ.b ScrapBuffer72
     JSR MoveMapSprite
     REP #$20
     RTL
