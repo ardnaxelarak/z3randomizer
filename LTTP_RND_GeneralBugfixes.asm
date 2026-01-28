@@ -334,6 +334,8 @@ DungeonMapDoorConnectors:
 incbin "menu/door_connectors.3bppc"
 MapSheetD4:
 incbin "menu/map_sheet_d4.3bppc"
+DRSheet14:
+incbin "menu/dr_sheet_14.3bppc"
 
 org $8CD7DF
 incsrc data/playernamecharmap.asm

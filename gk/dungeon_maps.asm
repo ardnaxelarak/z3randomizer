@@ -24,6 +24,8 @@ endmacro
 %WriteGFXSheetPointer($62, DungeonMapIcons5)
 %WriteGFXSheetPointer($63, DungeonMapIcons6)
 
+%WriteGFXSheetPointer($14, DRSheet14)
+
 pullpc
 
 incsrc doors_dungeon_map.asm
