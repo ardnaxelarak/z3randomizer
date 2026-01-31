@@ -1453,8 +1453,8 @@ MoveDoorsMapCursor:
 	BRA .done
 
 .no_move
-	LDA.b #$3C
-	STA.w $012E
+;	LDA.b #$3C
+;	STA.w $012E
 
 .done
 	PLP

@@ -89,7 +89,8 @@ org $80FDEE
 InitializeMirrorHDMA:
 
 org $89D62E
-UWSpritesPointers: ; 0x250 bytes for 0x128 rooms' 16-bit pointers
+;commenting out since this address can move
+;UWSpritesPointers: ; 0x250 bytes for 0x128 rooms' 16-bit pointers
 
 if !FEATURE_FIX_BASEROM
 	org $81DB67

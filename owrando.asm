@@ -6,18 +6,18 @@ OWFlags:
 dw 0
 OWReserved:
 dw 0
+OWFog:
+db 0 ; 0: disabled - 1: fog clears after visiting either world version of a screen - 2: fog clears after visiting the current world version of a screen
 org $aa8010
 OWVersionInfo:
 dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
 
 ;Hooks
-org $82a929
-OWDetectTransitionReturn:
+org $82a92C
+JSL OWDetectEdgeTransition ; JSL Link_CheckForEdgeScreenTransition
 
-org $82a939
-OverworldHandleTransitions_SpecialTrigger:
-JSL OWDetectEdgeTransition
-BCS OWDetectTransitionReturn
+org $82a936
+OverworldHandleTransitions_PerformEdgeTransition:
 
 org $82a999
 jsl OWEdgeTransition : nop #4 ;LDA $02A4E3,X : ORA $7EF3CA
@@ -106,19 +106,33 @@ jsl OWOldManSpeed
 org $8aba6c  ; < ? - Bank0a.asm:474 ()
 jsl OWMapWorldCheck16 : nop
 
-; Mixed Overworld Map
+; Custom Overworld Map
 org $8ABA99
 WorldMap_LoadDarkWorldMap:
 LDA.b GameMode : CMP.b #$14 ; attract module
 BEQ .vanilla_light
-    LDA.l OWMode+1 : AND.b #!FLAG_OW_MIXED : BNE .mixed
+    LDA.l OWFlags : AND.b #!FLAG_OW_CUSTOM_MAP : BNE .custom
         LDA.b OverworldIndex : AND.b #$40
         BEQ .vanilla_light
-    .mixed
-    PHB : PHK : PLB
-        JSL LoadMapDarkOrMixed
-    PLB
+    .custom
+    STZ.b ScrapBuffer72 ; clear tile swap flag
+    JSL LoadMapDarkOrCustom_long
+    NOP #2
+warnpc $8ABAB5
 .vanilla_light ; $0ABAB5
+
+org $8ABB32
+JSL LoadMapOppositeWorld
+
+org $8ABF78
+JSL WorldMap_SkipHandleSprites
+
+org $8ABA22
+JSL MoveLinkMapSprite
+
+org $8ABFF0
+JSL MoveMirrorPortalMapSprite
+; Could insert similar hooks at $8AB860 and $8AB8AC for flute spots
 
 ;(replacing -> LDA $8A : AND.b #$40)
 org $80d8c4  ; < ? - Bank00.asm:4068 ()
@@ -227,6 +241,7 @@ OWMapWorldCheck16:
 {
     lda.b GameMode : cmp.w #$0014 : beq .return ; attract module, return with Z flag cleared
         jsl OWWorldCheck16
+        eor.b ScrapBuffer72 ; apply tile swap flag
     .return
     rtl
 }
@@ -387,51 +402,110 @@ OWMarkVisited:
     RTL
 }
 
-LoadMapDarkOrMixed:
+LoadMapDarkOrCustom:
 {
-    CMP.b #!FLAG_OW_MIXED : REP #$30 : BEQ .mixed
+    CMP.b #!FLAG_OW_CUSTOM_MAP : REP #$30 : BEQ .custom
         LDX.w #$03FE ; draw vanilla Dark World (what we wrote over)
         .copy_next
             LDA.w WorldMap_DarkWorldTilemap,X : STA.w GFXStripes,X
             DEX : DEX : BPL .copy_next
         BRL .end
-    .mixed
+    .custom
         LDX.b OverworldIndex
         LDA.l OWTileWorldAssoc,X
-        STA.b Scrap00
-        LDY.w #$139C
-        LDX.w #$003F
-        .next_screen
-            PHX
-            LDA.l OWTileWorldAssoc,X
-            EOR.b Scrap00
             AND.w #$0040
-            BEQ .light
-                TYX : BRA .copy_screen
-            .light
-                TXA : AND.w #$0024 : LSR : TAX
-                TYA : SEC : SBC.l LWQuadrantOffsets,X
-                TYX : TAY
-            .copy_screen ; more efficient to have X on the right side
-            LDA.w $C739+$00,Y : STA.b $00,X
-            LDA.w $C739+$02,Y : STA.b $02,X
-            LDA.w $C739+$20,Y : STA.b $20,X
-            LDA.w $C739+$22,Y : STA.b $22,X
-            LDA.w $C739+$40,Y : STA.b $40,X
-            LDA.w $C739+$42,Y : STA.b $42,X
-            LDA.w $C739+$60,Y : STA.b $60,X
-            LDA.w $C739+$62,Y : STA.b $62,X
-            TXY : PLX
-            DEY : DEY : DEY : DEY ; move one screen left
-            TXA : AND.w #$0007 : BNE .same_row
-                TYA : SEC : SBC.w #$0060 : TAY ; move one screen row up
+        EOR.b ScrapBuffer72 ; apply tile swap flag
+        BEQ .draw_lw
+            LDA.w #OWMapGridDark
+            BRA .draw_dw
+        .draw_lw
+            LDA.w #OWMapGridLight
+        .draw_dw
+        STA.b Scrap00
+        LDA.w #OWMapGridLight>>16 ; current program bank
+        STA.b Scrap02
+        LDX.w #$139C
+        LDY.w #$003F
+        .next_cell
+            PHY
+            JSR GetOWMapTilemapOffsetToCopy
+            .copy_cell ; more efficient to have X on the right side
+            TAY
+            LDA.w WorldMap_LightWorldTilemap+$00,Y : STA.b $00,X
+            LDA.w WorldMap_LightWorldTilemap+$02,Y : STA.b $02,X
+            LDA.w WorldMap_LightWorldTilemap+$20,Y : STA.b $20,X
+            LDA.w WorldMap_LightWorldTilemap+$22,Y : STA.b $22,X
+            LDA.w WorldMap_LightWorldTilemap+$40,Y : STA.b $40,X
+            LDA.w WorldMap_LightWorldTilemap+$42,Y : STA.b $42,X
+            LDA.w WorldMap_LightWorldTilemap+$60,Y : STA.b $60,X
+            LDA.w WorldMap_LightWorldTilemap+$62,Y : STA.b $62,X
+            PLY
+            DEX : DEX : DEX : DEX ; move one screen left
+            TYA : AND.w #$0007 : BNE .same_row
+                TXA : SEC : SBC.w #$0060 : TAX ; move one screen row up
             .same_row
-            DEX
-        BPL .next_screen
+            DEY
+        BPL .next_cell
     .end
     SEP #$30
     LDA.b #$15 : STA.b NMIINCR ; what we wrote over
-    RTL
+    RTS
+}
+
+GetOWMapTilemapOffsetToCopy:
+{
+    LDA.l OWFog : AND.w #$00FF
+    CMP.w #$0001 : BEQ .parallel_fog
+    CMP.w #$0002 : BNE .no_fog
+
+    LDA.b [Scrap00],Y : AND.w #$00FF
+    PHX
+    TAX
+    BIT.w #$0040
+    BEQ .light_fog
+        LDA.l Overworld_ActualScreenID-$40,X : ORA.w #$0040
+        BRA .dark_fog
+    .light_fog
+        LDA.l Overworld_ActualScreenID,X
+    .dark_fog
+    AND.w #$00FF
+    TAX
+    LDA.l OverworldEventDataWRAM,X
+    .check_visited_flag
+    PLX
+    AND.w #$0080 : BNE .no_fog
+    LDA.w #($D350-$C739)
+    RTS
+
+    .parallel_fog
+    LDA.b [Scrap00],Y : AND.w #$003F
+    PHX
+    TAX
+    LDA.l Overworld_ActualScreenID,X
+    AND.w #$00FF
+    TAX
+    LDA.l OverworldEventDataWRAM,X
+    ORA.l OverworldEventDataWRAM+$40,X
+    BRA .check_visited_flag
+
+    .no_fog
+    LDA.b [Scrap00],Y : AND.w #$0038 : ASL : ASL : ASL : ASL
+    STA.b Scrap03
+    LDA.b [Scrap00],Y
+    BIT.w #$0040
+    BEQ .light
+        AND.w #$0007
+        ASL : ASL : ADC.w #$1000 : ADC.b Scrap03
+        RTS
+    .light
+    PHX
+    AND.w #$0024 : LSR : TAX
+    LDA.b [Scrap00],Y
+    AND.w #$0007
+    ASL : ASL : ADC.w #$1000 : ADC.b Scrap03
+    SEC : SBC.l LWQuadrantOffsets,X
+    PLX
+    RTS
 
     LWQuadrantOffsets:
     dw $1000-$0210 ; top left
@@ -439,6 +513,92 @@ LoadMapDarkOrMixed:
     dw 0,0,0,0,0,0
     dw $0800+$01F0 ; bottom left
     dw $0400+$0210 ; bottom right
+}
+
+LoadMapDarkOrCustom_long:
+{
+    PHB : LDA.b #WorldMap_DarkWorldTilemap>>16 : PHA : PLB
+        LDA.l OWFlags : AND.b #!FLAG_OW_CUSTOM_MAP
+        JSR LoadMapDarkOrCustom
+    PLB
+    RTL
+}
+LoadMapOppositeWorld:
+{
+    LDA.l OWFlags : AND.b #!FLAG_OW_ADJUST_DYNAMIC_MAP_SPRITE_POSITION : BEQ .vanilla
+    LDA.b ScrapBuffer72 : BEQ +
+        LDA.b Joy1B_All : AND.b #$30 : BNE .vanilla
+            STZ.b ScrapBuffer72 ; clear tile swap flag
+            BRA .new_tiles
+    + LDA.b Joy1B_New : AND.b #$30 : BEQ .vanilla
+        LDA.b #$40 : STA.b ScrapBuffer72 ; set tile swap flag
+.new_tiles
+    JSL OverworldMap_InitGfx+$10 ; load palette
+        DEC.w SubModuleInterface
+        LDA.b #$0F : STA.b INIDISPQ
+    JSL LoadMapDarkOrCustom_long
+    LDA.b #$24 : STA.w SFX3
+    PLA : PLA : PEA.w $BBAF ; skip everything upon return
+.vanilla
+    LDA.b Joy1B_New : AND.b #$70 ; what we wrote over
+    RTL
+}
+WorldMap_SkipHandleSprites:
+{
+    LDA.l OWFlags : AND.b #!FLAG_OW_ADJUST_DYNAMIC_MAP_SPRITE_POSITION : BEQ .vanilla
+    LDA.b ScrapBuffer72 : BEQ .vanilla ; skip draw if no tile swap
+        PLA : PLA : PEA.w $C3AF ; exit without drawing sprites
+    RTL 
+.vanilla
+    LDA.b FrameCounter : AND.b #$10 ; what we wrote over
+    RTL
+}
+
+MoveLinkMapSprite:
+{
+    STA.l $7EC10A ; what we overwrote
+    SEP #$20
+    STZ.b ScrapBuffer72
+    JSR MoveMapSprite
+    REP #$20
+    RTL
+}
+
+MoveMirrorPortalMapSprite:
+{
+    STA.l $7EC109 ; what we overwrote
+    JSR MoveMapSprite
+    RTL
+}
+
+MoveMapSprite:
+{
+    LDA.l OWFlags : AND.b #!FLAG_OW_ADJUST_DYNAMIC_MAP_SPRITE_POSITION : BEQ .return
+    LDA.l $7EC10B : AND.b #$0E : LSR
+    STA.b Scrap00
+    LDA.l $7EC109 : AND.b #$0E : ASL : ASL
+    ADC.b Scrap00
+    STA.b Scrap00
+    LDX.b OverworldIndex
+    LDA.l OWTileWorldAssoc,X
+    LDX.b Scrap00
+    AND.b #$40
+    BEQ .light
+        LDA.l OWMapGridDarkPositionByAbsolutePosition,X
+        BRA .dark
+    .light
+        LDA.l OWMapGridLightPositionByAbsolutePosition,X
+    .dark
+    TAX
+    AND.b #$07 : ASL
+    STA.b Scrap00
+    LDA.l $7EC10B : AND.b #$01 : ORA.b Scrap00 : STA.l $7EC10B
+    TXA
+    AND.b #$38 : LSR : LSR
+    STA.b Scrap00
+    LDA.l $7EC109 : AND.b #$01 : ORA.b Scrap00 : STA.l $7EC109
+    .return
+    RTS
 }
 
 OWBonkDropPrepSprite:
@@ -609,27 +769,26 @@ OWBonkDrops:
     JSL OWBonkSpritePrep
 
     .mark_collected ; S = Collected, FlagBitmask, X (row + 2)
-    PLA : BNE + ; S = FlagBitmask, X (row + 2)
-    TYX : JSL Sprite_IsOnscreen : BCC +
-        LDA.b IndoorsFlag : BEQ ++
+    PLA : BEQ + : - : JMP .return : + ; S = FlagBitmask, X (row + 2)
+    TYX : JSL Sprite_IsOnscreen : BCC -
+        LDA.b IndoorsFlag : BEQ +
             LDA.l RoomDataWRAM[$0120].high : ORA.b 1,S : STA.l RoomDataWRAM[$0120].high
             LDA.w $0400 : ORA.b 1,S : STA.w $0400
             BRA .increment_collection
-        ++
+        +
         LDA.b OverworldIndex
         BIT.b #$40 : BEQ + 
                 LDA.l ProgressIndicator : CMP.b #$02
-                LDA.b OverworldIndex : BCS ++ : AND.b #$BF
-            ++
+            LDA.b OverworldIndex : BCS + : AND.b #$BF
         +
         TAX : LDA.l OverworldEventDataWRAM,X : ORA.b 1,S : STA.l OverworldEventDataWRAM,X
         
         .increment_collection
         REP #$20
             LDA.l TotalItemCounter : INC : STA.l TotalItemCounter
-            INC.w UpdateHUDFlag
         SEP #$20
-    + BRA .return
+        LDA.b #$01 : STA.l UpdateHUDFlag
+        BRA .return
 
     ; spawn itemget item
     .spawn_item ; A = item id ; Y = bonk sprite slot ; S = Collected, FlagBitmask, X (row + 2)
@@ -738,20 +897,29 @@ OWBonkSpritePrep:
 org $aa9000
 OWDetectEdgeTransition:
 {
-    JSL OWDestroyItemSprites
+    JSL Link_CheckForEdgeScreenTransition ; what we wrote over
+    BCS .return
     STZ.w RandoOverworldWalkDist
     LDA.l OWMode : ORA.l OWMode+1 : BEQ .vanilla
+        PHY
         JSR OWShuffle
-        LDA.w RandoOverworldTargetEdge : BMI .special
+        PLY
+        LDA.w RandoOverworldTargetEdge : BMI .specialOrDisabled
     .vanilla
-    REP #$31 : LDX.b Scrap02 : LDA.b OverworldMap16Buffer ; what we wrote over
+    CLC ; allow transition
     RTL
+    .specialOrDisabled
+    CMP.b #$FF : BNE .special
+    STZ.w RandoOverworldTargetEdge
+    PHB
+    JML Link_CheckForEdgeScreenTransition_prevent_transition
     .special
     REP #$30
     AND.w #$0003 : TAY : ASL : TAX
     LDA.w #$007F : STA.w RandoOverworldTargetEdge
     JSR OWLoadSpecialArea
     SEC
+    .return
     RTL
 }
 OWDetectSpecialTransition:
@@ -761,17 +929,23 @@ OWDetectSpecialTransition:
     TXA : AND.w #$0002 : LSR
     STA.w RandoOverworldTerrain
     LDA.l OWSpecialDestIndex,X : BIT.w #$0080 : BEQ .switch_to_edge
+    AND.w #$00FF : CMP.w #$00FF : BEQ .disabled
     AND.w #$0003 : TAY : ASL : TAX
     .normal
     JSR OWLoadSpecialArea
     .return
     RTL
 
+    .disabled
+    SEP #$30
+    STZ.w RandoOverworldTargetEdge
+    RTL
+
     .switch_to_edge
     STA.w RandoOverworldTargetEdge
     LDA.l OWEdgeDataOffset,X : STA.w RandoOverworldEdgeAddr
     PLA : SEP #$30 : PLA ; delete 3 bytes from stack
-    JSL Link_CheckForEdgeScreenTransition : BCS .return ; Link_CheckForEdgeScreenTransition
+    JSL Link_CheckForEdgeScreenTransition : BCS .return
     LDA.l Overworld_CheckForSpecialOverworldTrigger_Direction,X : STA.b Scrap00 : CMP.b #$08 : BNE .hobo
         LSR : STA.b LinkPosY : STZ.b BG2V ; move Link and camera to edge
         LDA.b #$06 : STA.b Scrap02
@@ -790,16 +964,15 @@ OWDetectSpecialTransition:
         LDA.b #$FF : STA.b LinkRecoilZ : STA.b $C7
         STZ.b $3D : STZ.b LinkSpeed : STZ.w $032B : STZ.w LinkDashing : STZ.b LinkState
     .not_dashing
-    PLA : REP #$31 : PLA ; delete 3 bytes from stack
-    LDX.b Scrap02
-    LDA.b OverworldMap16Buffer
-    JML OverworldHandleTransitions_SpecialTrigger+6
+    PLA : PLA : PLA ; delete 3 bytes from stack
+    JML OverworldHandleTransitions_PerformEdgeTransition
 }
 OWEdgeTransition:
 {
     LDA.l OWMode : ORA.l OWMode+1 : BEQ .unshuffled
     LDY.w RandoOverworldTargetEdge : STZ.w RandoOverworldTargetEdge
     CPY.b #$7F : BEQ .unshuffled
+        JSL OWDestroyItemSprites
         REP #$10
         LDX.w RandoOverworldEdgeAddr
         PHB : PHK : PLB
@@ -1488,7 +1661,7 @@ dw $0b28, $0b38, $0010, $0b30, $1515, $1018, $0001, $000e
 dw $0b70, $0ba0, $0030, $0b88, $1515, $1020, $0000, $000f
 dw $0a40, $0b10, $00d0, $0aa8, $1d1d, $1006, $0000, $0010
 dw $0350, $0390, $0040, $0370, $1821, $2060, $0000, $0011
-dw $0670, $06a8, $0038, $068c, $1b23, $2002, $0000, $0012
+dw $0670, $06a8, $0038, $068c, $1b23, $2004, $0000, $0012
 dw $0898, $09b0, $0118, $0924, $1b24, $2054, $0000, $0013
 dw $0a40, $0ba0, $0160, $0af0, $2525, $100e, $0000, $0014
 dw $0c70, $0c90, $0020, $0c80, $1e26, $2002, $0000, $0015
@@ -1520,7 +1693,7 @@ dw $0b28, $0b38, $0010, $0b30, $5555, $1018, $0001, $002e
 dw $0b70, $0ba0, $0030, $0b88, $5555, $1020, $0000, $002f
 dw $0a40, $0b10, $00d0, $0aa8, $5d5d, $1006, $0000, $0030
 dw $0350, $0390, $0040, $0370, $5861, $2060, $0000, $0031
-dw $0670, $06a8, $0038, $068c, $5b63, $2002, $0000, $0032
+dw $0670, $06a8, $0038, $068c, $5b63, $2004, $0000, $0032
 dw $0898, $09b0, $0118, $0924, $5b64, $2054, $0000, $0033
 dw $0a40, $0ba0, $0160, $0af0, $6565, $100e, $0000, $0034
 dw $0c70, $0c90, $0020, $0c80, $5e66, $2002, $0000, $0035
@@ -1827,16 +2000,42 @@ db $74, $4e, $10, $b1, $00, $1c
 UWBonkPrizeData:
 db $ff, $00, $02, $b5, $00, $08
 
-; temporary fix - murahdahla replaces one of the bonk tree prizes
-;    so we copy the sprite table here and update the pointer
-;    longterm solution should be to spawn in murahdahla separately
-org $89AE2A
-Overworld_Sprites_Screen1A_2:
-db $08, $0F, $41 ; yx:{ 0x080, 0x0F0 }
-db $0E, $0C, $41 ; yx:{ 0x0E0, 0x0C0 }
-db $11, $0D, $E3 ; yx:{ 0x110, 0x0D0 }
-db $18, $0A, $D8 ; yx:{ 0x180, 0x0A0 }
-db $18, $0F, $45 ; yx:{ 0x180, 0x0F0 }
-db $FF ; END
-org $89CA55
-dw Overworld_Sprites_Screen1A_2&$FFFF
+org $AABC80 ;PC 153C80
+OWMapGridLight:
+db $00, $01, $02, $03, $04, $05, $06, $07
+db $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
+db $10, $11, $12, $13, $14, $15, $16, $17
+db $18, $19, $1A, $1B, $1C, $1D, $1E, $1F
+db $20, $21, $22, $23, $24, $25, $26, $27
+db $28, $29, $2A, $2B, $2C, $2D, $2E, $2F
+db $30, $31, $32, $33, $34, $35, $36, $37
+db $38, $39, $3A, $3B, $3C, $3D, $3E, $3F
+OWMapGridDark:
+db $40, $41, $42, $43, $44, $45, $46, $47
+db $48, $49, $4A, $4B, $4C, $4D, $4E, $4F
+db $50, $51, $52, $53, $54, $55, $56, $57
+db $58, $59, $5A, $5B, $5C, $5D, $5E, $5F
+db $60, $61, $62, $63, $64, $65, $66, $67
+db $68, $69, $6A, $6B, $6C, $6D, $6E, $6F
+db $70, $71, $72, $73, $74, $75, $76, $77
+db $78, $79, $7A, $7B, $7C, $7D, $7E, $7F
+
+org $AABD00 ;PC 153D00
+OWMapGridLightPositionByAbsolutePosition:
+db $00, $01, $02, $03, $04, $05, $06, $07
+db $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
+db $10, $11, $12, $13, $14, $15, $16, $17
+db $18, $19, $1A, $1B, $1C, $1D, $1E, $1F
+db $20, $21, $22, $23, $24, $25, $26, $27
+db $28, $29, $2A, $2B, $2C, $2D, $2E, $2F
+db $30, $31, $32, $33, $34, $35, $36, $37
+db $38, $39, $3A, $3B, $3C, $3D, $3E, $3F
+OWMapGridDarkPositionByAbsolutePosition:
+db $00, $01, $02, $03, $04, $05, $06, $07
+db $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
+db $10, $11, $12, $13, $14, $15, $16, $17
+db $18, $19, $1A, $1B, $1C, $1D, $1E, $1F
+db $20, $21, $22, $23, $24, $25, $26, $27
+db $28, $29, $2A, $2B, $2C, $2D, $2E, $2F
+db $30, $31, $32, $33, $34, $35, $36, $37
+db $38, $39, $3A, $3B, $3C, $3D, $3E, $3F
