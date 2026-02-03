@@ -49,27 +49,27 @@ WorldMapIcon_pos:
 .hc
 dw $FF00, $FF00, $FF00, $FF00, $FF00, $FF00
 .ep
-dw $0F30, $06E0, $FF00, $FF00, $0F30, $06E0
+dw $0F40, $0660, $FF00, $FF00, $0F40, $0660
 .dp
-dw $0170, $0E50, $FF00, $FF00, $0170, $0E50
+dw $0140, $0D00, $FF00, $FF00, $0140, $0D00
 .at
 dw $FF00, $FF00, $FF00, $FF00, $FF00, $FF00
 .sp
-dw $8790, $0FD0, $FF00, $FF00, $8790, $0FD0
+dw $8778, $0F50, $FF00, $FF00, $8778, $0F50
 .pod
-dw $8F30, $06E0, $FF00, $FF00, $8F30, $06E0
+dw $8F40, $0660, $FF00, $FF00, $8F40, $0660
 .mm
-dw $8160, $0D80, $FF00, $FF00, $8160, $0D80
+dw $8148, $0D00, $FF00, $FF00, $8148, $0D00
 .sw
-dw $80F0, $0160, $FF00, $FF00, $80F0, $0160
+dw $80B0, $00C0, $FF00, $FF00, $80B0, $00C0
 .ip
-dw $8CB0, $0E80, $FF00, $FF00, $8CB0, $0E80
+dw $8CA0, $0E00, $FF00, $FF00, $8CA0, $0E00
 .toh
-dw $0900, $0130, $FF00, $FF00, $0900, $0130
+dw $0900, $0100, $FF00, $FF00, $0900, $0100
 .tt
-dw $8240, $0840, $FF00, $FF00, $8240, $0840
+dw $81F8, $0800, $FF00, $FF00, $81F8, $0800
 .tr
-dw $8F30, $01B0, $FF00, $FF00, $8F30, $01B0
+dw $8F20, $0100, $FF00, $FF00, $8F20, $0100
 .gt
 dw $FF00, $FF00, $FF00, $FF00, $FF00, $FF00
 
@@ -262,8 +262,8 @@ DrawPrizesOverride:
 
 			; determine if draw and/or continue
 			JSR WorldMap_ValidateCoords : BCS .advance
-			JSR WorldMap_DrawTileOverlay
 			JSR WorldMap_DrawTile
+			JSR WorldMap_DrawTileOverlay
 		.advance
 		LDY.b Scrap05 : DEY #2 : BMI + : JMP .next_dungeon : +
 	PLB
@@ -321,18 +321,14 @@ RTS
 
 WorldMap_DrawTile:
 	LDA.b Scrap00 : PHA
-	SEP #$20
-	LDX.b Scrap0B : TXA : STA.b (OAMPtr+2)
-	INC.b OAMPtr+2
-	REP #$20
 	LDA.l $7EC10A : BIT.w #$4000 : SEP #$20 : BNE .raw_coords ; use raw OAM coordinates
-		JSR WorldMap_CalculateOAMCoordinates
-		BCS .apply_offsets
-		REP #$20
-		BRA .exit
-	.raw_coords
-		STA.b Scrap0E
-		LDA.l $7EC108 : STA.b Scrap0F
+	JSR WorldMap_CalculateOAMCoordinates
+	BCS .apply_offsets
+	REP #$20
+	BRA .exit
+.raw_coords
+	STA.b Scrap0E
+	LDA.l $7EC108 : STA.b Scrap0F
 .apply_offsets
 	LDX.b Scrap0A : BNE .aligned ; prize number/overlay: no offset
 	LDX.b Scrap0B : BEQ +
@@ -345,6 +341,8 @@ WorldMap_DrawTile:
 	LDA.b Scrap0E : SEC : SBC.b #$04 : STA.b Scrap0E
 	LDA.b Scrap0F : SBC.b #$04 : STA.b Scrap0F
 .aligned
+	LDX.b Scrap0B : TXA : STA.b (OAMPtr+2)
+	INC.b OAMPtr+2
 	REP #$20
 	LDA.b Scrap0E : STA.b (OAMPtr)
 	INC.b OAMPtr : INC.b OAMPtr
@@ -508,6 +506,45 @@ org $8AC3B6
 	JMP WorldMap_CalculateOAMCoordinates_exit_successfully
 
 warnpc $8AC433
+
+; most of this function is copied from the original, but rearranged
+org $8AB7F3
+FluteMenu_HandleSprites:
+	LDA.l $7EC108 : PHA
+	LDA.l $7EC109 : PHA
+	LDA.l $7EC10A : PHA
+	LDA.l $7EC10B : PHA
+	JSL FluteMenu_MoveLinkSprite ; override vanilla (LDA.b $1A : AND.b #$10)
+	BEQ .continue
+	JSR WorldMap_CalculateOAMCoordinates : BCC .continue
+		LDA.b Scrap0E : SEC : SBC.b #$04 : STA.b Scrap0E
+		LDA.b Scrap0F : SEC : SBC.b #$04 : STA.b Scrap0F
+		LDA.b #$00 : STA.b Scrap0D
+		LDA.b #$3E : STA.b Scrap0C
+		JSL OWMapFluteCancelIcon ; override vanilla (LDA.b #$02 : STA.b Scrap0B)
+		LDX.b #$10 : JSR WorldMap_HandleSpriteBlink
+.continue
+warnpc $8AB831
+
+; most of this function is copied from the original, but rearranged
+org $8ABF78
+WorldMap_HandleSprites:
+	LDA.l $7EC108 : PHA
+	LDA.l $7EC109 : PHA
+	LDA.l $7EC10A : PHA
+	LDA.l $7EC10B : PHA
+	JSL WorldMap_SkipHandleSprites ; override vanilla (LDA.b $1A : AND.b #$10)
+	BEQ .continue
+	JSR WorldMap_CalculateOAMCoordinates : BCC .continue
+		LDA.b Scrap0E : SEC : SBC.b #$04 : STA.b Scrap0E
+		LDA.b Scrap0F : SEC : SBC.b #$04 : STA.b Scrap0F
+		LDA.b #$00 : STA.b Scrap0D
+		LDA.b #$3E : STA.b Scrap0C
+		LDA.b #$02 : STA.b Scrap0B
+		LDX.b #$00 : JSR WorldMap_HandleSpriteBlink
+.continue
+warnpc $8ABFB6
+
 pullpc
 
 WorldMap_LoadChrHalfSlot:
