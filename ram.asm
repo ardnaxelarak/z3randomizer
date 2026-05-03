@@ -597,6 +597,8 @@ HUDMultiIndicator = $7EC790       ;
 HUDKeysObtained = $7EC7A2         ;
 HUDKeysSlash = $7EC7A4            ;
 HUDKeysTotal = $7EC7A6            ;
+HUDKeysExtraPlus = $7EC7E4        ;
+HUDKeysExtraCount = $7EC7E6       ;
                                   ;
 BigRAM = $7EC900                  ; Big buffer of free ram (0x1F00)
 ItemGFXStack = $7ECB00            ; Pointers to source of decompressed item tiles deferred to NMI loading.

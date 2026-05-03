@@ -2686,9 +2686,9 @@ org $B0EFFF ; PC 0x186FFF
 BallNChainDungeon: ; Dungeon ID where ball n chain guard is located. Write
 db $02             ; $FF to count ball and chain item for collection stats.
 
-;--------------------------------------------------------------------------------
-; 0x187000 - 18700F (unused)
-;--------------------------------------------------------------------------------
+org $B0F000
+ExtraChestKeys: ; PC 0x187000-0x18700F
+db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 org $B0F010
 ChestKeys: ; PC 0x187010-0x18701F
