@@ -1,10 +1,11 @@
 !BlankTile = $207F
 !SlashTile = $2830
+!PlusTile = $2404
 !HyphenTile = $2405
 !LTile = $2D68
 !DTile = $2D60
-!RedSquare = $345E
 !BlueSquare = $2C5E
+!BossIcon = $253C
 
 DrHudOverride:
 	PHB
@@ -46,7 +47,7 @@ DRHUD_BossIndicator:
 	SEP #$20
 	BEQ .draw_indicator
 	LDA.l CompassBossIndicator, x : CMP.b RoomIndex : BNE .draw_indicator
-	LDY.w #!RedSquare
+	LDY.w #!BossIcon
 .draw_indicator
 	STY.w HUDMultiIndicator
 	BRA DRHUD_DrawCurrentDungeonIndicator
@@ -71,13 +72,12 @@ DRHUD_DrawCurrentDungeonIndicator: ; mX
 	CMP.b #$06 : BEQ .draw_indicator
 
 .get_indicator
-	REP #$20 : LDA.l DungeonReminderTable,X : TAY
-	SEP #$20
+	LDY.w #$2C28
 .draw_indicator
 	STY.w HUDCurrentDungeonWorld
 
 DRHUD_DrawKeyCounter:
-	LDA.l DRFlags : AND.b #$04 : BEQ DRHUD_Finished
+	LDA.l DRFlags : AND.b #$04 : BEQ .to_finished
 	LDA.l CompassMode : BIT.b #$03 : BEQ DRHUD_Finished
 	REP #$20
 	BIT.w #$0002 : BNE .skip_map_check
@@ -90,8 +90,17 @@ DRHUD_DrawKeyCounter:
 	LDA.l GenericKeys : LSR : BCS .total_only
 	LDA.w DungeonCollectedKeys, X : JSR ConvertToDisplay : STA.w HUDKeysObtained
 	LDA.w #!SlashTile : STA.w HUDKeysSlash
+
+	LDA.l ExtraChestKeys, X : AND.w #$00FF : BEQ .total_only
+	JSR ConvertToDisplay : STA.w HUDKeysExtraCount
+	LDA.w #!PlusTile : STA.w HUDKeysExtraPlus
+
 .total_only
-	LDA.l ChestKeys, x : JSR ConvertToDisplay : STA.w HUDKeysTotal
+	SEP #$20
+	LDA.l ChestKeys, X : SEC : SBC.l ExtraChestKeys, X
+	REP #$20
+	JSR ConvertToDisplay : STA.w HUDKeysTotal
+.to_finished
 	JMP DRHUD_Finished
 
 OWRHUD_DrawWorldIndicator:
@@ -292,17 +301,29 @@ BossStatus:
 	; default palette 3 - white
 	LDA.l DungeonReminderTable, X : RTS
 
-ConvertToDisplay:
-    and.w #$00ff : cmp.w #$000a : !BLT +
-        !ADD.w #$2519 : rts
-    + !ADD.w #$2490 : rts
+ConvertToDisplay: ; transparent background
+	AND.w #$00FF
+		CMP.w #$000A : BCC .under10
+		CMP.w #$000C : BCC .under12
+	.over11
+		CLC : ADC.w #$2553 : RTS
+	.under12
+		CLC : ADC.w #$2519 : RTS
+	.under10
+		CLC : ADC.w #$2490 : RTS
 
-ConvertToDisplay2:
-    and.w #$00ff : beq ++
-        cmp.w #$000a : !BLT +
-            !ADD.w #$2517 : rts ; 2580 with 258A as "A" for non transparent digits
-        + !ADD.w #$2816 : rts
-    ++ lda.w #$2827 : rts ; 0/O for 0 or placeholder digit ;2483
+ConvertToDisplay2: ; solid background
+	AND.w #$00FF : BEQ .zero
+		CMP.w #$000A : BCC .under10
+		CMP.w #$000C : BCC .under12
+	.over11
+		CLC : ADC.w #$2580 : RTS
+	.under12
+		CLC : ADC.w #$2517 : RTS
+	.under10
+		CLC : ADC.w #$2816 : RTS
+	.zero
+		LDA.w #$2827 : RTS
 
 CountAbsorbedKeys:
 	JML IncrementSmallKeysNoPrimary

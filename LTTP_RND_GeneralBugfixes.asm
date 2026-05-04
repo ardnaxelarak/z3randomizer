@@ -213,6 +213,7 @@ incsrc gk/variable_ganon_vulnerability.asm
 incsrc gk/pseudoflute.asm
 incsrc gk/fast_junk.asm
 incsrc gk/dungeon_maps.asm
+incsrc gk/dungeon_indicator.asm
 print "End of B9: ", pc
 
 warnpc $B9EE00

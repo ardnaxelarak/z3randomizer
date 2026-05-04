@@ -34,6 +34,7 @@ incsrc map_bg3.asm
 incsrc dungeon_switch.asm
 incsrc draw_loot.asm
 incsrc check_loot.asm
+incsrc loot_hud.asm
 incsrc blink_loot.asm
 incsrc data/doors_display.asm
 incsrc data/spiral_stairs.asm
