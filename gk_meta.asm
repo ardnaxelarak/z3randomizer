@@ -13,7 +13,8 @@ GKRomVersion:
 ; $01 = Dungeon Maps
 ;  .., $01 = Dark rooms don't show on map from visition
 ;  .., $02 = OW Fog and Grid modes
-db $01, $02, $00
+;  .., $03 = Loot level of current supertile in HUD
+db $01, $03, $00
 ;--------------------------------------------------------------------------------
 
 ;================================================================================
