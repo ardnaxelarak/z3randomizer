@@ -15,11 +15,17 @@ UpdateLootHUD:
 	LDA.b $08 : PHA
 	LDA.b $0E : PHA
 
+	LDA.l DRMode
+	BNE +
+		LDA.b RoomIndex
+		BRA .check
++
 	JSL DetectLinksSection
 	INC A
 	XBA
 	ASL A : ASL A : ASL A : ASL A
 	ORA.b RoomIndex
+.check
 	JSL CheckLoot
 
 	SEP #$30

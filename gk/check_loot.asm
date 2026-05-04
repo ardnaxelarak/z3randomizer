@@ -31,8 +31,9 @@ CheckLoot:
 	STA.b $0E
 
 +	LDA.w DungeonID
-	CMP.w #$0010
-	BCS .skip_dungeon_checks
+	AND.w #$00FF
+	CMP.w #$00FF
+	BEQ .skip_dungeon_checks
 
 	TAX
 
@@ -628,21 +629,21 @@ GetIncomingStairSection:
 	STA.b $CC
 
 	LDA.b $CA
-	AND.w #$01FF
+	AND.w #$00FF
 	ASL A
 	TAX
 	LDA.l SplitRooms, X
 	TAX
 
 	LDA.l SplitRooms, X
-	AND.w #$01FF
+	AND.w #$00FF
 	STA.b $CE
 	BEQ .found
 
 	INX
 .check_next_section
 	LDA.l SplitRooms+0, X
-	AND.w #$01FF
+	AND.w #$00FF
 	AND.b $CC
 	BNE .found
 	TXA : CLC : ADC.w #$000D : TAX
