@@ -209,7 +209,11 @@ ShowItems:
 .visited_tile
 	db $01
 .reserved
-	skip 4
+	skip 2
+.hud_cap
+	db $FF
+.cave_cap
+	db $01
 warnpc $B9FF10
 
 org $B9FF10

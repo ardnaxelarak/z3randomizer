@@ -22,11 +22,26 @@ UpdateLootHUD:
 	ORA.b RoomIndex
 	JSL CheckLoot
 
+	SEP #$30
+	CMP.l ShowItems_hud_cap
+	BCC +
+	LDA.l ShowItems_hud_cap
++
+
+	LDX.w DungeonID
+	CPX.b #$FF
+	BNE +
+	CMP.l ShowItems_cave_cap
+	BCC +
+	LDA.l ShowItems_cave_cap
++
+
+	REP #$30
+
 	ASL A : TAX
 	LDA.l HUDLootTypeIcons, X
 	STA.w EnemyDropIndicator
 
-	REP #$30
 	PLA : STA.b $0E
 	PLA : STA.b $08
 	PLA : STA.b $06
