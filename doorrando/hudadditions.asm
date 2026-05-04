@@ -4,8 +4,8 @@
 !HyphenTile = $2405
 !LTile = $2D68
 !DTile = $2D60
-!RedSquare = $345E
 !BlueSquare = $2C5E
+!BossIcon = $253C
 
 DrHudOverride:
 	PHB
@@ -47,7 +47,7 @@ DRHUD_BossIndicator:
 	SEP #$20
 	BEQ .draw_indicator
 	LDA.l CompassBossIndicator, x : CMP.b RoomIndex : BNE .draw_indicator
-	LDY.w #!RedSquare
+	LDY.w #!BossIcon
 .draw_indicator
 	STY.w HUDMultiIndicator
 	BRA DRHUD_DrawCurrentDungeonIndicator
@@ -72,8 +72,7 @@ DRHUD_DrawCurrentDungeonIndicator: ; mX
 	CMP.b #$06 : BEQ .draw_indicator
 
 .get_indicator
-	REP #$20 : LDA.l DungeonReminderTable,X : TAY
-	SEP #$20
+	LDY.w #$2C28
 .draw_indicator
 	STY.w HUDCurrentDungeonWorld
 

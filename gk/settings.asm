@@ -146,6 +146,25 @@ dw $25A4, $25A4 ; Reserved
 dw $25A4, $25A4 ; Reserved
 
 ; $B9FB40
+HUDLootTypeIcons:
+dw $287F ; 00 - nothing
+dw $295C ; 01 - unknown - dot
+dw $2954 ; 02 - junk - pot
+dw $2950 ; 03 - small key
+dw $2952 ; 04 - triforce piece
+dw $2955 ; 05 - safety - plus
+dw $2953 ; 06 - less important item - small chest
+dw $2957 ; 07 - map
+dw $2D56 ; 08 - compass
+dw $2950 ; 09 - small key
+dw $2951 ; 0A - big key
+dw $295A ; 0B - important inventory item - big chest
+dw $2D58 ; 0C - pendant
+dw $2D59 ; 0D - crystal
+dw $2952 ; 0E - triforce piece
+dw $295B ; 0F - triforce
+
+; $B9FB60
 
 warnpc $B9FE00
 org $B9FE00
@@ -205,4 +224,8 @@ ItemSources:
 
 ; $B9FF11
 AlwaysShowCompass:
+	db $01
+
+; $B9FF12
+ShowLootInHUD:
 	db $01

@@ -17,7 +17,7 @@ CheckLoot:
 	STA.b $0E
 
 	LDA.b $CA
-	AND.w #$00FF
+	AND.w #$01FF
 	ASL A
 	TAX
 
@@ -31,6 +31,9 @@ CheckLoot:
 	STA.b $0E
 
 +	LDA.w DungeonID
+	CMP.w #$0010
+	BCS .skip_dungeon_checks
+
 	TAX
 
 	LDA.l MapField
@@ -51,6 +54,8 @@ CheckLoot:
 	BCC +
 	STA.b $0E
 +
+
+.skip_dungeon_checks
 
 	LDA.l ItemSources : BIT.w #$0001 : BEQ +
 	JSR CheckChests
@@ -82,7 +87,7 @@ CheckLoot:
 
 CheckChests:
 	LDA.b $CA
-	AND.w #$00FF
+	AND.w #$01FF
 	STA.b $00
 	ASL A
 	TAX
@@ -141,7 +146,7 @@ CheckBoss:
 
 +
 	LDA.b $CA
-	AND.w #$00FF
+	AND.w #$01FF
 	STA.b $04
 
 	LDX.w #$FFFA
@@ -196,7 +201,7 @@ CheckBoss:
 
 CheckPrize:
 	LDA.b $CA
-	AND.w #$00FF
+	AND.w #$01FF
 	STA.b $04
 
 	LDX.w #$FFFD
@@ -232,7 +237,7 @@ CheckPrize:
 
 CheckPots:
 	LDA.b $CA
-	AND.w #$00FF
+	AND.w #$01FF
 	ASL A
 	TAX
 
@@ -298,7 +303,7 @@ CheckPots:
 +
 
 	LDA.b $CA
-	AND.w #$00FF
+	AND.w #$01FF
 	ASL A
 	TAX
 if !FEATURE_FIX_BASEROM
@@ -336,7 +341,7 @@ CheckJunkPot:
 	+
 
 	LDA.b $CA
-	AND.w #$00FF
+	AND.w #$01FF
 	ASL A
 	TAX
 	LDA.l PotCollectionRateTable, X
@@ -364,7 +369,7 @@ endif
 
 CheckEnemies:
 	LDA.b $CA
-	AND.w #$00FF
+	AND.w #$01FF
 	ASL A
 	TAX
 
@@ -454,7 +459,7 @@ CheckEnemies:
 +
 
 	LDA.b $CA
-	AND.w #$00FF
+	AND.w #$01FF
 	ASL A
 	TAX
 
@@ -532,7 +537,7 @@ macro DefineGetFooSection(type, offset)
 Get<type>Section:
 	PHX
 	LDA.b $CA
-	AND.w #$00FF
+	AND.w #$01FF
 	ASL A
 	TAX
 	LDA.l SplitRooms, X
@@ -580,13 +585,13 @@ Check<type>Section:
 	STA.b $CC
 
 	LDA.b $CB
-	AND.w #$00FF
+	AND.w #$00F0
 	BEQ .yes
 
 	JSR Get<type>Section
 
 	LDA.b $CB
-	AND.w #$00FF
+	AND.w #$00F0
 	LSR A : LSR A : LSR A : LSR A
 	DEC A
 	CMP.b $CE
@@ -623,21 +628,21 @@ GetIncomingStairSection:
 	STA.b $CC
 
 	LDA.b $CA
-	AND.w #$00FF
+	AND.w #$01FF
 	ASL A
 	TAX
 	LDA.l SplitRooms, X
 	TAX
 
 	LDA.l SplitRooms, X
-	AND.w #$00FF
+	AND.w #$01FF
 	STA.b $CE
 	BEQ .found
 
 	INX
 .check_next_section
 	LDA.l SplitRooms+0, X
-	AND.w #$00FF
+	AND.w #$01FF
 	AND.b $CC
 	BNE .found
 	TXA : CLC : ADC.w #$000D : TAX

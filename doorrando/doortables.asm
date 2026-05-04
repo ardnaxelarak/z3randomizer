@@ -599,7 +599,7 @@ skip $10
 BigKeyStatus: ;27f040 (status 2 indicate BnC guard)
 dw $0002, $0002, $0001, $0001, $0000, $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0001, $0000, $0000
 DungeonReminderTable: ;27f060
-dw $2D50, $2D50, $2D51, $2D52, $2D54, $2D56, $2D55, $2D5A, $2D57, $2D59, $2D53, $2D58, $2D5B, $2D5C, $0000, $0000
+dw $2DA4, $2DA4, $2DA5, $2DA6, $2DA8, $2DAA, $2DA9, $2DAE, $2DAB, $2DAD, $2DA7, $2DAC, $2DAF, $2DB0, $0000, $0000
 TotalLocationsLow: ;27f080
 db $08, $08, $06, $06, $02, $00, $04, $08, $08, $08, $06, $08, $02, $07, $00, $00
 TotalLocationsHigh: ;27f090

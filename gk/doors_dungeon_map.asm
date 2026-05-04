@@ -172,6 +172,7 @@ DrawSingleRoomLoot:
 	STA.w GFXStripes+$0C, Y
 
 	LDA.b $CA
+	AND.w #$F0FF
 	JSL CheckLoot
 
 	ASL A : ASL A : ASL A
@@ -2105,6 +2106,13 @@ DrawDoorsStairs:
 
 DetectLinksSection:
 	LDA.b RoomIndex
+	CMP.w #$0128
+	BCC +
+
+	LDA.w #$0000
+	RTL
++
+
 	ASL A
 	TAX
 	LDA.l SplitRooms, X

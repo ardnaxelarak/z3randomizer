@@ -291,10 +291,10 @@ RTL
         REP #$30
 ;-------------------------------------------------------------------------------
 	; dungeon names
-	LDA.w #$2D50
+	LDA.w #$2DA4
 	LDY.w #00
 
-        .next_dungeon_name
+	.next_dungeon_name
 	LDX.w .dungeon_positions,Y
 	STA.w GFXStripes+$0646,X
 	INC
@@ -310,10 +310,10 @@ RTL
 	STA.w GFXStripes+$0706,X
 
 	DEX : DEX
-        BPL --
+	BPL --
 
 	LDA.l HudFlag : AND.w #$0020 : BEQ +
-	        JMP .maps_and_compasses
+		JMP .maps_and_compasses
 ;-------------------------------------------------------------------------------
         +
 	LDA.l HUDDungeonItems : AND.w #$0001 : BNE +

@@ -61,7 +61,24 @@ SplitRooms:
 %d(.no) : %d(.d1) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.d6) : %d(.no)
 %d(.no) : %d(.no) : %d(.no) : %d(.db) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
 
-%d(.no)
+; E0
+%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
+%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
+
+; F0
+%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
+%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.no)
+
+; 100
+%d(.no) : %d(.101) : %d(.no) : %d(.103) : %d(.no) : %d(.no) : %d(.106) : %d(.107)
+%d(.no) : %d(.no) : %d(.no) : %d(.no) : %d(.10c) : %d(.no) : %d(.10e) : %d(.no)
+
+; 110
+%d(.no) : %d(.no) : %d(.112) : %d(.no) : %d(.114) : %d(.115) : %d(.no) : %d(.no)
+%d(.no) : %d(.no) : %d(.no) : %d(.11b) : %d(.11c) : %d(.no) : %d(.11e) : %d(.11f)
+
+; 120
+%d(.120) : %d(.no) : %d(.122) : %d(.no) : %d(.124) : %d(.125) : %d(.126) : %d(.no)
 
 .no
 db $00
@@ -568,4 +585,327 @@ db $0B
 db $FF
 ..chests
 db $01
+db $FF
+
+.101 ; East Snitch House (2) // West Snitch House (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(..pots) : %d(..enemies)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+..pots
+db $00
+db $FF
+..enemies
+db $00
+db $FF
+
+.103 ; Man With Beds (3) // Front of Tavern (2) // Back of Tavern (1)
+db $02
+%sq($00)
+%d(..areas3) : %d(..doors3) : %d(.no_items)
+%d(.no_items) : %d(.no_items) : %d(..enemies3)
+%sq($00)
+%d(..areas2) : %d(..doors2) : %d(.no_items)
+%d(.no_items) : %d(..pots2) : %d(..enemies2)
+..areas3
+db $03, $80, $FF, $00, $FF
+db $FF
+..doors3
+db $08
+db $FF
+..enemies3
+db $02
+db $FF
+..areas2
+db $03, $00, $7F, $50, $FF
+db $FF
+..doors2
+db $06
+db $FF
+..pots2
+db $02
+db $FF
+..enemies2
+db $00
+db $01
+db $FF
+
+.106 ; VoO Chest Game (2) // Brewery (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(.no_items) : %d(..enemies)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+..enemies
+db $00
+db $FF
+
+.107 ; Library (2) // Bomb Refill Hut (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(.no_items) : %d(.no_items)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+
+.10c ; Mimic Cave (2) // Hookshot Fairy Pot (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(..chests) : %d(.no_items) : %d(..enemies)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+..chests
+db $00
+db $FF
+..enemies
+db $04
+db $05
+db $06
+db $07
+db $FF
+
+.10e ; Storyteller (2) // Storyteller (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(.no_items) : %d(..enemies)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+..chests
+db $FF
+..pots
+db $FF
+..enemies
+db $00
+db $FF
+
+.112 ; Dark Chapel (2) // Store (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(.no_items) : %d(..enemies)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+..enemies
+db $00
+db $FF
+
+.114 ; Waterfall Fairy (2) // Hint NPC (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(..chests) : %d(.no_items) : %d(..enemies)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+..chests
+db $00
+db $01
+db $FF
+..enemies
+db $00
+db $FF
+
+.115 ; Capacity Fairy (1) // Healing Fairy (2)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(.no_items) : %d(..enemies)
+..areas
+db $03, $80, $FF, $80, $FF
+db $FF
+..doors
+db $08
+db $FF
+..enemies
+db $00
+db $FF
+
+.11b ; Cave 45 (2) // Graveyard Ledge (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(..pots) : %d(..enemies)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+..pots
+db $00
+db $01
+db $02
+db $03
+db $04
+db $05
+db $FF
+..enemies
+db $01
+db $FF
+
+.11c ; Bomb Shop (2) // C-Shaped House (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(.no_items) : %d(..enemies)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+..enemies
+db $00
+db $FF
+
+.11e ; Long Fairy Cave (2) // Hype Cave (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(.no_items) : %d(..enemies)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+..enemies
+db $00
+db $01
+db $02
+db $03
+db $FF
+
+.11f ; Lumberjack House (1) // Store (2)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(.no_items) : %d(..enemies)
+..areas
+db $03, $80, $FF, $00, $FF
+db $FF
+..doors
+db $08
+db $FF
+..enemies
+db $00
+db $FF
+
+.120 ; Ice Rod Cave (1) // Cool Bee Cave (2)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(.no_items) : %d(..enemies)
+..areas
+db $03, $80, $FF, $00, $FF
+db $03, $80, $FF, $00, $FF
+db $FF
+..doors
+db $08
+db $FF
+..enemies
+db $00
+db $01
+db $02
+db $FF
+
+.122 ; Fortune Teller (2) // Other Fortune Teller (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(.no_items) : %d(..enemies)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+..enemies
+db $00
+db $FF
+
+.124 ; 50-Rupee Cave (1) // Bonk Rocks (2)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(..chests) : %d(.no_items) : %d(.no_items)
+..areas
+db $03, $80, $FF, $00, $FF
+db $FF
+..doors
+db $08
+db $FF
+..chests
+db $00
+db $FF
+
+.125 ; 20-Rupee Cave (2) // Spiky Hint Cave (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(..pots) : %d(..enemies)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+..pots
+db $00
+db $01
+db $02
+db $03
+db $FF
+..enemies
+db $00
+db $FF
+
+.126 ; Bonk Fairy Pool (2) // Checkerboard Cave (1)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(.no_items) : %d(..enemies)
+..areas
+db $03, $00, $7F, $00, $FF
+db $FF
+..doors
+db $06
+db $FF
+..enemies
+db $01
+db $02
+db $03
+db $04
 db $FF

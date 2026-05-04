@@ -165,6 +165,7 @@ AddInventory:
                         		LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .done
                                 REP #$30
                                 LDA.l TotalItemCounter : INC : TAY
+                                JSL UpdateLootHUD
                                 LDA.l BootsEquipment : AND.w #$00FF : BNE +
                                         TYA : STA.l PreBootsLocations
                                 +
