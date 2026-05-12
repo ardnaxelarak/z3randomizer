@@ -490,7 +490,9 @@ GetLootClass:
 	CMP.w #$0080 : BNE .not_compass
 
 .compass
-	LDA.l AlwaysShowCompass : BNE .check_value
+	LDA.l AlwaysShowCompass
+	AND.w #$00FF
+	BNE .check_value
 
 .not_compass
 	LDA.b $0E

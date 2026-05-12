@@ -452,7 +452,7 @@ db $01
 %d(..areas) : %d(..doors) : %d(.no_items) : %d(.no_items) : %d(.no_items) : %d(.no_items)
 ..areas
 db $02, $00, $80, $00, $FF
-db $01, $34, $D4, $B8, $FF
+db $01, $34, $44, $B4, $FF
 db $FF
 ..doors
 db $03, $06
