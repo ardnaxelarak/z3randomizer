@@ -688,6 +688,13 @@ GetSpecificRoomVisibility:
 	STA.b $0A
 +
 
+	SEP #$20
+	LDA.b $0A
+	CMP.b $0B
+	BCC +
+	STA.b $0B
++
+
 	REP #$20
 	LDA.b $CA
 	AND.w #$00FF

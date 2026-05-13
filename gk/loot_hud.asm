@@ -15,11 +15,21 @@ UpdateLootHUD:
 	LDA.b $08 : PHA
 	LDA.b $0E : PHA
 
+	; if if door rando, check for section of supertile
 	LDA.l DRMode
 	BNE +
-		LDA.b RoomIndex
-		BRA .check
-+
+
+	; if not in door rando, check for section of supertile if we're not in a dungeon
+	LDA.w DungeonID
+	AND.w #$00FF
+	CMP.w #$00FF
+	BEQ +
+
+	; just load the room id, we don't care about sections
+	LDA.b RoomIndex
+	BRA .check
+
++	; figure out section before checking
 	JSL DetectLinksSection
 	INC A
 	XBA
