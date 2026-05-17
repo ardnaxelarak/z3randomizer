@@ -360,7 +360,7 @@ ClearSpriteData:
 			STZ.w SprSourceItemId, X : STZ.w SprItemReceipt, X : STZ.w SprItemMWPlayer, X
 			STZ.w SprRedrawFlag, X
 			DEX : BPL .loop
-		JSL UpdateLootHUD
+		JSL ClearLootHUD
 	PLX
 	RTL
 

@@ -1,3 +1,23 @@
+pushpc
+org $82C0C3
+JSL TransitionLinkOutOfDoorEnding
+NOP
+pullpc
+
+ClearLootHUD:
+	PHP
+	REP #$20
+	LDA.w #!BlankTile : STA.w EnemyDropIndicator
+	PLP
+	RTL
+
+TransitionLinkOutOfDoorEnding:
+	; what we wrote over
+	STZ.w $0418
+	INC.b $B0
+
+; fall into UpdateLootHUD
+
 UpdateLootHUD:
 	PHP
 	REP #$30
