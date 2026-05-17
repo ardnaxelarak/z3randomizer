@@ -2765,6 +2765,9 @@ JSL AdjustDefaultGraphics
 org $828190
 JSL LoadDungeonIndicator
 
+org $829AA2
+JSL LoadDungeonIndicator
+
 ;================================================================================
 ; Special Weapons Modes
 ;--------------------------------------------------------------------------------

@@ -5,6 +5,10 @@ NOP
 pullpc
 
 ClearLootHUD:
+	LDA.b GameMode
+	CMP.b #$07
+	BNE UpdateLootHUD
+
 	PHP
 	REP #$20
 	LDA.w #!BlankTile : STA.w EnemyDropIndicator
