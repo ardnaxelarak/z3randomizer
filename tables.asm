@@ -237,12 +237,8 @@ db $00
 ;a - Infinite Arrows
 ;--------------------------------------------------------------------------------
 org $B0804E ; PC 0x18004E
-UncleRefill:
+UncleRefill_deprecated: ; no longer used
 db $00
-;---- -mba
-;m - Refill Magic
-;b - Refill Bombs
-;a - Refill Arrows
 ;--------------------------------------------------------------------------------
 org $B0804F ; PC 0x18004F
 ByrnaInvulnerability:
@@ -890,8 +886,8 @@ SilverArrowsAutoEquip:
 db $01 ; #$00 = Off - #$01 = Collection Time (Default) - #$02 = Entering Ganon - #$03 = Collection Time & Entering Ganon
 ;================================================================================
 org $B08183 ; PC 0x180183
-FreeUncleItemAmount:
-dw $12C ; 300 rupees (Default)
+RainDeathRefillRupeeBow:
+dw $012C ; 300 rupees (Default)
 ;--------------------------------------------------------------------------------
 org $B08185 ; PC 0x180185
 RainDeathRefillTable:

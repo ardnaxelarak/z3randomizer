@@ -38,7 +38,7 @@ RTL
 OnPlayerDead:
 	PHA
 		JSL SetDeathWorldChecked
-                JSL DynamicDropGFXClear
+		JSL DynamicDropGFXClear
 		JSL SetSilverBowMode
 		JSL RefreshRainAmmo
 	PLA
@@ -79,30 +79,20 @@ RTL
 ;--------------------------------------------------------------------------------
 OnUncleItemGet:
 	PHA
-
-	LDA.l EscapeAssist
-	BIT.b #$04 : BEQ + : STA.l InfiniteMagic : +
-	BIT.b #$02 : BEQ + : STA.l InfiniteBombs : +
-	BIT.b #$01 : BEQ + : STA.l InfiniteArrows : +
-
 	LDA.l UncleItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
 	PLA
 	JSL Link_ReceiveItem
 
-	LDA.l UncleRefill : BIT.b #$04 : BEQ + : LDA.b #$80 : STA.l MagicFiller : + ; refill magic
-	LDA.l UncleRefill : BIT.b #$02 : BEQ + : LDA.b #50 : STA.l BombsFiller : + ; refill bombs
-	LDA.l UncleRefill : BIT.b #$01 : BEQ + ; refill arrows
-		LDA.b #70 : STA.l ArrowsFiller
+	LDA.l ProgressIndicator : BNE +
+		LDA.b #$01 : STA.l ProgressIndicator ; set rain state
+		JSL SetEscapeAssist
+		JSL RefreshRainAmmo
 
+		; grant arrows if we started with a bow in retro mode
 		LDA.l ArrowMode : BEQ +
-			LDA.l BowTracking : ORA.b #$80 : STA.l BowTracking ; enable bow toggle
-			REP #$20 ; set 16-bit accumulator
-			LDA.l CurrentRupees : !ADD.l FreeUncleItemAmount : STA.l CurrentRupees ; rupee arrows, so also give the player some money to start
-			SEP #$20 ; set 8-bit accumulator
+		LDA.l RainDeathRefillRupeeBow : ORA.l RainDeathRefillRupeeBow+1 : BEQ +
+		LDA.b #$01 : STA.l ArrowsFiller
 	+
-        LDA.l ProgressIndicator : BNE +
-                LDA.b #$01 : STA.l ProgressIndicator ; handle rain state
-        +
 RTL
 ;--------------------------------------------------------------------------------
 OnAga1Defeated:
@@ -201,12 +191,12 @@ OnNewFile:
 		STZ.w TreePullKills
 		STZ.w TreePullHits
 		STZ.w PrizePackIndexes
-                STZ.w PrizePackIndexes+1
-                STZ.w PrizePackIndexes+2
-                STZ.w PrizePackIndexes+3
-                STZ.w PrizePackIndexes+4
-                STZ.w PrizePackIndexes+5
-                STZ.w PrizePackIndexes+6
+		STZ.w PrizePackIndexes+1
+		STZ.w PrizePackIndexes+2
+		STZ.w PrizePackIndexes+3
+		STZ.w PrizePackIndexes+4
+		STZ.w PrizePackIndexes+5
+		STZ.w PrizePackIndexes+6
 		LDA.b #$00 : STA.l MosaicLevel
 		JSL InitRNGPointerTable
 	PLP : PLX
