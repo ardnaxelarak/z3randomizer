@@ -2,7 +2,24 @@ pushpc
 org $82C0C3
 JSL TransitionLinkOutOfDoorEnding
 NOP
+
+org $87956F
+JSL UpdateHUDAndLandLink
+
+org $829611
+JSL UpdateHUDAndUpdateQuadrants
 pullpc
+
+UpdateHUDAndLandLink:
+	JSL UpdateLootHUD
+	LDA.b $51
+	STA.b LinkPosY
+	RTL
+
+UpdateHUDAndUpdateQuadrants:
+	JSL UpdateLootHUD
+	JSL $82B803
+	RTL
 
 ClearLootHUD:
 	LDA.b GameMode

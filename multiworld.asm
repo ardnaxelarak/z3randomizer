@@ -123,6 +123,11 @@ GetMultiworldItem:
 		BRL .return
 	+
 
+	LDA.b LinkPushDirection
+	BEQ +
+		BRL .return
+	+
+
 	LDA.l !MULTIWORLD_ITEM : BNE +
 		BRL .return
 	+

@@ -21,14 +21,19 @@ SpiralWarp: {
     lda.w $045e : cmp.b #$5e : beq .gtg ; abort if not spiral - intended room is in A!
     cmp.b #$5f : beq .gtg
     cmp.b #$26 : beq .inroom
-    .abort
-    SEP #$30 : stz.w $045e : lda.b PreviousRoom : and.b #$0f : rtl ; clear,run hijacked code and get out
-    .inroom
+.abort
+    SEP #$30
+    stz.w $045e
+    JSL UpdateLootHUD
+    lda.b PreviousRoom : and.b #$0f
+    rtl ; clear,run hijacked code and get out
+
+.inroom
     jsr InroomStairsWarp
     lda.b PreviousRoom : and.b #$0f ; this is the code we are hijacking
     rtl
 
-    .gtg
+.gtg
     phb : phk : plb : phx : phy ; push stuff
     jsr LookupSpiralOffset
     rep #$30 : and.w #$00FF : asl #2 : tax
@@ -81,6 +86,8 @@ SpiralWarp: {
     ldy.b #$01 : jsr SetCamera
 
     jsr StairCleanup
+    JSL UpdateLootHUD
+
     ply : plx : plb ; pull the stuff we pushed
     lda.b PreviousRoom : and.b #$0f ; this is the code we are hijacking
     rtl
@@ -261,6 +268,8 @@ InroomStairsWarp: {
     .skipCamera
 
     jsr StairCleanup
+    JSL UpdateLootHUD
+
     ply : plx : plb ; pull the stuff we pushed
     rts
 }

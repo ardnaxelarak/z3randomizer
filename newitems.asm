@@ -155,8 +155,8 @@ AddReceivedItemExpandedGetItem:
 	PHA : LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
 		PLA : BRA .done
 	+ PLA
-        JSR ItemBehavior
-        SEP #$30
+	JSR ItemBehavior
+	SEP #$30
 .done
 	PLB : PLX
 	LDA.w ItemReceiptMethod : CMP.b #$01 ; thing we wrote over
@@ -229,13 +229,13 @@ ItemBehavior:
         JSR .increment_sword
         RTS
 
-		.fighter_shield
+        .fighter_shield
         .red_shield
         .mirror_shield
         SEP #$10
         LDA.l ProgressiveFlag : BEQ +
-		   LDA.l HighestShield : INC : TAX
-		   JSR .increment_shield
+            LDA.l HighestShield : INC : TAX
+            JSR .increment_shield
         + RTS
 
         .blue_mail
@@ -269,7 +269,7 @@ ItemBehavior:
         .prog_shield
         SEP #$10
         LDA.l HighestShield : INC : TAX
-		JSR .increment_shield
+        JSR .increment_shield
         REP #$10
         RTS
 
@@ -282,13 +282,13 @@ ItemBehavior:
 
         .bow
         BIT.b #$40 : BNE .silversbow
-                LDA.b #$01 : STA.l BowEquipment
+            LDA.b #$01 : STA.l BowEquipment
         RTS
 
         .silversbow
         LDA.l BowTracking : ORA.b #$40 : STA.l BowTracking
         LDA.l SilverArrowsUseRestriction : BNE +
-                LDA.b #03 : STA.l BowEquipment ; set bow to silver
+            LDA.b #03 : STA.l BowEquipment ; set bow to silver
         +
         LDA.b #$01 : STA.l BowEquipment
         RTS
@@ -331,16 +331,16 @@ ItemBehavior:
         .bow_and_arrows
         LDA.l BowTracking : BIT.b #$40 : BEQ .no_silvers
         LDA.l SilverArrowsUseRestriction : BNE .no_silvers
-                LDA.l CurrentArrows : BEQ +
-                        LDA.b #04 : STA.l BowEquipment
-                        BRA .store_bow
-                +
-                LDA.b #$03
+            LDA.l CurrentArrows : BEQ +
+                LDA.b #04 : STA.l BowEquipment
                 BRA .store_bow
+            +
+            LDA.b #$03
+            BRA .store_bow
         .no_silvers
         LDA.l CurrentArrows : BEQ +
-                LDA.b #02
-                BRA .store_bow
+            LDA.b #02
+            BRA .store_bow
         +
         LDA.b #$01
         .store_bow
@@ -350,13 +350,13 @@ ItemBehavior:
         .silver_bow
         LDA.b #$40 : ORA.l BowTracking : STA.l BowTracking
         LDA.l SilverArrowsUseRestriction : BNE .noequip
-                LDA.l SilverArrowsAutoEquip : AND.b #$01 : BEQ .noequip
-                LDA.l CurrentArrows : BNE + ; check arrows
-                                LDA.b #$03 : BRA ++ ; bow without arrow
-                        +
-                        LDA.b #$04 ; bow with arrow
-                ++
-                STA.l BowEquipment
+            LDA.l SilverArrowsAutoEquip : AND.b #$01 : BEQ .noequip
+            LDA.l CurrentArrows : BNE + ; check arrows
+                    LDA.b #$03 : BRA ++ ; bow without arrow
+                +
+                LDA.b #$04 ; bow with arrow
+            ++
+            STA.l BowEquipment
         .noequip
         RTS
 
@@ -385,7 +385,7 @@ ItemBehavior:
         .master_sword_safe
         SEP #$10
         LDA.l SwordEquipment : CMP.b #$02 : !BGE + ; skip if we have a better sword
-                LDA.b #$02 : STA.l SwordEquipment ; set master sword
+            LDA.b #$02 : STA.l SwordEquipment ; set master sword
         +
         LDX.b #$02
         JSR .increment_sword
@@ -426,20 +426,20 @@ ItemBehavior:
         .silver_arrows
         LDA.l BowTracking : ORA.b #$40 : STA.l BowTracking
         LDA.l SilverArrowsUseRestriction : BNE ++
-                LDA.l SilverArrowsAutoEquip : AND.b #$01 : BEQ ++
-                        LDA.l BowEquipment : BEQ ++ : CMP.b #$03 : !BGE +
-                                !ADD.b #$02 : STA.l BowEquipment ; switch to silver bow
-                        +
-                ++
+            LDA.l SilverArrowsAutoEquip : AND.b #$01 : BEQ ++
+                LDA.l BowEquipment : BEQ ++ : CMP.b #$03 : !BGE +
+                    !ADD.b #$02 : STA.l BowEquipment ; switch to silver bow
+                +
+            ++
         LDA.l ArrowMode : BEQ +
-                LDA.b #$01 : STA.l ArrowsFiller
+            LDA.b #$01 : STA.l ArrowsFiller
         +
         RTS
 
         .single_arrow
         LDA.l ArrowMode : BEQ +
-                LDA.l CurrentArrows : INC : STA.l CurrentArrows ; Should be sole write to this address
-                LDA.b #$01 : STA.l UpdateHUDFlag                             ; in retro/rupee bow mode.
+            LDA.l CurrentArrows : INC : STA.l CurrentArrows ; Should be sole write to this address
+            LDA.b #$01 : STA.l UpdateHUDFlag                             ; in retro/rupee bow mode.
         +
         RTS
 
@@ -474,7 +474,7 @@ ItemBehavior:
         .triforce
         LDA.b OverworldIndex : CMP.b #$80 : BNE +
         LDA.b LinkPosX+1 : BNE +
-                JSL ActivateGoal
+            JSL ActivateGoal
         +
         RTS
 
@@ -484,10 +484,10 @@ ItemBehavior:
         LDA.l GoalCounter : INC : STA.l GoalCounter
         CMP.w GoalItemRequirement : BCC +
         LDA.l TurnInGoalItems : AND.w #$00FF : BNE +
-                SEP #$20 ; set 8-bit accumulator
-                LDA.b OverworldIndex : CMP.b #$80 : BNE +
-                LDA.b LinkPosX+1 : BNE +
-                        JSL ActivateGoal
+            SEP #$20 ; set 8-bit accumulator
+            LDA.b OverworldIndex : CMP.b #$80 : BNE +
+            LDA.b LinkPosX+1 : BNE +
+                JSL ActivateGoal
         +
         SEP #$20 ; set 8-bit accumulator
         RTS
@@ -559,8 +559,8 @@ ItemBehavior:
         LSR
         AND.w #$000F : TAX
         ASL : CMP.w DungeonID : BEQ .same_dungeon
-                LDA.l DungeonKeys,X : INC : STA.l DungeonKeys,X
-                RTS
+            LDA.l DungeonKeys,X : INC : STA.l DungeonKeys,X
+            RTS
         .same_dungeon
         SEP #$20
         LDA.l CurrentSmallKeys : INC : STA.l CurrentSmallKeys : STA.l DungeonKeys,X
@@ -575,69 +575,69 @@ ItemBehavior:
 
         .hc_smallkey
         LDA.w DungeonID : CMP.b #$03 : BCC .same_dungeon_hc
-                LDA.l HyruleCastleKeys : INC : STA.l HyruleCastleKeys
-                LDA.l SewerKeys : INC : STA.l SewerKeys
-                RTS
+            LDA.l HyruleCastleKeys : INC : STA.l HyruleCastleKeys
+            LDA.l SewerKeys : INC : STA.l SewerKeys
+            RTS
 
         .generic_smallkey
         LDA.l GenericKeys : BEQ .normal
-                LDA.l CurrentSmallKeys : INC
-                STA.l CurrentGenericKeys : STA.l CurrentSmallKeys
-                RTS
+            LDA.l CurrentSmallKeys : INC
+            STA.l CurrentGenericKeys : STA.l CurrentSmallKeys
+            RTS
         .normal
         LDA.w DungeonID : BMI +
-                LDA.l CurrentSmallKeys : INC : STA.l CurrentSmallKeys
-                RTS
+            LDA.l CurrentSmallKeys : INC : STA.l CurrentSmallKeys
+            RTS
         +
         RTS
 
         .increment_sword
         LDA.l HighestSword
         INC : STA.b Scrap04 : CPX.b Scrap04 : BCC + ; don't increment unless we're getting a better sword
-                TXA : STA.l HighestSword
+            TXA : STA.l HighestSword
         +
         RTS
 
         .increment_shield
         LDA.l HighestShield
         INC : STA.b Scrap04 : CPX.b Scrap04 : BCC + ; don't increment unless we're getting a better shield
-                TXA : STA.l HighestShield
+            TXA : STA.l HighestShield
         +
         RTS
 
         .increment_mail
         LDA.l HighestMail
         INC : STA.b Scrap04 : CPX.b Scrap04 : BCC +   ; don't increment unless we're getting a better mail
-                TXA : STA.l HighestMail
+            TXA : STA.l HighestMail
         +
         RTS
 
         .increment_bigkey
         SEP #$20
         LDA.l StatsLocked : BNE +
-                LDA.l BigKeysBigChests
-                CLC : ADC.b #$10
-                STA.l BigKeysBigChests
+            LDA.l BigKeysBigChests
+            CLC : ADC.b #$10
+            STA.l BigKeysBigChests
         +
         RTS
 
         .increment_map
         SEP #$20
         LDA.l StatsLocked : BNE +
-                LDA.l MapsCompasses
-                CLC : ADC.b #$10
-                STA.l MapsCompasses
-                JSL MaybeFlagMapTotalPickup
+            LDA.l MapsCompasses
+            CLC : ADC.b #$10
+            STA.l MapsCompasses
+            JSL MaybeFlagMapTotalPickup
         +
         RTS
 
         .increment_compass
         SEP #$20
         LDA.l StatsLocked : BNE +
-                LDA.l MapsCompasses : INC : AND.b #$0F : TAX
-                LDA.l MapsCompasses : AND.b #$F0 : STA.l MapsCompasses
-                TXA : ORA.l MapsCompasses : STA.l MapsCompasses
-                JSL MaybeFlagCompassTotalPickup
+            LDA.l MapsCompasses : INC : AND.b #$0F : TAX
+            LDA.l MapsCompasses : AND.b #$F0 : STA.l MapsCompasses
+            TXA : ORA.l MapsCompasses : STA.l MapsCompasses
+            JSL MaybeFlagCompassTotalPickup
         +
         RTS
 
@@ -647,7 +647,7 @@ ItemBehavior:
         SEC : SBC.b #$37
         TAX
         LDA.w PendantMasks,X : AND.l PendantsField : BNE +
-                LDA.l PendantCounter : INC : STA.l PendantCounter
+            LDA.l PendantCounter : INC : STA.l PendantCounter
         +
         RTS
 
@@ -663,15 +663,15 @@ ItemBehavior:
         LDA.w #$0000
         SEC
         -
-                ROL
-                DEX
+            ROL
+            DEX
         BPL -
         SEP #$20
         TAX
         AND.l CrystalsField : BNE +
-                TXA
-                ORA.l CrystalsField : STA.l CrystalsField
-                LDA.l CrystalCounter : INC : STA.l CrystalCounter
+            TXA
+            ORA.l CrystalsField : STA.l CrystalsField
+            LDA.l CrystalCounter : INC : STA.l CrystalCounter
         +
         .done
         RTS
@@ -682,56 +682,56 @@ ItemBehavior:
         .bee_trap
         SEP #$30
         LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI + ; DashBeeHive_SpawnBee
-                LDA.b LinkPosX : CLC : ADC.b #$03 : AND.b #$F8 : STA.w SpritePosXLow,Y
-                LDA.b LinkPosX+1 : ADC.b #$00 : STA.w SpritePosXHigh,Y ; round X to nearest 8
-                LDA.b LinkPosY : STA.w SpritePosYLow, Y : LDA.b LinkPosY+1 : STA.w SpritePosYHigh, Y
-                LDA.b LinkLayer : STA.w SpriteLayer,Y ; spawns on same layer as link
+            LDA.b LinkPosX : CLC : ADC.b #$03 : AND.b #$F8 : STA.w SpritePosXLow,Y
+            LDA.b LinkPosX+1 : ADC.b #$00 : STA.w SpritePosXHigh,Y ; round X to nearest 8
+            LDA.b LinkPosY : STA.w SpritePosYLow, Y : LDA.b LinkPosY+1 : STA.w SpritePosYHigh, Y
+            LDA.b LinkLayer : STA.w SpriteLayer,Y ; spawns on same layer as link
         +
         RTS
 
         .good_bee
         SEP #$30
         LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI + ; DashBeeHive_SpawnBee
-                LDA.b LinkPosX : CLC : ADC.b #$03 : AND.b #$F8 : STA.w SpritePosXLow,Y
-                LDA.b LinkPosX+1 : ADC.b #$00 : STA.w SpritePosXHigh,Y ; round X to nearest 8
-                LDA.b LinkPosY : STA.w SpritePosYLow, Y : LDA.b LinkPosY+1 : STA.w SpritePosYHigh, Y
-                LDA.b LinkLayer : STA.w SpriteLayer,Y ; spawns on same layer as link
-                JSL GoldBee_SpawnSelf_SetProperties
+            LDA.b LinkPosX : CLC : ADC.b #$03 : AND.b #$F8 : STA.w SpritePosXLow,Y
+            LDA.b LinkPosX+1 : ADC.b #$00 : STA.w SpritePosXHigh,Y ; round X to nearest 8
+            LDA.b LinkPosY : STA.w SpritePosYLow, Y : LDA.b LinkPosY+1 : STA.w SpritePosYHigh, Y
+            LDA.b LinkLayer : STA.w SpriteLayer,Y ; spawns on same layer as link
+            JSL GoldBee_SpawnSelf_SetProperties
         +
         RTS
 
         .apples
         SEP #$30
         LDA.b #$AC : JSL Sprite_SpawnDynamically : BMI +
-                LDA.b LinkPosX : CLC : ADC.b #$03 : AND.b #$F8 : STA.w SpritePosXLow,Y
-                LDA.b LinkPosX+1 : ADC.b #$00 : STA.w SpritePosXHigh,Y ; round X to nearest 8
-                LDA.b LinkPosY : SEC : SBC.b #$10 : STA.w SpritePosYLow,Y
-                LDA.b LinkPosY+1 : SBC.b #$00 : STA.w SpritePosYHigh,Y ; move up 16 pixels
-                LDA.b LinkLayer : STA.w SpriteLayer,Y ; spawns on same layer as link
-                LDA.b #$FF : STA.w EnemyStunTimer,Y ; allows them to expire
+            LDA.b LinkPosX : CLC : ADC.b #$03 : AND.b #$F8 : STA.w SpritePosXLow,Y
+            LDA.b LinkPosX+1 : ADC.b #$00 : STA.w SpritePosXHigh,Y ; round X to nearest 8
+            LDA.b LinkPosY : SEC : SBC.b #$10 : STA.w SpritePosYLow,Y
+            LDA.b LinkPosY+1 : SBC.b #$00 : STA.w SpritePosYHigh,Y ; move up 16 pixels
+            LDA.b LinkLayer : STA.w SpriteLayer,Y ; spawns on same layer as link
+            LDA.b #$FF : STA.w EnemyStunTimer,Y ; allows them to expire
         +
         RTS
 
         .fairy
         SEP #$30
         LDA.b #$E3 : JSL Sprite_SpawnDynamically : BMI +
-                LDA.b LinkPosX : CLC : ADC.b #$03 : AND.b #$F8 : STA.w SpritePosXLow,Y
-                LDA.b LinkPosX+1 : ADC.b #$00 : STA.w SpritePosXHigh,Y ; round X to nearest 8
-                LDA.b LinkPosY : SEC : SBC.b #$10 : STA.w SpritePosYLow,Y
-                LDA.b LinkPosY+1 : SBC.b #$00 : STA.w SpritePosYHigh,Y ; move up 16 pixels
-                LDA.b LinkLayer : STA.w SpriteLayer,Y ; spawns on same layer as link
-                LDA.b #$FF : STA.w EnemyStunTimer,Y ; allows them to expire
+            LDA.b LinkPosX : CLC : ADC.b #$03 : AND.b #$F8 : STA.w SpritePosXLow,Y
+            LDA.b LinkPosX+1 : ADC.b #$00 : STA.w SpritePosXHigh,Y ; round X to nearest 8
+            LDA.b LinkPosY : SEC : SBC.b #$10 : STA.w SpritePosYLow,Y
+            LDA.b LinkPosY+1 : SBC.b #$00 : STA.w SpritePosYHigh,Y ; move up 16 pixels
+            LDA.b LinkLayer : STA.w SpriteLayer,Y ; spawns on same layer as link
+            LDA.b #$FF : STA.w EnemyStunTimer,Y ; allows them to expire
         +
         RTS
 
         .chicken
         SEP #$30
         LDA.b #$0B : JSL Sprite_SpawnDynamically : BMI +
-                LDA.b LinkPosX : CLC : ADC.b #$03 : AND.b #$F8 : STA.w SpritePosXLow,Y
-                LDA.b LinkPosX+1 : ADC.b #$00 : STA.w SpritePosXHigh,Y ; round X to nearest 8
-                LDA.b LinkPosY : SEC : SBC.b #$08 : STA.w SpritePosYLow,Y
-                LDA.b LinkPosY+1 : SBC.b #$00 : STA.w SpritePosYHigh,Y ; move up 8 pixels
-                LDA.b LinkLayer : STA.w SpriteLayer,Y ; spawns on same layer as link
+            LDA.b LinkPosX : CLC : ADC.b #$03 : AND.b #$F8 : STA.w SpritePosXLow,Y
+            LDA.b LinkPosX+1 : ADC.b #$00 : STA.w SpritePosXHigh,Y ; round X to nearest 8
+            LDA.b LinkPosY : SEC : SBC.b #$08 : STA.w SpritePosYLow,Y
+            LDA.b LinkPosY+1 : SBC.b #$00 : STA.w SpritePosYHigh,Y ; move up 8 pixels
+            LDA.b LinkLayer : STA.w SpriteLayer,Y ; spawns on same layer as link
         +
         RTS
 
@@ -804,7 +804,7 @@ ResolveLootID:
         CMP.l ProgressiveSwordLimit : BCC +
                 LDA.l ProgressiveSwordReplacement
                 JMP .get_item
-			++ LDA.l SwordEquipment
+        ++ LDA.l SwordEquipment
         +
         TAX
         LDA.w .prog_sword_ids,X
@@ -820,7 +820,7 @@ ResolveLootID:
         CMP.l ProgressiveShieldLimit : BCC +
                 LDA.l ProgressiveShieldReplacement
                 JMP .get_item
-        	++ LDA.l HighestShield
+        ++ LDA.l HighestShield
         +
         TAX
         LDA.w .shields_ids,X
@@ -836,7 +836,7 @@ ResolveLootID:
                 LDA.l ProgressiveArmorReplacement
                 JMP .get_item
         +
-        	++ LDA.l ArmorEquipment
+        ++ LDA.l ArmorEquipment
         TAX
         LDA.w .armor_ids,X
         JMP .have_item

@@ -61,73 +61,84 @@ LoadDialogAddressIndirect:
 RTL
 ;--------------------------------------------------------------------------------
 FreeDungeonItemNotice:
-        STA.l ScratchBufferV
+	STA.l ScratchBufferV
 
-        PHA : PHX : PHY
-        PHP
-        PHB : PHK : PLB
-        SEP #$20 ; set 8-bit accumulator
-        REP #$10 ; set 16-bit index registers
-        PEI.b (Scrap00)
-        LDA.b Scrap02 : PHA
-        LDA.l ScratchBufferNV : PHA
-        LDA.l ScratchBufferNV+1 : PHA
+	PHA : PHX : PHY
+	PHP
+	PHB : PHK : PLB
+	SEP #$20 ; set 8-bit accumulator
+	REP #$10 ; set 16-bit index registers
+	PEI.b (Scrap00)
+	LDA.b Scrap02 : PHA
+	LDA.l ScratchBufferNV : PHA
+	LDA.l ScratchBufferNV+1 : PHA
 	;--------------------------------
 
-	LDA.l FreeItemText : BNE + : JMP .skip : +
+	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
+	LDA.b #$2F ; if not from our world, show all dungeon item and crystal notices
++	ORA.l FreeItemText : BNE + : JMP .skip : +
 
+	STA.b Scrap00
 	LDA.b #$00 : STA.l ScratchBufferNV ; initialize scratch
-	LDA.l FreeItemText : AND.b #$01 : BEQ + ; show message for general small key
+
+	LDA.b Scrap00 : AND.b #$01 : BEQ + ; show message for general small key
 	LDA.l ScratchBufferV : CMP.b #$24 : BNE + ; general small key
 		%CopyDialog(Notice_SmallKeyOf)
 		LDA.l DialogReturnPointer : DEC #2 : STA.l DialogOffsetPointer
 		%CopyDialog(Notice_Self)
 		JMP .done
-	+ : LDA.l FreeItemText : AND.b #$02 : BEQ + ; show message for general compass
+
++	LDA.b Scrap00 : AND.b #$02 : BEQ + ; show message for general compass
 	LDA.l ScratchBufferV : CMP.b #$25 : BNE + ; general compass
 		%CopyDialog(Notice_CompassOf)
 		LDA.l DialogReturnPointer : DEC #2 : STA.l DialogOffsetPointer
 		%CopyDialog(Notice_Self)
 		JMP .done
-	+ : LDA.l FreeItemText : AND.b #$04 : BEQ + ; show message for general map
+
++	LDA.b Scrap00 : AND.b #$04 : BEQ + ; show message for general map
 	LDA.l ScratchBufferV : CMP.b #$33 : BNE + ; general map
 		%CopyDialog(Notice_MapOf)
 		LDA.l DialogReturnPointer : DEC #2 : STA.l DialogOffsetPointer
 		%CopyDialog(Notice_Self)
 		JMP .done
-	+ : LDA.l FreeItemText : AND.b #$08 : BEQ + ; show message for general big key
+
++	LDA.b Scrap00 : AND.b #$08 : BEQ + ; show message for general big key
 	LDA.l ScratchBufferV : CMP.b #$32 : BNE + ; general big key
 		%CopyDialog(Notice_BigKeyOf)
 		LDA.l DialogReturnPointer : DEC #2 : STA.l DialogOffsetPointer
 		%CopyDialog(Notice_Self)
 		JMP .done
-	+
-	LDA.l FreeItemText : AND.b #$04 : BEQ + ; show message for dungeon map
+
++	LDA.b Scrap00 : AND.b #$04 : BEQ + ; show message for dungeon map
 	LDA.l ScratchBufferV : AND.b #$F0 ; looking at high bits only
 	CMP.b #$70 : BNE + ; map of...
 		%CopyDialog(Notice_MapOf)
 		JMP .dungeon
-	+ : LDA.l FreeItemText : AND.b #$02 : BEQ + ; show message for dungeon compass
+
++	LDA.b Scrap00 : AND.b #$02 : BEQ + ; show message for dungeon compass
 	LDA.l ScratchBufferV : AND.b #$F0 : CMP.b #$80 : BNE + ; compass of...
 		%CopyDialog(Notice_CompassOf)
 		JMP .dungeon
-	+ : LDA.l FreeItemText : AND.b #$08 : BEQ + ; show message for dungeon big key
+
++	LDA.b Scrap00 : AND.b #$08 : BEQ + ; show message for dungeon big key
 	LDA.l ScratchBufferV : AND.b #$F0 : CMP.b #$90 : BNE + ; big key of...
 		%CopyDialog(Notice_BigKeyOf)
 		JMP .dungeon
-	+ : LDA.l FreeItemText : AND.b #$01 : BEQ + ; show message for dungeon small key
+
++	LDA.b Scrap00 : AND.b #$01 : BEQ + ; show message for dungeon small key
 	LDA.l ScratchBufferV : AND.b #$F0 : CMP.b #$A0 : BNE + ; small key of...
 		LDA.l ScratchBufferV : CMP.b #$AF : BNE ++ : JMP .skip : ++
 		%CopyDialog(Notice_SmallKeyOf)
 		LDA.b #$01 : STA.l ScratchBufferNV ; set up a flip for small keys
 		BRA .dungeon
-	+ : LDA.l FreeItemText : AND.b #$20 : BEQ + ; show message for crystal
+
++	LDA.b Scrap00 : AND.b #$20 : BEQ + ; show message for crystal
 	LDA.l ScratchBufferV : CMP.b #$B0 : !BLT + ;  crystal #
-                               CMP.b #$B7 : !BGE +
+	                       CMP.b #$B7 : !BGE +
 		%CopyDialog(Notice_Crystal)
 		JMP .crystal
-        +
-	JMP .skip ; it's not something we are going to give a notice for
+
++	JMP .skip ; it's not something we are going to give a notice for
 
 	.dungeon
 	LDA.l DialogReturnPointer : DEC #2 : STA.l DialogOffsetPointer
@@ -139,23 +150,26 @@ FreeDungeonItemNotice:
 		LDA.b #$0F : !SUB.l ScratchBufferNV+1 : STA.l ScratchBufferNV+1 ; flip the values for small keys
 	+
 	LDA.l ScratchBufferNV+1
-        ASL : TAX
-        REP #$20
-        LDA.l DungeonItemIDMap,X : CMP.w #$0003 : BCC .hc_sewers
-                                   CMP.w DungeonID : BNE +
-                BRA .self_notice
-                .hc_sewers
-                LDA.w DungeonID : CMP.w #$0003 : BCS +
-                        .self_notice
-                        SEP #$20
-                        LDA.l FreeItemText : AND.b #$40 : BEQ ++
-                                LDA.b #$00 : STA.l DialogOffsetPointer : STA.l DialogOffsetPointer+1
-                                JMP .skip
-                        ++
-                        %CopyDialog(Notice_Self)
-                        JMP .done
-        +
-        SEP #$20
+	ASL : TAX
+	REP #$20
+
+	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : AND.w #$00FF : BNE +
+
+	LDA.l DungeonItemIDMap, X : CMP.w #$0003 : BCC .hc_sewers
+	                            CMP.w DungeonID : BNE +
+		BRA .self_notice
+		.hc_sewers
+		LDA.w DungeonID : CMP.w #$0003 : BCS +
+			.self_notice
+			SEP #$20
+			LDA.l FreeItemText : AND.b #$40 : BEQ ++
+				LDA.b #$00 : STA.l DialogOffsetPointer : STA.l DialogOffsetPointer+1
+				JMP .skip
+			++
+			%CopyDialog(Notice_Self)
+			JMP .done
+	+
+	SEP #$20
 	LDA.l ScratchBufferNV+1
 	CMP.b #$00 : BNE + ; ...light world
 		%CopyDialog(Notice_LightWorld) : JMP .done
@@ -190,9 +204,9 @@ FreeDungeonItemNotice:
 	+ : CMP.b #$0F : BNE + ; ...sewers
 		%CopyDialog(Notice_Sewers)
 	+
-        JMP .done
+	JMP .done
 
-        .crystal
+	.crystal
 	LDA.l DialogReturnPointer : DEC #2 : STA.l DialogOffsetPointer
 	LDA.l ScratchBufferV
 	AND.b #$0F ; looking at low bits only
@@ -210,7 +224,7 @@ FreeDungeonItemNotice:
 		%CopyDialog(Notice_Four) : JMP .done
 	+ : CMP.b #$06 : BNE +
 		%CopyDialog(Notice_Three) : JMP .done
-        +
+	+
 
 	.done
 
@@ -220,14 +234,14 @@ FreeDungeonItemNotice:
 
 	;--------------------------------
 	.skip
-        PLA : STA.l ScratchBufferNV+1
-        PLA : STA.l ScratchBufferNV
-        PLA : STA.b Scrap02
-        REP #$20
-        PLA : STA.b Scrap00
-        PLB
-        PLP
-        PLY : PLX : PLA
+	PLA : STA.l ScratchBufferNV+1
+	PLA : STA.l ScratchBufferNV
+	PLA : STA.b Scrap02
+	REP #$20
+	PLA : STA.b Scrap00
+	PLB
+	PLP
+	PLY : PLX : PLA
 RTL
 
 ;--------------------------------------------------------------------------------
