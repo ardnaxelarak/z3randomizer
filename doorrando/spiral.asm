@@ -24,7 +24,6 @@ SpiralWarp: {
 .abort
     SEP #$30
     stz.w $045e
-    JSL UpdateLootHUD
     lda.b PreviousRoom : and.b #$0f
     rtl ; clear,run hijacked code and get out
 
@@ -86,7 +85,6 @@ SpiralWarp: {
     ldy.b #$01 : jsr SetCamera
 
     jsr StairCleanup
-    JSL UpdateLootHUD
 
     ply : plx : plb ; pull the stuff we pushed
     lda.b PreviousRoom : and.b #$0f ; this is the code we are hijacking
@@ -268,7 +266,6 @@ InroomStairsWarp: {
     .skipCamera
 
     jsr StairCleanup
-    JSL UpdateLootHUD
 
     ply : plx : plb ; pull the stuff we pushed
     rts

@@ -1,41 +1,24 @@
 pushpc
-org $82C0C3
-JSL TransitionLinkOutOfDoorEnding
+org $828C73
+JSL EnterRoom
 NOP
-
-org $87956F
-JSL UpdateHUDAndLandLink
-
-org $829611
-JSL UpdateHUDAndUpdateQuadrants
 pullpc
-
-UpdateHUDAndLandLink:
-	JSL UpdateLootHUD
-	LDA.b $51
-	STA.b LinkPosY
-	RTL
-
-UpdateHUDAndUpdateQuadrants:
-	JSL UpdateLootHUD
-	JSL $82B803
-	RTL
 
 ClearLootHUD:
 	LDA.b GameMode
 	CMP.b #$07
 	BNE UpdateLootHUD
-
+;
 	PHP
 	REP #$20
 	LDA.w #!BlankTile : STA.w EnemyDropIndicator
 	PLP
 	RTL
 
-TransitionLinkOutOfDoorEnding:
+EnterRoom:
 	; what we wrote over
-	STZ.w $0418
-	INC.b $B0
+	STZ.w $0200
+	STZ.b $B0
 
 ; fall into UpdateLootHUD
 
