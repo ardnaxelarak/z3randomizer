@@ -338,6 +338,7 @@ SpawnedItemFlag = $7E0726         ; 0x02 - one for pot, 2 for sprite drop
 SpawnedItemMWPlayer = $7E0728     ; Player Id for spawned item if Multiworld item 0x02
                                   ;
 EnemyDropIndicator = $7E072A      ; Used by HUD to indicate enemy drops remaining
+NpcItemIndicator = $7E072C        ; Flag used by HUD to indicate NPC item present
 SkipBeeTrapDisguise = $7E072D     ; Flag to skip bee trap disguise during draw routine
 
 SprDropsItem = $7E0730            ; Array for whether a sprite drops an item 0x16

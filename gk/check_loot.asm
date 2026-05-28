@@ -71,12 +71,15 @@ CheckLoot:
 +
 
 	LDA.l ItemSources : BIT.w #$0008 : BEQ +
-	JSR CheckBoss
+	JSR CheckMisc
+	JSR CheckMisc2
 +
 
 	LDA.l ItemSources : BIT.w #$0010 : BEQ +
 	JSR CheckPrize
 +
+
+JSR CheckNpcs
 
 .done
 	PLA : STA.b $0E
@@ -133,25 +136,22 @@ CheckChests:
 .done
 	RTS
 
-CheckBoss:
-	; we assume all bosses are in section 1 of split sections
-	; mainly to simplify hera cage key and GT torch
-	; which use the same flow
-	; and bosses are always in their own section anyway
+CheckMisc:
+	; this includes bosses, bonk torches, and standing items (in caves + hera cage key)
+	; all dungeon items in this section are in section 1 of split sections
+	; for cave items we'll always know what section we're in
+	; but for dungeon items, we won't have a section specified in door rando
+	; so if we don't have a section, assume it's 1, and it'll match all the dungeon items anyway
 	LDA.b $CA
-	AND.w #$F000
-	XBA
-	CMP.w #$0020
-	BCC +
-	RTS
-
+	BIT.w #$F000
+	BNE +
+	ORA.w #$1000
 +
-	LDA.b $CA
-	AND.w #$01FF
+	AND.w #$F1FF
 	STA.b $04
 
 	LDX.w #$FFFA
-.next_boss
+.next_misc
 	INX #6
 	LDA.l MiscLocations, X
 	BPL .check
@@ -159,9 +159,10 @@ CheckBoss:
 
 .check
 	CMP.b $04
-	BNE .next_boss
+	BNE .next_misc
 
 	TXY
+	AND.w #$01FF
 	CMP.b RoomIndex
 	BEQ .current_room
 
@@ -186,7 +187,7 @@ CheckBoss:
 
 	TYX
 	BIT.b $04
-	BNE .next_boss ; continue checking if we already got the item
+	BNE .next_misc ; continue checking if we already got the item
 
 	LDA.l MiscLocations+4, X
 	STA.b $05
@@ -198,7 +199,24 @@ CheckBoss:
 	AND.w #$00FF
 	JSR GetLootClass
 
-	BRA .next_boss
+	BRA .next_misc
+
+CheckMisc2:
+	; this currently only includes the library and Uncle
+	; so let's just hard-code them for now
+	LDA.b $CA
+	CMP.w #$2107 : BNE +
+	LDA.l NpcFlags : AND.w #$0080 : BNE +
+	LDA.l LibraryItem : AND.w #$00FF : JSR GetLootClass
++
+
+	LDA.b $CA
+	CMP.w #$1055 : BNE +
+	LDA.l ProgressFlags : AND.w #$0001 : BNE +
+	LDA.l UncleItem : AND.w #$00FF : JSR GetLootClass
++
+
+	RTS
 
 CheckPrize:
 	LDA.b $CA
@@ -235,6 +253,41 @@ CheckPrize:
 	JSR GetLootClass
 
 	BRA .next_prize
+
+CheckNpcs:
+	LDA.b $CA
+
+	LDX.w #$FFFA
+.next_npc
+	INX #6
+	LDA.l NpcItems, X
+	BMI .nope
+
+	CMP.b $CA
+	BNE .next_npc
+
+	LDA.l NpcItems+3, X ; get location of data to check
+	STA.b $05
+
+	LDA.l NpcItems+2, X
+	STA.b $04
+
+	LDA.b [$04]
+	AND.w #$00FF
+	AND.l NpcItems+5, X
+	BNE .next_npc
+
+.yep
+	LDA.w NpcItemIndicator
+	ORA.w #$0001
+	STA.w NpcItemIndicator
+	RTS
+
+.nope
+	LDA.w NpcItemIndicator
+	AND.w #$FF00
+	STA.w NpcItemIndicator
+	RTS
 
 CheckPots:
 	LDA.b $CA

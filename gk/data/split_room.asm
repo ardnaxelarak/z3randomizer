@@ -78,7 +78,7 @@ SplitRooms:
 %d(.no) : %d(.no) : %d(.no) : %d(.11b) : %d(.11c) : %d(.no) : %d(.11e) : %d(.11f)
 
 ; 120
-%d(.120) : %d(.no) : %d(.122) : %d(.no) : %d(.124) : %d(.125) : %d(.126) : %d(.no)
+%d(.120) : %d(.no) : %d(.122) : %d(.no) : %d(.124) : %d(.125) : %d(.126) : %d(.127)
 
 .no
 db $00
@@ -908,4 +908,22 @@ db $01
 db $02
 db $03
 db $04
+db $FF
+
+.127 ; Hammer Pegs Cave (1) // Fake Dark Lake Hylia Spike Hint Cave (2)
+db $01
+%sq($00)
+%d(..areas) : %d(..doors) : %d(.no_items)
+%d(.no_items) : %d(..pots) : %d(.no_items)
+..areas
+db $03, $80, $FF, $00, $FF
+db $FF
+..doors
+db $08
+db $FF
+..pots
+db $04
+db $05
+db $06
+db $07
 db $FF

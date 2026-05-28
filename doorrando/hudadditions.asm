@@ -6,6 +6,7 @@
 !DTile = $2D60
 !BlueSquare = $2C5E
 !BossIcon = $253C
+!NPCIcon = $253B
 
 DrHudOverride:
 	PHB
@@ -30,6 +31,13 @@ DRHUD_DrawIndicators:
 	LDA.b FrameCounter : AND.b #$10 : BEQ DRHUD_EnemyDropIndicator
 
 DRHUD_BossIndicator:
+	LDA.w DungeonID : CMP.b #$FF : BNE .in_dungeon
+	LDA.w NpcItemIndicator : BEQ .early_exit
+	LDA.l ShowLootInHUD : BEQ .early_exit
+	REP #$10
+	LDY.w #!NPCIcon : STY.w HUDMultiIndicator
+	JMP DRHUD_Finished
+.in_dungeon
 	LDA.l DRMode : BNE .continue
 .early_exit
 	REP #$10

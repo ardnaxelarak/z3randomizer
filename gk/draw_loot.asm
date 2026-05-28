@@ -32,6 +32,9 @@ DrawLoot:
 	LDA.l DRMode
 	BNE .skip
 
+	LDA.l ShowLootOnMap
+	BEQ .skip
+
 	REP #$30
 	PHX : PHY
 

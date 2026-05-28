@@ -1117,7 +1117,8 @@ JSL CompareBombsToMax : NOP #11
 org $85FC7E ; <- 2FC7E - sprite_dash_item.asm : 118 (LDA $7EF36F : INC A : STA $7EF36F)
 JSL GiveBonkItem : NOP #5
 org $85FC97 ; <- 2FC97 - sprite_dash_item.asm : 126 (LDA.b #$2F : JSL Sound_SetSfx3PanLong)
-NOP #6
+JSL UpdateLootHUD
+NOP #2
 ;--------------------------------------------------------------------------------
 org $868D39 ; <- 30D39 - sprite_prep.asm : 1435 - (LDA.b #$08 : STA $0F50, X)
 JSL LoadBonkItemGFX
@@ -1643,7 +1644,8 @@ JSL FixAga2Bunny : NOP
 ; Open Mode Fixes
 ;--------------------------------------------------------------------------------
 org $85DF65 ; <- 2DF65 - sprite_uncle_and_priest.asm:994 - (LDA.b #$01 : STA $7EF3C5)
-NOP #6
+JSL UpdateLootHUD
+NOP #2
 ;--------------------------------------------------------------------------------
 org $85EDDF ; <- 2EDDF - sprite_zelda.asm:398 - (LDA.b #$02 : STA $7EF3C5)
 JSL EndRainState : NOP #2
@@ -2757,6 +2759,13 @@ JSL MimicDirection
 ;--------------------------------------------------------------------------------
 org $828068
 JSL AdjustDefaultGraphics
+
+;================================================================================
+;--------------------------------------------------------------------------------
+; Remove Overwriting HUD gfx on game over
+;--------------------------------------------------------------------------------
+org $809038
+RTS
 
 ;================================================================================
 ;--------------------------------------------------------------------------------

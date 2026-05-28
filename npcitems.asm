@@ -90,11 +90,17 @@ ItemSet_FairySword:
 RTL
 
 ItemSet_SmithSword:
-	PHA : LDA.l NpcFlags+1 : ORA.b #$04 : STA.l NpcFlags+1 : PLA
+	PHA
+	LDA.l NpcFlags+1 : ORA.b #$04 : STA.l NpcFlags+1
+	JSL UpdateLootHUD
+	PLA
 RTL
 
 ItemSet_MagicBat:
-	PHA : LDA.l NpcFlags+1 : ORA.b #$80 : STA.l NpcFlags+1 : PLA
+	PHA
+	LDA.l NpcFlags+1 : ORA.b #$80 : STA.l NpcFlags+1
+	JSL UpdateLootHUD
+	PLA
 RTL
 
 ItemSet_OldMan:
@@ -110,7 +116,10 @@ RTL
 ItemSet_SickKid:
 	PHA : LDA.l SickKidItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID : PLA
 	JSL Link_ReceiveItem ; thing we wrote over
-	PHA : LDA.l NpcFlags : ORA.b #$04 : STA.l NpcFlags : PLA
+	PHA
+	LDA.l NpcFlags : ORA.b #$04 : STA.l NpcFlags
+	JSL UpdateLootHUD
+	PLA
 RTL
 
 ItemSet_TreeKid:
@@ -122,7 +131,10 @@ RTL
 ItemSet_Sahasrala:
 	PHA : LDA.l SahasralaItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID : PLA
 	JSL Link_ReceiveItem ; thing we wrote over
-	PHA : LDA.l NpcFlags : ORA.b #$10 : STA.l NpcFlags : PLA
+	PHA
+	LDA.l NpcFlags : ORA.b #$10 : STA.l NpcFlags
+	JSL UpdateLootHUD
+	PLA
 RTL
 
 ItemSet_Catfish:
@@ -132,7 +144,10 @@ RTL
 ItemSet_Library:
 	PHA : LDA.l LibraryItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID : PLA
 	JSL Link_ReceiveItem ; thing we wrote over
-	PHA : LDA.l NpcFlags : ORA.b #$80 : STA.l NpcFlags : PLA
+	PHA
+	LDA.l NpcFlags : ORA.b #$80 : STA.l NpcFlags
+	JSL UpdateLootHUD
+	PLA
 RTL
 
 ItemSet_Mushroom:
@@ -149,7 +164,10 @@ ItemSet_Mushroom:
 RTL
 
 ItemSet_Powder:
-	PHA : LDA.l NpcFlags+1 : ORA.b #$20 : STA.l NpcFlags+1 : PLA
+	PHA
+	LDA.l NpcFlags+1 : ORA.b #$20 : STA.l NpcFlags+1
+	JSL UpdateLootHUD
+	PLA
 RTL
 ;================================================================================
 

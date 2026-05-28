@@ -150,7 +150,10 @@ DrawFullRoomTile:
 	RTL
 
 DrawSingleRoomLoot:
-	PHX : PHY
+	LDA.l ShowLootOnMap : AND.w #$00FF : BNE +
+		RTL
+
++	PHX : PHY
 
 	TYX
 

@@ -73,29 +73,32 @@ warnpc $B9FA00
 org $B9FA00
 ; Room ID mappings to bit to check for presence and address of item drop
 MiscLocations:
-dw $00C8 : db $04 : dl HeartContainer_ArmosKnights
-dw $0033 : db $04 : dl HeartContainer_Lanmolas
-dw $0007 : db $04 : dl HeartContainer_Moldorm
+dw $10C8 : db $04 : dl HeartContainer_ArmosKnights
+dw $1033 : db $04 : dl HeartContainer_Lanmolas
+dw $1007 : db $04 : dl HeartContainer_Moldorm
 
-dw $005A : db $04 : dl HeartContainer_HelmasaurKing
-dw $0006 : db $04 : dl HeartContainer_Arrghus
-dw $0029 : db $04 : dl HeartContainer_Mothula
-dw $00AC : db $04 : dl HeartContainer_Blind
-dw $00DE : db $04 : dl HeartContainer_Kholdstare
-dw $0090 : db $04 : dl HeartContainer_Vitreous
-dw $00A4 : db $04 : dl HeartContainer_Trinexx
+dw $105A : db $04 : dl HeartContainer_HelmasaurKing
+dw $1006 : db $04 : dl HeartContainer_Arrghus
+dw $1029 : db $04 : dl HeartContainer_Mothula
+dw $10AC : db $04 : dl HeartContainer_Blind
+dw $10DE : db $04 : dl HeartContainer_Kholdstare
+dw $1090 : db $04 : dl HeartContainer_Vitreous
+dw $10A4 : db $04 : dl HeartContainer_Trinexx
 
-dw $0073 : db $05 : dl BonkKey_Desert ; torch
-dw $008C : db $05 : dl BonkKey_GTower ; torch
-dw $0087 : db $05 : dl StandingKey_Hera
+dw $1073 : db $05 : dl BonkKey_Desert ; torch
+dw $108C : db $05 : dl BonkKey_GTower ; torch
+dw $1087 : db $05 : dl StandingKey_Hera ; investigate
 
-dw $FFFF : db $FF : dl $FFFFFF ; Placeholders
-dw $FFFF : db $FF : dl $FFFFFF
-dw $FFFF : db $FF : dl $FFFFFF ; Aga 1? ($0020)
-dw $FFFF : db $FF : dl $FFFFFF ; Ice Armos? ($001C)
-dw $FFFF : db $FF : dl $FFFFFF ; Lanmolas 2? ($0033)
-dw $FFFF : db $FF : dl $FFFFFF ; Moldorm 2? ($004D)
-dw $FFFF : db $FF : dl $FFFFFF ; Aga 2? ($000D)
+dw $10E1 : db $06 : dl HeartPiece_Forest_Thieves
+dw $10E2 : db $06 : dl HeartPiece_Lumberjack_Tree
+dw $10EA : db $05 : dl HeartPiece_Spectacle_Cave
+dw $111B : db $06 : dl HeartPiece_Graveyard_Warp
+dw $211B : db $05 : dl HeartPiece_Circle_Bushes
+dw $111E : db $05 : dl RupeeNPC_NortheastDarkSwampCave
+dw $1123 : db $05 : dl RupeeNPC_MoldormCave
+dw $1126 : db $06 : dl HeartPiece_Mire_Warp
+dw $1127 : db $05 : dl HeartPiece_Smith_Pegs
+
 dw $FFFF
 
 warnpc $B9FA9A
@@ -128,7 +131,7 @@ pad $B9FB00
 
 ; $B9FB00
 DungeonLabels:
-dw $2550, $2579 ; Sewers
+dw $25A4, $2579 ; Sewers
 dw $2564, $255F ; Hyrule Castle
 dw $2561, $256C ; Eastern Palace
 dw $2560, $256C ; Desert Palace
@@ -165,6 +168,25 @@ dw $2952 ; 0E - triforce piece
 dw $295B ; 0F - triforce
 
 ; $B9FB60
+NpcItems:
+dw $10E3 : dl $7EF411 : db $80 ; Magic Bat
+dw $1102 : dl $7EF410 : db $04 ; Sick Kid
+dw $1105 : dl $7EF410 : db $10 ; Sahasrahla
+dw $1109 : dl $7EF411 : db $20 ; Potion Shop
+dw $1121 : dl $7EF411 : db $04 ; Blacksmith
+dw $FFFF
+
+warnpc $B9FBA0
+padbyte $FF
+pad $B9FBA0
+
+; $B9FBA0
+; Currently these two are hard-coded checks
+; but maybe that will change if more show up someday?
+MiscLocations2:
+dw $1055 : dw $7EF3C6 : db $01 : dl UncleItem
+dw $2107 : dw $7EF410 : db $80 : dl LibraryItem
+dw $FFFF
 
 warnpc $B9FE00
 org $B9FE00
@@ -231,5 +253,9 @@ AlwaysShowCompass:
 	db $01
 
 ; $B9FF12
+ShowLootOnMap:
+	db $01
+
+; $B9FF13
 ShowLootInHUD:
 	db $01

@@ -2,7 +2,24 @@ pushpc
 org $828C73
 JSL EnterRoom
 NOP
+
+org $86C0AB
+JSL CollectHeartPieceAndUpdate
+
+org $86D1A8
+JSL SetDeathFlagAndUpdate
+
 pullpc
+
+SetDeathFlagAndUpdate:
+	JSL UpdateLootHUD
+	JSL Sprite_ManuallySetDeathFlagUW
+	RTL
+
+CollectHeartPieceAndUpdate:
+	JSL $85F018
+	JSL UpdateLootHUD
+	RTL
 
 ClearLootHUD:
 	LDA.b GameMode
