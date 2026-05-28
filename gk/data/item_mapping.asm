@@ -3,8 +3,8 @@
 !TIER_LOW_KEY = $03
 !TIER_HEALTH = $05
 !TIER_MINOR = $06
-!TIER_MAP = $07
-!TIER_COMPASS = $08
+!TIER_COMPASS = $07
+!TIER_MAP = $08
 !TIER_SM_KEY = $09
 !TIER_BIG_KEY = $0A
 !TIER_MAJOR = $0B
@@ -49,7 +49,7 @@ db !TIER_CRYSTAL ; 20 - Crystal
 db !TIER_MINOR   ; 21 - Net
 db !TIER_MINOR   ; 22 - Blue Mail
 db !TIER_MINOR   ; 23 - Red Mail
-db !TIER_LOW_KEY ; 24 - Small Key
+db !TIER_SM_KEY  ; 24 - Small Key
 db !TIER_COMPASS ; 25 - Compass
 db !TIER_HEALTH  ; 26 - Heart Container from 4/4
 db !TIER_JUNK    ; 27 - Bomb
