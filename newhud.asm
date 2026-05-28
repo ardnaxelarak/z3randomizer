@@ -309,13 +309,13 @@ MagicMeterColorMasks:
 ;================================================================================
 PrizeIconTiles_Transparent:
 dw $0000  ; no icon
-dw $2978  ; crystal 1
-dw $2979  ; crystal 2
-dw $297A  ; crystal 3
-dw $297B  ; crystal 4
-dw $297C  ; crystal 5
-dw $297D  ; crystal 6
-dw $297E  ; crystal 7
+dw $2891  ; crystal 1
+dw $2892  ; crystal 2
+dw $2893  ; crystal 3
+dw $2894  ; crystal 4
+dw $2895  ; crystal 5
+dw $2896  ; crystal 6
+dw $2897  ; crystal 7
 dw $2963  ; green pendant
 dw $295E  ; blue pendant
 dw $296E  ; red pendant
