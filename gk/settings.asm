@@ -54,8 +54,8 @@ dw $29CA, $69CA, $29DA, $29DB ; 03 - small key
 dw $29E9, $69E9, $29F9, $69F9 ; 04 - triforce piece
 dw $29DD, $69DD, $A9DD, $E9DD ; 05 - safety - plus
 dw $29EC, $69EC, $29FC, $69FC ; 06 - less important item - small chest
-dw $29CE, $29CF, $29DE, $29DF ; 07 - map
-dw $29E8, $69E8, $29F8, $69F8 ; 08 - compass
+dw $29E8, $69E8, $29F8, $69F8 ; 07 - compass
+dw $29CE, $29CF, $29DE, $29DF ; 08 - map
 dw $29CA, $69CA, $29DA, $29DB ; 09 - small key
 dw $29C8, $69C8, $29D8, $29D9 ; 0A - big key
 dw $29ED, $69ED, $29FD, $69FD ; 0B - important inventory item - big chest
