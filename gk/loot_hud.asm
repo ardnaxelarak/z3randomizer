@@ -45,7 +45,7 @@ UpdateLootHUD:
 	PHX : PHY
 	SEP #$30
 
-	LDA.l ShowLootInHUD : BEQ .setting_off
+	LDA.l HudItems_enabled : BEQ .setting_off
 	LDA.b IndoorsFlag : BEQ .done
 
 	REP #$30
@@ -77,23 +77,7 @@ UpdateLootHUD:
 	ASL A : ASL A : ASL A : ASL A
 	ORA.b RoomIndex
 .check
-	JSL CheckLoot
-
-	SEP #$30
-	CMP.l ShowItems_hud_cap
-	BCC +
-	LDA.l ShowItems_hud_cap
-+
-
-	LDX.w DungeonID
-	CPX.b #$FF
-	BNE +
-	CMP.l ShowItems_cave_cap
-	BCC +
-	LDA.l ShowItems_cave_cap
-+
-
-	REP #$30
+	JSL CheckHudLoot
 
 	ASL A : TAX
 	LDA.l HUDLootTypeIcons, X

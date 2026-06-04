@@ -33,7 +33,7 @@ DRHUD_DrawIndicators:
 DRHUD_BossIndicator:
 	LDA.w DungeonID : CMP.b #$FF : BNE .in_dungeon
 	LDA.w NpcItemIndicator : BEQ .early_exit
-	LDA.l ShowLootInHUD : BEQ .early_exit
+	LDA.l HudItems_enabled : BEQ .early_exit
 	REP #$10
 	LDY.w #!NPCIcon : STY.w HUDMultiIndicator
 	JMP DRHUD_Finished

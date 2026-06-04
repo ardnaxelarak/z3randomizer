@@ -1,18 +1,15 @@
 ; A = room_id
 ; out A = level of loot
-CheckLoot:
+CheckMapLoot:
 	PHP
 	REP #$30
-	PHB : PHX : PHY
+	PHX
 
 	STA.b $CA
 
-	LDA.b $06 : PHA
 	LDA.b $0E : PHA
 
-	STZ.b $02 ; best item class found
-
-	LDA.l ShowItems_default
+	LDA.l MapItems_default
 	AND.w #$00FF
 	STA.b $0E
 
@@ -24,7 +21,7 @@ CheckLoot:
 	LDA.l SaveDataWRAM, X
 	AND.w #$000F
 	BEQ +
-	LDA.l ShowItems_visited_tile
+	LDA.l MapItems_visited_tile
 	AND.w #$00FF
 	CMP.b $0E
 	BCC +
@@ -40,7 +37,7 @@ CheckLoot:
 	LDA.l MapField
 	AND.l DungeonMask, X
 	BEQ +
-	LDA.l ShowItems_have_map
+	LDA.l MapItems_have_map
 	AND.w #$00FF
 	CMP.b $0E
 	BCC +
@@ -49,7 +46,7 @@ CheckLoot:
 +	LDA.l CompassField
 	AND.l DungeonMask, X
 	BEQ +
-	LDA.l ShowItems_have_compass
+	LDA.l MapItems_have_compass
 	AND.w #$00FF
 	CMP.b $0E
 	BCC +
@@ -57,6 +54,84 @@ CheckLoot:
 +
 
 .skip_dungeon_checks
+	JMP GetLootLevelAndCleanUp
+
+; A = room_id
+; out A = level of loot
+CheckHudLoot:
+	PHP
+	REP #$30
+	PHX
+
+	STA.b $CA
+
+	LDA.b $0E : PHA
+
++	LDA.w DungeonID
+	AND.w #$00FF
+	CMP.w #$00FF
+	BEQ .cave
+
+	TAX
+
+	LDA.l HudItems_default_dungeon
+	AND.w #$00FF
+	STA.b $0E
+
+	LDA.l MapField
+	AND.l DungeonMask, X
+	BEQ +
+	LDA.l HudItems_have_map
+	AND.w #$00FF
+	CMP.b $0E
+	BCC +
+	STA.b $0E
+
++	LDA.l CompassField
+	AND.l DungeonMask, X
+	BEQ +
+	LDA.l HudItems_have_compass
+	AND.w #$00FF
+	CMP.b $0E
+	BCC +
+	STA.b $0E
++
+
+	BRA GetLootLevelAndCleanUp
+
+.cave
+	LDA.l HudItems_cave
+	AND.w #$00FF
+	STA.b $0E
+	; intentional fall-through
+
+GetLootLevelAndCleanUp:
+	STZ.b $02
+
+	LDA.b $0E
+	AND.w #$00FF
+	BEQ +
+		JSL GetLootLevel
++
+
+	PLA : STA.b $0E
+	PLX
+	PLP
+
+	LDA.b $02
+RTL
+
+; $CA = room_id
+; $0E = level of details to return
+;       (1 - presence, 2 - compass or presence, 3 - value)
+; out $02 = level of loot
+GetLootLevel:
+	PHP
+	REP #$30
+	PHB : PHX : PHY
+	LDA.b $06 : PHA
+
+	STZ.b $02 ; best item class found
 
 	LDA.l ItemSources : BIT.w #$0001 : BEQ +
 	JSR CheckChests
@@ -82,11 +157,9 @@ CheckLoot:
 JSR CheckNpcs
 
 .done
-	PLA : STA.b $0E
 	PLA : STA.b $06
 	PLY : PLX : PLB
 	PLP
-	LDA.b $02
 	RTL
 
 CheckChests:
@@ -543,15 +616,19 @@ GetLootClass:
 	CMP.w #$0080 : BNE .not_compass
 
 .compass
-	LDA.l AlwaysShowCompass
+	LDA.b $0E
 	AND.w #$00FF
-	BNE .check_value
+	CMP.w #$0002
+	BEQ .check_value
 
 .not_compass
 	LDA.b $0E
 	BEQ .done
-	CMP.w #$0001
-	BEQ .value_set
+	CMP.w #$0003
+	BCS .check_value
+
+	LDA.w #$0001
+	BRA .value_set
 
 .check_value
 	LDA.l LootTypeMapping, X
@@ -574,9 +651,13 @@ GetPotJunkClass:
 
 	LDA.b $0E
 	BEQ .done
-	CMP.w #$0001
-	BEQ .value_set
+	CMP.w #$0003
+	BCS .check_value
 
+	LDA.w #$0001
+	BRA .value_set
+
+.check_value
 	; hardcode as junk for now
 	LDA.w #$0002
 

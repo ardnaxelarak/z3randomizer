@@ -52,7 +52,7 @@ dw $2DCB, $6DCB, $ADCB, $EDCB ; 01 - unknown - dot
 dw $29EB, $69EB, $29FB, $69FB ; 02 - junk - pot
 dw $29CA, $69CA, $29DA, $29DB ; 03 - small key
 dw $29E9, $69E9, $29F9, $69F9 ; 04 - triforce piece
-dw $29DD, $69DD, $A9DD, $E9DD ; 05 - safety - plus
+dw $29DD, $69DD, $A9DD, $E9DD ; 05 - health - plus
 dw $29EC, $69EC, $29FC, $69FC ; 06 - less important item - small chest
 dw $29E8, $69E8, $29F8, $69F8 ; 07 - compass
 dw $29CE, $29CF, $29DE, $29DF ; 08 - map
@@ -87,7 +87,7 @@ dw $10A4 : db $04 : dl HeartContainer_Trinexx
 
 dw $1073 : db $05 : dl BonkKey_Desert ; torch
 dw $108C : db $05 : dl BonkKey_GTower ; torch
-dw $1087 : db $05 : dl StandingKey_Hera ; investigate
+dw $1087 : db $05 : dl StandingKey_Hera
 
 dw $10E1 : db $06 : dl HeartPiece_Forest_Thieves
 dw $10E2 : db $06 : dl HeartPiece_Lumberjack_Tree
@@ -220,42 +220,53 @@ warnpc $B9FF08
 org $B9FF08
 ; $00 - do not show anything
 ; $01 - show presence of unobtained items
-; $02 - show category of item
-ShowItems:
+; $02 - show compass if presence, otherwise presence of unobtained items
+; $03 - show category of item
+MapItems:
 .default
 	db $00
 .have_map
 	db $00
 .have_compass
-	db $02
+	db $03
 .visited_tile
-	db $01
+	db $02
 .reserved
-	skip 2
-.hud_cap
-	db $FF
-.cave_cap
+	skip 3
+.enabled
 	db $01
 warnpc $B9FF10
 
 org $B9FF10
-; ---P bepc
+HudItems:
+.cave
+	db $00
+.default_dungeon
+	db $00
+.have_map
+	db $01
+.have_compass
+	db $03
+.reserved
+	skip 3
+.enabled
+	db $01
+warnpc $B9FF18
+
+org $B9FF20
+; ---P sepc
 ; P - dungeon prizes
-; b - bosses (and torches in GT and desert, plus hera basement standing item)
+; s - standing items (plus torches in GT and desert and bosses)
 ; e - enemy drops
 ; p - pots
 ; c - chests
 ItemSources:
 	db $09
 
-; $B9FF11
-AlwaysShowCompass:
-	db $01
-
-; $B9FF12
-ShowLootOnMap:
-	db $01
-
-; $B9FF13
-ShowLootInHUD:
+; B9FF21
+; a--- --mv
+; a - always
+; m - have map
+; v - have visited dungeon
+MapSwapping:
 	db $01

@@ -32,7 +32,7 @@ DrawLoot:
 	LDA.l DRMode
 	BNE .skip
 
-	LDA.l ShowLootOnMap
+	LDA.l MapItems_enabled
 	BEQ .skip
 
 	REP #$30
@@ -128,7 +128,7 @@ DrawSingleFloorLoot:
 	LDA.w #$0000
 	BRA +
 .valid_room
-	JSL CheckLoot
+	JSL CheckMapLoot
 +
 	ASL A : ASL A : ASL A
 

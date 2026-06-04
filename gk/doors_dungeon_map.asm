@@ -150,7 +150,7 @@ DrawFullRoomTile:
 	RTL
 
 DrawSingleRoomLoot:
-	LDA.l ShowLootOnMap : AND.w #$00FF : BNE +
+	LDA.l MapItems_enabled : AND.w #$00FF : BNE +
 		RTL
 
 +	PHX : PHY
@@ -176,7 +176,7 @@ DrawSingleRoomLoot:
 
 	LDA.b $CA
 	AND.w #$F0FF
-	JSL CheckLoot
+	JSL CheckMapLoot
 
 	ASL A : ASL A : ASL A
 
