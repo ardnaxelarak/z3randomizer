@@ -42,6 +42,8 @@ CheckSwitchMap:
 	BRA .doors_done
 
 .change_dungeon
+	LDA.l MapSwapping
+	BEQ .doors_done
 	JSL DoorsMapChangeDungeon
 	BRA .doors_done
 
@@ -59,10 +61,14 @@ CheckSwitchMap:
 
 .not_fancy_door_map
 	SEP #$20
+	LDA.l MapSwapping
+	BEQ .no_swap
+
 	LDA.b $F6
 	AND.b #$30
-	BNE +
+	BNE .do_swap
 
+.no_swap
 	; what we wrote over
 	REP #$20
 	LDA.w DungeonMapFloorCountData, X
@@ -70,15 +76,20 @@ CheckSwitchMap:
 	CLC : ADC.b $00
 	RTL
 
-+	PHA
+.do_swap
 	TXA
+.try_next
 	ASL A
 	TAX
-	PLA
+	LDA.b $F6
 	BIT.b #$20
 	BNE +
 	INX
-+	LDA.l DungeonMapData.prev, X
++
+
+	LDA.l DungeonMapData.prev, X
+	JSL IsValidDungeonToSwapTo
+	BCC .try_next
 	STA.w DungeonID
 
 	LDA.b #$04
@@ -86,6 +97,58 @@ CheckSwitchMap:
 	REP #$20
 	LDA.w #$0000
 	RTL
+
+; in A = dungeon ID to check
+; out C - CC = not valid, CS = valid
+IsValidDungeonToSwapTo:
+	CMP.l CachedDungeonID ; dungeon we're in is always valid
+	BNE +
+		SEC
+		RTL
++
+
+	PHP
+	REP #$20
+	PHX : PHA
+	TAX
+
+	LDA.l MapSwapping
+	BIT.w #$0080
+	BNE .yes
+
+	BIT.w #$0001
+	BEQ +
+	; check visited flag
+	LDA.l SwapMasks, X
+	AND.l DungeonVisited
+	BNE .yes
++
+
+	LDA.l MapSwapping : BIT.w #$0002
+	BEQ +
+	; check map flag
+	LDA.l SwapMasks, X
+	AND.l MapField
+	BNE .yes
++
+
+.no
+	PLA : PLX
+	PLP
+	CLC
+	RTL
+
+.yes
+	PLA : PLX
+	PLP
+	SEC
+	RTL
+
+SwapMasks:
+	dw $C000, $C000, $2000, $1000
+	dw $0800, $0400, $0200, $0100
+	dw $0080, $0040, $0020, $0010
+	dw $0008, $0004, $0002, $0001
 
 DungeonMapSwitch_Submodule:
 	JSL $80893D
@@ -224,39 +287,32 @@ DrawDungeonLabel:
 	CLC : ADC.w #$0008
 	TAY
 
+	LDA.l MapSwapping
+	BEQ +
 	; L/R switch indicators
-	LDA.w #$E310
+	LDA.w #$E360
 	STA.w GFXStripes+$02, Y
-	LDA.w #$E910
+	LDA.w #$E960
 	STA.w GFXStripes+$0A, Y
-	LDA.w #$E318
-	STA.w GFXStripes+$12, Y
-	LDA.w #$E918
-	STA.w GFXStripes+$1A, Y
 
 	LDA.w #$0300
 	STA.w GFXStripes+$04, Y
 	STA.w GFXStripes+$0C, Y
-	STA.w GFXStripes+$14, Y
-	STA.w GFXStripes+$1C, Y
 
-	LDA.w #$49AF
+	LDA.w #$65BF
 	STA.w GFXStripes+$06, Y
-	STA.w GFXStripes+$16, Y
-	LDA.w #$099E
+	LDA.w #$25BD
 	STA.w GFXStripes+$08, Y
-	STA.w GFXStripes+$18, Y
 
-	LDA.w #$099F
+	LDA.w #$25BE
 	STA.w GFXStripes+$0E, Y
-	STA.w GFXStripes+$1E, Y
-	LDA.w #$09AF
+	LDA.w #$25BF
 	STA.w GFXStripes+$10, Y
-	STA.w GFXStripes+$20, Y
 
 	TYA
-	CLC : ADC.w #$0020
+	CLC : ADC.w #$0010
 	TAY
++
 
 	LDA.l DRMode
 	BNE .doors

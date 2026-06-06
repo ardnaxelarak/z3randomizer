@@ -1240,7 +1240,7 @@ DrawDoorsMapBlinker:
 	AND.w #$01E0
 	ASL A : ASL A : ASL A
 	XBA
-	CLC : ADC.w #$00A4
+	CLC : ADC.w #$00A5
 	STA.w OAMBuffer, X
 
 	LDA.b LinkPosY
@@ -1718,10 +1718,13 @@ DoorsMapChangeDungeon:
 	BNE +
 	INX
 +	LDA.l DungeonMapData.prev, X
+	STA.w DungeonID
 	CMP.b $00
 	BEQ .done
 
-	STA.w DungeonID
+	JSL IsValidDungeonToSwapTo
+	BCC .next
+
 	JSL FindFirstEntrance
 	CPY.b #$FF
 	BEQ .next

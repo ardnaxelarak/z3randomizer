@@ -1,4 +1,5 @@
 RedrawLoot:
+	SEP #$20
 	JSL DrawLoot
 
 	; what we wrote over

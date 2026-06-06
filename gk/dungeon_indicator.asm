@@ -5,6 +5,15 @@ LoadDungeonIndicator:
 	LDA.w DungeonID
 	CMP.b #DungeonIndicatorMap_end-DungeonIndicatorMap : BCS .done
 	TAX
+
+	; mark dungeon as entered
+	REP #$20
+	LDA.w DungeonMask, X
+	ORA.l DungeonVisited
+	STA.l DungeonVisited
+	SEP #$20
+
+	; load indicator
 	LDA.l DungeonIndicatorMap, X
 	TAX
 
