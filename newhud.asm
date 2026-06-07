@@ -316,9 +316,9 @@ dw $2894  ; crystal 4
 dw $2895  ; crystal 5
 dw $2896  ; crystal 6
 dw $2897  ; crystal 7
-dw $2963  ; green pendant
-dw $295E  ; blue pendant
-dw $296E  ; red pendant
+dw $2935  ; green pendant
+dw $2936  ; blue pendant
+dw $2937  ; red pendant
 
 ;================================================================================
 DrawCompassCounts:

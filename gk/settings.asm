@@ -155,7 +155,7 @@ dw $295C ; 01 - unknown - dot
 dw $2954 ; 02 - junk - pot
 dw $2950 ; 03 - small key
 dw $2952 ; 04 - triforce piece
-dw $2955 ; 05 - safety - plus
+dw $2955 ; 05 - health - plus
 dw $2953 ; 06 - less important item - small chest
 dw $2D56 ; 07 - compass
 dw $2957 ; 08 - map
