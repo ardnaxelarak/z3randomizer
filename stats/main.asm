@@ -25,8 +25,8 @@ PreparePointer:
 	LDY.w #$0000
 RTL
 
-;   Regular stat:   XXXX X00L   LLLL LLLL   BBBB SSSS   CCC- ----	---- ----	AAAA AAAA   AAAA AAAA   AAAA AAAA
-;   Time stat:      XXXX X01L   LLLL LLLL   ---- ----	---- ----	---- ----	AAAA AAAA   AAAA AAAA   AAAA AAAA
+;   Regular stat:   XXXX X00L   LLLL LLLL   BBBB SSSS   CCC- ----   ---- ----   AAAA AAAA   AAAA AAAA   AAAA AAAA
+;   Time stat:      XXXX X01L   LLLL LLLL   ---- ----   ---- ----   ---- ----   AAAA AAAA   AAAA AAAA   AAAA AAAA
 ;   End of data:    1111 1111   1111 1111
 
 ;   X   X offset (measured in 8x8 tiles)
@@ -174,7 +174,7 @@ FindLine:
 !FRAMES_PER_SECOND = 60
 !FRAMES_PER_MINUTE = 60*60
 !FRAMES_PER_HOUR = 60*60*60
-!MAX_FRAME_COUNT = 59*60+59*60+59*60+99
+!MAX_FRAME_COUNT = (99*60)+(59*60)+(59*60)+59
 
 macro CountUnits(framesPerUnit, unitCounter)
 	STZ.b <unitCounter>
@@ -196,7 +196,7 @@ endmacro
 
 !ColonOffset = $8A
 !PeriodOffset = $4D
-BlankCreditsTile = $883D
+BlankCreditsTile = $3D88
 
 RenderCreditsStatCounter:
 	PHB
@@ -498,45 +498,45 @@ RenderLineNumber:
 	RTS
 
 LoadCreditsTiles:
-        JSL CopyFontToVRAM ; What we wrote over
+	JSL CopyFontToVRAM ; What we wrote over
 
-        REP #$10
-        LDA.b #$80 : STA.w VMAIN
-        LDA.b #$01 : STA.w DMAP0
-        LDA.b #$18 : STA.w BBAD0
+	REP #$10
+	LDA.b #$80 : STA.w VMAIN
+	LDA.b #$01 : STA.w DMAP0
+	LDA.b #$18 : STA.w BBAD0
 
-        ; Item tiles
-        LDX.w #$8200 : STX.w VMADDL
-        LDA.b #FileSelectNewGraphics>>16 : STA.w A1B0
-        LDX.w #FileSelectNewGraphics : STX.w A1T0L
-        LDX.w #$0C00 : STX.w DAS0L
-        LDA.b #$01 : STA.w DMAENABLE
+	; Item tiles
+	LDX.w #$8200 : STX.w VMADDL
+	LDA.b #FileSelectNewGraphics>>16 : STA.w A1B0
+	LDX.w #FileSelectNewGraphics : STX.w A1T0L
+	LDX.w #$0C00 : STX.w DAS0L
+	LDA.b #$01 : STA.w DMAENABLE
 
-        ; Small characters A-Z
-        LDX.w #$7F00 : STX.w VMADDL
-        LDA.b #SmallCharacters>>16 : STA.w A1B0
-        LDX.w #SmallCharacters : STX.w A1T0L
-        LDX.w #$0200 : STX.w DAS0L
-        LDA.b #$01 : STA.w DMAENABLE
+	; Small characters A-Z
+	LDX.w #$7F00 : STX.w VMADDL
+	LDA.b #SmallCharacters>>16 : STA.w A1B0
+	LDX.w #SmallCharacters : STX.w A1T0L
+	LDX.w #$0200 : STX.w DAS0L
+	LDA.b #$01 : STA.w DMAENABLE
 
-        SEP #$10
+	SEP #$10
 RTL
 
 LoadOverworldCreditsTiles:
-        JSL CopyFontToVRAM ; What we wrote over
-        REP #$10
+	JSL CopyFontToVRAM ; What we wrote over
+	REP #$10
 
-        ; Small characters A-Z
-        LDA.b #$80 : STA.w VMAIN
-        LDA.b #$01 : STA.w DMAP0
-        LDA.b #$18 : STA.w BBAD0
-        LDA.b #SmallCharacters>>16 : STA.w A1B0
-        LDX.w #SmallCharacters : STX.w A1T0L
-        LDX.w #$0200 : STX.w DAS0L
-        LDX.w #$7F00 : STX.w VMADDL
-        LDA.b #$01 : STA.w DMAENABLE
+	; Small characters A-Z
+	LDA.b #$80 : STA.w VMAIN
+	LDA.b #$01 : STA.w DMAP0
+	LDA.b #$18 : STA.w BBAD0
+	LDA.b #SmallCharacters>>16 : STA.w A1B0
+	LDX.w #SmallCharacters : STX.w A1T0L
+	LDX.w #$0200 : STX.w DAS0L
+	LDX.w #$7F00 : STX.w VMADDL
+	LDA.b #$01 : STA.w DMAENABLE
 
-        SEP #$10
+	SEP #$10
 RTL
 
 CheckFontTable:
@@ -577,23 +577,23 @@ RTS
 ; Dialog Pointer Override
 ;--------------------------------------------------------------------------------
 EndingSequenceTableOverride:
-        PHY
-        PHX
-        TYX
-        LDA.l EndingSequenceText, X
-        PLX
-        STA.w $1008, X
-        PLY
+	PHY
+	PHX
+	TYX
+	LDA.l EndingSequenceText, X
+	PLX
+	STA.w $1008, X
+	PLY
 RTL
 ;--------------------------------------------------------------------------------
 EndingSequenceTableLookupOverride:
-        PHX : PHB
-        PHK : PLB
-        TYX
-        LDA.l EndingSequenceText, X : AND.w #$00FF
-        ASL
-        TAY
-        LDA.w FontTable,Y
-        PLB : PLX
+	PHX : PHB
+	PHK : PLB
+	TYX
+	LDA.l EndingSequenceText, X : AND.w #$00FF
+	ASL A
+	TAY
+	LDA.w FontTable,Y
+	PLB : PLX
 RTL
 ;--------------------------------------------------------------------------------

@@ -265,4 +265,6 @@ dw $3D99 ; -               ; $FB
 dw $0000 ;                 ;
 dw $0000 ;                 ;
 dw $0000 ;                 ;
-dw $0000 ;                 ;
+
+; yellow dot
+dw $2DFA ;                 ; FF

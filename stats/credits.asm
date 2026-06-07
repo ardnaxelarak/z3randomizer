@@ -504,7 +504,16 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("SPRITE DEVELOPMENT", "yellow")
+%smallcredits("GWAAKIWI * DUNGEON MAPS", "yellow")
+
+%blankline()
+
+%bigcredits("KARAFRUIT")
+
+%blankline()
+%blankline()
+
+%smallcredits("SPRITE DEVELOPMENT", "green")
 
 %blankline()
 
@@ -525,7 +534,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("YOUR SPRITE BY", "green")
+%smallcredits("YOUR SPRITE BY", "yellow")
 
 %blankline()
 
@@ -535,7 +544,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("MSU SUPPORT", "yellow")
+%smallcredits("MSU SUPPORT", "green")
 
 %blankline()
 
@@ -544,7 +553,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("PALETTE SHUFFLER", "green")
+%smallcredits("PALETTE SHUFFLER", "yellow")
 
 %blankline()
 
@@ -553,7 +562,7 @@ CreditsLineBlank:
 %blankline()
 %blankline()
 
-%smallcredits("WEBSITE LOGO", "yellow")
+%smallcredits("WEBSITE LOGO", "green")
 
 %blankline()
 
@@ -623,12 +632,6 @@ endif
 
 %bigcredits("HTTPS://ALTTPR.COM/DISCORD")
 
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
-%emptyline()
 %emptyline()
 %emptyline()
 
@@ -752,13 +755,12 @@ endif
 
 %blankline()
 
+%bigcreditsleft("TOTAL MAP TIME")
+
+%blankline()
+
 %bigcreditsleft("TOTAL LAG TIME")
 
-%blankline()
-%blankline()
-
-
-%blankline()
 %blankline()
 
 

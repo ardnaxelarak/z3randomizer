@@ -308,7 +308,7 @@ HeartContainerCounter: skip 1   ; Total number of heart containers collected (in
 DeathCounter: skip 1            ; Number of deaths (integer)
 skip 1                          ; Reserved
 FluteCounter: skip 1            ; Number of times fluted (integer)
-skip 4                          ;
+MapFrames: skip 4               ; Total map time in frames (32-bit integer)
 RNGItem: skip 2                 ; RNG Item
 SwordlessBossKills: skip 1      ; Number of bosses killed without a sword (integer)
 FaerieRevivalCounter: skip 1    ; Number of faerie revivals (integer)

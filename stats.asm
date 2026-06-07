@@ -36,7 +36,7 @@ DungeonHoleWarpTransition:
 	BRA StatTransitionCounter
 DungeonHoleEntranceTransition:
 	JSL EnableForceBlank
-	
+
 	LDA.l SilverArrowsAutoEquip : AND.b #$02 : BEQ +
 	LDA.w EntranceIndex : CMP.b #$7B : BNE + ; skip unless falling to ganon's room
 	LDA.l BowTracking : AND.b #$40 : BEQ + ; skip if we don't have silvers
@@ -44,7 +44,7 @@ DungeonHoleEntranceTransition:
 	CMP.b #$03 : !BGE + ; skip if the bow is already silver
 		!ADD.b #$02 : STA.l BowEquipment ; increase bow to silver
 	+
-	
+
 	BRA StatTransitionCounter
 DungeonStairsTransition:
 	JSL Dungeon_SaveRoomQuadrantData
@@ -88,27 +88,27 @@ IncrementSmallKeys:
 RTL
 ;--------------------------------------------------------------------------------
 IncrementSmallKeysNoPrimary:
-        STA.l CurrentSmallKeys ; thing we wrote over, write small key count
-        PHX
-        LDA.l StatsLocked : BNE +
-                LDA.l SmallKeyCounter : INC : STA.l SmallKeyCounter
-        +
-        JSL UpdateKeys
-        LDA.b IndoorsFlag : BEQ + ; skip room check if outdoors
-                PHP : REP #$20 ; set 16-bit accumulator
-                LDA.b RoomIndex : CMP.w #$0087 : BNE ++ ; hera basement
-                LDA.b $A8 : AND.w #$0003 : CMP.w #$0002 : BNE ++ ; must be quadrant 2
-                LDA.w SprDropsItem, X : AND.w #$00FF : BNE ++ ; must not be a standing item
-                        PLP : PHY
-                        LDY.b #$24
-                        JSL AddInventory
-                        PLY : BRA +
-                ++
-                PLP
-        +
-        LDA.b #$01 : STA.l UpdateHUDFlag
-        JSL HUD_RebuildLong
-        PLX
+	STA.l CurrentSmallKeys ; thing we wrote over, write small key count
+	PHX
+	LDA.l StatsLocked : BNE +
+		LDA.l SmallKeyCounter : INC : STA.l SmallKeyCounter
+	+
+	JSL UpdateKeys
+	LDA.b IndoorsFlag : BEQ + ; skip room check if outdoors
+		PHP : REP #$20 ; set 16-bit accumulator
+		LDA.b RoomIndex : CMP.w #$0087 : BNE ++ ; hera basement
+		LDA.b $A8 : AND.w #$0003 : CMP.w #$0002 : BNE ++ ; must be quadrant 2
+		LDA.w SprDropsItem, X : AND.w #$00FF : BNE ++ ; must not be a standing item
+			PLP : PHY
+			LDY.b #$24
+			JSL AddInventory
+			PLY : BRA +
+		++
+		PLP
+	+
+	LDA.b #$01 : STA.l UpdateHUDFlag
+	JSL HUD_RebuildLong
+	PLX
 RTL
 ;--------------------------------------------------------------------------------
 DecrementSmallKeys:
@@ -188,9 +188,9 @@ CountAllKey:
 
 ;--------------------------------------------------------------------------------
 IncrementAgahnim2Sword:
-        PHA
-        JSL IncrementBossSword
-        PLA
+	PHA
+	JSL IncrementBossSword
+	PLA
 RTL
 ;--------------------------------------------------------------------------------
 IncrementDeathCounter:
@@ -239,22 +239,22 @@ RTL
 DecrementItemCounter:
 	PHA
 		LDA.l StatsLocked : BNE +
-                        REP #$20
+		REP #$20
 			LDA.l TotalItemCounter : DEC : STA.l TotalItemCounter
-                        SEP #$20
+		SEP #$20
 		+
 	PLA
 RTL
 ;--------------------------------------------------------------------------------
 IncrementBigChestCounter:
-        JSL Dungeon_SaveRoomQuadrantData ; thing we wrote over
-        PHA
-        LDA.l StatsLocked : BNE +
-                LDA.l BigKeysBigChests : INC : AND.b #$0F : TAX
-                LDA.l BigKeysBigChests : AND.b #$F0 : STA.l BigKeysBigChests
-                TXA : ORA.l BigKeysBigChests : STA.l BigKeysBigChests
-        +
-        PLA
+	JSL Dungeon_SaveRoomQuadrantData ; thing we wrote over
+	PHA
+	LDA.l StatsLocked : BNE +
+		LDA.l BigKeysBigChests : INC : AND.b #$0F : TAX
+		LDA.l BigKeysBigChests : AND.b #$F0 : STA.l BigKeysBigChests
+		TXA : ORA.l BigKeysBigChests : STA.l BigKeysBigChests
+	+
+	PLA
 RTL
 ;--------------------------------------------------------------------------------
 IncrementDamageTakenCounter_Eight:
@@ -338,8 +338,8 @@ IncrementUWMirror:
 RTL
 ;--------------------------------------------------------------------------------
 IncrementSpentRupees:
-    DEC A : BPL .subtractRupees
-    LDA.w #$0000 : STA.l CurrentRupees
+	DEC A : BPL .subtractRupees
+	LDA.w #$0000 : STA.l CurrentRupees
 RTL
 	.subtractRupees
 	PHA : PHP
@@ -355,18 +355,18 @@ IndoorTileTransitionCounter:
 JMP StatTransitionCounter
 ;--------------------------------------------------------------------------------
 IndoorSubtileTransitionCounter:
-    ;JSL HeartPieceSetRedraw ; set redraw flag for items
-    STZ.w SomariaSwitchFlag ; stuff we wrote over
-    STZ.w SpriteRoomTag
+	;JSL HeartPieceSetRedraw ; set redraw flag for items
+	STZ.w SomariaSwitchFlag ; stuff we wrote over
+	STZ.w SpriteRoomTag
 JMP StatTransitionCounter
 ;--------------------------------------------------------------------------------
 StatsFinalPrep:
 	PHA : PHX : PHP
 		SEP #$30 ; set 8-bit accumulator and index registers
-		
+
 		LDA.l StatsLocked : BNE .ramPostOnly
 		INC : STA.l StatsLocked
-	
+
 		JSL IncrementFinalSword
 
 		LDA.l HighestMail : INC : STA.l HighestMail ; add green mail to mail count
@@ -385,12 +385,12 @@ StatsFinalPrep:
 		LDA.l RupeesSpent : !ADD.l DisplayRupees : STA.l RupeesCollected
 		LDA.l RupeesSpent+1 : ADC.l DisplayRupees+1 : STA.l RupeesCollected+1
 
-                REP #$20
+		REP #$20
 		LDA.l TotalItemCounter : !SUB.l ChestsOpened : STA.l NonChestCounter
 
 		.done
 	PLP : PLX : PLA
 	LDA.b #$19 : STA.b GameMode ; thing we wrote over, load triforce room
-        STZ.b GameSubMode
-        STZ.b SubSubModule
+	STZ.b GameSubMode
+	STZ.b SubSubModule
 RTL
