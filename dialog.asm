@@ -304,7 +304,7 @@ DialogGanon2:
 	BCS +
 		LDA.w #$018D : JMP .done
 	+
-	LDA.l GanonVulnerabilityItem : AND.w #$00FF
+	LDA.l GanonVulnerabilityItem : AND.w #$007F
 	BEQ .silver_arrows
 	CMP.w #$0001 : BEQ .silver_arrows
 	CMP.w #$0004 : BEQ .bombs

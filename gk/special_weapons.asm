@@ -1,6 +1,6 @@
 DamageClassCalc:
 	PHA
-	LDA.l GanonVulnerabilityItem : BEQ +
+	LDA.l GanonVulnerabilityItem : AND.b #$7F : BEQ +
 	LDA.w SpriteTypeTable, X : CMP.b #$D7 : BNE +
 	PLA
 	JSL Ganon_CheckAncillaVulnerability
