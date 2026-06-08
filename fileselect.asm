@@ -82,7 +82,10 @@ DrawBottle:
 	AND.w #$00FF : BNE +
 		LDX.w #FileSelectItems_empty_bottle
 		JMP DrawItemGray
-	+ : DEC #2 : BNE +
+	+ : DEC : BNE +
+		LDX.w #FileSelectItems_orange_potion
+		JMP DrawItem
+	+ : DEC : BNE +
 		LDX.w #FileSelectItems_empty_bottle
 		JMP DrawItem
 	+ : DEC : BNE +
@@ -619,6 +622,8 @@ FileSelectItems:
 	dw #$0282|!FS_COLOR_GREEN, #$0282|!FS_COLOR_GREEN|!FS_HFLIP, #$0292|!FS_COLOR_GREEN, #$0284|!FS_COLOR_GREEN
 	.blue_potion
 	dw #$0282|!FS_COLOR_BLUE, #$0282|!FS_COLOR_BLUE|!FS_HFLIP, #$0292|!FS_COLOR_BLUE, #$0285|!FS_COLOR_BLUE
+	.orange_potion
+	dw #$0282|!FS_COLOR_BROWN, #$0282|!FS_COLOR_BROWN|!FS_HFLIP, #$0292|!FS_COLOR_BROWN, #$0286|!FS_COLOR_BROWN
 	.fairy_bottle
 	dw #$0287|!FS_COLOR_YELLOW|!FS_HFLIP, #$0287|!FS_COLOR_YELLOW, #$0296|!FS_COLOR_BLUE, #$0297|!FS_COLOR_BLUE
 	.bee_bottle

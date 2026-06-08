@@ -101,7 +101,7 @@ db $00 ; 62 - RNG pool item (single)
 db $00 ; 63 - RNG pool item (multi)
 db $00 ; 64 - Progressive bow
 db $00 ; 65 - Progressive bow
-db $00 ; 66 -
+db $00 ; 66 - Potion refill (orange)
 db $00 ; 67 -
 db $00 ; 68 -
 db $00 ; 69 -

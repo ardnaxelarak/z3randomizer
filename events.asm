@@ -1,14 +1,14 @@
 OnPrepFileSelect:
-        LDA.b GameSubMode : CMP.b #$03 : BNE +
-                LDA.b #$06 : STA.b NMISTRIPES ; thing we wrote over
-                RTL
-        +
-        PHA : PHX
-        REP #$10
-        JSL LoadAlphabetTilemap
-        JSL LoadFullItemTiles
-        SEP #$10
-        PLX : PLA
+	LDA.b GameSubMode : CMP.b #$03 : BNE +
+		LDA.b #$06 : STA.b NMISTRIPES ; thing we wrote over
+		RTL
+	+
+	PHA : PHX
+	REP #$10
+	JSL LoadAlphabetTilemap
+	JSL LoadFullItemTiles
+	SEP #$10
+	PLX : PLA
 RTL
 ;--------------------------------------------------------------------------------
 OnDrawHud:
@@ -22,17 +22,17 @@ JML ReturnFromOnDrawHud
 ;--------------------------------------------------------------------------------
 OnDungeonEntrance:
 	STA.l PegColor ; thing we wrote over
-        JSL MaybeFlagDungeonTotalsEntrance
-        LDA.w #$0001 : STA.l UpdateHUDFlag
-        SEP #$30
-        JSL DynamicDropGFXClear
-        REP #$30
+	JSL MaybeFlagDungeonTotalsEntrance
+	LDA.w #$0001 : STA.l UpdateHUDFlag
+	SEP #$30
+	JSL DynamicDropGFXClear
+	REP #$30
 RTL
 ;--------------------------------------------------------------------------------
 OnDungeonBossExit:
-        JSL StatTransitionCounter
-        JSL ClearMultiworldText
-        JSL DynamicDropGFXClear
+	JSL StatTransitionCounter
+	JSL ClearMultiworldText
+	JSL DynamicDropGFXClear
 RTL
 ;--------------------------------------------------------------------------------
 OnPlayerDead:
@@ -41,40 +41,44 @@ OnPlayerDead:
 		JSL DynamicDropGFXClear
 		JSL SetSilverBowMode
 		JSL RefreshRainAmmo
+		LDA.b #$00
+		STA.l InfiniteMagic
 	PLA
 RTL
 ;--------------------------------------------------------------------------------
 OnDungeonExit:
-        PHA : PHP
-        SEP #$20 ; set 8-bit accumulator
-        JSL SQEGFix
-        JSL DynamicDropGFXClear
-        PLP : PLA
+	PHA : PHP
+	SEP #$20 ; set 8-bit accumulator
+	JSL SQEGFix
+	JSL DynamicDropGFXClear
+	PLP : PLA
 
-        STA.w DungeonID : STZ.w Map16ChangeIndex ; thing we wrote over
+	STA.w DungeonID : STZ.w Map16ChangeIndex ; thing we wrote over
 
-        PHA : PHP
-        LDA.w #$0001 : STA.l UpdateHUDFlag
-        JSL HUD_RebuildLong
-        JSL FloodGateResetInner
-        JSL SetSilverBowMode
-        PLP : PLA
+	PHA : PHP
+	LDA.w #$0001 : STA.l UpdateHUDFlag
+	JSL HUD_RebuildLong
+	JSL FloodGateResetInner
+	JSL SetSilverBowMode
+	PLP : PLA
 RTL
 ;--------------------------------------------------------------------------------
 OnSave:
-        LDA.b #$70 : PHA : PLB ; thing we wrote over - data bank change
+	LDA.b #$70 : PHA : PLB ; thing we wrote over - data bank change
 	JSL DarkWorldSaveFix
-        JML MSUResumeReset
+	JML MSUResumeReset
 ;--------------------------------------------------------------------------------
 OnQuit:
 	JSL SQEGFix
 	LDA.b #$00 : STA.l AltTextFlag ; bandaid patch bug with mirroring away from text
 	LDA.b #$10 : STA.b MAINDESQ ; thing we wrote over
+	LDA.b #$00
+	STA.l InfiniteMagic
 RTL
 ;--------------------------------------------------------------------------------
 OnDeathNoSave:
-        JSL MSUResumeReset
-        LDA.b #$05 : STA.b $10 ; what we wrote over
+	JSL MSUResumeReset
+	LDA.b #$05 : STA.b $10 ; what we wrote over
 RTL
 ;--------------------------------------------------------------------------------
 OnUncleItemGet:

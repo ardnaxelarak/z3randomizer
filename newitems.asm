@@ -935,7 +935,7 @@ BottleListExpanded:
     db $16, $2B, $2C, $2D, $3D, $3C, $48
 
 PotionListExpanded:
-    db $2E, $2F, $30, $FF, $0E
+    db $66, $FF, $2E, $2F, $30, $FF, $0E
 ;--------------------------------------------------------------------------------
 HandleBowTracking:
 ; In: A - Item Receipt ID

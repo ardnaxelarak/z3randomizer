@@ -206,6 +206,7 @@ warnpc $A38000
 
 org $B98000
 incsrc gk/crystalswitchbook.asm
+incsrc gk/orange_potion.asm
 incsrc gk/mimicdash.asm
 incsrc gk/gloom.asm
 incsrc gk/special_weapons.asm

@@ -239,7 +239,7 @@ endmacro
 %ReceiptProps($63, -4, 0, $FF, $F36A, $FF, skip, rng_multi) ; 63 - RNG pool item (multi)
 %ReceiptProps($64, -4, 0, $FF, $F340, $FF, skip, progressive_bow) ; 64 - Progressive bow
 %ReceiptProps($65, -4, 0, $FF, $F340, $FF, skip, progressive_bow_2) ; 65 - Progressive bow
-%ReceiptProps($66, -4, 0, $FF, $F36A, $FF, skip, skip) ; 66 - 
+%ReceiptProps($66, -4, 0, $51, $F36E, $FF, skip, skip) ; 66 - Potion refill (yellow)
 %ReceiptProps($67, -4, 0, $FF, $F36A, $FF, skip, skip) ; 67 - 
 %ReceiptProps($68, -4, 0, $FF, $F36A, $FF, skip, skip) ; 68 - 
 %ReceiptProps($69, -4, 0, $FF, $F36A, $FF, skip, skip) ; 69 - 
@@ -518,7 +518,7 @@ endmacro
 %SpriteProps($63, 2, 2, $FF, $FF, $0000)                                ; 63 - RNG pool item (multi)
 %SpriteProps($64, 2, 2, $FF, $FF, $0000)                                ; 64 - Progressive bow
 %SpriteProps($65, 2, 2, $FF, $FF, $0000)                                ; 65 - Progressive bow
-%SpriteProps($66, 2, 2, $00, $00, $0000)                                ; 66 - 
+%SpriteProps($66, 2, 2, $02, $02, $0000)                                ; 66 - Potion refill (yellow)
 %SpriteProps($67, 2, 2, $00, $00, $0000)                                ; 67 - 
 %SpriteProps($68, 2, 2, $00, $00, $0000)                                ; 68 - 
 %SpriteProps($69, 2, 2, $00, $00, $0000)                                ; 69 - 
@@ -794,7 +794,7 @@ endmacro
 %InventoryItem($63, $0001, $0000, $0000) ; 63 - RNG pool item (multi)
 %InventoryItem($64, $00A5, $0000, $0000) ; 64 - Progressive bow
 %InventoryItem($65, $00A5, $0000, $0000) ; 65 - Progressive bow
-%InventoryItem($66, $0001, $0000, $0000) ; 66 -
+%InventoryItem($66, $0081, $0000, $0000) ; 66 - Potion refill (yellow)
 %InventoryItem($67, $0001, $0000, $0000) ; 67 -
 %InventoryItem($68, $0001, $0000, $0000) ; 68 -
 %InventoryItem($69, $0001, $0000, $0000) ; 69 -
@@ -1054,7 +1054,7 @@ ItemReceiptGraphicsOffsets:
 	dw $0                                  ; 63 - RNG pool item (multi)
 	dw $0                                  ; 64 - Progressive bow
 	dw $0                                  ; 65 - Progressive bow
-	dw $0                                  ; 66 -
+	dw $0CE0                               ; 66 - Potion refill (yellow)
 	dw $0                                  ; 67 -
 	dw $0                                  ; 68 -
 	dw $0                                  ; 69 -
@@ -1324,7 +1324,7 @@ StandingItemGraphicsOffsets:
 	dw $0                                  ; 63 - RNG pool item (multi)
 	dw $0                                  ; 64 - Progressive bow
 	dw $0                                  ; 65 - Progressive bow
-	dw $0                                  ; 66 -
+	dw $0CA0                               ; 66 - Potion refill (yellow)
 	dw $0                                  ; 67 -
 	dw $0                                  ; 68 -
 	dw $0                                  ; 69 -
@@ -1590,7 +1590,7 @@ VRAMAddressOffset:
 	dw $0024                               ; 63 - RNG pool item (multi)
 	dw $0024                               ; 64 - Progressive bow
 	dw $0024                               ; 65 - Progressive bow
-	dw $0024                               ; 66 -
+	dw $0024                               ; 66 - Potion refill (yellow)
 	dw $0024                               ; 67 -
 	dw $0024                               ; 68 -
 	dw $0024                               ; 69 -
