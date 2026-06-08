@@ -16,9 +16,6 @@ CheckOrangePotion:
 
 	STZ.w $0301
 
-	LDA.b #$80
-	STA.l MagicFiller
-
 	LDA.b #$01
 	STA.l InfiniteMagic
 
