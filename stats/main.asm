@@ -174,7 +174,7 @@ FindLine:
 !FRAMES_PER_SECOND = 60
 !FRAMES_PER_MINUTE = 60*60
 !FRAMES_PER_HOUR = 60*60*60
-!MAX_FRAME_COUNT = (99*60)+(59*60)+(59*60)+59
+!MAX_FRAME_COUNT = (99*60*60*60)+(59*60*60)+(59*60)+59
 
 macro CountUnits(framesPerUnit, unitCounter)
 	STZ.b <unitCounter>
