@@ -252,10 +252,14 @@ RTL
 ;--------------------------------------------------------------------------------
 DialogItemReceive:
 	BCS .nomessage ; if doubling the item value overflowed it must be a rando item
+	CPY.b #$CC : BEQ .orange_potion
 	CPY.b #$98 : BCC ++ ;if the item is $4C or greater it must be a rando item
 .nomessage
 	LDA.w #$FFFF
+	BRA .done
 
+.orange_potion
+	LDA.w #$0198
 	BRA .done
 
 ++	LDA.w Ancilla_ReceiveItem_item_messages, Y
