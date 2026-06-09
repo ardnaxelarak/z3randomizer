@@ -252,10 +252,14 @@ RTL
 ;--------------------------------------------------------------------------------
 DialogItemReceive:
 	BCS .nomessage ; if doubling the item value overflowed it must be a rando item
+	CPY.b #$CC : BEQ .orange_potion
 	CPY.b #$98 : BCC ++ ;if the item is $4C or greater it must be a rando item
 .nomessage
 	LDA.w #$FFFF
+	BRA .done
 
+.orange_potion
+	LDA.w #$0198
 	BRA .done
 
 ++	LDA.w Ancilla_ReceiveItem_item_messages, Y
@@ -304,7 +308,7 @@ DialogGanon2:
 	BCS +
 		LDA.w #$018D : JMP .done
 	+
-	LDA.l GanonVulnerabilityItem : AND.w #$00FF
+	LDA.l GanonVulnerabilityItem : AND.w #$007F
 	BEQ .silver_arrows
 	CMP.w #$0001 : BEQ .silver_arrows
 	CMP.w #$0004 : BEQ .bombs

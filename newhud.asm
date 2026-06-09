@@ -273,10 +273,15 @@ NewHUD_DrawMagicMeter:
         STA.w CurrentMagic
         TAY
 
-        LDA.b FrameCounter
         REP #$30
-        AND.w #$000C
-        LSR
+        LDA.w #$0002
+
+        ; ; cycle through colors
+        ; LDA.b FrameCounter
+        ; REP #$30
+        ; AND.w #$000C
+        ; LSR
+
         BRA .recolor
 
 .set_index ; this branch is always 0000 when taken

@@ -105,6 +105,10 @@ db $00
 ;--------------------------------------------------------------------------------
 org $B0802E
 GanonVulnerabilityItem:
+; sn-i iiii
+; s - immune to sword spins in phase 4
+; n - immune to all items
+; i - index of item vulnerability
 db $00 ; $00 = default behavior (silver arrows)
 ;--------------------------------------------------------------------------------
 org $B0902F

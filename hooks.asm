@@ -997,6 +997,12 @@ LDA.w BottleListExpanded, X
 
 org $89895C ; 4895C - ancilla_init.asm:1344 (LDA PotionList, X)
 LDA.w PotionListExpanded, X
+
+org $89895A
+LDX.b #$06
+
+org $89896A
+ADC.b #$01
 ;--------------------------------------------------------------------------------
 org $86D1EB ; 351EB - sprite_absorbable.asm:364 (STA $7EF375) ; bugbug commented out until i figure out why it doesn't work
 JSL HandleBombAbsorbtion
@@ -1029,6 +1035,7 @@ JSL RefillHealth
 ;--------------------------------------------------------------------------------
 org $80F922 ; <- 7922 - Bank00.asm:8543 - (JSL HUD.RefillMagicPower : BCC .beta)
 JSL RefillMagic
+;--------------------------------------------------------------------------------
 
 ;================================================================================
 ; Early Bottle Fix
@@ -1165,6 +1172,8 @@ ORA.w #$8000 : STA.w $007E, Y
 ORA.w #$4000 : STA.w $0084, Y
 JSL AddYMarker : NOP #2
 ;--------------------------------------------------------------------------------
+org $8DF779 ; <- 6F779 (not in disassembly) - mushroom bottle hud tile
+dw $20D2, $60D2, $20E2, $202D ; (Orig: $2044, $2045, $2046, $2047)
 org $8DF789+6 ; <- 6F789+6 (not in disassembly) - red bottle hud tile, lower right
 dw $2413 ; (Orig: #$24E3)
 org $8DF789+6+8  ; green bottle hud tile, lower right
@@ -2846,4 +2855,11 @@ NOP
 org $8DFB63 ; bank_0D.asm@18092 (LDA.l $7EF33F, X : AND.w #$00FF)
 JSL CheckFluteInHUD
 NOP #3
+;--------------------------------------------------------------------------------
+
+;================================================================================
+; Orange Potion (Chateau Romani)
+;--------------------------------------------------------------------------------
+org $87A15C ; bank_07.asm@6963 (LDA.l $7EF35C, X)
+JSL CheckOrangePotion
 ;--------------------------------------------------------------------------------

@@ -40,7 +40,7 @@ RenderCharToMapExtended:
     sta.b Scrap05
     jml RenderCharToMapExtended_return
 
-.uncompressed    
+.uncompressed
     lda.l FontProperties+$2, x
     plx
     clc : adc.w #(NewFont&$ffff)
@@ -92,7 +92,7 @@ RenderCharLookupWidth:
     plx : lda.l RenderCharThinTable, x : clc
     rtl
 .vwf
-    and.w #$000f     
+    and.w #$000f
     plx : cpx.w #$0000 : beq + : lda.l RenderCharThinTable, x
 +   clc : rtl
 
@@ -140,7 +140,7 @@ RenderCharExtended:
     cpx.w #$0010
     bne -
 
-.end    
+.end
     plb
     jml RenderCharExtended_returnUncompressed
 
@@ -368,7 +368,7 @@ FontProperties:
     dw $8001, $06C0     ; C7 ; !
     dw $8001, $02D0     ; C8 ; ,
     dw $8001, $02B0     ; C9 ; -
-    dw $8000, $0000     ; CA ; 🡄"
+    dw $8000, $0000     ; CA ; 🡄
     dw $8000, $0000     ; CB ; 🡆
     dw $0000, $0000     ; CC ; Blank char
     dw $8001, $02C0     ; CD ; .

@@ -433,6 +433,7 @@ Shopkeeper_BuyItem:
     CMP.b #$2E : BEQ .refill ; Red Potion Refill
     CMP.b #$2F : BEQ .refill ; Green Potion Refill
     CMP.b #$30 : BEQ .refill ; Blue Potion Refill
+    CMP.b #$66 : BEQ .refill ; Orange Potion Refill
     CMP.b #$AF : BEQ .generic_key
     BRA +
     .refill

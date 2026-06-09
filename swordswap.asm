@@ -101,7 +101,7 @@ CheckGanonHammerDamage:
 		LDA.w SpriteTypeTable, X : CMP.b #$D8 ; original behavior except ganon
 		RTL
 	+
-	LDA.l GanonVulnerabilityItem : CMP.b #$0C : BEQ .hammer_silvers
+	LDA.l GanonVulnerabilityItem : AND.b #$7F : CMP.b #$0C : BEQ .hammer_silvers
 	LDA.w SpriteTypeTable, X : CMP.b #$D6 ; original behavior
 	RTL
 

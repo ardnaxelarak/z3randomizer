@@ -116,7 +116,7 @@ db !TIER_JUNK    ; 62 - RNG pool item (single)
 db !TIER_JUNK    ; 63 - RNG pool item (multi)
 db !TIER_MAJOR   ; 64 - Progressive bow
 db !TIER_MAJOR   ; 65 - Progressive bow
-db !TIER_JUNK    ; 66 -
+db !TIER_HEALTH  ; 66 - Potion refill (orange)
 db !TIER_JUNK    ; 67 -
 db !TIER_JUNK    ; 68 -
 db !TIER_JUNK    ; 69 -
