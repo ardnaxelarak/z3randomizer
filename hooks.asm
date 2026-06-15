@@ -998,6 +998,9 @@ LDA.w BottleListExpanded, X
 org $89895C ; 4895C - ancilla_init.asm:1344 (LDA PotionList, X)
 LDA.w PotionListExpanded, X
 
+org $898946
+CMP.b #$00 : BNE + : skip 9 : +
+
 org $89895A
 LDX.b #$06
 
