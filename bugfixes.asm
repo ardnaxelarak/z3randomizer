@@ -64,6 +64,7 @@ RTL
 ; fix issue where if a player beats aga1 without moon pearl, they don't turn into
 ; bunny on the pyramid
 FixAga2Bunny:
+    LDX.b OverworldIndex : JSL OWMarkVisited_mark
     LDA.l FixFakeWorld :  BEQ + ; Only use this fix is fakeworld fix is in use
         LDA.l InvertedMode : BEQ +++
             LDA.b #$00 : STA.l CurrentWorld ; Switch to light world

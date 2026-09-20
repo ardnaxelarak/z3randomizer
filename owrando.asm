@@ -392,7 +392,11 @@ OWOldManSpeed:
 OWMarkVisited:
 {
     LDX.b OverworldIndex : STZ.w $0412 ; what we wrote over
-    LDA.b GameMode : CMP.b #$14 : BCS .return
+    LDA.b GameMode : CMP.b #$14 : BEQ .return
+    BCC .mark
+        CMP.b #$15 : BNE .return
+        TXA : BEQ .return  ; allow aga transition
+    .mark
         LDA.l OverworldEventDataWRAM,X
         ORA.b #$80 : STA.l OverworldEventDataWRAM,X
 
