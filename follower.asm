@@ -113,8 +113,14 @@ MaybeDeleteFollowersOnDeath:
     LDA.l FollowerTravelAllowed : CMP.b #$02 : BNE .vanilla
         ; s+q = favor keeping current follower
         ; death = favor replacing with unfulfilled starting followers
+        ; s+q while dropped = fully clear follower
+        ; death while dropped = retain dropped follower
         ; during escape = always favor keeping zelda
-        LDA.b GameMode : CMP.b #$17 : BEQ .keep
+        LDA.b GameMode : CMP.b #$17 : BNE .death
+            ; voluntary S+Q
+            LDA.l FollowerDropped : BNE .delete
+            BRA .keep
+.death
         LDA.w DungeonID : NOP #2 : BPL .keep
         LDA.l InitFollowerIndicator : BEQ .keep
         JSL DetermineFollowerSpawn_check_resolved : BCS .keep
