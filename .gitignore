@@ -1,6 +1,6 @@
 *.sfc
 *.sym
-randomizer-diff.txt
+compare-diff.txt
 
 tournament.asm
 /build

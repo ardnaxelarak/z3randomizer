@@ -3,7 +3,7 @@
 assembly:
 	entry              = LTTP_RND_GeneralBugfixes.asm
 	type               = hack
-	output             = alttp_rando.sfc
+	output             = alttp_rando_fixed.sfc
 	base               = alttp_jp.sfc
 
 header:
