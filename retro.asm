@@ -51,7 +51,7 @@ DecrementArrows:
 		REP #$20
 		LDA.l CurrentRupees : BEQ +
 			PHA : LDA.l BowEquipment : DEC : AND.w #$0002 : TAX : PLA
-			!SUB.l ArrowModeWoodArrowCost, X ; CMP.w #$0000
+			SEC : SBC.l ArrowModeWoodArrowCost, X ; CMP.w #$0000
 			BMI .not_enough_money
 				STA.l CurrentRupees : LDA.w #$0001 : BRA +
 			.not_enough_money
@@ -65,7 +65,7 @@ RTL
 
 ArrowGame:
 	LDA.w $0B99 : BEQ +
-		DEC $0B99 ; reduce minigame arrow count
+		DEC.w $0B99 ; reduce minigame arrow count
 		LDA.l ArrowMode : BNE .rupees
 		.normal
 			LDA.l CurrentArrows : INC #2 : STA.l CurrentArrows ; increment arrow count (by 2 for some reason)
@@ -74,7 +74,7 @@ ArrowGame:
 			PHX
 			REP #$20 ; set 16-bit accumulator
 				LDA.l BowEquipment : DEC : AND.w #$0002 : TAX
-				LDA.l CurrentRupees : !ADD.l ArrowModeWoodArrowCost, X : STA.l CurrentRupees
+				LDA.l CurrentRupees : CLC : ADC.l ArrowModeWoodArrowCost, X : STA.l CurrentRupees
 			SEP #$20 ; set 8-bit accumulator
 			PLX
 	+

@@ -7,27 +7,27 @@
 ; $0C-$0D : Value to Display
 ; $0E-$0F : Base Coordinate
 ;--------------------------------------------------------------------------------
-macro DrawDigit(value,offset)
+macro DrawDigit(value, offset)
 	STZ.b Scrap0A ; clear digit buffer
 	LDA.b Scrap0C ; load value
 	--
-	CMP.w <value> : !BLT ++
-		!SUB.w <value>
+	CMP.w {value} : BCC ++
+		SEC : SBC.w {value}
 		INC.b Scrap0A
 		BRA --
 	++
 	STA.b Scrap0C ; save value
 	CPY.b #$FF : BNE +
-		LDY.b <offset>
-		LDA.b Scrap0E : !ADD.w .digit_offsets, Y : STA.b Scrap0E
+		LDY.b {offset}
+		LDA.b Scrap0E : CLC : ADC.w .digit_offsets, Y : STA.b Scrap0E
 	+
 	LDA.b Scrap0E : STA.l BigRAM, X : INX : INX
 	LDA.w #56 : STA.l BigRAM, X : INX : INX
 	LDA.b RoomIndex : CMP.w #$109 : BNE + : LDA.w #$FFCA : STA.l BigRAM-2, X : +
-	LDY.b Scrap0A : TYA : ASL : TAY : LDA.w .digit_properties, Y : STA.l BigRAM, X : INX : INX
+	LDY.b Scrap0A : TYA : ASL A : TAY : LDA.w .digit_properties, Y : STA.l BigRAM, X : INX : INX
 	LDA.w #$0000 : STA.l BigRAM, X : INX : INX
 	
-	LDA.b Scrap0E : !ADD.w #$0008 : STA.b Scrap0E ; move offset 8px right
+	LDA.b Scrap0E : CLC : ADC.w #$0008 : STA.b Scrap0E ; move offset 8px right
 endmacro
 ;--------------------------------------------------------------------------------
 DrawPrice:
@@ -36,10 +36,10 @@ DrawPrice:
 		LDY.b #$FF
 		LDX.b #$00 ; clear bigram pointer
 
-		LDA.b Scrap0C : CMP.w #1000 : !BLT + : JMP .len4 : +
-				  CMP.w #100 : !BLT + : JMP .len3 : +
-				  CMP.w #10 : !BLT + : JMP .len2 : +
-				  CMP.w #1 : !BLT + : JMP .len1 : +
+		LDA.b Scrap0C : CMP.w #1000 : BCC + : JMP .len4 : +
+				  CMP.w #100 : BCC + : JMP .len3 : +
+				  CMP.w #10 : BCC + : JMP .len2 : +
+				  CMP.w #1 : BCC + : JMP .len1 : +
 
 			.len4
 				%DrawDigit(#1000,#6)
@@ -57,8 +57,8 @@ DrawPrice:
 		TXA : LSR #3 : STA.b Scrap06 ; request 1-4 OAM slots
 		ASL #2
 			PHA
-				LDA.b LinkPosX : CMP.l ShopPriceColumn : !BLT .off
-                                        CMP.l ShopPriceColumn+1 : !BGE .off
+				LDA.b LinkPosX : CMP.l ShopPriceColumn : BCC .off
+                                        CMP.l ShopPriceColumn+1 : BCS .off
 				.on
 				PLA : JSL OAM_AllocateFromRegionB : BRA + ; request 4-16 bytes
 				.off
@@ -120,7 +120,7 @@ SpritePrep_ShopKeeper:
 	LDX.w #$0000
 	LDY.w #$0000
 	-
-		TYA : CMP.l ShopCapacity : !BLT ++ : JMP .done : ++
+		TYA : CMP.l ShopCapacity : BCC ++ : JMP .done : ++
 		LDA.l ShopContentsTable+1, X : CMP.b #$FF : BNE ++ : JMP .done : ++
 		
 		LDA.l ShopContentsTable, X : CMP.l ShopId : BEQ ++ : JMP .next : ++
@@ -132,12 +132,12 @@ SpritePrep_ShopKeeper:
             PLA : STA.l ShopInventoryPlayer, X : LDA.b #$00 : STA.l ShopInventoryDisguise, X : PLX
 			PHY
 				PHX
-					LDA.b #$00 : XBA : TYA : LSR #2 : !ADD.l ShopSRAMIndex : TAX
+					LDA.b #$00 : XBA : TYA : LSR #2 : CLC : ADC.l ShopSRAMIndex : TAX
 					LDA.l PurchaseCounts, X : TYX : STA.l ShopInventory+3, X : TAY
 				PLX
 				
 				LDA.l ShopContentsTable+4, X : BEQ +
-				TYA : CMP.l ShopContentsTable+4, X : !BLT ++
+				TYA : CMP.l ShopContentsTable+4, X : BCC ++
 					PLY
 					LDA.l ShopContentsTable+5, X : PHX : TYX : STA.l ShopInventory, X : PLX
 					LDA.l ShopContentsTable+6, X : PHX : TYX : STA.l ShopInventory+1, X : PLX
@@ -162,7 +162,7 @@ SpritePrep_ShopKeeper:
 					STA.l ShopInventoryDisguise, X : PLX
 				+ : TAY
 				REP #$30
-				LDA.b 1,s : TAX : LDA.l .tile_offsets, X : TAX
+				LDA 1,s : TAX : LDA.l .tile_offsets, X : TAX
 				JSR SetupTileTransfer
 				PLY : PLX
 				INY #4
@@ -318,14 +318,14 @@ RTL
 ;--------------------------------------------------------------------------------
 macro DrawMerchant(head,body,speed)
 	PHX : LDX.b #$00
-	LDA.b FrameCounter : AND.b <speed> : BEQ +
+	LDA.b FrameCounter : AND.b #{speed} : BEQ +
 		-
 			LDA.w .oam_shopkeeper_f1, X : STA.l BigRAM, X : INX
-		CPX.b #$10 : !BLT -
+		CPX.b #$10 : BCC -
 	+
 		-
 			LDA.w .oam_shopkeeper_f2, X : STA.l BigRAM, X : INX
-		CPX.b #$10 : !BLT -
+		CPX.b #$10 : BCC -
 	++
 	PLX
 
@@ -341,16 +341,16 @@ macro DrawMerchant(head,body,speed)
 		LDA.b #BigRAM>>8 : STA.b Scrap09
 		LDA.b #$7E : PHA : PLB ; set data bank to $7E
 		JSL Sprite_DrawMultiple_quantity_preset
-		LDA.b OAMPtr : !ADD.b #$04*2 : STA.b OAMPtr ; increment oam pointer
+		LDA.b OAMPtr : CLC : ADC.b #$04*2 : STA.b OAMPtr ; increment oam pointer
 		LDA.b OAMPtr+2 : INC #2 : STA.b OAMPtr+2
 	PLB
 RTS
 .oam_shopkeeper_f1
-dw 0, -8 : db <head>, $00, $00, $02
-dw 0, 0 : db <body>, $00, $00, $02
+dw 0, -8 : db {head}, $00, $00, $02
+dw 0, 0 : db {body}, $00, $00, $02
 .oam_shopkeeper_f2
-dw 0, -8 : db <head>, $00, $00, $02
-dw 0, 0 : db <body>, $40, $00, $02
+dw 0, -8 : db {head}, $00, $00, $02
+dw 0, 0 : db {body}, $40, $00, $02
 endmacro
 ;--------------------------------------------------------------------------------
 Shopkeeper_DrawMerchant:
@@ -362,7 +362,7 @@ Shopkeeper_DrawMerchant:
 	CMP.b #$04 : BNE + : RTS : +
 ;--------------------------------------------------------------------------------
 Shopkeeper_DrawMerchant_Type0:
-%DrawMerchant(#$00, #$10, #$10)
+%DrawMerchant($00, $10, $10)
 ;--------------------------------------------------------------------------------
 Shopkeeper_DrawMerchant_Type1:
 	LDA.b #$01 : STA.b Scrap06 ; request 1 OAM slot
@@ -377,7 +377,7 @@ Shopkeeper_DrawMerchant_Type1:
 		LDA.b #.oam_shopkeeper_f2>>8 : STA.b Scrap09
 	++
 	JSL Sprite_DrawMultiple_quantity_preset
-	LDA.b OAMPtr : !ADD.b #$04 : STA.b OAMPtr ; increment oam pointer
+	LDA.b OAMPtr : CLC : ADC.b #$04 : STA.b OAMPtr ; increment oam pointer
 	LDA.b OAMPtr+2 : INC : STA.b OAMPtr+2
 RTS
 .oam_shopkeeper_f1
@@ -386,10 +386,10 @@ dw 0, 0 : db $46, $0A, $00, $02
 dw 0, 0 : db $46, $4A, $00, $02
 ;--------------------------------------------------------------------------------
 Shopkeeper_DrawMerchant_Type2:
-%DrawMerchant(#$84, #$10, #$40)
+%DrawMerchant($84, $10, $40)
 ;--------------------------------------------------------------------------------
 Shopkeeper_DrawMerchant_Type3:
-%DrawMerchant(#$8E, #$10, #$40)
+%DrawMerchant($8E, $10, $40)
 ;--------------------------------------------------------------------------------
 Shopkeeper_SetupHitboxes:
 	PHX : PHY : PHP
@@ -414,12 +414,12 @@ Shopkeeper_SetupHitboxes:
 		JSL Utility_CheckIfHitBoxesOverlapLong : BCC .no_interaction
 		    LDA.w ItemReceiptPose : BNE .no_interaction ; defer if link is buying a potion (this is faster than the potion buying speed before potion shop shuffle)
 		    LDA.b Joy1B_New : AND.b #$80 : BEQ .no_interaction ; check for A-press
-			LDA.b GameMode : CMP.b #$0C : !BGE .no_interaction ; don't interact in other modes besides game action
+			LDA.b GameMode : CMP.b #$0C : BCS .no_interaction ; don't interact in other modes besides game action
 			JSR Shopkeeper_BuyItem
 		.no_interaction
 		INY #4
-	TYA : CMP.l ShopCapacity : !BLT -
-	;CPY.b #$0C : !BLT -
+	TYA : CMP.l ShopCapacity : BCC -
+	;CPY.b #$0C : BCC -
 	
 	PLP : PLY : PLX
 RTS
@@ -443,7 +443,7 @@ Shopkeeper_BuyItem:
     +
 
         LDA.l ShopType : AND.b #$80 : BNE .buy ; don't charge if this is a take-any
-            REP #$20 : LDA.l CurrentRupees : CMP.l ShopInventory+1, X : SEP #$20 : !BGE .buy
+            REP #$20 : LDA.l CurrentRupees : CMP.l ShopInventory+1, X : SEP #$20 : BCS .buy
 
         .cant_afford
         LDA.b #$7A
@@ -457,12 +457,12 @@ Shopkeeper_BuyItem:
     JMP .done
     .buy
     LDA.l ShopType : AND.b #$80 : BNE ++ ; don't charge if this is a take-any
-        REP #$20 : LDA.l CurrentRupees : !SUB.l ShopInventory+1, X : STA.l CurrentRupees : SEP #$20 ; Take price away
+        REP #$20 : LDA.l CurrentRupees : SEC : SBC.l ShopInventory+1, X : STA.l CurrentRupees : SEP #$20 ; Take price away
     ++
     PHX
         LDA.b #$00 : XBA : TXA : LSR #2 : TAX
         LDA.l ShopInventoryPlayer, X : STA.l !MULTIWORLD_ITEM_PLAYER_ID
-        TXA : !ADD.l ShopSRAMIndex : TAX
+        TXA : CLC : ADC.l ShopSRAMIndex : TAX
         LDA.l PurchaseCounts, X : BNE +++	;Is this the first time buying this slot?
             LDA.l EnableShopItemCount, X : STA.l ShopEnableCount ; If so, store the permission to count the item here.
         +++
@@ -477,7 +477,7 @@ Shopkeeper_BuyItem:
         LDA.l ShopkeeperRefill : BNE +++
             LDA.l ShopState : ORA.w Shopkeeper_ItemMasks, X : STA.l ShopState
         +++ PHX
-        TXA : !ADD.l ShopSRAMIndex : TAX
+        TXA : CLC : ADC.l ShopSRAMIndex : TAX
         LDA.l PurchaseCounts, X : INC : BEQ +++ : STA.l PurchaseCounts, X : +++
         PLX
         BRA ++
@@ -502,7 +502,7 @@ Shopkeeper_BuyItem:
     PLY : PLX
 RTS
 Shopkeeper_ItemMasks:
-db #$01, #$02, #$04, #$08
+db $01, $02, $04, $08
 ;--------------------
 Setup_ShopItemCollisionHitbox:
 ;The complications with XBA are to handle the fact that nintendo likes to store
@@ -519,11 +519,11 @@ Setup_ShopItemCollisionHitbox:
         PHA : PHY
         LDA.l ShopType : AND.w #$0003 : DEC : ASL : TAY
         LDA.b RoomIndex : CMP.w #$109 : BNE + : INY #6 : +
-        LDA.w Shopkeeper_DrawNextItem_item_offsets_idx, Y : STA.b Scrap00 ; get table from the table table
+        LDA.w Shopkeeper_DrawNextItem.item_offsets_idx, Y : STA.b Scrap00 ; get table from the table table
         PLY : PLA
     
-        !ADD.b (Scrap00), Y
-        !ADD.w #$0002 ; a small negative margin
+        CLC : ADC.b (Scrap00), Y
+        CLC : ADC.w #$0002 ; a small negative margin
         ; TODO: add 4 for a narrow item
         SEP #$20 ; set 8-bit accumulator
 
@@ -535,10 +535,10 @@ Setup_ShopItemCollisionHitbox:
 
         REP #$20 ; set 16-bit accumulator
         PHY : INY #2
-        !ADD.b (Scrap00), Y
+        CLC : ADC.b (Scrap00), Y
         PLY
         PHA : LDA.l ShopType : AND.w #$0080 : BEQ + ; lower by 4 for Take-any
-                PLA : !ADD.w #$0004
+                PLA : CLC : ADC.w #$0004
                 BRA ++
         + : PLA : ++
         SEP #$20 ; set 8-bit accumulator
@@ -562,15 +562,15 @@ Setup_ShopItemInteractionHitbox:
         SEP #$20 ; set 8-bit accumulator
 
         ; collision hitbox has left margin of -2, we want margin of 8 so we subtract 10
-        LDA.b Scrap04 : !SUB.b #$0A : STA.b Scrap04
+        LDA.b Scrap04 : SEC : SBC.b #$0A : STA.b Scrap04
         LDA.b Scrap0A : SBC.b #$00 : STA.b Scrap0A ; Apply borrow
 
         ; collision hitbox has 0 top margin, we want a margin of 8 so we subtract 8
-        LDA.b Scrap05 : !SUB.b #$08 : STA.b Scrap05
+        LDA.b Scrap05 : SEC : SBC.b #$08 : STA.b Scrap05
         LDA.b Scrap0B : SBC.b #$00 : STA.b Scrap0B ; Apply borrow
 
         ; We want a width of 32 for wide or 24 for narrow, so we add 20
-        LDA.b Scrap06 : !ADD.b #20 : STA.b Scrap06 ; Hitbox width
+        LDA.b Scrap06 : CLC : ADC.b #20 : STA.b Scrap06 ; Hitbox width
 
         LDA.b #40 : STA.b Scrap07 ; Hitbox height, always 40
         PLP
@@ -582,7 +582,7 @@ Setup_LinksHitbox:
 	LDA.b #$08 : STA.b Scrap02
                      STA.b Scrap03
 
-        LDA.b LinkPosX : !ADD.b #$04 : STA.b Scrap00
+        LDA.b LinkPosX : CLC : ADC.b #$04 : STA.b Scrap00
         LDA.b LinkPosX+1 : ADC.b #$00 : STA.b Scrap08
 
         LDA.b LinkPosY : ADC.b #$08 : STA.b Scrap01
@@ -627,13 +627,13 @@ Shopkeeper_DrawNextItem:
 	REP #$20 ; set 16-bit accumulator
 	LDA.b RoomIndex : CMP.w #$109 : BNE + : INY #6 : +
 	LDA.w .item_offsets_idx, Y : STA.b Scrap00 ; get table from the table table
-	LDA.b 1,s : ASL #2 : TAY ; set Y to the item index
+	LDA 1,s : ASL #2 : TAY ; set Y to the item index
 	LDA.b (Scrap00), Y : STA.l SpriteOAM ; load X-coordinate
 	INY #2
 	LDA.l ShopType : AND.w #$0080 : BNE +
 		LDA.b (Scrap00), Y : STA.l SpriteOAM+2 : BRA ++ ; load Y-coordinate
 	+
-		LDA.b (Scrap00), Y : !ADD.w #$0004 : STA.l SpriteOAM+2 ; load Y-coordinate
+		LDA.b (Scrap00), Y : CLC : ADC.w #$0004 : STA.l SpriteOAM+2 ; load Y-coordinate
 	++
 	SEP #$20 ; set 8-bit accumulator
 	PLY
@@ -707,7 +707,7 @@ Shopkeeper_DrawNextItem:
 	XBA
 
 	LDA.l ShopType : AND.b #$10 : BEQ +
-		XBA : !SUB.b #$22 : XBA ; alt vram
+		XBA : SEC : SBC.b #$22 : XBA ; alt vram
 	+
 	XBA
 
@@ -717,7 +717,7 @@ Shopkeeper_DrawNextItem:
 
 	LDA.b Scrap0D
 	PHX
-	JSL GetSpritePalette_resolved
+	JSL GetSpritePalette.resolved
 	PLX : CPX.b #$0C : BCC + ; if this is powder item
 		ORA.b #$01
 	+ STA.l SpriteOAM+5
@@ -734,7 +734,7 @@ Shopkeeper_DrawNextItem:
 	LDA.b Scrap0D
 	PHX
 	TAX
-	LDA.l SpriteProperties_standing_width,X : BEQ .narrow
+	LDA.l SpriteProperties.standing_width,X : BEQ .narrow
 	.full
 		PLX
 		LDA.b #$02
@@ -765,13 +765,13 @@ Shopkeeper_DrawNextItem:
 RTS
 ;--------------------------------------------------------------------------------
 .item_offsets_idx ; 112 60
-dw #.item_offsets_1
-dw #.item_offsets_2
-dw #.item_offsets_3
+dw .item_offsets_1
+dw .item_offsets_2
+dw .item_offsets_3
 .item_offsets_idx_Potion ; 160 176 - (112 64) = (48 112)
-dw #.item_offsets_1p
-dw #.item_offsets_2p
-dw #.item_offsets_3p
+dw .item_offsets_1p
+dw .item_offsets_2p
+dw .item_offsets_3p
 .item_offsets_1
 dw 8, 40
 .item_offsets_2
@@ -804,7 +804,7 @@ Shopkeeper_DrawNextPrice:
         LDA.l ShopType : AND.w #$0003 : DEC : ASL : TAY
         LDA.w .price_columns_idx, Y : STA.b Scrap02 ; get table from the table table
         LDA.b RoomIndex : CMP.w #$109 : BNE + : INY #6 : +
-        LDA.w Shopkeeper_DrawNextItem_item_offsets_idx, Y : STA.b Scrap00 ; get table from the table table
+        LDA.w Shopkeeper_DrawNextItem.item_offsets_idx, Y : STA.b Scrap00 ; get table from the table table
         PLY : PHY
         TYA : ASL #2 : TAY
         LDA.b (Scrap00), Y : STA.b Scrap0E ; set coordinate
@@ -822,46 +822,46 @@ Shopkeeper_DrawNextPrice:
                 LDA.b #BigRAM>>8 : STA.b Scrap09
                 LDA.b #$7E : PHA : PLB ; set data bank to $7E
 
-		PHX : PHA : LDA.l ShopScratch : TAX : PLA : JSL Sprite_DrawMultiple_quantity_preset : PLX
+        PHX : PHA : LDA.l ShopScratch : TAX : PLA : JSL Sprite_DrawMultiple_quantity_preset : PLX
 
-		LDA.b 1,s
-		ASL #2 : !ADD.b OAMPtr : STA.b OAMPtr ; increment oam pointer
+        LDA 1,s
+        ASL #2 : CLC : ADC.b OAMPtr : STA.b OAMPtr ; increment oam pointer
                 PLA
-                !ADD.b OAMPtr+2 : STA.b OAMPtr+2
+                CLC : ADC.b OAMPtr+2 : STA.b OAMPtr+2
         .free
         PLP : PLY : PLX
         PLB
 RTS
 .price_columns_idx
-dw #.price_columns_1
-dw #.price_columns_2
-dw #.price_columns_3
+dw .price_columns_1
+dw .price_columns_2
+dw .price_columns_3
 .price_columns_1
-db #$00, #$FF
+db $00, $FF
 .price_columns_2
-db #$00, #$80, #$80, $FF
+db $00, $80, $80, $FF
 .price_columns_3
-db #$00, #$60, #$60, #$90, #$90, $FF, $FF, $FF
+db $00, $60, $60, $90, $90, $FF, $FF, $FF
 ;--------------------------------------------------------------------------------
 RequestItemOAM:
-        PHX : PHY : PHA
-                STA.b Scrap06 ; request A OAM slots
-                LDA.b LinkPosY : CMP.b #$62 : !BGE .below
-                        .above
-                        LDA.b 1,s : ASL #2 : JSL OAM_AllocateFromRegionA ; request 4A bytes
-                        BRA +
-                        .below
-                        LDA.b 1,s : ASL #2 : JSL OAM_AllocateFromRegionB ; request 4A bytes
-                +
-                LDA.b 1,s  : STA.b Scrap06 ; request 3 OAM slots
-                STZ.b Scrap07
-                LDA.b #SpriteOAM : STA.b Scrap08
-                LDA.b #SpriteOAM>>8 : STA.b Scrap09
-                LDA.b #$7E : PHB : PHA : PLB
-                JSL Sprite_DrawMultiple_quantity_preset
-                PLB
-                LDA.b 1,s : ASL #2 : !ADD.b OAMPtr : STA.b OAMPtr ; increment oam pointer
-                LDA.b OAMPtr+2 : !ADD 1,s : STA.b OAMPtr+2
+	PHX : PHY : PHA
+		STA.b Scrap06 ; request A OAM slots
+		LDA.b LinkPosY : CMP.b #$62 : BCS .below
+			.above
+			LDA 1,s : ASL #2 : JSL OAM_AllocateFromRegionA ; request 4A bytes
+			BRA +
+			.below
+			LDA 1,s : ASL #2 : JSL OAM_AllocateFromRegionB ; request 4A bytes
+		+
+		LDA 1,s  : STA.b Scrap06 ; request 3 OAM slots
+		STZ.b Scrap07
+		LDA.b #SpriteOAM : STA.b Scrap08
+		LDA.b #SpriteOAM>>8 : STA.b Scrap09
+		LDA.b #$7E : PHB : PHA : PLB
+		JSL Sprite_DrawMultiple_quantity_preset
+		PLB
+		LDA 1,s : ASL #2 : CLC : ADC.b OAMPtr : STA.b OAMPtr ; increment oam pointer
+		LDA.b OAMPtr+2 : CLC : ADC 1,s : STA.b OAMPtr+2
 	PLA : PLY : PLX
 RTS
 ;--------------------------------------------------------------------------------
@@ -869,9 +869,9 @@ PrepNarrowLower:
 	PHX
 	LDX.b #$00
 		REP #$20 ; set 16-bit accumulator
-		LDA.l SpriteOAM, X : !ADD.w #$0004 : STA.l SpriteOAM, X : STA.l SpriteOAM+8, X
-		LDA.l SpriteOAM+2, X : !ADD.w #$0008 : STA.l SpriteOAM+10, X
-		LDA.l SpriteOAM+4, X : !ADD.w #$0010 : STA.l SpriteOAM+12, X
+		LDA.l SpriteOAM, X : CLC : ADC.w #$0004 : STA.l SpriteOAM, X : STA.l SpriteOAM+8, X
+		LDA.l SpriteOAM+2, X : CLC : ADC.w #$0008 : STA.l SpriteOAM+10, X
+		LDA.l SpriteOAM+4, X : CLC : ADC.w #$0010 : STA.l SpriteOAM+12, X
 		LDA.l SpriteOAM+6, X : STA.l SpriteOAM+14, X
 		SEP #$20 ; set 8-bit accumulator
 	PLX

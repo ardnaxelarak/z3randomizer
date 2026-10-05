@@ -68,7 +68,7 @@ ReloadingFloors:
     LDA.w #$0800                ; Length
     PHB
     ;MVN $7F, IcePalaceFloorGfx>>16
-	MVN $B17F ; CHANGE THIS IF YOU MOVE THE GRAPHICS FILE - kkat
+    MVN $B1, $7F ; CHANGE THIS IF YOU MOVE THE GRAPHICS FILE - kkat
     PLB
 
     ; Pretend that we ran the original routine

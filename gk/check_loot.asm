@@ -9,7 +9,7 @@ CheckMapLoot:
 
 	LDA.b $0E : PHA
 
-	LDA.l MapItems_default
+	LDA.l MapItems.default
 	AND.w #$00FF
 	STA.b $0E
 
@@ -21,7 +21,7 @@ CheckMapLoot:
 	LDA.l SaveDataWRAM, X
 	AND.w #$000F
 	BEQ +
-	LDA.l MapItems_visited_tile
+	LDA.l MapItems.visited_tile
 	AND.w #$00FF
 	CMP.b $0E
 	BCC +
@@ -37,7 +37,7 @@ CheckMapLoot:
 	LDA.l MapField
 	AND.l DungeonMask, X
 	BEQ +
-	LDA.l MapItems_have_map
+	LDA.l MapItems.have_map
 	AND.w #$00FF
 	CMP.b $0E
 	BCC +
@@ -46,7 +46,7 @@ CheckMapLoot:
 +	LDA.l CompassField
 	AND.l DungeonMask, X
 	BEQ +
-	LDA.l MapItems_have_compass
+	LDA.l MapItems.have_compass
 	AND.w #$00FF
 	CMP.b $0E
 	BCC +
@@ -74,14 +74,14 @@ CheckHudLoot:
 
 	TAX
 
-	LDA.l HudItems_default_dungeon
+	LDA.l HudItems.default_dungeon
 	AND.w #$00FF
 	STA.b $0E
 
 	LDA.l MapField
 	AND.l DungeonMask, X
 	BEQ +
-	LDA.l HudItems_have_map
+	LDA.l HudItems.have_map
 	AND.w #$00FF
 	CMP.b $0E
 	BCC +
@@ -90,7 +90,7 @@ CheckHudLoot:
 +	LDA.l CompassField
 	AND.l DungeonMask, X
 	BEQ +
-	LDA.l HudItems_have_compass
+	LDA.l HudItems.have_compass
 	AND.w #$00FF
 	CMP.b $0E
 	BCC +
@@ -100,7 +100,7 @@ CheckHudLoot:
 	BRA GetLootLevelAndCleanUp
 
 .cave
-	LDA.l HudItems_cave
+	LDA.l HudItems.cave
 	AND.w #$00FF
 	STA.b $0E
 	; intentional fall-through
@@ -370,7 +370,7 @@ CheckPots:
 
 	LDA.l UWPotsPointers, X
 	STA.b $04
-	LDA.w #bank(UWPotsData)
+	LDA.w #^UWPotsData
 	STA.b $06
 
 	LDY.w #$0000
@@ -509,7 +509,7 @@ CheckEnemies:
 	LDA.b [$04], Y
 	INC A ; skip the layered/unlayered indicator
 	STA.b $04
-	LDA.w #bank(UWSpritesData)
+	LDA.w #^UWSpritesData
 	STA.b $06
 
 	LDY.w #$0000
@@ -671,7 +671,7 @@ GetPotJunkClass:
 	RTS
 
 macro DefineGetFooSection(type, offset)
-Get<type>Section:
+Get{type}Section:
 	PHX
 	LDA.b $CA
 	AND.w #$01FF
@@ -688,7 +688,7 @@ Get<type>Section:
 	INX
 .check_next_section
 	PHX
-	LDA.l SplitRooms+<offset>, X
+	LDA.l SplitRooms+{offset}, X
 	TAX
 -
 	LDA.l SplitRooms, X
@@ -718,14 +718,14 @@ Get<type>Section:
 endmacro
 
 macro DefineCheckFooSection(type)
-Check<type>Section:
+Check{type}Section:
 	STA.b $CC
 
 	LDA.b $CB
 	AND.w #$00F0
 	BEQ .yes
 
-	JSR Get<type>Section
+	JSR Get{type}Section
 
 	LDA.b $CB
 	AND.w #$00F0

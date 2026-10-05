@@ -116,8 +116,7 @@ org $8AE83E
 
 org $8AE86C
 	JML FindCurrentRoom
-	padbyte $EA
-	pad $8AE891
+	fill byte until $8AE891 :: $EA
 
 org $8AEBF8
 	LDA.w $0217

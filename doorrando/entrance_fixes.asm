@@ -58,7 +58,7 @@ PrepDoorDraw:
 	; It's a lot to explain why this is necessary
 	; Much easier to just tell you to look at $01890D in the disassembly
 	; and you should understand the vanilla program flow we need to reject
-	PEA.w DoorDrawJankMove_return-1
+	PEA.w DoorDrawJankMove.return-1
 	LDA.b Scrap00
 	STA.w $19EE ; for current routine
 

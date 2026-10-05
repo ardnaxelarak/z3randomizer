@@ -10,7 +10,7 @@ OWSkipFlags = $03
 
 ;---------------------------------------------------------------------------------------------------
 
-function OWW_RLESize(s) = s<<8
+function OWW_RLESize(s) => {s}<<8
 
 !OWW_STOP             = $8000
 !OWW_END              = $FFFF

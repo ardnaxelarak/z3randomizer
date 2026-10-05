@@ -1,3 +1,7 @@
+*.sfc
+*.sym
+randomizer-diff.txt
+
 tournament.asm
 /build
 /.idea

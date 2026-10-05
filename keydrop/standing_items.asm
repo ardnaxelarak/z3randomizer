@@ -36,8 +36,8 @@ org $86d03d
 org $86D19F
 	JSL MarkSRAMForItem : NOP #2
 
-org $86d180
-	JSL BigKeyGet : BCS $07 : NOP #5
+org $86D180
+	JSL BigKeyGet : BCS + : NOP #7 : +
 
 org $86d18d ; <- 3518D - sprite_absorbable.asm : 274 (LDA $7EF36F : INC A : STA $7EF36F)
 	JSL KeyGet
@@ -351,7 +351,7 @@ RTS
 
 ClearSpriteData:
 	STZ.b Scrap03 ; what we overrode  # we no longer need STZ $02 see underworld_sprite_hooks
-	.shared:
+	.shared
 
 	PHX
 		LDX.b #$0F
@@ -712,7 +712,7 @@ KeyGet:
             + LSR : TAX
             LDA.b Scrap00 : CMP.l KeyTable, X : BNE +
                 .countIt
-                LDA.l StandingItemCounterMask : AND SpawnedItemFlag : BEQ ++
+                LDA.l StandingItemCounterMask : AND.l SpawnedItemFlag : BEQ ++
                     JSL AddInventory
                 ++ PLX : PLA : RTL
             + CMP.b #$AF : beq .countIt ; universal key
@@ -961,7 +961,7 @@ ConditionalLoadCommonSprites_Do3To4Low:
 ++ LDA.b #$50 : STA.w $2117 ; skip over some DMA bytes
 JML Sound_LoadLightWorldSongBank-1 ; just some RTS in Bank 00
 
-incsrc dynamic_si_vram.asm
+incsrc "dynamic_si_vram.asm"
 
 ;===================================================================================================
 ; Pot items

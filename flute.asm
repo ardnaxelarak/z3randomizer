@@ -23,11 +23,11 @@ SpawnHauntedGroveItem:
 	LDA.b #$FF : STA.w EnemyStunTimer, Y
 	LDA.b #$30 : STA.w SpriteTimerE, Y
 
-	LDA.b LinkPosX : !ADD.l .x_offsets, X
+	LDA.b LinkPosX : CLC : ADC.l .x_offsets, X
         AND.b #$F0 : STA.w SpritePosXLow, Y
 	LDA.b LinkPosX+1 : ADC.b #$00 : STA.w SpritePosXHigh, Y
 
-	LDA.b LinkPosY : !ADD.b #$16 : AND.b #$F0 : STA.w SpritePosYLow, Y
+	LDA.b LinkPosY : CLC : ADC.b #$16 : AND.b #$F0 : STA.w SpritePosYLow, Y
 	LDA.b LinkPosY+1 : ADC.b #$00 : STA.w SpritePosYHigh, Y
 
 	LDA.b #$00 : STA.w SpriteLayer, Y

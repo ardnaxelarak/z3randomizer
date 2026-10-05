@@ -8,7 +8,7 @@
 ; Gfx uses $b1 to for sub-sub-sub-module thing
 
 ; Hooks into various routines
-incsrc drhooks.asm
+incsrc "drhooks.asm"
 
 ;Main Code
 org $A78000 ;138000
@@ -41,19 +41,19 @@ dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
 
 org $A78020
 
-incsrc normal.asm
-incsrc scroll.asm
-incsrc spiral.asm
-incsrc gfx.asm
-incsrc keydoors.asm
-incsrc overrides.asm
-incsrc edges.asm
-incsrc math.asm
-incsrc hudadditions.asm
-incsrc dr_lobby.asm
-incsrc entrance_fixes.asm
-incsrc bugfix/kholdstare_shell_collision.asm
+incsrc "normal.asm"
+incsrc "scroll.asm"
+incsrc "spiral.asm"
+incsrc "gfx.asm"
+incsrc "keydoors.asm"
+incsrc "overrides.asm"
+incsrc "edges.asm"
+incsrc "math.asm"
+incsrc "hudadditions.asm"
+incsrc "dr_lobby.asm"
+incsrc "entrance_fixes.asm"
+incsrc "bugfix/kholdstare_shell_collision.asm"
 warnpc $A79C00
 
-incsrc doortables.asm
+incsrc "doortables.asm"
 warnpc $A88000

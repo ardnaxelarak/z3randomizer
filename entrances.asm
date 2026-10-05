@@ -8,7 +8,7 @@ LockAgahnimDoors:
 		;#$0 = Never Locked
 		LDA.w #$0000 : RTL
 	+ : CMP.w #$0001 : BNE +
-		LDA.l ProgressIndicator : AND.w #$000F : CMP.w #$0002 : !BGE .unlock ; if we rescued zelda, skip
+		LDA.l ProgressIndicator : AND.w #$000F : CMP.w #$0002 : BCS .unlock ; if we rescued zelda, skip
 			JSR LockAgahnimDoorsCore : RTL
 	+ : CMP.w #$0002 : BNE +
 		JSR LockAgahnimDoorsCore : BEQ .unlock
@@ -17,7 +17,7 @@ LockAgahnimDoors:
 		JSL CheckTowerOpen
 		REP #$30
 		PLY : PLX
-		!BGE .crystalOrUnlock
+		BCS .crystalOrUnlock
 		LDA.w #$0001 : RTL
 		.crystalOrUnlock
 		LDA.l SwapAgaGanonsTower : AND.w #$00FF : BEQ .unlock
@@ -53,9 +53,9 @@ FlagAgahnimDoor:
 
 ;--------------------------------------------------------------------------------
 LockAgahnimDoorsCore:
-	LDA.b LinkPosX : CMP.w #1992 : !BLT + ; door too far left, skip
-			  CMP.w #2088 : !BGE + ; door too rat right, skip
-	LDA.b LinkPosY : CMP.w #1720 : !BGE + ; door too low, skip
+	LDA.b LinkPosX : CMP.w #1992 : BCC + ; door too far left, skip
+			  CMP.w #2088 : BCS + ; door too rat right, skip
+	LDA.b LinkPosY : CMP.w #1720 : BCS + ; door too low, skip
 		LDA.w #$0001
 RTS
 	+
@@ -68,7 +68,7 @@ SmithDoorCheck:
 		JML Overworld_Entrance_BRANCH_RHO
 
 	.orig ; The rest is equivlent to what we overwrote
-	CPX.w #$0076 : !BGE +
+	CPX.w #$0076 : BCS +
 		JML Overworld_Entrance_BRANCH_LAMBDA
 	+
 
@@ -87,13 +87,13 @@ AllowStartFromSingleEntranceCave:
 		+
 		DEC
 		STA.b Scrap00
-		ASL #2 : !ADD.l Scrap00 : ASL #2 ; mult by 20
+		ASL #2 : CLC : ADC.l Scrap00 : ASL #2 ; mult by 20
 		TAX
 
 		LDA.w #$0016 : STA.l EN_MAINDESQ ; Cache the main screen designation
 		LDA.l StartingAreaExitTable+$05, X : STA.l EN_BG2VERT ; Cache BG1 V scroll
 		LDA.l StartingAreaExitTable+$07, X : STA.l EN_BG2HORZ ; Cache BG1 H scroll
-		LDA.l StartingAreaExitTable+$09, X : !ADD.w #$0010 : STA.l EN_POSY ; Cache Link's Y coordinate
+		LDA.l StartingAreaExitTable+$09, X : CLC : ADC.w #$0010 : STA.l EN_POSY ; Cache Link's Y coordinate
 		LDA.l StartingAreaExitTable+$0B, X : STA.l EN_POSX ; Cache Link's X coordinate
 		LDA.l StartingAreaExitTable+$0D, X : STA.l EN_SCROLLATN ; Cache Camera Y coord lower bound.
 		LDA.l StartingAreaExitTable+$0F, X : STA.l EN_SCROLLATW ; Cache Camera X coord lower bound.
@@ -111,8 +111,8 @@ AllowStartFromSingleEntranceCave:
 		BIT.w #$0080 : BEQ + : ORA.w #$FF00 : + ; Sign extend
 		STA.l EN_SCRMODXA
 
-		LDA.w #$0000 : !SUB.l EN_SCRMODYA : STA.l EN_SCRMODYB
-		LDA.w #$0000 : !SUB.l EN_SCRMODXA : STA.l EN_SCRMODXB
+		LDA.w #$0000 : SEC : SBC.l EN_SCRMODYA : STA.l EN_SCRMODYB
+		LDA.w #$0000 : SEC : SBC.l EN_SCRMODXA : STA.l EN_SCRMODXB
 
 		LDA.l StartingAreaExitTable+$02, X : AND.w #$00FF
 		STA.l EN_OWSCR ; Cache the overworld area number

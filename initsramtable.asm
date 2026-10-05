@@ -11,8 +11,7 @@
 ; See sram.asm for further documentation on how to write to this table.
 ;--------------------------------------------------------------------------------
 
-fillword $0000 ; Zero out the table
-fill $500      ;
+fill byte size $500 :: $00 ; Zero out the table
 
 org $B0B000 ; PC 0x183000
 InitSRAMTable:

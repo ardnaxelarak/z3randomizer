@@ -26,13 +26,13 @@ GetAnimatedSpriteGfxFile:
 		LDY.b #$5E : JML GetAnimatedSpriteGfxFile_return
 	+
 
-    CMP.b #$24 : !BGE +
+    CMP.b #$24 : BCS +
 		LDY.b #$5B : JML GetAnimatedSpriteGfxFile_return
 	+
-    CMP.b #$37 : !BGE +
+    CMP.b #$37 : BCS +
 		LDY.b #$5C : JML GetAnimatedSpriteGfxFile_return
 	+
-    CMP.b #$39 : !BGE +
+    CMP.b #$39 : BCS +
 		LDY.b #$5D : JML GetAnimatedSpriteGfxFile_return
 	+
 		LDY.b #$32
@@ -75,13 +75,13 @@ GetAnimatedSpriteBufferPointer:
 RTL
 
 macro ProgrammableItemLogic(index)
-	LDA.l ProgrammableItemLogicPointer_<index> : BNE ?jump
-	LDA.l ProgrammableItemLogicPointer_<index>+1 : BNE ?jump
-	LDA.l ProgrammableItemLogicPointer_<index>+2 : BNE ?jump
-		BRA ?end
-	?jump:
-		JSL ProgrammableItemLogicJump_<index>
-	?end:
+	LDA.l ProgrammableItemLogicPointer_{index} : BNE {?}_jump
+	LDA.l ProgrammableItemLogicPointer_{index}+1 : BNE {?}_jump
+	LDA.l ProgrammableItemLogicPointer_{index}+2 : BNE {?}_jump
+		BRA {?}_end
+	#{?}_jump:
+		JSL ProgrammableItemLogicJump_{index}
+	#{?}_end:
 endmacro
 
 ;--------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ ProcessEventItems:
 		CMP.b #$E0 : BNE +
 			REP #$30 ; set 16-bit accumulator & index registers
 			LDA.l RNGItem : ASL : TAX
-			LDA.l EventDataOffsets, X : !ADD.l #EventDataTable : STA.b Scrap00
+			LDA.l EventDataOffsets, X : CLC : ADC.w #EventDataTable : STA.b Scrap00
 
 			SEP #$20 ; set 8-bit accumulator
 			LDA.b #$AF : STA.b Scrap02
@@ -166,7 +166,7 @@ ItemBehavior:
         REP #$30
         AND.w #$00FF : ASL : TAX
         SEP #$20
-        JMP (ItemReceipts_behavior,X)
+        JMP (ItemReceipts.behavior,X)
 
         .skip
         RTS
@@ -371,7 +371,7 @@ ItemBehavior:
         RTS
 
         .magic_2
-        LDA.l MagicConsumption : CMP.b #$02 : !BGE +
+        LDA.l MagicConsumption : CMP.b #$02 : BCS +
                 INC : STA.l MagicConsumption ; upgrade magic
         +
         LDA.b #$80 : STA.l MagicFiller ; fill magic
@@ -384,7 +384,7 @@ ItemBehavior:
 
         .master_sword_safe
         SEP #$10
-        LDA.l SwordEquipment : CMP.b #$02 : !BGE + ; skip if we have a better sword
+        LDA.l SwordEquipment : CMP.b #$02 : BCS + ; skip if we have a better sword
             LDA.b #$02 : STA.l SwordEquipment ; set master sword
         +
         LDX.b #$02
@@ -392,22 +392,22 @@ ItemBehavior:
         RTS
 
         .bombs_5
-        LDA.l BombCapacity : !ADD.b #$05 : STA.l BombCapacity ; upgrade bombs +5
+        LDA.l BombCapacity : CLC : ADC.b #$05 : STA.l BombCapacity ; upgrade bombs +5
         LDA.l Upgrade5BombsRefill : STA.l BombsFiller ; fill bombs
         RTS
 
         .bombs_10
-        LDA.l BombCapacity : !ADD.b #$0A : STA.l BombCapacity ; upgrade bombs +10
+        LDA.l BombCapacity : CLC : ADC.b #$0A : STA.l BombCapacity ; upgrade bombs +10
         LDA.l Upgrade10BombsRefill : STA.l BombsFiller ; fill bombs
         RTS
 
         .arrows_5
-        LDA.l ArrowCapacity : !ADD.b #$05 : STA.l ArrowCapacity ; upgrade arrows +5
+        LDA.l ArrowCapacity : CLC : ADC.b #$05 : STA.l ArrowCapacity ; upgrade arrows +5
         LDA.l Upgrade5ArrowsRefill : STA.l ArrowsFiller ; fill arrows
         RTS
 
         .arrows_10
-        LDA.l ArrowCapacity : !ADD.b #$0A : STA.l ArrowCapacity ; upgrade arrows +10
+        LDA.l ArrowCapacity : CLC : ADC.b #$0A : STA.l ArrowCapacity ; upgrade arrows +10
         LDA.l Upgrade10ArrowsRefill : STA.l ArrowsFiller ; fill arrows
         RTS
 
@@ -427,8 +427,8 @@ ItemBehavior:
         LDA.l BowTracking : ORA.b #$40 : STA.l BowTracking
         LDA.l SilverArrowsUseRestriction : BNE ++
             LDA.l SilverArrowsAutoEquip : AND.b #$01 : BEQ ++
-                LDA.l BowEquipment : BEQ ++ : CMP.b #$03 : !BGE +
-                    !ADD.b #$02 : STA.l BowEquipment ; switch to silver bow
+                LDA.l BowEquipment : BEQ ++ : CMP.b #$03 : BCS +
+                    CLC : ADC.b #$02 : STA.l BowEquipment ; switch to silver bow
                 +
             ++
         LDA.l ArrowMode : BEQ +
@@ -444,7 +444,7 @@ ItemBehavior:
         RTS
 
         .rupoor
-        REP #$20 : LDA.l CurrentRupees : !SUB.l RupoorDeduction : STA.l CurrentRupees : SEP #$20 ; Take 1 rupee
+        REP #$20 : LDA.l CurrentRupees : SEC : SBC.l RupoorDeduction : STA.l CurrentRupees : SEP #$20 ; Take 1 rupee
         RTS
 
         .null
@@ -452,21 +452,21 @@ ItemBehavior:
 
         .red_clock
         REP #$20 ; set 16-bit accumulator
-        LDA.l ChallengeTimer : !ADD.l RedClockAmount : STA.l ChallengeTimer
+        LDA.l ChallengeTimer : CLC : ADC.l RedClockAmount : STA.l ChallengeTimer
         LDA.l ChallengeTimer+2 : ADC.l RedClockAmount+2 : STA.l ChallengeTimer+2
         SEP #$20 ; set 8-bit accumulator
         RTS
 
         .blue_clock
         REP #$20 ; set 16-bit accumulator
-        LDA.l ChallengeTimer : !ADD.l BlueClockAmount : STA.l ChallengeTimer
+        LDA.l ChallengeTimer : CLC : ADC.l BlueClockAmount : STA.l ChallengeTimer
         LDA.l ChallengeTimer+2 : ADC.l BlueClockAmount+2 : STA.l ChallengeTimer+2
         SEP #$20 ; set 8-bit accumulator
         RTS
 
         .green_clock
         REP #$20 ; set 16-bit accumulator
-        LDA.l ChallengeTimer : !ADD.l GreenClockAmount : STA.l ChallengeTimer
+        LDA.l ChallengeTimer : CLC : ADC.l GreenClockAmount : STA.l ChallengeTimer
         LDA.l ChallengeTimer+2 : ADC.l GreenClockAmount+2 : STA.l ChallengeTimer+2
         SEP #$20 ; set 8-bit accumulator
         RTS
@@ -770,7 +770,7 @@ ResolveLootID:
         REP #$30
         AND.w #$00FF : ASL : TAX
         TYA
-        JMP (ItemReceipts_resolution,X)
+        JMP (ItemReceipts.resolution,X)
         .have_item
         SEP #$30
         PLB : PLX
@@ -782,7 +782,7 @@ ResolveLootID:
         .bottles
         SEP #$30
         JSR CountBottles : CMP.l BottleLimit : BCC +
-        		LDA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE +
+                LDA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE +
                 LDA.l BottleLimitReplacement
                 JMP .get_item
         +
@@ -792,7 +792,7 @@ ResolveLootID:
         .magic
         SEP #$20
         LDA.l MagicConsumption : TAX
-        LDA.w .magic_ids,X
+        LDA.w .magic.ids,X
         JMP .have_item
         ..ids
         db $4E, $4F, $4F
@@ -807,7 +807,7 @@ ResolveLootID:
         ++ LDA.l SwordEquipment
         +
         TAX
-        LDA.w .prog_sword_ids,X
+        LDA.w .prog_sword.ids,X
         JMP .have_item
         ..ids
         db $49, $50, $02, $03, $03
@@ -823,7 +823,7 @@ ResolveLootID:
         ++ LDA.l HighestShield
         +
         TAX
-        LDA.w .shields_ids,X
+        LDA.w .shields.ids,X
         JMP .have_item
         ..ids
         db $04, $05, $06, $06
@@ -838,7 +838,7 @@ ResolveLootID:
         +
         ++ LDA.l ArmorEquipment
         TAX
-        LDA.w .armor_ids,X
+        LDA.w .armor.ids,X
         JMP .have_item
         ..ids
         db $22, $23, $23
@@ -847,7 +847,7 @@ ResolveLootID:
         .gloves
         SEP #$20
         LDA.l GloveEquipment : TAX
-        LDA.w .gloves_ids,X
+        LDA.w .gloves.ids,X
         JMP .have_item
         ..ids
         db $1B, $1C, $1C
@@ -867,7 +867,7 @@ ResolveLootID:
         +
         .skipbowlimit
         LDA.l BowEquipment : TAX
-        LDA.w ResolveLootID_bows_ids,X
+        LDA.w ResolveLootID.bows.ids,X
         JMP .get_item
 
         .progressive_bow_2
@@ -883,7 +883,7 @@ ResolveLootID:
         .skipbowlimit_2
         +
         LDA.l BowEquipment : TAX
-        LDA.w ResolveLootID_bows_ids,X
+        LDA.w ResolveLootID.bows.ids,X
         JMP .get_item
 
         .bows
@@ -972,16 +972,16 @@ RTS
 CheckHUDSilverArrows:
         LDA.l ArrowMode : BNE .rupee_bow
                 LDA.l BowEquipment : TAX : BEQ .nobow
-                        JSL DrawHUDArrows_normal
+                        JSL DrawHUDArrows.normal
                         TXA
                         RTL
         .rupee_bow
         LDA.l BowEquipment : TAX
-        JSL DrawHUDArrows_rupee_arrows
+        JSL DrawHUDArrows.rupee_arrows
         TXA
         RTL
         .nobow
-        JSL DrawHUDArrows_silverscheck
+        JSL DrawHUDArrows.silverscheck
         TXA
         RTL
 ;--------------------------------------------------------------------------------
@@ -992,7 +992,7 @@ DrawHUDArrows:
         .silverscheck
 	LDA.l BowTracking : AND.b #$40 : BNE .silver
 	BRA .wooden
-	+ CMP.b #03 : !BGE .silver
+	+ CMP.b #03 : BCS .silver
 
 	.wooden
 	LDA.b #$A7 : STA.l HUDTileMapBuffer+$20 ; draw wooden arrow marker
@@ -1025,7 +1025,7 @@ GetRNGItemSingle:
 		.single_reroll
 			JSL GetRandomInt : AND.b #$7F ; select random value
 			INX : CPX.b #$7F : BCC + : LDA.b #$00 : BRA +++ : + ; default to 0 if too many attempts
-			CMP.l RNGSingleTableSize : !BGE .single_reroll
+			CMP.l RNGSingleTableSize : BCS .single_reroll
 		+++
 
 		STA.l ScratchBufferV ; put our index value here
@@ -1090,7 +1090,7 @@ GetRNGItemMulti:
 	- ; reroll
 		JSL GetRandomInt : AND.b #$7F ; select random value
 		INX : CPX.b #$7F : BCC + : LDA.b 00 : BRA .done : + ; default to 0 if too many attempts
-		CMP.l RNGMultiTableSize : !BGE -
+		CMP.l RNGMultiTableSize : BCS -
 	.done
 	STA.l RNGLockIn
 	TAX : XBA : LDA.l RNGMultiItemTable, X
@@ -1102,7 +1102,7 @@ IncrementItemCounters:
 		-
 			LDA.l ItemSubstitutionRules, X
 			CMP.b #$FF : BEQ .exit
-			CMP.b 1,s : BNE .noMatch
+			CMP 1,s : BNE .noMatch
 				.match
 					PHX
 						TXA : LSR #2 : TAX
@@ -1123,14 +1123,14 @@ AttemptItemSubstitution:
         -
                 LDA.l ItemSubstitutionRules, X
                 CMP.b #$FF : BEQ .exit
-                CMP.b 1,S : BNE .noMatch
+                CMP 1,S : BNE .noMatch
                         .match
                         PHX
                         TXA : LSR #2 : TAX
                         LDA.l ItemLimitCounts, X
                         PLX
                         CMP.l ItemSubstitutionRules+1, X : BCC +
-                                LDA.l ItemSubstitutionRules+2, X : STA.b 1,S
+                                LDA.l ItemSubstitutionRules+2, X : STA 1,S
                         +
                         BEQ .exit
                                 .noMatch

@@ -1,4 +1,6 @@
-table "data/textwordcharmap.txt"
+encoder textword = "data/textwordcharmap.txt"
+
+encoder textword
 
 org $B28000
 ; You have found

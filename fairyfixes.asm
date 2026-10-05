@@ -63,7 +63,7 @@ HappinessPond_Check:
 	LDA.w SpriteCoordCacheX : STA.w SpritePosXLow, Y
 	LDA.w SpriteCoordCacheX+1 : STA.w SpritePosXHigh, Y
 
-	LDA.w SpriteCoordCacheY : !SUB.b #$40 : STA.w SpritePosYLow, Y
+	LDA.w SpriteCoordCacheY : SEC : SBC.b #$40 : STA.w SpritePosYLow, Y
 	LDA.w SpriteCoordCacheY+1 : SBC.b #$00 : STA.w SpritePosYHigh, Y
 
 	LDA.b #$01 : STA.w SpriteAuxTable, Y
@@ -76,7 +76,7 @@ HappinessPond_Check:
 	LDA.w SpriteCoordCacheX : STA.w SpritePosXLow, Y
 	LDA.w SpriteCoordCacheX+1 : STA.w SpritePosXHigh, Y
 
-	LDA.w SpriteCoordCacheY : !SUB.b #$20 : STA.w SpritePosYLow, Y
+	LDA.w SpriteCoordCacheY : SEC : SBC.b #$20 : STA.w SpritePosYLow, Y
 	LDA.w SpriteCoordCacheY+1 : SBC.b #$00 : STA.w SpritePosYHigh, Y
 
 	STZ.w SpriteAITable, X ; self terminate

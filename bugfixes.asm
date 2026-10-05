@@ -141,7 +141,7 @@ REP #$20
 LDA.l SwordEquipment : STA.b Scrap0C
 LDA.l ArmorEquipment : AND.w #$00FF
 JSL LoadGearPalettes_variable
-JSL SpriteSwap_Palette_ArmorAndGloves_part_two
+JSL SpriteSwap_Palette_ArmorAndGloves.part_two
 RTL
 
 ;--------------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 ; RNG Fixes
 ;--------------------------------------------------------------------------------
 RigDigRNG:
-	LDA.l MiniGameTime+1 : CMP.l DiggingGameRNG : !BGE .forceHeart
+	LDA.l MiniGameTime+1 : CMP.l DiggingGameRNG : BCS .forceHeart
 	.normalItem
 	JML GetRandomInt
 	.forceHeart
@@ -67,9 +67,9 @@ RNG_Vitreous:
 	LDA.b #$07 : BRA _rng_done
 RNG_Trinexx:
 	LDA.b #$08 : BRA _rng_done
-RNG_Lanmolas2:;x
+RNG_Lanmolas2:
 	LDA.b #$09 : BRA _rng_done
-RNG_Moldorm2:;x
+RNG_Moldorm2:
 	LDA.b #$0A : BRA _rng_done
 RNG_Agahnim2:
 	LDA.b #$0B
@@ -81,7 +81,7 @@ RNG_Agahnim2:
 	+
 	PLA
 	RTL
-RNG_Agahnim2Phantoms:;x
+RNG_Agahnim2Phantoms:
 	LDA.b #$0C : BRA _rng_done
 RNG_Ganon:
 	LDA.b #$0D : BRA _rng_done
@@ -125,7 +125,7 @@ InitRNGPointerTable:
 		LDA.l .rngDefaults, X : STA.l RNGPointers, X : INX #2
 		LDA.l .rngDefaults, X : STA.l RNGPointers, X : INX #2
 		LDA.l .rngDefaults, X : STA.l RNGPointers, X : INX #2
-	CPX.w #$001F : !BLT -
+	CPX.w #$001F : BCC -
 	PLP : PLX
 RTL
 .rngDefaults

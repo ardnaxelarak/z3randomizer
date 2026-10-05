@@ -164,7 +164,7 @@ CopyExtendedSaveFileToWRAM:
         LDA.w #$0FFF
         LDX.w #ExtendedSaveDataSRAM
         LDY.w #ExtendedSaveDataWRAM
-        MVN ExtendedSaveDataWRAM>>16, CartridgeSRAM>>16
+        MVN ^CartridgeSRAM, ^ExtendedSaveDataWRAM
         PLB
         PLA
         STA.l $7EC00D ; What we wrote over. Keep this write last.
@@ -175,7 +175,7 @@ CopyExtendedWRAMSaveFileToSRAM:
         LDA.w #$0FFF
         LDX.w #ExtendedSaveDataWRAM
         LDY.w #ExtendedSaveDataSRAM
-        MVN CartridgeSRAM>>16, ExtendedSaveDataWRAM>>16
+        MVN ^ExtendedSaveDataWRAM, ^CartridgeSRAM
         PLB
         TDC
         TAX

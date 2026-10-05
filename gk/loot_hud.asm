@@ -45,7 +45,7 @@ UpdateLootHUD:
 	PHX : PHY
 	SEP #$30
 
-	LDA.l HudItems_enabled : BEQ .setting_off
+	LDA.l HudItems.enabled : BEQ .setting_off
 	LDA.b IndoorsFlag : BEQ .done
 
 	REP #$30

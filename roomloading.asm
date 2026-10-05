@@ -20,8 +20,7 @@ NoCallback:
     RTL
 
 macro setTilePointer(roomX, roomY, quadX, quadY)
-    ; Left-to-right math. Should be equivalent to 0x7e2000+(roomX*2)+(roomY*128)+(quadX*64)+(quadY*4096)
-    LDX.w #<quadY>*32+<roomY>*2+<quadX>*32+<roomX>*2
+    LDX.w #({quadY})*4096 + ({quadX})*64 + ({roomY})*128 + ({roomX})*2
 endmacro
 
 macro writeTile()
@@ -30,7 +29,7 @@ macro writeTile()
 endmacro
 
 macro writeTileAt(roomX, roomY, quadX, quadY)
-    STA.l <quadY>*32+<roomY>*2+<quadX>*32+<roomX>*2+TileMapA
+    STA.l {quadY}*32+{roomY}*2+{quadX}*32+{roomX}*2+TileMapA
 endmacro
 
 !BOMBOS_BORDER = $08D0
@@ -40,26 +39,26 @@ endmacro
 !BOMBOS_ICON_4 = $0CDB
 macro DrawBombosPlatform(roomX, roomY, quadX, quadY)
     REP #$30 ; 16 AXY
-    %setTilePointer(<roomX>, <roomY>, <quadX>, <quadY>)
+    %setTilePointer({roomX}, {roomY}, {quadX}, {quadY})
     LDA.w #!BOMBOS_BORDER
     %writeTile()
     %writeTile()
     %writeTile()
     %writeTile()
 
-    %setTilePointer(<roomX>, <roomY>+1, <quadX>, <quadY>)
+    %setTilePointer({roomX}, {roomY}+1, {quadX}, {quadY})
     %writeTile()
     LDA.w #!BOMBOS_ICON_1 : %writeTile()
     LDA.w #!BOMBOS_ICON_2 : %writeTile()
     LDA.w #!BOMBOS_BORDER : %writeTile()
 
-    %setTilePointer(<roomX>, <roomY>+2, <quadX>, <quadY>)
+    %setTilePointer({roomX}, {roomY}+2, {quadX}, {quadY})
     %writeTile()
     LDA.w #!BOMBOS_ICON_3 : %writeTile()
     LDA.w #!BOMBOS_ICON_4 : %writeTile()
     LDA.w #!BOMBOS_BORDER : %writeTile()
 
-    %setTilePointer(<roomX>, <roomY>+3, <quadX>, <quadY>)
+    %setTilePointer({roomX}, {roomY}+3, {quadX}, {quadY})
     %writeTile()
     %writeTile()
     %writeTile()

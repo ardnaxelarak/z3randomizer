@@ -1,12 +1,17 @@
 org $B9F000
 SupertileRoomShapes:
-incsrc data/supertile_shapes.asm
+incsrc "data/supertile_shapes.asm"
 warnpc $B9F800
-padbyte $FF
-pad $B9F800
+fill byte until $B9F800 :: $FF
 
 org $B9F800
 DungeonMapData:
+	.prev : skip 1
+	.next : skip 1
+	.floor : skip 1
+	.unused : skip 1
+
+org DungeonMapData
 	db $02, $04, $00, $00 ; Sewers
 	db $1A, $00, $00, $00 ; Hyrule Castle
 	db $00, $06, $00, $00 ; Eastern Palace
@@ -23,13 +28,6 @@ DungeonMapData:
 	db $18, $02, $01, $00 ; Ganon's Tower
 	db $1A, $02, $00, $00 ; Extra
 	db $1A, $02, $00, $00 ; Extra
-
-struct DungeonMapData DungeonMapData
-	.prev: skip 1
-	.next: skip 1
-	.floor: skip 1
-	.unused: skip 1
-endstruct
 
 warnpc $B9F840
 org $B9F840
@@ -67,7 +65,7 @@ dw $29EA, $69EA, $29FA, $69FA ; 0F - triforce
 warnpc $B9F900
 org $B9F900
 LootTypeMapping:
-incsrc data/item_mapping.asm
+incsrc "data/item_mapping.asm"
 
 warnpc $B9FA00
 org $B9FA00
@@ -124,10 +122,9 @@ dw $FFFF
 warnpc $B9FAC0
 org $B9FAC0
 SupertileEntrances:
-incsrc data/entrance_tiles.asm
+incsrc "data/entrance_tiles.asm"
 warnpc $B9FB00
-padbyte $FF
-pad $B9FB00
+fill byte until $B9FB00 :: $FF
 
 ; $B9FB00
 DungeonLabels:
@@ -177,8 +174,7 @@ dw $1121 : dl $7EF411 : db $04 ; Blacksmith
 dw $FFFF
 
 warnpc $B9FBA0
-padbyte $FF
-pad $B9FBA0
+fill byte until $B9FBA0 :: $FF
 
 ; $B9FBA0
 ; Currently these two are hard-coded checks
@@ -191,7 +187,7 @@ dw $FFFF
 warnpc $B9FE00
 org $B9FE00
 JunkTable:
-incsrc data/junk_items.asm
+incsrc "data/junk_items.asm"
 
 warnpc $B9FF00
 org $B9FF00

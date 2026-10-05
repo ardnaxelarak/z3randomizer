@@ -18,7 +18,7 @@ GetVisibilityProps:
 	PLX
 	RTS
 
-.visibility_props:
+.visibility_props
 	dw $0000, $0F00
 	dw $C000, $174F
 	dw $C000, $174F
@@ -65,12 +65,12 @@ DrawDungeonMapRoom:
 	TAY
 
 	macro DrawQuadrant(quadrant, writeOffset)
-		.draw_quadrant_<quadrant>:
-			LDA.w #(3-<quadrant>)<<14
+		.draw_quadrant_{quadrant}
+			LDA.w #(3-{quadrant})<<14
 			STA.b $0C
 
 			LDA.b $0E
-			BIT.w #1<<(3-<quadrant>)
+			BIT.w #1<<(3-{quadrant})
 			BNE ..visited
 
 			LDA.b $0A
@@ -83,7 +83,7 @@ DrawDungeonMapRoom:
 			AND.w #$00FF
 			JSR GetVisibilityProps
 
-			LDA.w SupertileRoomShapes+(2*<quadrant>), Y
+			LDA.w SupertileRoomShapes+(2*{quadrant}), Y
 			CMP.w #$FFFF : BNE ..get_quadrant
 			LDA.b $0A
 			AND.w #$00FF
@@ -102,7 +102,7 @@ DrawDungeonMapRoom:
 			LDA.w #$0F00
 
 		..write
-			STA.l $7F0000+<writeOffset>, X
+			STA.l $7F0000+{writeOffset}, X
 	endmacro
 
 	%DrawQuadrant(0, $00)
@@ -194,20 +194,20 @@ macro DrawSingleEntrance(offset)
 
 	LDA.b $06
 	CPX.b #$02
-	BNE ?+
+	BNE .{?}_1
 	ASL A
-?+
+.{?}_1
 	CLC : ADC.b $06
 	ASL #3
-	CLC : ADC.b #$90+<offset>
+	CLC : ADC.b #$90+{offset}
 	STA.w OAMBuffer+0, Y
 
 	PHX
 	LDA.b $07
 	CPX.b #$02
-	BNE ?+
+	BNE .{?}_2
 	ASL A
-?+
+.{?}_2
 	CLC : ADC.b $07
 	ASL #3
 

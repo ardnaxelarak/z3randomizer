@@ -114,25 +114,25 @@
 ;------------------------------------------------------------------------------
 
 ItemReceipts:
-	.offset_y     : fillbyte $00   : fill 256
-	.offset_x     : fillbyte $00   : fill 256
-	.graphics     : fillbyte $00   : fill 256   ; item_graphics_indices
-	.target       : fillword $0000 : fill 256*2 ; item_target_addr
-	.value        : fillbyte $00   : fill 256   ; item_values
-	.behavior     : fillword $0000 : fill 256*2 ; ItemBehavior
-	.resolution   : fillword $0000 : fill 256*2 ; ReceiptResolution
+	.offset_y     : fill byte count 256 :: $00
+	.offset_x     : fill byte count 256 :: $00
+	.graphics     : fill byte count 256 :: $00   ; item_graphics_indices
+	.target       : fill word count 256 :: $0000 ; item_target_addr
+	.value        : fill byte count 256 :: $00   ; item_values
+	.behavior     : fill word count 256 :: $0000 ; ItemBehavior
+	.resolution   : fill word count 256 :: $0000 ; ReceiptResolution
 
 
 macro ReceiptProps(id, y, x, gfx, sram, value, behavior, res)
 	pushpc
 
-	org ItemReceipts_offset_y+<id>        : db <y>
-	org ItemReceipts_offset_x+<id>        : db <x>
-	org ItemReceipts_graphics+<id>        : db <gfx>
-	org ItemReceipts_target+<id>+<id>     : dw <sram>
-	org ItemReceipts_value+<id>           : db <value>
-	org ItemReceipts_behavior+<id>+<id>   : dw ItemBehavior_<behavior>
-	org ItemReceipts_resolution+<id>+<id> : dw ResolveLootID_<res>
+	org ItemReceipts.offset_y+{id}        : db {y}
+	org ItemReceipts.offset_x+{id}        : db {x}
+	org ItemReceipts.graphics+{id}        : db {gfx}
+	org ItemReceipts.target+{id}+{id}     : dw {sram}
+	org ItemReceipts.value+{id}           : db {value}
+	org ItemReceipts.behavior+{id}+{id}   : dw ItemBehavior.{behavior}
+	org ItemReceipts.resolution+{id}+{id} : dw ResolveLootID.{res}
 
 	pullpc
 endmacro
@@ -398,31 +398,31 @@ endmacro
 ; Palettes: l - - - - c c c
 ; c = Color Index | l = Load palette data from ROM
 SpriteProperties:
-        .chest_width         : fillbyte $00   : fill 256
-        .standing_width      : fillbyte $00   : fill 256
-        .chest_palette       : fillbyte $00   : fill 256
-        .standing_palette    : fillbyte $00   : fill 256
-        .palette_addr        : fillword $0000 : fill 256*2 ; bank $9B
+	.chest_width      : fill byte count 256 :: $00
+	.standing_width   : fill byte count 256 :: $00
+	.chest_palette    : fill byte count 256 :: $00
+	.standing_palette : fill byte count 256 :: $00
+	.palette_addr     : fill word count 256 :: $0000 ; bank $9B
 
 macro SpriteProps(id, chest_width, standing_width, chest_pal, standing_pal, addr)
 	pushpc
-    
-	org SpriteProperties_chest_width+<id>         : db <chest_width>
-	org SpriteProperties_standing_width+<id>      : db <standing_width>
-	org SpriteProperties_chest_palette+<id>       : db <chest_pal>
-	org SpriteProperties_standing_palette+<id>    : db <standing_pal>
-	org SpriteProperties_palette_addr+<id>+<id>   : dw <addr>
+
+	org SpriteProperties.chest_width+{id}         : db {chest_width}
+	org SpriteProperties.standing_width+{id}      : db {standing_width}
+	org SpriteProperties.chest_palette+{id}       : db {chest_pal}
+	org SpriteProperties.standing_palette+{id}    : db {standing_pal}
+	org SpriteProperties.palette_addr+{id}+{id}   : dw {addr}
 
 	pullpc
 endmacro
 
 %SpriteProps($00, 0, 2, $05, $02, PalettesVanilla_blue_ice+$0E)         ; 00 - Fighter sword & Shield
-%SpriteProps($01, 0, 2, $05, $05, PalettesCustom_master_sword)          ; 01 - Master sword
-%SpriteProps($02, 0, 2, $05, $01, PalettesCustom_tempered_sword)        ; 02 - Tempered sword
-%SpriteProps($03, 0, 2, $05, $04, PalettesCustom_golden_sword)          ; 03 - Golden sword
-%SpriteProps($04, 0, 0, $05, $80, PalettesCustom_fighter_shield)        ; 04 - Fighter shield
-%SpriteProps($05, 2, 2, $05, $80, PalettesCustom_red_shield)            ; 05 - Fire shield
-%SpriteProps($06, 2, 2, $05, $80, PalettesCustom_mirror_shield)         ; 06 - Mirror shield
+%SpriteProps($01, 0, 2, $05, $05, PalettesCustom.master_sword)          ; 01 - Master sword
+%SpriteProps($02, 0, 2, $05, $01, PalettesCustom.tempered_sword)        ; 02 - Tempered sword
+%SpriteProps($03, 0, 2, $05, $04, PalettesCustom.golden_sword)          ; 03 - Golden sword
+%SpriteProps($04, 0, 0, $05, $80, PalettesCustom.fighter_shield)        ; 04 - Fighter shield
+%SpriteProps($05, 2, 2, $05, $80, PalettesCustom.red_shield)            ; 05 - Fire shield
+%SpriteProps($06, 2, 2, $05, $80, PalettesCustom.mirror_shield)         ; 06 - Mirror shield
 %SpriteProps($07, 0, 0, $01, $01, PalettesVanilla_red_melon+$0E)        ; 07 - Fire rod
 %SpriteProps($08, 0, 0, $02, $02, PalettesVanilla_blue_ice+$0E)         ; 08 - Ice rod
 %SpriteProps($09, 0, 0, $01, $01, PalettesVanilla_red_melon+$0E)        ; 09 - Hammer
@@ -448,7 +448,7 @@ endmacro
 %SpriteProps($1D, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 1D - Book
 %SpriteProps($1E, 2, 2, $02, $02, PalettesVanilla_blue_ice+$0E)         ; 1E - Flippers
 %SpriteProps($1F, 2, 2, $01, $01, PalettesVanilla_red_melon+$0E)        ; 1F - Pearl
-%SpriteProps($20, 2, 2, $86, $86, PalettesCustom_crystal)               ; 20 - Crystal
+%SpriteProps($20, 2, 2, $86, $86, PalettesCustom.crystal)               ; 20 - Crystal
 %SpriteProps($21, 2, 2, $01, $01, PalettesVanilla_red_melon+$0E)        ; 21 - Net
 %SpriteProps($22, 2, 2, $02, $02, PalettesVanilla_blue_ice+$0E)         ; 22 - Blue mail
 %SpriteProps($23, 2, 2, $01, $01, PalettesVanilla_red_melon+$0E)        ; 23 - Red mail
@@ -489,14 +489,14 @@ endmacro
 %SpriteProps($46, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 46 - 300 rupees
 %SpriteProps($47, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 47 - 20 rupees green
 %SpriteProps($48, 2, 2, $02, $02, PalettesVanilla_blue_ice+$0E)         ; 48 - Full bottle (good bee)
-%SpriteProps($49, 0, 2, $05, $02, PalettesCustom_fighter_shield)        ; 49 - Tossed fighter sword
+%SpriteProps($49, 0, 2, $05, $02, PalettesCustom.fighter_shield)        ; 49 - Tossed fighter sword
 %SpriteProps($4A, 2, 2, $02, $02, PalettesVanilla_blue_ice+$0E)         ; 4A - Active Flute
 %SpriteProps($4B, 2, 2, $01, $01, PalettesVanilla_red_melon+$0E)        ; 4B - Boots
 %SpriteProps($4C, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 4C - Bomb capacity (50)
 %SpriteProps($4D, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 4D - Arrow capacity (70)
 %SpriteProps($4E, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 4E - 1/2 magic
 %SpriteProps($4F, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 4F - 1/4 magic
-%SpriteProps($50, 0, 2, $05, $02, PalettesCustom_master_sword)          ; 50 - Safe master sword
+%SpriteProps($50, 0, 2, $05, $02, PalettesCustom.master_sword)          ; 50 - Safe master sword
 %SpriteProps($51, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 51 - Bomb capacity (+5)
 %SpriteProps($52, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 52 - Bomb capacity (+10)
 %SpriteProps($53, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 53 - Arrow capacity (+5)
@@ -505,7 +505,7 @@ endmacro
 %SpriteProps($56, 2, 2, $04, $04, $0000)                                ; 56 - Programmable item 2
 %SpriteProps($57, 2, 2, $04, $04, $0000)                                ; 57 - Programmable item 3
 %SpriteProps($58, 2, 2, $01, $01, PalettesVanilla_red_melon+$0E)        ; 58 - Upgrade-only Silver Arrows
-%SpriteProps($59, 0, 0, $03, $03, PalettesCustom_off_black)             ; 59 - Rupoor
+%SpriteProps($59, 0, 0, $03, $03, PalettesCustom.off_black)             ; 59 - Rupoor
 %SpriteProps($5A, 2, 2, $01, $01, $0000)                                ; 5A - Nothing
 %SpriteProps($5B, 2, 2, $01, $01, PalettesVanilla_red_melon+$0E)        ; 5B - Red clock
 %SpriteProps($5C, 2, 2, $02, $02, PalettesVanilla_blue_ice+$0E)         ; 5C - Blue clock
@@ -593,12 +593,12 @@ endmacro
 %SpriteProps($AE, 2, 2, $02, $02, $0000)                                ; AE - Reserved
 %SpriteProps($AF, 0, 0, $02, $04, PalettesVanilla_blue_ice+$0E)         ; AF - Generic small key
 %SpriteProps($B0, 2, 2, $01, $01, PalettesVanilla_red_melon+$0E)        ; B0 - Crystal 6
-%SpriteProps($B1, 2, 2, $80, $80, PalettesCustom_crystal)               ; B1 - Crystal 1
+%SpriteProps($B1, 2, 2, $80, $80, PalettesCustom.crystal)               ; B1 - Crystal 1
 %SpriteProps($B2, 2, 2, $01, $01, PalettesVanilla_red_melon+$0E)        ; B2 - Crystal 5
-%SpriteProps($B3, 2, 2, $80, $80, PalettesCustom_crystal)               ; B3 - Crystal 7
-%SpriteProps($B4, 2, 2, $80, $80, PalettesCustom_crystal)               ; B4 - Crystal 2
-%SpriteProps($B5, 2, 2, $80, $80, PalettesCustom_crystal)               ; B5 - Crystal 4
-%SpriteProps($B6, 2, 2, $80, $80, PalettesCustom_crystal)               ; B6 - Crystal 3
+%SpriteProps($B3, 2, 2, $80, $80, PalettesCustom.crystal)               ; B3 - Crystal 7
+%SpriteProps($B4, 2, 2, $80, $80, PalettesCustom.crystal)               ; B4 - Crystal 2
+%SpriteProps($B5, 2, 2, $80, $80, PalettesCustom.crystal)               ; B5 - Crystal 4
+%SpriteProps($B6, 2, 2, $80, $80, PalettesCustom.crystal)               ; B6 - Crystal 3
 %SpriteProps($B7, 2, 2, $80, $80, $0000)                                ; B7 - Reserved
 %SpriteProps($B8, 2, 2, $04, $04, $0000)                                ; B8 - 
 %SpriteProps($B9, 2, 2, $04, $04, $0000)                                ; B9 - 
@@ -680,15 +680,15 @@ endmacro
 ; o = Bomb item                    | w = Bow item
 ; k = Chest Key                    | p = Crystal prize behavior (sparkle, etc) if set
 InventoryTable:
-	.properties : fillword $0000 : fill 256*2 ; See above
-	.stamp      : fillword $0000 : fill 256*2 ; Address to stamp with 32-bit time (bank $7E)
-	.stat       : fillword $0000 : fill 256*2 ; Address to increment by one (bank $7E)
+	.properties : fill word count 256 :: $0000 ; See above
+	.stamp      : fill word count 256 :: $0000 ; Address to stamp with 32-bit time (bank $7E)
+	.stat       : fill word count 256 :: $0000 ; Address to increment by one (bank $7E)
 
 macro InventoryItem(id, props, stamp, stat)
 	pushpc
-	org InventoryTable_properties+<id>+<id> : dw <props>
-	org InventoryTable_stamp+<id>+<id>      : dw <stamp>
-	org InventoryTable_stat+<id>+<id>       : dw <stat>
+	org InventoryTable.properties+{id}+{id} : dw {props}
+	org InventoryTable.stamp+{id}+{id}      : dw {stamp}
+	org InventoryTable.stat+{id}+{id}       : dw {stat}
 	pullpc
 endmacro
 

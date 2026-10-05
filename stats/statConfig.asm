@@ -40,12 +40,12 @@
 !TOTAL_TIME_Y = 383
 
 macro AddStat(address, type, shiftRight, bits, digits, xPos, lineNumber)
-    db <xPos><<2|<type><<9|<lineNumber>>>8
-    db <lineNumber>
-    db <bits><<4|<shiftRight>
-    db <digits><<5
+    db {xPos}<<3 | {type}<<1 | {lineNumber}>>8
+    db {lineNumber}
+    db {bits}<<4 | {shiftRight}
+    db {digits}<<5
     db $00
-    dl <address>
+    dl {address}
 endmacro
 
 CreditsStats:

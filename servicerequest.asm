@@ -67,8 +67,8 @@ macro ServiceRequestChest(type)
 			LDA.b OverworldIndex : STA.l TxBuffer+9 ; area id
 			LDA.b #$00 : STA.l TxBuffer+10 ; protocol defines this as a ushort
 		++
-		LDA.b $76 : !SUB.b #$58 : STA.l TxBuffer+11 ; object index (type 2 only)
-		LDA.b #<type> : STA.l TxBuffer ; item get
+		LDA.b $76 : SEC : SBC.b #$58 : STA.l TxBuffer+11 ; object index (type 2 only)
+		LDA.b #{type} : STA.l TxBuffer ; item get
 	LDA.b #$01 : STA.l TxStatus ; mark ready for reading
 	SEC ; mark request as successful
 RTL
@@ -85,8 +85,8 @@ macro ServiceRequest(type,index)
 			LDA.b OverworldIndex : STA.l TxBuffer+9 ; area id
 			LDA.b #$00 : STA.l TxBuffer+10 ; protocol defines this as a ushort
 		++
-		LDA.b #<index> : STA.l TxBuffer+11 ; object index (type 2 only)
-		LDA.b #<type> : STA.l TxBuffer ; item get
+		LDA.b #{index} : STA.l TxBuffer+11 ; object index (type 2 only)
+		LDA.b #{type} : STA.l TxBuffer ; item get
 	LDA.b #$01 : STA.l TxStatus ; mark ready for reading
 	SEC ; mark request as successful
 RTL
@@ -121,7 +121,7 @@ PollService:
 			%ServiceRequestVersion()
 		+
 	.done
-	LDA.l #$00 : STA.l RxStatus ; release lock
+	LDA.w #$0000 : STA.l RxStatus ; release lock
 	PLP
 	SEC ; mark request as successful
 RTL

@@ -9,11 +9,11 @@ db $00, $01, $02
 db $03, $04, $05
 
 macro d(label)
-dw <label>-SplitRooms
+dw {label}-SplitRooms
 endmacro
 
 macro sq(byte)
-db <byte>
+db {byte}
 endmacro
 
 SplitRooms:

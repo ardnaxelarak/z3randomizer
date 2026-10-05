@@ -41,8 +41,8 @@ DungeonHoleEntranceTransition:
 	LDA.w EntranceIndex : CMP.b #$7B : BNE + ; skip unless falling to ganon's room
 	LDA.l BowTracking : AND.b #$40 : BEQ + ; skip if we don't have silvers
 	LDA.l BowEquipment : BEQ + ; skip if we have no bow
-	CMP.b #$03 : !BGE + ; skip if the bow is already silver
-		!ADD.b #$02 : STA.l BowEquipment ; increase bow to silver
+	CMP.b #$03 : BCS + ; skip if the bow is already silver
+		CLC : ADC.b #$02 : STA.l BowEquipment ; increase bow to silver
 	+
 
 	BRA StatTransitionCounter
@@ -167,9 +167,9 @@ CountAllKey:
 
 .all_dungoens
 	STA.b Scrap00 : TAX ; store dungeon index in X, $00
-  LDA.l DungeonAllCollectedKeys-1, X : INC : STA.l DungeonAllCollectedKeys-1, X
+	LDA.l DungeonAllCollectedKeys-1, X : INC : STA.l DungeonAllCollectedKeys-1, X
 	REP #$10 : PLX : PHX ; 16 bit index
-  LDA.l InventoryTable_properties, X : BIT.b #$40 : BEQ .done
+	LDA.l InventoryTable.properties, X : BIT.b #$40 : BEQ .done
 	SEP #$10 : LDX.b Scrap00
 	LDA.l DungeonCollectedKeys,X : INC : STA.l DungeonCollectedKeys,X
 	BRA .done
@@ -177,7 +177,7 @@ CountAllKey:
 .hc_sewers
 	LDA.l HCAllCollectedKeys : INC : STA.l HCAllCollectedKeys
 	REP #$10 : PLX : PHX  ; 16 bit index
-	LDA.l InventoryTable_properties, X : BIT.b #$40 : BEQ .done
+	LDA.l InventoryTable.properties, X : BIT.b #$40 : BEQ .done
 	LDA.l SewerCollectedKeys : INC
 	STA.l SewerCollectedKeys : STA.l HCCollectedKeys
 
@@ -374,19 +374,19 @@ StatsFinalPrep:
 		LDA.l ScreenTransitions : DEC : STA.l ScreenTransitions ; remove extra transition from exiting gtower via duck
 
 		.ramPostOnly
-		LDA.l SwordBossKills : LSR #4 : !ADD.l SwordBossKills : STA.l BossKills
-		LDA.l SwordBossKills+1 : LSR #4 : !ADD.l SwordBossKills+1 : !ADD.l BossKills : AND.b #$0F : STA.l BossKills
+		LDA.l SwordBossKills : LSR #4 : CLC : ADC.l SwordBossKills : STA.l BossKills
+		LDA.l SwordBossKills+1 : LSR #4 : CLC : ADC.l SwordBossKills+1 : CLC : ADC.l BossKills : AND.b #$0F : STA.l BossKills
 
-		LDA.l NMIFrames : !SUB.l LoopFrames : STA.l LagTime
+		LDA.l NMIFrames : SEC : SBC.l LoopFrames : STA.l LagTime
 		LDA.l NMIFrames+1 : SBC.l LoopFrames+1 : STA.l LagTime+1
 		LDA.l NMIFrames+2 : SBC.l LoopFrames+2 : STA.l LagTime+2
 		LDA.l NMIFrames+3 : SBC.l LoopFrames+3 : STA.l LagTime+3
 
-		LDA.l RupeesSpent : !ADD.l DisplayRupees : STA.l RupeesCollected
+		LDA.l RupeesSpent : CLC : ADC.l DisplayRupees : STA.l RupeesCollected
 		LDA.l RupeesSpent+1 : ADC.l DisplayRupees+1 : STA.l RupeesCollected+1
 
 		REP #$20
-		LDA.l TotalItemCounter : !SUB.l ChestsOpened : STA.l NonChestCounter
+		LDA.l TotalItemCounter : SEC : SBC.l ChestsOpened : STA.l NonChestCounter
 
 		.done
 	PLP : PLX : PLA

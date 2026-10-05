@@ -26,7 +26,7 @@ FrameHookAction:
 	REP #$30 : PLA : PLP
 RTL
 
-!NMI_MW = "$7F5047"
+!NMI_MW = $7F5047
 ;--------------------------------------------------------------------------------
 NMIHookAction:
 	PHA : PHX : PHY : PHD ; thing we wrote over, push stuff
@@ -56,7 +56,7 @@ JML NMIHookReturn
 PostNMIHookAction:
 	LDA.w NMIAux : BEQ +
 		PHK : PEA.w .return-1 ; push stack for RTL return
-		JMP.w [NMIAux]
+		JML.w [NMIAux]
 		.return
 		STZ.w NMIAux ; zero bank byte of NMI hook pointer
 	+

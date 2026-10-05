@@ -6,7 +6,7 @@
 LoadSwordForDamage:
 	LDA.w SpriteTypeTable, X : CMP.b #$88 : BNE .notMoth
 		JSR LoadModifiedSwordLevel ; load normal sword value
-		CMP.b #$04 : !BLT + : DEC : + ; if it's gold sword, change it to tempered
+		CMP.b #$04 : BCC + : DEC : + ; if it's gold sword, change it to tempered
 		RTL
 	.notMoth
 	JSR LoadModifiedSwordLevel ; load normal sword value
@@ -33,9 +33,9 @@ RTL
 ;================================================================================
 LoadModifiedSwordLevel: ; returns short
 	LDA.l SwordModifier : BEQ +
-		!ADD.l SwordEquipment ; add normal sword value to modifier
+		CLC : ADC.l SwordEquipment ; add normal sword value to modifier
 			BNE ++ : LDA.b #$01 : RTS : ++
-			CMP.b #$05 : !BLT ++ : LDA.b #$04 : RTS : ++
+			CMP.b #$05 : BCC ++ : LDA.b #$04 : RTS : ++
 		RTS
 	+
 	LDA.l SwordEquipment ; load normal sword value
@@ -44,20 +44,20 @@ RTS
 ; ArmorEquipment - Armor Inventory
 LoadModifiedArmorLevel:
 	PHA
-		LDA.l ArmorEquipment : !ADD.l ArmorModifier
+		LDA.l ArmorEquipment : CLC : ADC.l ArmorModifier
 		CMP.b #$FF : BNE + : LDA.b #$00 : +
-		CMP.b #$03 : !BLT + : LDA.b #$02 : +
+		CMP.b #$03 : BCC + : LDA.b #$02 : +
 		STA.l ScratchBufferV
 	PLA
-	!ADD.l ScratchBufferV
+	CLC : ADC.l ScratchBufferV
 RTL
 ;================================================================================
 ; MagicConsumption - Magic Inventory
 LoadModifiedMagicLevel:
 	LDA.l MagicModifier : BEQ +
-		!ADD.l MagicConsumption ; add normal magic value to modifier
+		CLC : ADC.l MagicConsumption ; add normal magic value to modifier
 			CMP.b #$FF : BNE ++ : LDA.b #$00 : RTL : ++
-			CMP.b #$03 : !BLT ++ : LDA.b #$02 : ++
+			CMP.b #$03 : BCC ++ : LDA.b #$02 : ++
 		RTL
 	+
 	LDA.l MagicConsumption ; load normal magic value
@@ -119,7 +119,7 @@ GetSmithSword:
 		JML Smithy_DoesntHaveSword ; Classic Smithy
 	+
 
-	REP #$20 : LDA.l CurrentRupees : CMP.w #$000A : SEP #$20 : !BGE .buy
+	REP #$20 : LDA.l CurrentRupees : CMP.w #$000A : SEP #$20 : BCS .buy
 	.cant_afford
 		REP #$10
 		LDA.b #$7A
@@ -135,7 +135,7 @@ GetSmithSword:
 		STZ.w ItemReceiptMethod ; Item from NPC
 		PHX : JSL Link_ReceiveItem : PLX
 
-		REP #$20 : LDA.l CurrentRupees : !SUB.w #$000A : STA.l CurrentRupees : SEP #$20 ; Take 10 rupees
+		REP #$20 : LDA.l CurrentRupees : SEC : SBC.w #$000A : STA.l CurrentRupees : SEP #$20 ; Take 10 rupees
 		JSL ItemSet_SmithSword
 	
 	.done
@@ -157,27 +157,27 @@ CheckMedallionSword:
 			LDA.b RoomIndex ; load room ID
 			CMP.w #$000E : BNE + ; freezor1
 				LDA.b LinkPosX : AND.w #$01FF ; check x-coord
-					CMP.w #368-8 : !BLT .normal
-					CMP.w #368+32-8 : !BGE .normal
+					CMP.w #368-8 : BCC .normal
+					CMP.w #368+32-8 : BCS .normal
 				LDA.b LinkPosY : AND.w #$01FF ; check y-coord
-					CMP.w #400-22 : !BLT .normal
-					CMP.w #400+32-22 : !BGE .normal
+					CMP.w #400-22 : BCC .normal
+					CMP.w #400+32-22 : BCS .normal
 				JMP .permit
 			+ : CMP.w #$007E : BNE + ; freezor2
 				LDA.b LinkPosX : AND.w #$01FF ; check x-coord
-					CMP.w #112-8 : !BLT .normal
-					CMP.w #112+32-8 : !BGE .normal
+					CMP.w #112-8 : BCC .normal
+					CMP.w #112+32-8 : BCS .normal
 				LDA.b LinkPosY : AND.w #$01FF ; check y-coord
-					CMP.w #400-22 : !BLT .normal
-					CMP.w #400+32-22 : !BGE .normal
+					CMP.w #400-22 : BCC .normal
+					CMP.w #400+32-22 : BCS .normal
 				JMP .permit
 			+ : CMP.w #$00DE : BNE + ; kholdstare
 				LDA.b LinkPosX : AND.w #$01FF ; check x-coord
-					CMP.w #368-8 : !BLT .normal
-					CMP.w #368+32-8 : !BGE .normal
+					CMP.w #368-8 : BCC .normal
+					CMP.w #368+32-8 : BCS .normal
 				LDA.b LinkPosY : AND.w #$01FF ; check y-coord
-					CMP.w #144-22 : !BLT .normal
-					CMP.w #144+32-22 : !BGE .normal
+					CMP.w #144-22 : BCC .normal
+					CMP.w #144+32-22 : BCS .normal
 				BRA .permit
 			+ : .normal
 			SEP #$20 ; set 8-bit accumulator
@@ -205,5 +205,5 @@ CheckMedallionSword:
 		LDA.b #$02 ; Pretend we have master sword
 		RTL
 .medallion_type
-db #$0F, #$10, #$11
+db $0F, $10, $11
 ;================================================================================

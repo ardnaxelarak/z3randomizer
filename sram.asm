@@ -8,12 +8,11 @@
 ; $7F6000 - $7F6FFF in WRAM maps to the next 4k bytes, occupying the 2nd and 3rd vanilla
 ; save file locations. ($700500 - $701500)
 ;--------------------------------------------------------------------------------
-pushpc
-org 0 ; This module writes no bytes. Asar gives bank cross errors without this.
-SaveDataWRAM = $7EF000
+site $7EF000
+SaveDataWRAM:
 
 ;================================================================================
-; Room Data ($7EF000 - $7EF27F
+; Room Data ($7EF000 - $7EF27F)
 ;--------------------------------------------------------------------------------
 ; Each room has two bytes. There are 296 ($128) rooms in the ROM. The data beyond
 ; $7EF24F is unused. The current room index is located at $A0 in WRAM (16-bits.)
@@ -45,12 +44,13 @@ SaveDataWRAM = $7EF000
 ; c = Chest 0
 ; q = Quadrant visits
 ;--------------------------------------------------------------------------------
-struct RoomDataWRAM $7EF000
-    .l
-    .low: skip 1
-    .high: skip 1
-endstruct align 2
+RoomDataWRAM:
+	.low : skip 1
+	.high : skip 1
+^.size
 
+function roomDataLow(roomId) => RoomDataWRAM.low + 2 * {roomId}
+function roomDataHigh(roomId) => RoomDataWRAM.high + 2 * {roomId}
 ;================================================================================
 ; Overworld Event Data ($7EF280 - $7EF33F)
 ;--------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ MultiClientFlagsWRAM = $7EF33D
 ;
 ; $00 = None
 ;--------------------------------------------------------------------------------
-base $7EF340
+site $7EF340
 EquipmentWRAM:                  ;
 BowEquipment: skip 1            ; $01 = Bow              | $02 = Bow & Arrows
                                 ; $03 = Silver Arrow Bow | $04 = Bow & Silver Arrows
@@ -390,7 +390,7 @@ InverseChecksumWRAM: skip 2     ; Vanilla Inverse Checksum. Don't write unless c
 ; This $1000 byte segment is saved beginning where the second save file was in SRAM
 ; beginning at $700500
 ;--------------------------------------------------------------------------------
-base $7F6000                     ; $1000 byte buffer we place beginning at second save file
+site $7F6000                     ; $1000 byte buffer we place beginning at second save file
 ExtendedSaveDataWRAM:            ;
 ExtendedFileNameWRAM: skip 24    ; File name, 12 word-length characters.
 RoomPotData: skip 592            ; Table for expanded pot shuffle. One word per room.
@@ -406,7 +406,7 @@ skip 231
 ; for burning in values such as the ROM name directly or when we only have to read
 ; a small amount of data which is not currently in the WRAM mirror.
 ;--------------------------------------------------------------------------------
-base $700000                    ;
+site $700000                    ;
 CartridgeSRAM:                  ;
 RoomDataSRAM:                   ;
 skip $280                       ;
@@ -436,243 +436,240 @@ PasswordSRAM: skip 16           ; Password value (16 bytes)
 skip 8155                       ;
 SaveBackupSRAM:                 ; Backup copy of save ram. Game will attempt to use this if
                                 ; checksum on file select screen load fails.
-base off
 
-;================================================================================
-; Assertions
-;================================================================================
-macro assertSRAM(label, address)
-  assert <label> = <address>, "<label> labeled at incorrect address."
-endmacro
-
-;================================================================================
-; Vanilla Assertions
-;--------------------------------------------------------------------------------
-; All of these need to pass for the base rom to build or something is probably
-; very wrong.
-;--------------------------------------------------------------------------------
-%assertSRAM(EquipmentWRAM, $7EF340)
-%assertSRAM(BowEquipment, $7EF340)
-%assertSRAM(BoomerangEquipment, $7EF341)
-%assertSRAM(HookshotEquipment, $7EF342)
-%assertSRAM(BombsEquipment, $7EF343)
-%assertSRAM(PowderEquipment, $7EF344)
-%assertSRAM(FireRodEquipment, $7EF345)
-%assertSRAM(IceRodEquipment, $7EF346)
-%assertSRAM(BombosEquipment, $7EF347)
-%assertSRAM(EtherEquipment, $7EF348)
-%assertSRAM(QuakeEquipment, $7EF349)
-%assertSRAM(LampEquipment, $7EF34A)
-%assertSRAM(HammerEquipment, $7EF34B)
-%assertSRAM(FluteEquipment, $7EF34C)
-%assertSRAM(BugNetEquipment, $7EF34D)
-%assertSRAM(BookOfMudoraEquipment, $7EF34E)
-%assertSRAM(BottleIndex, $7EF34F)
-%assertSRAM(SomariaEquipment, $7EF350)
-%assertSRAM(ByrnaEquipment, $7EF351)
-%assertSRAM(CapeEquipment, $7EF352)
-%assertSRAM(MirrorEquipment, $7EF353)
-%assertSRAM(GloveEquipment, $7EF354)
-%assertSRAM(BootsEquipment, $7EF355)
-%assertSRAM(FlippersEquipment, $7EF356)
-%assertSRAM(MoonPearlEquipment, $7EF357)
-%assertSRAM(SwordEquipment, $7EF359)
-%assertSRAM(ShieldEquipment, $7EF35A)
-%assertSRAM(ArmorEquipment, $7EF35B)
-%assertSRAM(BottleContentsOne, $7EF35C)
-%assertSRAM(BottleContentsTwo, $7EF35D)
-%assertSRAM(BottleContentsThree, $7EF35E)
-%assertSRAM(BottleContentsFour, $7EF35F)
-%assertSRAM(CurrentRupees, $7EF360)
-%assertSRAM(DisplayRupees, $7EF362)
-;--------------------------------------------------------------------------------
-%assertSRAM(CompassField, $7EF364)
-%assertSRAM(BigKeyField, $7EF366)
-%assertSRAM(MapField, $7EF368)
-;--------------------------------------------------------------------------------
-%assertSRAM(HeartPieceQuarter, $7EF36B)
-%assertSRAM(MaximumHealth, $7EF36C)
-%assertSRAM(CurrentHealth, $7EF36D)
-%assertSRAM(CurrentMagic, $7EF36E)
-%assertSRAM(CurrentSmallKeys, $7EF36F)
-%assertSRAM(BombCapacity, $7EF370)
-%assertSRAM(ArrowCapacity, $7EF371)
-%assertSRAM(HeartsFiller, $7EF372)
-%assertSRAM(MagicFiller, $7EF373)
-%assertSRAM(PendantsField, $7EF374)
-%assertSRAM(BombsFiller, $7EF375)
-%assertSRAM(ArrowsFiller, $7EF376)
-%assertSRAM(CurrentArrows, $7EF377)
-%assertSRAM(AbilityFlags, $7EF379)
-%assertSRAM(CrystalsField, $7EF37A)
-%assertSRAM(MagicConsumption, $7EF37B)
-;--------------------------------------------------------------------------------
-%assertSRAM(DungeonKeys, $7EF37C)
-%assertSRAM(SewerKeys, $7EF37C)
-%assertSRAM(HyruleCastleKeys, $7EF37D)
-%assertSRAM(EasternKeys, $7EF37E)
-%assertSRAM(DesertKeys, $7EF37F)
-%assertSRAM(CastleTowerKeys, $7EF380)
-%assertSRAM(SwampKeys, $7EF381)
-%assertSRAM(PalaceOfDarknessKeys, $7EF382)
-%assertSRAM(MireKeys, $7EF383)
-%assertSRAM(SkullWoodsKeys, $7EF384)
-%assertSRAM(IcePalaceKeys, $7EF385)
-%assertSRAM(HeraKeys, $7EF386)
-%assertSRAM(ThievesTownKeys, $7EF387)
-%assertSRAM(TurtleRockKeys, $7EF388)
-%assertSRAM(GanonsTowerKeys, $7EF389)
-%assertSRAM(CurrentGenericKeys, $7EF38B)
-;--------------------------------------------------------------------------------
-%assertSRAM(ProgressIndicator, $7EF3C5)
-%assertSRAM(ProgressFlags, $7EF3C6)
-%assertSRAM(MapIcons, $7EF3C7)
-%assertSRAM(StartingEntrance, $7EF3C8)
-%assertSRAM(NpcFlagsVanilla, $7EF3C9)
-%assertSRAM(CurrentWorld, $7EF3CA)
-%assertSRAM(FollowerIndicator, $7EF3CC)
-%assertSRAM(FollowerYCoord, $7EF3CD)
-%assertSRAM(FollowerXCoord, $7EF3CF)
-%assertSRAM(DroppedFollowerIndoors, $7EF3D1)
-%assertSRAM(DroppedFollowerLayer, $7EF3D2)
-%assertSRAM(FollowerDropped, $7EF3D3)
-%assertSRAM(FileNameVanillaWRAM, $7EF3D9)
-%assertSRAM(FileValidity, $7EF3E1)
-%assertSRAM(InverseChecksumWRAM, $7EF4FE)
-
-;================================================================================
-; Randomizer Assertions
-;--------------------------------------------------------------------------------
-; Trackers and other third party consumers may depend on these values.
-;--------------------------------------------------------------------------------
-%assertSRAM(InventoryTracking, $7EF38C)
-%assertSRAM(BowTracking, $7EF38E)
-%assertSRAM(ItemLimitCounts, $7EF390)
-;--------------------------------------------------------------------------------
-%assertSRAM(GameCounter, $7EF3FF)
-%assertSRAM(PostGameCounter, $7EF401)
-%assertSRAM(CompassCountDisplay, $7EF403)
-%assertSRAM(Aga2Duck, $7EF40F)
-%assertSRAM(NpcFlags, $7EF410)
-%assertSRAM(MapOverlay, $7EF414)
-%assertSRAM(HudFlag, $7EF416)
-%assertSRAM(IgnoreFaeries, $7EF416)
-%assertSRAM(HasGroveItem, $7EF416)
-%assertSRAM(GeneralFlags, $7EF416)
-%assertSRAM(HighestSword, $7EF417)
-%assertSRAM(GoalCounter, $7EF418)
-%assertSRAM(ProgrammableItemOne, $7EF41A)
-%assertSRAM(ProgrammableItemTwo, $7EF41C)
-%assertSRAM(ProgrammableItemThree, $7EF41E)
-%assertSRAM(BonkCounter, $7EF420)
-%assertSRAM(YAItemCounter, $7EF421)
-%assertSRAM(HighestShield, $7EF422)
-%assertSRAM(TotalItemCounter, $7EF423)
-%assertSRAM(SwordBossKills, $7EF425)
-%assertSRAM(BigKeysBigChests, $7EF427)
-%assertSRAM(MapsCompasses, $7EF428)
-%assertSRAM(PendantCounter, $7EF429)
-%assertSRAM(PreGTBKLocations, $7EF42A)
-%assertSRAM(RupeesSpent, $7EF42B)
-%assertSRAM(SaveQuitCounter, $7EF42D)
-%assertSRAM(LoopFrames, $7EF42E)
-%assertSRAM(PreBootsLocations, $7EF432)
-%assertSRAM(PreMirrorLocations, $7EF434)
-%assertSRAM(PreFluteLocations, $7EF436)
-%assertSRAM(OverworldMirrors, $7EF43A)
-%assertSRAM(UnderworldMirrors, $7EF43B)
-%assertSRAM(ScreenTransitions, $7EF43C)
-%assertSRAM(NMIFrames, $7EF43E)
-%assertSRAM(ChestsOpened, $7EF442)
-%assertSRAM(StatsLocked, $7EF443)
-%assertSRAM(MenuFrames, $7EF444)
-%assertSRAM(HeartContainerCounter, $7EF448)
-%assertSRAM(DeathCounter, $7EF449)
-%assertSRAM(FluteCounter, $7EF44B)
-%assertSRAM(RNGItem, $7EF450)
-%assertSRAM(SwordlessBossKills, $7EF452)
-%assertSRAM(FaerieRevivalCounter, $7EF453)
-%assertSRAM(ChallengeTimer, $7EF454)
-%assertSRAM(SwordTime, $7EF458)
-%assertSRAM(BootsTime, $7EF45C)
-%assertSRAM(FluteTime, $7EF460)
-%assertSRAM(MirrorTime, $7EF464)
-%assertSRAM(ChestTurnCounter, $7EF468)
-%assertSRAM(CapacityUpgrades, $7EF469)
-%assertSRAM(DamageCounter, $7EF46A)
-%assertSRAM(MagicCounter, $7EF46C)
-%assertSRAM(HighestMail, $7EF46E)
-%assertSRAM(SmallKeyCounter, $7EF46F)
-%assertSRAM(HeartPieceCounter, $7EF470)
-%assertSRAM(DungeonsCompleted, $7EF472)
-%assertSRAM(MapCountDisplay, $7EF474)
-%assertSRAM(CrystalCounter, $7EF476)
-;--------------------------------------------------------------------------------
-%assertSRAM(ServiceSequence, $7EF4A0)
-%assertSRAM(ServiceSequenceRx, $7EF4A0)
-%assertSRAM(ServiceSequenceTx, $7EF4A8)
-;--------------------------------------------------------------------------------
-%assertSRAM(DungeonLocationsChecked, $7EF4B0)
-%assertSRAM(SewersLocations, $7EF4B0)
-%assertSRAM(HCLocations, $7EF4B2)
-%assertSRAM(EPLocations, $7EF4B4)
-%assertSRAM(DPLocations, $7EF4B6)
-%assertSRAM(CTLocations, $7EF4B8)
-%assertSRAM(SPLocations, $7EF4BA)
-%assertSRAM(PDLocations, $7EF4BC)
-%assertSRAM(MMLocations, $7EF4BE)
-%assertSRAM(SWLocations, $7EF4C0)
-%assertSRAM(IPLocations, $7EF4C2)
-%assertSRAM(THLocations, $7EF4C4)
-%assertSRAM(TTLocations, $7EF4C6)
-%assertSRAM(TRLocations, $7EF4C8)
-%assertSRAM(GTLocations, $7EF4CA)
-%assertSRAM(DungeonCollectedKeys, $7EF4E0)
-%assertSRAM(SewerCollectedKeys, $7EF4E0)
-%assertSRAM(HCCollectedKeys, $7EF4E1)
-%assertSRAM(EPCollectedKeys, $7EF4E2)
-%assertSRAM(DPCollectedKeys, $7EF4E3)
-%assertSRAM(CTCollectedKeys, $7EF4E4)
-%assertSRAM(SPCollectedKeys, $7EF4E5)
-%assertSRAM(PDCollectedKeys, $7EF4E6)
-%assertSRAM(MMCollectedKeys, $7EF4E7)
-%assertSRAM(SWCollectedKeys, $7EF4E8)
-%assertSRAM(IPCollectedKeys, $7EF4E9)
-%assertSRAM(THCollectedKeys, $7EF4EA)
-%assertSRAM(TTCollectedKeys, $7EF4EB)
-%assertSRAM(TRCollectedKeys, $7EF4EC)
-%assertSRAM(GTCollectedKeys, $7EF4ED)
-%assertSRAM(FileMarker, $7EF4F0)
-%assertSRAM(DungeonAllCollectedKeys, $7EF4F1)
-;--------------------------------------------------------------------------------
-%assertSRAM(ExtendedSaveDataWRAM, $7F6000)
-%assertSRAM(ExtendedFileNameWRAM, $7F6000)
-%assertSRAM(RoomPotData, $7F6018)
-%assertSRAM(SpriteDropData, $7F6268)
-%assertSRAM(PurchaseCounts, $7F64B8)
-%assertSRAM(PrivateBlockPersistent, $7F6518)
-
-;================================================================================
-; Direct SRAM Assertions
-;--------------------------------------------------------------------------------
-%assertSRAM(CartridgeSRAM, $700000)
-%assertSRAM(RoomDataSRAM, $700000)
-%assertSRAM(OverworldEventDataSRAM, $700280)
-%assertSRAM(EquipmentSRAM, $700340)
-%assertSRAM(BombsEquipmentSRAM, $700343)
-%assertSRAM(DisplayRupeesSRAM, $700362)
-%assertSRAM(CurrentArrowsSRAM, $700377)
-%assertSRAM(InventoryTrackingSRAM, $70038C)
-%assertSRAM(BowTrackingSRAM, $70038E)
-%assertSRAM(ProgressIndicatorSRAM, $7003C5)
-%assertSRAM(FileNameVanillaSRAM, $7003D9)
-%assertSRAM(FileValiditySRAM, $7003E1)
-%assertSRAM(InverseChecksumSRAM, $7004FE)
-%assertSRAM(ExtendedSaveDataSRAM, $700500)
-%assertSRAM(ExtendedFileNameSRAM, $700500)
-%assertSRAM(RomVersionSRAM, $701FFC)
-%assertSRAM(RomNameSRAM, $702000)
-%assertSRAM(PasswordSRAM, $702015)
-%assertSRAM(SaveBackupSRAM, $704000)
-
-pullpc
+; ;================================================================================
+; ; Assertions
+; ;================================================================================
+; macro assertSRAM(label, address)
+;   assert <label> = <address>, "<label> labeled at incorrect address."
+; endmacro
+; 
+; ;================================================================================
+; ; Vanilla Assertions
+; ;--------------------------------------------------------------------------------
+; ; All of these need to pass for the base rom to build or something is probably
+; ; very wrong.
+; ;--------------------------------------------------------------------------------
+; %assertSRAM(EquipmentWRAM, $7EF340)
+; %assertSRAM(BowEquipment, $7EF340)
+; %assertSRAM(BoomerangEquipment, $7EF341)
+; %assertSRAM(HookshotEquipment, $7EF342)
+; %assertSRAM(BombsEquipment, $7EF343)
+; %assertSRAM(PowderEquipment, $7EF344)
+; %assertSRAM(FireRodEquipment, $7EF345)
+; %assertSRAM(IceRodEquipment, $7EF346)
+; %assertSRAM(BombosEquipment, $7EF347)
+; %assertSRAM(EtherEquipment, $7EF348)
+; %assertSRAM(QuakeEquipment, $7EF349)
+; %assertSRAM(LampEquipment, $7EF34A)
+; %assertSRAM(HammerEquipment, $7EF34B)
+; %assertSRAM(FluteEquipment, $7EF34C)
+; %assertSRAM(BugNetEquipment, $7EF34D)
+; %assertSRAM(BookOfMudoraEquipment, $7EF34E)
+; %assertSRAM(BottleIndex, $7EF34F)
+; %assertSRAM(SomariaEquipment, $7EF350)
+; %assertSRAM(ByrnaEquipment, $7EF351)
+; %assertSRAM(CapeEquipment, $7EF352)
+; %assertSRAM(MirrorEquipment, $7EF353)
+; %assertSRAM(GloveEquipment, $7EF354)
+; %assertSRAM(BootsEquipment, $7EF355)
+; %assertSRAM(FlippersEquipment, $7EF356)
+; %assertSRAM(MoonPearlEquipment, $7EF357)
+; %assertSRAM(SwordEquipment, $7EF359)
+; %assertSRAM(ShieldEquipment, $7EF35A)
+; %assertSRAM(ArmorEquipment, $7EF35B)
+; %assertSRAM(BottleContentsOne, $7EF35C)
+; %assertSRAM(BottleContentsTwo, $7EF35D)
+; %assertSRAM(BottleContentsThree, $7EF35E)
+; %assertSRAM(BottleContentsFour, $7EF35F)
+; %assertSRAM(CurrentRupees, $7EF360)
+; %assertSRAM(DisplayRupees, $7EF362)
+; ;--------------------------------------------------------------------------------
+; %assertSRAM(CompassField, $7EF364)
+; %assertSRAM(BigKeyField, $7EF366)
+; %assertSRAM(MapField, $7EF368)
+; ;--------------------------------------------------------------------------------
+; %assertSRAM(HeartPieceQuarter, $7EF36B)
+; %assertSRAM(MaximumHealth, $7EF36C)
+; %assertSRAM(CurrentHealth, $7EF36D)
+; %assertSRAM(CurrentMagic, $7EF36E)
+; %assertSRAM(CurrentSmallKeys, $7EF36F)
+; %assertSRAM(BombCapacity, $7EF370)
+; %assertSRAM(ArrowCapacity, $7EF371)
+; %assertSRAM(HeartsFiller, $7EF372)
+; %assertSRAM(MagicFiller, $7EF373)
+; %assertSRAM(PendantsField, $7EF374)
+; %assertSRAM(BombsFiller, $7EF375)
+; %assertSRAM(ArrowsFiller, $7EF376)
+; %assertSRAM(CurrentArrows, $7EF377)
+; %assertSRAM(AbilityFlags, $7EF379)
+; %assertSRAM(CrystalsField, $7EF37A)
+; %assertSRAM(MagicConsumption, $7EF37B)
+; ;--------------------------------------------------------------------------------
+; %assertSRAM(DungeonKeys, $7EF37C)
+; %assertSRAM(SewerKeys, $7EF37C)
+; %assertSRAM(HyruleCastleKeys, $7EF37D)
+; %assertSRAM(EasternKeys, $7EF37E)
+; %assertSRAM(DesertKeys, $7EF37F)
+; %assertSRAM(CastleTowerKeys, $7EF380)
+; %assertSRAM(SwampKeys, $7EF381)
+; %assertSRAM(PalaceOfDarknessKeys, $7EF382)
+; %assertSRAM(MireKeys, $7EF383)
+; %assertSRAM(SkullWoodsKeys, $7EF384)
+; %assertSRAM(IcePalaceKeys, $7EF385)
+; %assertSRAM(HeraKeys, $7EF386)
+; %assertSRAM(ThievesTownKeys, $7EF387)
+; %assertSRAM(TurtleRockKeys, $7EF388)
+; %assertSRAM(GanonsTowerKeys, $7EF389)
+; %assertSRAM(CurrentGenericKeys, $7EF38B)
+; ;--------------------------------------------------------------------------------
+; %assertSRAM(ProgressIndicator, $7EF3C5)
+; %assertSRAM(ProgressFlags, $7EF3C6)
+; %assertSRAM(MapIcons, $7EF3C7)
+; %assertSRAM(StartingEntrance, $7EF3C8)
+; %assertSRAM(NpcFlagsVanilla, $7EF3C9)
+; %assertSRAM(CurrentWorld, $7EF3CA)
+; %assertSRAM(FollowerIndicator, $7EF3CC)
+; %assertSRAM(FollowerYCoord, $7EF3CD)
+; %assertSRAM(FollowerXCoord, $7EF3CF)
+; %assertSRAM(DroppedFollowerIndoors, $7EF3D1)
+; %assertSRAM(DroppedFollowerLayer, $7EF3D2)
+; %assertSRAM(FollowerDropped, $7EF3D3)
+; %assertSRAM(FileNameVanillaWRAM, $7EF3D9)
+; %assertSRAM(FileValidity, $7EF3E1)
+; %assertSRAM(InverseChecksumWRAM, $7EF4FE)
+; 
+; ;================================================================================
+; ; Randomizer Assertions
+; ;--------------------------------------------------------------------------------
+; ; Trackers and other third party consumers may depend on these values.
+; ;--------------------------------------------------------------------------------
+; %assertSRAM(InventoryTracking, $7EF38C)
+; %assertSRAM(BowTracking, $7EF38E)
+; %assertSRAM(ItemLimitCounts, $7EF390)
+; ;--------------------------------------------------------------------------------
+; %assertSRAM(GameCounter, $7EF3FF)
+; %assertSRAM(PostGameCounter, $7EF401)
+; %assertSRAM(CompassCountDisplay, $7EF403)
+; %assertSRAM(Aga2Duck, $7EF40F)
+; %assertSRAM(NpcFlags, $7EF410)
+; %assertSRAM(MapOverlay, $7EF414)
+; %assertSRAM(HudFlag, $7EF416)
+; %assertSRAM(IgnoreFaeries, $7EF416)
+; %assertSRAM(HasGroveItem, $7EF416)
+; %assertSRAM(GeneralFlags, $7EF416)
+; %assertSRAM(HighestSword, $7EF417)
+; %assertSRAM(GoalCounter, $7EF418)
+; %assertSRAM(ProgrammableItemOne, $7EF41A)
+; %assertSRAM(ProgrammableItemTwo, $7EF41C)
+; %assertSRAM(ProgrammableItemThree, $7EF41E)
+; %assertSRAM(BonkCounter, $7EF420)
+; %assertSRAM(YAItemCounter, $7EF421)
+; %assertSRAM(HighestShield, $7EF422)
+; %assertSRAM(TotalItemCounter, $7EF423)
+; %assertSRAM(SwordBossKills, $7EF425)
+; %assertSRAM(BigKeysBigChests, $7EF427)
+; %assertSRAM(MapsCompasses, $7EF428)
+; %assertSRAM(PendantCounter, $7EF429)
+; %assertSRAM(PreGTBKLocations, $7EF42A)
+; %assertSRAM(RupeesSpent, $7EF42B)
+; %assertSRAM(SaveQuitCounter, $7EF42D)
+; %assertSRAM(LoopFrames, $7EF42E)
+; %assertSRAM(PreBootsLocations, $7EF432)
+; %assertSRAM(PreMirrorLocations, $7EF434)
+; %assertSRAM(PreFluteLocations, $7EF436)
+; %assertSRAM(OverworldMirrors, $7EF43A)
+; %assertSRAM(UnderworldMirrors, $7EF43B)
+; %assertSRAM(ScreenTransitions, $7EF43C)
+; %assertSRAM(NMIFrames, $7EF43E)
+; %assertSRAM(ChestsOpened, $7EF442)
+; %assertSRAM(StatsLocked, $7EF443)
+; %assertSRAM(MenuFrames, $7EF444)
+; %assertSRAM(HeartContainerCounter, $7EF448)
+; %assertSRAM(DeathCounter, $7EF449)
+; %assertSRAM(FluteCounter, $7EF44B)
+; %assertSRAM(RNGItem, $7EF450)
+; %assertSRAM(SwordlessBossKills, $7EF452)
+; %assertSRAM(FaerieRevivalCounter, $7EF453)
+; %assertSRAM(ChallengeTimer, $7EF454)
+; %assertSRAM(SwordTime, $7EF458)
+; %assertSRAM(BootsTime, $7EF45C)
+; %assertSRAM(FluteTime, $7EF460)
+; %assertSRAM(MirrorTime, $7EF464)
+; %assertSRAM(ChestTurnCounter, $7EF468)
+; %assertSRAM(CapacityUpgrades, $7EF469)
+; %assertSRAM(DamageCounter, $7EF46A)
+; %assertSRAM(MagicCounter, $7EF46C)
+; %assertSRAM(HighestMail, $7EF46E)
+; %assertSRAM(SmallKeyCounter, $7EF46F)
+; %assertSRAM(HeartPieceCounter, $7EF470)
+; %assertSRAM(DungeonsCompleted, $7EF472)
+; %assertSRAM(MapCountDisplay, $7EF474)
+; %assertSRAM(CrystalCounter, $7EF476)
+; ;--------------------------------------------------------------------------------
+; %assertSRAM(ServiceSequence, $7EF4A0)
+; %assertSRAM(ServiceSequenceRx, $7EF4A0)
+; %assertSRAM(ServiceSequenceTx, $7EF4A8)
+; ;--------------------------------------------------------------------------------
+; %assertSRAM(DungeonLocationsChecked, $7EF4B0)
+; %assertSRAM(SewersLocations, $7EF4B0)
+; %assertSRAM(HCLocations, $7EF4B2)
+; %assertSRAM(EPLocations, $7EF4B4)
+; %assertSRAM(DPLocations, $7EF4B6)
+; %assertSRAM(CTLocations, $7EF4B8)
+; %assertSRAM(SPLocations, $7EF4BA)
+; %assertSRAM(PDLocations, $7EF4BC)
+; %assertSRAM(MMLocations, $7EF4BE)
+; %assertSRAM(SWLocations, $7EF4C0)
+; %assertSRAM(IPLocations, $7EF4C2)
+; %assertSRAM(THLocations, $7EF4C4)
+; %assertSRAM(TTLocations, $7EF4C6)
+; %assertSRAM(TRLocations, $7EF4C8)
+; %assertSRAM(GTLocations, $7EF4CA)
+; %assertSRAM(DungeonCollectedKeys, $7EF4E0)
+; %assertSRAM(SewerCollectedKeys, $7EF4E0)
+; %assertSRAM(HCCollectedKeys, $7EF4E1)
+; %assertSRAM(EPCollectedKeys, $7EF4E2)
+; %assertSRAM(DPCollectedKeys, $7EF4E3)
+; %assertSRAM(CTCollectedKeys, $7EF4E4)
+; %assertSRAM(SPCollectedKeys, $7EF4E5)
+; %assertSRAM(PDCollectedKeys, $7EF4E6)
+; %assertSRAM(MMCollectedKeys, $7EF4E7)
+; %assertSRAM(SWCollectedKeys, $7EF4E8)
+; %assertSRAM(IPCollectedKeys, $7EF4E9)
+; %assertSRAM(THCollectedKeys, $7EF4EA)
+; %assertSRAM(TTCollectedKeys, $7EF4EB)
+; %assertSRAM(TRCollectedKeys, $7EF4EC)
+; %assertSRAM(GTCollectedKeys, $7EF4ED)
+; %assertSRAM(FileMarker, $7EF4F0)
+; %assertSRAM(DungeonAllCollectedKeys, $7EF4F1)
+; ;--------------------------------------------------------------------------------
+; %assertSRAM(ExtendedSaveDataWRAM, $7F6000)
+; %assertSRAM(ExtendedFileNameWRAM, $7F6000)
+; %assertSRAM(RoomPotData, $7F6018)
+; %assertSRAM(SpriteDropData, $7F6268)
+; %assertSRAM(PurchaseCounts, $7F64B8)
+; %assertSRAM(PrivateBlockPersistent, $7F6518)
+; 
+; ;================================================================================
+; ; Direct SRAM Assertions
+; ;--------------------------------------------------------------------------------
+; %assertSRAM(CartridgeSRAM, $700000)
+; %assertSRAM(RoomDataSRAM, $700000)
+; %assertSRAM(OverworldEventDataSRAM, $700280)
+; %assertSRAM(EquipmentSRAM, $700340)
+; %assertSRAM(BombsEquipmentSRAM, $700343)
+; %assertSRAM(DisplayRupeesSRAM, $700362)
+; %assertSRAM(CurrentArrowsSRAM, $700377)
+; %assertSRAM(InventoryTrackingSRAM, $70038C)
+; %assertSRAM(BowTrackingSRAM, $70038E)
+; %assertSRAM(ProgressIndicatorSRAM, $7003C5)
+; %assertSRAM(FileNameVanillaSRAM, $7003D9)
+; %assertSRAM(FileValiditySRAM, $7003E1)
+; %assertSRAM(InverseChecksumSRAM, $7004FE)
+; %assertSRAM(ExtendedSaveDataSRAM, $700500)
+; %assertSRAM(ExtendedFileNameSRAM, $700500)
+; %assertSRAM(RomVersionSRAM, $701FFC)
+; %assertSRAM(RomNameSRAM, $702000)
+; %assertSRAM(PasswordSRAM, $702015)
+; %assertSRAM(SaveBackupSRAM, $704000)

@@ -2,41 +2,41 @@
 ; Utility Functions
 ;================================================================================
 ; GetSpriteTile
-; in:	A - Loot ID
-; out:	A - Sprite GFX ID
+; in:   A - Loot ID
+; out:  A - Sprite GFX ID
 ;--------------------------------------------------------------------------------
 GetSpriteID:
 	JSL AttemptItemSubstitution
 	JSR ResolveLootID
-        CMP.b #$6D : BEQ .server_F0 ; Server Request F0
-        CMP.b #$6E : BEQ .server_F1 ; Server Request F1
-        CMP.b #$6F : BEQ .server_F2 ; Server Request F2
+	CMP.b #$6D : BEQ .server_F0 ; Server Request F0
+	CMP.b #$6E : BEQ .server_F1 ; Server Request F1
+	CMP.b #$6F : BEQ .server_F2 ; Server Request F2
 	BRA .normal
-                .server_F0
-                JSL ItemVisualServiceRequest_F0
-                BRA .normal
-                .server_F1
-                JSL ItemVisualServiceRequest_F1
+		.server_F0
+		JSL ItemVisualServiceRequest_F0
+		BRA .normal
+		.server_F1
+		JSL ItemVisualServiceRequest_F1
 		BRA .normal
 		.server_F2
 		JSL ItemVisualServiceRequest_F2
 	.normal
 	PHX
-	TAX : LDA.l ItemReceipts_graphics, X ; look up item gfx
+	TAX : LDA.l ItemReceipts.graphics, X ; look up item gfx
 	PLX
 RTL
 
 ;--------------------------------------------------------------------------------
 ; GetSpritePalette
-; in:	A - Loot ID
-; out:	A - Palette
+; in:   A - Loot ID
+; out:  A - Palette
 ;--------------------------------------------------------------------------------
 GetSpritePalette:
         JSL AttemptItemSubstitution
         JSR ResolveLootID
         .resolved
         TAX
-        LDA.l SpriteProperties_standing_palette, X : BIT #$80 : BNE .load_palette
+        LDA.l SpriteProperties.standing_palette, X : BIT.b #$80 : BNE .load_palette
         ASL
 RTL
         .load_palette
@@ -67,12 +67,12 @@ PrepDynamicTile:
 	CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS + : BRA ++ ; if rupees, don't draw to OAM
 		+ JSL TransferItemReceiptToBuffer_using_ReceiptID
 			SEP #$30
-    ++ LDA.b #$00 : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID  ; clear player id
+	++ LDA.b #$00 : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID  ; clear player id
 	PLB : PLY : PLX
 RTL
-        .loot_resolved
+	.loot_resolved
 	PHX : PHY : PHB
-        BRA -
+	BRA -
 ;--------------------------------------------------------------------------------
 ; ResolveBeeTrap
 ; In: A - Loot ID
@@ -109,21 +109,21 @@ LoadDynamicTileOAMTable:
         LDA.w #$0000 : STA.l SpriteOAM : STA.l SpriteOAM+2
         LDA.w #$0200 : STA.l SpriteOAM+6
         LDA.l BeeTrapDisguise : AND.w #$00FF : BNE +
-        	LDA.w SprItemReceipt,X : AND.w #$00FF
+            LDA.w SprItemReceipt,X : AND.w #$00FF
         + LDY.w #$0024
         PHX : ASL : TAX
-        LDA.l InventoryTable_properties, X : BIT.w #$8000 : BEQ +
-        	LDA.l VRAMAddressOffset, X : TAY
+        LDA.l InventoryTable.properties, X : BIT.w #$8000 : BEQ +
+            LDA.l VRAMAddressOffset, X : TAY
         + TYA : STA.l SpriteOAM+4
         PLX
         SEP #$30
 
-		LDA.l BeeTrapDisguise : BNE +
-			LDA.w SprItemReceipt,X
-        + JSL GetSpritePalette_resolved
+        LDA.l BeeTrapDisguise : BNE +
+            LDA.w SprItemReceipt,X
+        + JSL GetSpritePalette.resolved
         STA.l SpriteOAM+5 : STA.l SpriteOAM+13
         PHX
-        LDA.l SpriteProperties_standing_width,X : BEQ .narrow
+        LDA.l SpriteProperties.standing_width,X : BEQ .narrow
         BRA .done
 
         .narrow
@@ -143,18 +143,18 @@ LoadDynamicTileOAMTable:
 RTS
 ;--------------------------------------------------------------------------------
 ; DrawDynamicTile
-; in:	A - Loot ID
+; in:   A - Loot ID
 ; out:  A - OAM Slots Taken
 ;--------------------------------------------------------------------------------
 ; This wastes two OAM slots if you don't want a shadow - fix later - I wrote "fix later" over a year ago and it's still not fixed (Aug 6, 2017) - lol (May 25th, 2019)
 ;-------------------------------------------------------------------------------- 2084B8
 DrawDynamicTile:
-		JSR PrepDrawRemoteItemSprite
+        JSR PrepDrawRemoteItemSprite
         PHX
         TAX
         LDA.l BeeTrapDisguise : BEQ +
-        	TAX
-        + LDA.l SpriteProperties_standing_width,X : BEQ .narrow
+            TAX
+        + LDA.l SpriteProperties.standing_width,X : BEQ .narrow
 
         .full
         PLX
@@ -179,16 +179,16 @@ DrawDynamicTile:
         LDA.b #$00 : STA.l SpriteSkipEOR
         PLB
 
-        LDA.b OAMPtr : !ADD.b #$08 : STA.b OAMPtr ; leave the pointer in the right spot to draw the shadow, if desired
+        LDA.b OAMPtr : CLC : ADC.b #$08 : STA.b OAMPtr ; leave the pointer in the right spot to draw the shadow, if desired
         LDA.b OAMPtr+2 : INC #2 : STA.b OAMPtr+2
         PLA
 RTL
 ;--------------------------------------------------------------------------------
 DrawDynamicTileNoShadow:
-		JSR PrepDrawRemoteItemSprite
+        JSR PrepDrawRemoteItemSprite
         PHX
         TAX
-        LDA.l SpriteProperties_standing_width,X : BEQ .narrow
+        LDA.l SpriteProperties.standing_width,X : BEQ .narrow
 
         .full
         PLX
@@ -211,7 +211,7 @@ DrawDynamicTileNoShadow:
         LDA.l Bob : BNE + : LDA.b #$00 : STA.l SpriteSkipEOR : + ; Bob fix is conditional
         PLB
 
-        LDA.b OAMPtr : !ADD.b #$08 : STA.b OAMPtr
+        LDA.b OAMPtr : CLC : ADC.b #$08 : STA.b OAMPtr
         LDA.b OAMPtr+2 : INC #2 : STA.b OAMPtr+2
 RTL
 ;--------------------------------------------------------------------------------
@@ -247,12 +247,12 @@ LoadModifiedTileBufferAddress:
 	PHA
 	LDA.l TileUploadOffsetOverride : BEQ +
 		TAX
-    	LDY.w #$0002
+		LDY.w #$0002
 		LDA.w #$0000 : STA.l TileUploadOffsetOverride
 		BRA .done
 	+
-    LDX.w #$2D40
-    LDY.w #$0002
+	LDX.w #$2D40
+	LDY.w #$0002
 	.done
 	PLA
 RTL
@@ -267,8 +267,8 @@ Sprite_IsOnscreen:
         JSR .check_sprite
         BCS +
                 REP #$20
-                LDA.b BG2H : PHA : !SUB.w #$0F : STA.b BG2H
-                LDA.b BG2V : PHA : !SUB.w #$0F : STA.b BG2V
+                LDA.b BG2H : PHA : SEC : SBC.w #$0F : STA.b BG2H
+                LDA.b BG2V : PHA : SEC : SBC.w #$0F : STA.b BG2V
                 SEP #$20
                 JSR .check_sprite
                 REP #$20
@@ -306,11 +306,11 @@ Sprite_GetScreenRelativeCoords:
 	STA.b Scrap08
 
 	LDA.w SpritePosYLow, X : STA.b Scrap00
-	!SUB.b BG2V       : STA.b Scrap06
+	SEC : SBC.b BG2V       : STA.b Scrap06
 	LDA.w SpritePosYHigh, X : STA.b Scrap01
 
 	LDA.w SpritePosXLow, X : STA.b Scrap02
-	!SUB.b BG2H       : STA.b Scrap07
+	SEC : SBC.b BG2H       : STA.b Scrap07
 	LDA.w SpritePosXHigh, X : STA.b Scrap03
 RTL
 ;--------------------------------------------------------------------------------
@@ -361,12 +361,12 @@ WriteVRAMBlock:
         PHX
                 TYX ; set X to source
                 PHA
-                        TXA : !ADD.w #$1002 : TAY ; set Y to dest
+                        TXA : CLC : ADC.w #$1002 : TAY ; set Y to dest
                 PLA
                 ;A is already the value we need for mvn
-                MVN $7F7E ; currently we transfer from our buffers in 7F to the vram buffer in 7E
+                MVN $7F, $7E ; currently we transfer from our buffers in 7F to the vram buffer in 7E
 
-                !ADD 1, s ; add the length in A to the stack pointer on the top of the stack
+                CLC : ADC 1, s ; add the length in A to the stack pointer on the top of the stack
         PLX : TAX ; pull and promptly ignore, copying the value we just got over it
 
         SEP #$20 ; set 8-bit accumulator
@@ -419,14 +419,14 @@ CheckReceivedItemPropertiesBeforeLoad:
                         LDA.b RoomIndex+1 : CMP.b #$01 : BEQ .normalCode
                 + LDA.l RoomFade : BNE .load_palette
                         .normalCode
-                        LDA.l SpriteProperties_chest_palette,X : BIT #$80 : BNE .load_palette
+                        LDA.l SpriteProperties.chest_palette,X : BIT.b #$80 : BNE .load_palette
                         RTL
                         .load_palette
                         JSL LoadItemPalette
                         RTL
         .falling_sprite
         PLX
-        LDA.l SpriteProperties_standing_palette,X : BIT #$80 : BNE .load_palette
+        LDA.l SpriteProperties.standing_palette,X : BIT.b #$80 : BNE .load_palette
 RTL
 
 ;------------------------------------------------------------------------------
@@ -440,7 +440,7 @@ LoadItemPalette:
         REP #$30
 
         TXA : ASL : TAX
-        LDA.l SpriteProperties_palette_addr,X : STA.b Scrap0A
+        LDA.l SpriteProperties.palette_addr,X : STA.b Scrap0A
         LDY.w #$000E
         JSR AuxPaletteCheck : BCS .aux
                 LDA.w TransparencyFlag : BNE .SP05
@@ -493,11 +493,11 @@ ItemReceiptWidthCheck:
         LDX.w CurrentSpriteSlot
         LDA.w AncillaID,X : CMP.b #$29 : BEQ .falling_sprite
                 PLX
-                LDA.l SpriteProperties_chest_width, X
+                LDA.l SpriteProperties.chest_width, X
                 RTL
         .falling_sprite
         PLX
-        LDA.l SpriteProperties_standing_width, X
+        LDA.l SpriteProperties.standing_width, X
 RTL
 
 AuxPaletteCheck:
@@ -528,7 +528,7 @@ CountBits:
         PHX : TAX
         PHY : PHP
         SEP #$20
-        LDA.b 1,S : BIT.b #$20 : BNE +
+        LDA 1,S : BIT.b #$20 : BNE +
                 PLP : TXA : LDX.w #$000F : LDY.w #$0000
                 BRA ++
         + PLP : TXA : LDX.b #$07 : LDY.b #$00

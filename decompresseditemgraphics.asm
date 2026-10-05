@@ -18,7 +18,7 @@ TransferItemReceiptToBuffer_using_GraphicsID:
 	LDX.b #$00
 
 .find_reverse
-	CMP.l ItemReceipts_graphics,X
+	CMP.l ItemReceipts.graphics,X
 	BEQ .found
 
 	INX
@@ -232,8 +232,8 @@ AddGfxSheetToBigBuffer:
 	LDA.l GFXSheetPointers_background_high,X : XBA
 	LDA.l GFXSheetPointers_background_low,X
 
-	CPX.b #$73 : !BLT FastSpriteDecomp
-	CPX.b #$73+$0C : !BGE FastSpriteDecomp
+	CPX.b #$73 : BCC FastSpriteDecomp
+	CPX.b #$73+$0C : BCS FastSpriteDecomp
 
 .uncompressed
 	JMP Direct3BPPConvert
@@ -244,7 +244,7 @@ AddGfxSheetToBigBuffer:
 macro GetNextByte()
 	LDA.w $0000,Y
 	INY
-	BNE ?++
+	BNE .{?}
 
 	; Y pulls more than it needs, but that's fine
 	; the high byte should only be affected if we somehow have FF as our bank
@@ -257,7 +257,7 @@ macro GetNextByte()
 
 	LDY.w #$8000
 
-?++
+.{?}
 endmacro
 
 ;===================================================================================================
@@ -486,14 +486,14 @@ FastSpriteDecomp:
 ;===================================================================================================
 
 macro DoPlanesA(offset)
-	LDA.w DecompBuffer2+<offset>+<offset>,Y
-	STA.w BigDecompressionBuffer+<offset>+<offset>,X
+	LDA.w DecompBuffer2+{offset}+{offset},Y
+	STA.w BigDecompressionBuffer+{offset}+{offset},X
 
-	ORA.w DecompBuffer2+<offset>+<offset>-1,Y
+	ORA.w DecompBuffer2+{offset}+{offset}-1,Y
 	AND.w #$FF00
 	STA.b Decomp3BPPScratch
 
-	LDA.w DecompBuffer2+$10+<offset>,Y
+	LDA.w DecompBuffer2+$10+{offset},Y
 	AND.w #$00FF
 	TSB.b Decomp3BPPScratch
 
@@ -504,23 +504,23 @@ macro DoPlanesA(offset)
 			AND.w #$00FF ; idk why this line works but some sheets we pull in aren't correct without it
 		+
 	PLY
-	STA.w BigDecompressionBuffer+$10+<offset>+<offset>,X
+	STA.w BigDecompressionBuffer+$10+{offset}+{offset},X
 
 endmacro
 
 ;===================================================================================================
 
 macro DoIndirectPlanesA(offset)
-	LDA.b Scrap00 : ADC.w #<offset>+<offset> : STA.b Scrap02
+	LDA.b Scrap00 : ADC.w #{offset}+{offset} : STA.b Scrap02
 	LDA.b (Scrap02),Y
-	STA.l BigDecompressionBuffer+<offset>+<offset>,X
+	STA.l BigDecompressionBuffer+{offset}+{offset},X
 
 	DEC.b Scrap02
 	ORA.b (Scrap02),Y
 	AND.w #$FF00
 	STA.b Decomp3BPPScratch
 
-	LDA.b Scrap00 : ADC.w #$10+<offset> : STA.b Scrap02
+	LDA.b Scrap00 : ADC.w #$10+{offset} : STA.b Scrap02
 	LDA.b (Scrap02),Y
 	AND.w #$00FF
 	TSB.b Decomp3BPPScratch
@@ -532,7 +532,7 @@ macro DoIndirectPlanesA(offset)
 			AND.w #$00FF ; idk why this line works but some sheets we pull in aren't correct without it
 		+
 	PLY
-	STA.l BigDecompressionBuffer+$10+<offset>+<offset>,X
+	STA.l BigDecompressionBuffer+$10+{offset}+{offset},X
 
 endmacro
 
@@ -624,14 +624,14 @@ Unrolled3BPPConvert:
 ;===================================================================================================
 
 macro CherryPickGfx(source,dest,length)
-	LDX.w #BigDecompressionBuffer+<source>
-	LDY.w #BigDecompressionBuffer+<dest>
-	LDA.w #<length>-1
+	LDX.w #BigDecompressionBuffer+{source}
+	LDY.w #BigDecompressionBuffer+{dest}
+	LDA.w #{length}-1
 	MVN BigDecompressionBuffer>>16,BigDecompressionBuffer>>16
 
-	LDX.w #BigDecompressionBuffer+<source>+$200
-	LDY.w #BigDecompressionBuffer+<dest>+$200
-	LDA.w #<length>-1
+	LDX.w #BigDecompressionBuffer+{source}+$200
+	LDY.w #BigDecompressionBuffer+{dest}+$200
+	LDA.w #{length}-1
 	MVN BigDecompressionBuffer>>16,BigDecompressionBuffer>>16
 endmacro
 

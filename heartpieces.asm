@@ -24,7 +24,7 @@ HeartContainerGet:
     PHX : PHY
     JSL IncrementBossSword
     LDY.w SprSourceItemId, X
-    BRA HeartPieceGet_skipLoad
+    BRA HeartPieceGet.skipLoad
 ;--------------------------------------------------------------------------------
 DrawHeartPieceGFX:
     PHP
@@ -39,7 +39,7 @@ DrawHeartPieceGFX:
         .skipLoad
         PHA : PHX
         TAX
-        LDA.l SpriteProperties_standing_width,X : BNE +
+        LDA.l SpriteProperties.standing_width,X : BNE +
             PLX
             REP #$20 : LDA.b RoomIndex : CMP.w #$0120 : SEP #$20 : BNE .prepShadow
                 LDA.b IndoorsFlag : BNE .draw ; skip "shadow" change in good bee room
@@ -67,18 +67,18 @@ RTL
 ;--------------------------------------------------------------------------------
 DrawHeartContainerGFX:
 	PHP
-	JSL Sprite_IsOnscreen : BCC DrawHeartPieceGFX_offscreen
+	JSL Sprite_IsOnscreen : BCC DrawHeartPieceGFX.offscreen
 	
 	PHA : PHY
 	LDA.w SprRedrawFlag, X : BEQ .skipInit ; skip init if already ready
 		JSL HeartContainerSpritePrep
 		LDA.w SprRedrawFlag, X : CMP.b #$02 : BEQ .skipInit
-		BRA DrawHeartPieceGFX_done ; don't draw on the init frame
+		BRA DrawHeartPieceGFX.done ; don't draw on the init frame
 	
 	.skipInit
 	LDA.w SprItemReceipt, X ; Retrieve stored item type
 
-	BRA DrawHeartPieceGFX_skipLoad
+	BRA DrawHeartPieceGFX.skipLoad
 ;--------------------------------------------------------------------------------
 HeartContainerSound:
     LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE +
@@ -135,8 +135,8 @@ LoadHeartPieceRoomValue:
     .done
 RTL
 ;--------------------------------------------------------------------------------
-!DynamicDropGFXSlotCount_UW = (FreeUWGraphics_end-FreeUWGraphics)>>1
-!DynamicDropGFXSlotCount_OW = (FreeOWGraphics_end-FreeOWGraphics)>>1
+; !DynamicDropGFXSlotCount_UW = (FreeUWGraphics.size)>>1
+; !DynamicDropGFXSlotCount_OW = (FreeOWGraphics.size)>>1
 HPItemReset:
     PHA
     LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .skip
@@ -169,28 +169,28 @@ HeartPieceSpawnDelayFix:
 	+ CLC : RTL
 ;--------------------------------------------------------------------------------
 macro GetPossiblyEncryptedItem(ItemLabel,TableLabel)
-    LDA.l IsEncrypted : BNE ?encrypted
-        LDA.l <ItemLabel>
-        BRA ?done
-    ?encrypted:
+    LDA.l IsEncrypted : BNE {?}_encrypted
+        LDA.l {ItemLabel}
+        BRA {?}_done
+    #{?}_encrypted:
     PHX : PHP
         REP #$30 ; set 16-bit accumulator & index registers
         LDA.b Scrap00 : PHA : LDA.b Scrap02 : PHA
 
-        LDA.w #<TableLabel> : STA.b Scrap00
-        LDA.w #<TableLabel>>>16 : STA.b Scrap02
-        LDA.w #<ItemLabel>-<TableLabel>
+        LDA.w #{TableLabel} : STA.b Scrap00
+        LDA.w #{TableLabel}>>16 : STA.b Scrap02
+        LDA.w #{ItemLabel}-{TableLabel}
         JSL RetrieveValueFromEncryptedTable
 
         PLX : STX.b Scrap02 : PLX : STX.b Scrap01
     PLP : PLX
-    ?done:
+    #{?}_done:
 endmacro
 
 LoadIndoorValue:
 	PHP
 	REP #$20 ; set 16-bit accumulator
-	LDA.b RoomIndex ; these are all decimal because i got them that way
+	LDA.b RoomIndex ; these are all decimal because I got them that way
 	CMP.w #225 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Forest_Thieves, HeartPieceIndoorValues)
 		JMP .done
@@ -225,7 +225,7 @@ LoadIndoorValue:
 	LDX.w CurrentSpriteSlot ; If we're on a different screen ID via glitches load the sprite
 	LDA.w SprItemReceipt,X        ; we can see and are interacting with
 	PLX
-	.done
+.done
 	AND.w #$00FF ; the loads are words but the values are 1-byte so we need to clear the top half of the accumulator - no guarantee it was 8-bit before
 	PLP
 RTL
@@ -249,10 +249,10 @@ LoadOutdoorValue:
 		++
 	+
 	CMP.w #$00 : BNE +
-		LDA.l OWBonkPrizeTable[$00].loot
+		%ldaStruct(OWBonkPrizeTable, $00, loot)
 		JMP .done
 	+ CMP.w #$03 : BNE +
-		LDA.b LinkPosX : CMP.w #1890 : !BLT ++
+		LDA.b LinkPosX : CMP.w #1890 : BCC ++
 			%GetPossiblyEncryptedItem(HeartPiece_Spectacle, HeartPieceOutdoorValues)
 			JMP .done
 		++
@@ -260,93 +260,93 @@ LoadOutdoorValue:
 			JMP .done
 	+ CMP.w #$05 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$01].loot
+			%ldaStruct(OWBonkPrizeTable, $01, loot)
 			JMP .done
 		++
 			%GetPossiblyEncryptedItem(HeartPiece_Mountain_Warp, HeartPieceOutdoorValues)
 			JMP .done
 	+ CMP.w #$0A : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$02].loot
+			%ldaStruct(OWBonkPrizeTable, $02, loot)
 			JMP .done
 		++
-			LDA.l OWBonkPrizeTable[$03].loot
+			%ldaStruct(OWBonkPrizeTable, $03, loot)
 			JMP .done
 	+ CMP.w #$10 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$04].loot
+			%ldaStruct(OWBonkPrizeTable, $04, loot)
 			JMP .done
 		++
-			LDA.l OWBonkPrizeTable[$05].loot
+			%ldaStruct(OWBonkPrizeTable, $05, loot)
 			JMP .done
 	+ CMP.w #$11 : BNE +
-		LDA.l OWBonkPrizeTable[$06].loot
+		%ldaStruct(OWBonkPrizeTable, $06, loot)
 		JMP .done
 	+ CMP.w #$12 : BNE +
-		LDA.l OWBonkPrizeTable[$07].loot
+		%ldaStruct(OWBonkPrizeTable, $07, loot)
 		JMP .done
 	+ CMP.w #$13 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$08].loot
+			%ldaStruct(OWBonkPrizeTable, $08, loot)
 			JMP .done
 		++
-			LDA.l OWBonkPrizeTable[$09].loot
+			%ldaStruct(OWBonkPrizeTable, $09, loot)
 			JMP .done
 	+ CMP.w #$15 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$0A].loot
+			%ldaStruct(OWBonkPrizeTable, $0A, loot)
 			JMP .done
 		++
-			LDA.l OWBonkPrizeTable[$0B].loot
+			%ldaStruct(OWBonkPrizeTable, $0B, loot)
 			JMP .done
 	+ CMP.w #$18 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$0C].loot
+			%ldaStruct(OWBonkPrizeTable, $0C, loot)
 			JMP .done
 		++
-			LDA.l OWBonkPrizeTable[$0D].loot
+			%ldaStruct(OWBonkPrizeTable, $0D, loot)
 			JMP .done
 	+ CMP.w #$1A : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$0E].loot
+			%ldaStruct(OWBonkPrizeTable, $0E, loot)
 			JMP .done
 		++
-			LDA.l OWBonkPrizeTable[$0F].loot
+			%ldaStruct(OWBonkPrizeTable, $0F, loot)
 			JMP .done
 	+ CMP.w #$1B : BNE +
-		LDA.l OWBonkPrizeTable[$10].loot
+		%ldaStruct(OWBonkPrizeTable, $10, loot)
 		JMP .done
 	+ CMP.w #$1D : BNE +
-		LDA.l OWBonkPrizeTable[$11].loot
+		%ldaStruct(OWBonkPrizeTable, $11, loot)
 		JMP .done
 	+ CMP.w #$1E : BNE +
-		LDA.l OWBonkPrizeTable[$12].loot
+		%ldaStruct(OWBonkPrizeTable, $12, loot)
 		JMP .done
 	+ CMP.w #$28 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Maze, HeartPieceOutdoorValues)
 		JMP .done
 	+ CMP.w #$2A : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$13].loot
+			%ldaStruct(OWBonkPrizeTable, $13, loot)
 			JMP .done
 		++ CMP.w #$0008 : BNE ++
-			LDA.l OWBonkPrizeTable[$14].loot
+			%ldaStruct(OWBonkPrizeTable, $14, loot)
 			JMP .done
 		++
 			%GetPossiblyEncryptedItem(HauntedGroveItem, HeartPieceOutdoorValues)
 			JMP .done
 	+ CMP.w #$2B : BNE +
-		LDA.l OWBonkPrizeTable[$15].loot
+		%ldaStruct(OWBonkPrizeTable, $15, loot)
 		JMP .done
 	+ CMP.w #$2E : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$16].loot
+			%ldaStruct(OWBonkPrizeTable, $16, loot)
 			JMP .done
 		++
-			LDA.l OWBonkPrizeTable[$17].loot
+			%ldaStruct(OWBonkPrizeTable, $17, loot)
 			JMP .done
 	+ CMP.w #$30 : BNE +
-		LDA.b LinkPosX : CMP.w #512 : !BGE ++
+		LDA.b LinkPosX : CMP.w #512 : BCS ++
 			%GetPossiblyEncryptedItem(HeartPiece_Desert, HeartPieceOutdoorValues)
 			JMP .done
 		++
@@ -354,10 +354,10 @@ LoadOutdoorValue:
 			JMP .done
 	+ CMP.w #$32 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$18].loot
+			%ldaStruct(OWBonkPrizeTable, $18, loot)
 			JMP .done
 		++
-			LDA.l OWBonkPrizeTable[$19].loot
+			%ldaStruct(OWBonkPrizeTable, $19, loot)
 			JMP .done
 	+ CMP.w #$35 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Lake, HeartPieceOutdoorValues)
@@ -367,7 +367,7 @@ LoadOutdoorValue:
 		JMP .done
 	+ CMP.w #$42 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$1A].loot
+			%ldaStruct(OWBonkPrizeTable, $1A, loot)
 			JMP .done
 		++
 			%GetPossiblyEncryptedItem(HeartPiece_Cliffside, HeartPieceOutdoorValues)
@@ -377,56 +377,56 @@ LoadOutdoorValue:
 		JMP .done
 	+ CMP.w #$51 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$1B].loot
+			%ldaStruct(OWBonkPrizeTable, $1B, loot)
 			JMP .done
 		++
-			LDA.l OWBonkPrizeTable[$1C].loot
+			%ldaStruct(OWBonkPrizeTable, $1C, loot)
 			JMP .done
 	+ CMP.w #$54 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$1D].loot
+			%ldaStruct(OWBonkPrizeTable, $1D, loot)
 			JMP .done
 		++ CMP.w #$0008 : BNE ++
-			LDA.l OWBonkPrizeTable[$1E].loot
+			%ldaStruct(OWBonkPrizeTable, $1E, loot)
 			JMP .done
 		++
-			LDA.l OWBonkPrizeTable[$1F].loot
+			%ldaStruct(OWBonkPrizeTable, $1F, loot)
 			JMP .done
 	+ CMP.w #$55 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$20].loot
+			%ldaStruct(OWBonkPrizeTable, $20, loot)
 			JMP .done
 		++
-			LDA.l OWBonkPrizeTable[$21].loot
+			%ldaStruct(OWBonkPrizeTable, $21, loot)
 			JMP .done
 	+ CMP.w #$56 : BNE +
-		LDA.l OWBonkPrizeTable[$22].loot
+		%ldaStruct(OWBonkPrizeTable, $22, loot)
 		JMP .done
 	+ CMP.w #$5B : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$23].loot
+			%ldaStruct(OWBonkPrizeTable, $23, loot)
 			JMP .done
 		++
 			%GetPossiblyEncryptedItem(HeartPiece_Pyramid, HeartPieceOutdoorValues)
 			JMP .done
 	+ CMP.w #$5E : BNE +
-		LDA.l OWBonkPrizeTable[$24].loot
+		%ldaStruct(OWBonkPrizeTable, $24, loot)
 		JMP .done
 	+ CMP.w #$68 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Digging, HeartPieceOutdoorValues)
 		JMP .done
 	+ CMP.w #$6E : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$25].loot
+			%ldaStruct(OWBonkPrizeTable, $25, loot)
 			JMP .done
 		++ CMP.w #$0008 : BNE ++
-			LDA.l OWBonkPrizeTable[$26].loot
+			%ldaStruct(OWBonkPrizeTable, $26, loot)
 			JMP .done
 		++
-			LDA.l OWBonkPrizeTable[$27].loot
+			%ldaStruct(OWBonkPrizeTable, $27, loot)
 			JMP .done
 	+ CMP.w #$74 : BNE +
-		LDA.l OWBonkPrizeTable[$28].loot
+		%ldaStruct(OWBonkPrizeTable, $28, loot)
 		JMP .done
 	+ CMP.w #$81 : BNE +
 		%GetPossiblyEncryptedItem(HeartPiece_Zora, HeartPieceOutdoorValues)
@@ -597,7 +597,7 @@ HeartPieceGetPlayer:
 			LDA.l HeartPiece_Graveyard_Warp_Player
 			BRL .done
 	+ CMP.w #288 : BNE +
-		LDA.l OWBonkPrizeTable[$2A].mw_player
+		%ldaStruct(OWBonkPrizeTable, $2A, mw_player)
 		BRL .done
 	+ CMP.w #294 : BNE +
 		LDA.l HeartPiece_Mire_Warp_Player
@@ -613,10 +613,10 @@ HeartPieceGetPlayer:
 	REP #$20 ; set 16-bit accumulator
 	LDA.b OverworldIndex
 	CMP.w #$00 : BNE +
-		LDA.l OWBonkPrizeTable[$00].mw_player
+		%ldaStruct(OWBonkPrizeTable, $00, mw_player)
 		BRL .done
 	+ CMP.w #$03 : BNE +
-		LDA.b LinkPosX : CMP.w #1890 : !BLT ++
+		LDA.b LinkPosX : CMP.w #1890 : BCC ++
 			LDA.l HeartPiece_Spectacle_Player
 			BRL .done
 		++
@@ -624,93 +624,93 @@ HeartPieceGetPlayer:
 			BRL .done
 	+ CMP.w #$05 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$01].mw_player
+			%ldaStruct(OWBonkPrizeTable, $01, mw_player)
 			BRL .done
 		++
 			LDA.l HeartPiece_Mountain_Warp_Player
 			BRL .done
 	+ CMP.w #$0A : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$02].mw_player
+			%ldaStruct(OWBonkPrizeTable, $02, mw_player)
 			BRL .done
 		++
-			LDA.l OWBonkPrizeTable[$03].mw_player
+			%ldaStruct(OWBonkPrizeTable, $03, mw_player)
 			BRL .done
 	+ CMP.w #$10 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$04].mw_player
+			%ldaStruct(OWBonkPrizeTable, $04, mw_player)
 			BRL .done
 		++
-			LDA.l OWBonkPrizeTable[$05].mw_player
+			%ldaStruct(OWBonkPrizeTable, $05, mw_player)
 			BRL .done
 	+ CMP.w #$11 : BNE +
-		LDA.l OWBonkPrizeTable[$06].mw_player
+		%ldaStruct(OWBonkPrizeTable, $06, mw_player)
 		BRL .done
 	+ CMP.w #$12 : BNE +
-		LDA.l OWBonkPrizeTable[$07].mw_player
+		%ldaStruct(OWBonkPrizeTable, $07, mw_player)
 		BRL .done
 	+ CMP.w #$13 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$08].mw_player
+			%ldaStruct(OWBonkPrizeTable, $08, mw_player)
 			BRL .done
 		++
-			LDA.l OWBonkPrizeTable[$09].mw_player
+			%ldaStruct(OWBonkPrizeTable, $09, mw_player)
 			BRL .done
 	+ CMP.w #$15 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$0A].mw_player
+			%ldaStruct(OWBonkPrizeTable, $0A, mw_player)
 			BRL .done
 		++
-			LDA.l OWBonkPrizeTable[$0B].mw_player
+			%ldaStruct(OWBonkPrizeTable, $0B, mw_player)
 			BRL .done
 	+ CMP.w #$18 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$0C].mw_player
+			%ldaStruct(OWBonkPrizeTable, $0C, mw_player)
 			BRL .done
 		++
-			LDA.l OWBonkPrizeTable[$0D].mw_player
+			%ldaStruct(OWBonkPrizeTable, $0D, mw_player)
 			BRL .done
 	+ CMP.w #$1A : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$0E].mw_player
+			%ldaStruct(OWBonkPrizeTable, $0E, mw_player)
 			BRL .done
 		++
-			LDA.l OWBonkPrizeTable[$0F].mw_player
+			%ldaStruct(OWBonkPrizeTable, $0F, mw_player)
 			BRL .done
 	+ CMP.w #$1B : BNE +
-		LDA.l OWBonkPrizeTable[$11].mw_player
+		%ldaStruct(OWBonkPrizeTable, $11, mw_player)
 		BRL .done
 	+ CMP.w #$1D : BNE +
-		LDA.l OWBonkPrizeTable[$12].mw_player
+		%ldaStruct(OWBonkPrizeTable, $12, mw_player)
 		BRL .done
 	+ CMP.w #$1E : BNE +
-		LDA.l OWBonkPrizeTable[$13].mw_player
+		%ldaStruct(OWBonkPrizeTable, $13, mw_player)
 		BRL .done
 	+ CMP.w #$28 : BNE +
 		LDA.l HeartPiece_Maze_Player
 		BRL .done
 	+ CMP.w #$2A : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$14].mw_player
+			%ldaStruct(OWBonkPrizeTable, $14, mw_player)
 			BRL .done
 		++ CMP.w #$0008 : BNE ++
-			LDA.l OWBonkPrizeTable[$15].mw_player
+			%ldaStruct(OWBonkPrizeTable, $15, mw_player)
 			BRL .done
 		++
 			LDA.l HauntedGroveItem_Player
 			BRL .done
 	+ CMP.w #$2B : BNE +
-		LDA.l OWBonkPrizeTable[$16].mw_player
+		%ldaStruct(OWBonkPrizeTable, $16, mw_player)
 		BRL .done
 	+ CMP.w #$2E : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$17].mw_player
+			%ldaStruct(OWBonkPrizeTable, $17, mw_player)
 			BRL .done
 		++
-			LDA.l OWBonkPrizeTable[$18].mw_player
+			%ldaStruct(OWBonkPrizeTable, $18, mw_player)
 			BRL .done
 	+ CMP.w #$30 : BNE +
-		LDA.b LinkPosX : CMP.w #512 : !BGE ++
+		LDA.b LinkPosX : CMP.w #512 : BCS ++
 			LDA.l HeartPiece_Desert_Player
 			BRL .done
 		++
@@ -718,10 +718,10 @@ HeartPieceGetPlayer:
 			BRL .done
 	+ CMP.w #$32 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$19].mw_player
+			%ldaStruct(OWBonkPrizeTable, $19, mw_player)
 			BRL .done
 		++
-			LDA.l OWBonkPrizeTable[$1A].mw_player
+			%ldaStruct(OWBonkPrizeTable, $1A, mw_player)
 			BRL .done
 	+ CMP.w #$35 : BNE +
 		LDA.l HeartPiece_Lake_Player
@@ -731,7 +731,7 @@ HeartPieceGetPlayer:
 		BRL .done
 	+ CMP.w #$42 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$1B].mw_player
+			%ldaStruct(OWBonkPrizeTable, $1B, mw_player)
 			BRL .done
 		++
 			LDA.l HeartPiece_Cliffside_Player
@@ -741,56 +741,56 @@ HeartPieceGetPlayer:
 		BRL .done
 	+ CMP.w #$51 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$1C].mw_player
+			%ldaStruct(OWBonkPrizeTable, $1C, mw_player)
 			BRL .done
 		++
-			LDA.l OWBonkPrizeTable[$1D].mw_player
+			%ldaStruct(OWBonkPrizeTable, $1D, mw_player)
 			BRL .done
 	+ CMP.w #$54 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$1E].mw_player
+			%ldaStruct(OWBonkPrizeTable, $1E, mw_player)
 			BRL .done
 		++ CMP.w #$0008 : BNE ++
-			LDA.l OWBonkPrizeTable[$1F].mw_player
+			%ldaStruct(OWBonkPrizeTable, $1F, mw_player)
 			BRL .done
 		++
-			LDA.l OWBonkPrizeTable[$20].mw_player
+			%ldaStruct(OWBonkPrizeTable, $20, mw_player)
 			BRL .done
 	+ CMP.w #$55 : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$21].mw_player
+			%ldaStruct(OWBonkPrizeTable, $21, mw_player)
 			BRL .done
 		++
-			LDA.l OWBonkPrizeTable[$22].mw_player
+			%ldaStruct(OWBonkPrizeTable, $22, mw_player)
 			BRL .done
 	+ CMP.w #$56 : BNE +
-		LDA.l OWBonkPrizeTable[$23].mw_player
+		%ldaStruct(OWBonkPrizeTable, $23, mw_player)
 		BRL .done
 	+ CMP.w #$5B : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$24].mw_player
+			%ldaStruct(OWBonkPrizeTable, $24, mw_player)
 			BRL .done
 		++
 			LDA.l HeartPiece_Pyramid_Player
 			BRL .done
 	+ CMP.w #$5E : BNE +
-		LDA.l OWBonkPrizeTable[$25].mw_player
+		%ldaStruct(OWBonkPrizeTable, $25, mw_player)
 		BRL .done
 	+ CMP.w #$68 : BNE +
 		LDA.l HeartPiece_Digging_Player
 		BRL .done
 	+ CMP.w #$6E : BNE +
 		LDA.w SpriteSpawnStep,X : AND.w #$00FF : CMP.w #$0010 : BNE ++
-			LDA.l OWBonkPrizeTable[$26].mw_player
+			%ldaStruct(OWBonkPrizeTable, $26, mw_player)
 			BRL .done
 		++ CMP.w #$0008 : BNE ++
-			LDA.l OWBonkPrizeTable[$27].mw_player
+			%ldaStruct(OWBonkPrizeTable, $27, mw_player)
 			BRL .done
 		++
-			LDA.l OWBonkPrizeTable[$28].mw_player
+			%ldaStruct(OWBonkPrizeTable, $28, mw_player)
 			BRL .done
 	+ CMP.w #$74 : BNE +
-		LDA.l OWBonkPrizeTable[$29].mw_player
+		%ldaStruct(OWBonkPrizeTable, $29, mw_player)
 		BRL .done
 	+ CMP.w #$81 : BNE +
 		LDA.l HeartPiece_Zora_Player

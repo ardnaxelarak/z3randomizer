@@ -81,9 +81,9 @@ BringMenuDownEnhanced:
 			LDA.l MenuSpeed
 		++
 
-		EOR.w #$FFFF : !ADD.w #$0001 ; negate menu speed
+		EOR.w #$FFFF : CLC : ADC.w #$0001 ; negate menu speed
 
-		!ADD.l BG3VOFSQL : CMP.w #$FF18 : !BGE .noOvershoot
+		CLC : ADC.l BG3VOFSQL : CMP.w #$FF18 : BCS .noOvershoot
 			LDA.w #$FF18 ; if we went past the limit, go to the limit
 		.noOvershoot
 		STA.b BG3VOFSQL : CMP.w #$FF18
@@ -101,7 +101,7 @@ RaiseHudMenu:
 		LDA.l MenuSpeed : AND.w #$00FF
 	++
 
-	!ADD.l BG3VOFSQL : BMI .noOvershoot
+	CLC : ADC.l BG3VOFSQL : BMI .noOvershoot
 		LDA.w #$0000 ; if we went past the limit, go to the limit
 	.noOvershoot
 	STA.b BG3VOFSQL
@@ -374,7 +374,7 @@ RTL
 
         .next_boss_kill
         LDX.w .boss_room_ids,Y
-        LDA.l RoomDataWRAM.l,X
+        LDA.l RoomDataWRAM, X
         AND.w #$0800
         BEQ ..skip_boss_kill
                 LDA.w #$2826
@@ -653,9 +653,9 @@ RestoreMenu_SetSubModule:
 RTL
 ;-------------------------------------------------------------------------------
 DrawHeartPiecesMenu:
-        LDA.l HUDHeartColors_index : AND.w #$00FF
+        LDA.l HUDHeartColors.index : AND.w #$00FF
         ASL : TAX
-        LDA.l HUDHeartColors_masks_game_hud,X
+        LDA.l HUDHeartColors.masks_game_hud,X
         STA.b Scrap0D
 
         LDA.l HeartPieceQuarter : AND.w #$00FF

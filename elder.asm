@@ -1,17 +1,17 @@
 NewElderCode:
 {
-LDA.b OverworldIndex : AND.b #$3F : CMP.b #$1B : BEQ .newCodeContinue
-;Restore Jump we can keep the RTL so JML
-JML Sprite_16_Elder
-.newCodeContinue
-PHB : PHK : PLB
-LDA.b #$07 : STA.w SpriteOAMProp, X ; Palette 
-JSR Elder_Draw
-JSL Sprite_PlayerCantPassThrough
-JSR Elder_Code
+	LDA.b OverworldIndex : AND.b #$3F : CMP.b #$1B : BEQ .newCodeContinue
+	;Restore Jump we can keep the RTL so JML
+	JML Sprite_16_Elder
+	.newCodeContinue
+	PHB : PHK : PLB
+	LDA.b #$07 : STA.w SpriteOAMProp, X ; Palette 
+	JSR Elder_Draw
+	JSL Sprite_PlayerCantPassThrough
+	JSR Elder_Code
 
-PLB
-RTL
+	PLB
+	RTL
 }
 
     Elder_Draw:
@@ -210,7 +210,7 @@ MasterSword_ConditionalHandleReceipt:
         RTL
     .specialCutscene
         PLA : PLA : PEA.w MasterSword_ConditionalHandleReceipt_DoReceipt-1
-        LDA.b 4,S : TAX
+        LDA 4,S : TAX
         LDY.b #$6A
     RTL
 

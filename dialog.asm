@@ -35,19 +35,19 @@ macro LoadDialogAddress(address)
 endmacro
 ;--------------------------------------------------------------------------------
 macro CopyDialog(address)
-	LDA.b #<address> : STA.b Scrap00 ; write pointer to direct page
-	LDA.b #<address>>>8 : STA.b Scrap01
-	LDA.b #<address>>>16 : STA.b Scrap02
+	LDA.b #{address} : STA.b Scrap00 ; write pointer to direct page
+	LDA.b #{address}>>8 : STA.b Scrap01
+	LDA.b #{address}>>16 : STA.b Scrap02
 	%CopyDialogIndirect()
 endmacro
 ;--------------------------------------------------------------------------------
 macro CopyDialogIndirect()
 	REP #$20 : LDA.l DialogOffsetPointer : TAX : LDY.w #$0000 : SEP #$20 ; copy 2-byte offset pointer to X and set Y to 0
-	?loop:
+	#{?}_loop:
 		LDA.b [Scrap00], Y ; load the next character from the pointer
 		STA.l DialogBuffer, X ; write to the buffer
 		INX : INY
-	CMP.b #$7F : BNE ?loop
+	CMP.b #$7F : BNE {?}_loop
 	REP #$20 ; set 16-bit accumulator
 	TXA : INC : STA.l DialogReturnPointer ; copy out X into
 	LDA.w #$0000 : STA.l DialogOffsetPointer
@@ -133,8 +133,8 @@ FreeDungeonItemNotice:
 		BRA .dungeon
 
 +	LDA.b Scrap00 : AND.b #$20 : BEQ + ; show message for crystal
-	LDA.l ScratchBufferV : CMP.b #$B0 : !BLT + ;  crystal #
-	                       CMP.b #$B7 : !BGE +
+	LDA.l ScratchBufferV : CMP.b #$B0 : BCC + ;  crystal #
+	                       CMP.b #$B7 : BCS +
 		%CopyDialog(Notice_Crystal)
 		JMP .crystal
 
@@ -147,7 +147,7 @@ FreeDungeonItemNotice:
 	STA.l ScratchBufferNV+1
 	LDA.l ScratchBufferNV : BEQ +
 		LDA.l ScratchBufferNV
-		LDA.b #$0F : !SUB.l ScratchBufferNV+1 : STA.l ScratchBufferNV+1 ; flip the values for small keys
+		LDA.b #$0F : SEC : SBC.l ScratchBufferNV+1 : STA.l ScratchBufferNV+1 ; flip the values for small keys
 	+
 	LDA.l ScratchBufferNV+1
 	ASL : TAX
@@ -273,7 +273,7 @@ DialogFairyThrow:
         ORA.l BottleContentsTwo : ORA.l BottleContentsThree : ORA.l BottleContentsFour : BNE .normal
 	
 	.noInventory
-	LDA.w SpriteActivity, X : !ADD.b #$08 : STA.w SpriteActivity, X
+	LDA.w SpriteActivity, X : CLC : ADC.b #$08 : STA.w SpriteActivity, X
 	LDA.b #$51
 	LDY.b #$01
 RTL
@@ -398,7 +398,7 @@ DialogBombosTablet:
 	LDA.l AllowHammerTablets : BEQ ++
 		LDA.l HammerEquipment : BEQ .yesText : BRA .noText
 	++
-		LDA.l SwordEquipment : CMP.b #$FF : BEQ .yesText : CMP.b #$02 : !BGE .noText
+		LDA.l SwordEquipment : CMP.b #$FF : BEQ .yesText : CMP.b #$02 : BCS .noText
 	;++
 	.yesText
 	PLA 
@@ -445,7 +445,8 @@ AgahnimAsksAboutPed:
 ;--------------------------------------------------------------------------------
 Main_ShowTextMessage_Alt:
 	; Are we in text mode? If so then end the routine.
-	LDA.b GameMode : CMP.b #$0E : BEQ .already_in_text_mode
+	LDA.b GameMode : CMP.b #$0E : BEQ Sprite_ShowMessageMinimal_Alt.already_in_text_mode
+
 Sprite_ShowMessageMinimal_Alt:
 	STZ.b GameSubMode
 
@@ -488,7 +489,7 @@ Sprite_ShowMessageMinimal_Alt:
 	PLA : STA.b Scrap00
 	PLY : PLX
 
-Main_ShowTextMessage_Alt_already_in_text_mode:
+.already_in_text_mode
 RTL
 
 CalculateSignIndex:
@@ -502,7 +503,7 @@ CalculateSignIndex:
   LDA.w OWScreenSize : BEQ .done ; If a small map, we can skip these calculations.
 
   LDA.b LinkPosY+1 : AND.w #$0002 : ASL #2 : EOR.b OverworldIndex : AND.w #$0008 : BEQ +
-  	TYA : !ADD.w #$0010 : TAY  ;add 16 if we are in lower half of big screen.
+  	TYA : CLC : ADC.w #$0010 : TAY  ;add 16 if we are in lower half of big screen.
   + 
 
   LDA.b LinkPosX+1 : AND.w #$0002 : LSR : EOR.b OverworldIndex : AND.w #$0001 : BEQ +

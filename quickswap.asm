@@ -25,7 +25,7 @@ QuickSwap:
 	+
 	; Only pressed L
 	JSR LCode
-	LDA.b Joy1B_All : BIT #$10 : BNE .special_swap ; Still holding R from a previous frame
+	LDA.b Joy1B_All : BIT.b #$10 : BNE .special_swap ; Still holding R from a previous frame
 	BRA .store
 
 	.special_swap
@@ -36,7 +36,7 @@ QuickSwap:
 	CPX.b #$0D : BEQ + ; flute
 	CPX.b #$10 : BEQ + ; bottle
 	BRA .store
-	+ STX.w ItemCursor : JSL ProcessMenuButtons_y_pressed
+	+ STX.w ItemCursor : JSL ProcessMenuButtons.y_pressed
 
 	.store
 	LDA.b #$20 : STA.w SFX3
@@ -67,7 +67,7 @@ RTS
 
 LCode:
 	LDX.w ItemCursor
-	LDA.b Joy1B_All : BIT #$10 : BNE ++ ; Still holding R from a previous frame
+	LDA.b Joy1B_All : BIT.b #$10 : BNE ++ ; Still holding R from a previous frame
 		LDA.l InventoryTracking+1 : AND.b #$FE : STA.l InventoryTracking+1
 		BRA +
 	++

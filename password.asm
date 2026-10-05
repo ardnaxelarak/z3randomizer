@@ -55,29 +55,29 @@ Password_Main:
 		JSR PasswordMoveCursorLeft
 	+
 	LDA.b Joy1A_New : AND.b #$01 : BEQ + ; right
-		LDA.b PasswordSelectPosition : INC A : CMP.b #$24 : !BLT ++
-			!SUB.b #$24
+		LDA.b PasswordSelectPosition : INC A : CMP.b #$24 : BCC ++
+			SEC : SBC.b #$24
 		++
 		STA.b PasswordSelectPosition
 		LDA.b #$20 : STA.w SFX3
 	+
 	LDA.b Joy1A_New : AND.b #$02 : BEQ + ; left
 		LDA.b PasswordSelectPosition : DEC A : BPL ++
-			!ADD.b #$24
+			CLC : ADC.b #$24
 		++
 		STA.b PasswordSelectPosition
 		LDA.b #$20 : STA.w SFX3
 	+
 	LDA.b Joy1A_New : AND.b #$04 : BEQ + ; down
-		LDA.b PasswordSelectPosition : !ADD.b #$09 : CMP.b #$24 : !BLT ++
-			!SUB.b #$24
+		LDA.b PasswordSelectPosition : CLC : ADC.b #$09 : CMP.b #$24 : BCC ++
+			SEC : SBC.b #$24
 		++
 		STA.b PasswordSelectPosition
 		LDA.b #$20 : STA.w SFX3
 	+
 	LDA.b Joy1A_New : AND.b #$08 : BEQ + ; up
-		LDA.b PasswordSelectPosition : !SUB.b #$09 :  BPL ++
-			!ADD.b #$24
+		LDA.b PasswordSelectPosition : SEC : SBC.b #$09 :  BPL ++
+			CLC : ADC.b #$24
 		++
 		STA.b PasswordSelectPosition
 		LDA.b #$20 : STA.w SFX3
@@ -231,12 +231,12 @@ PasswordToKey:
 		ORA.l KeyBase, X
 		STA.l KeyBase, X
 
-		LDA.b Scrap04 : !SUB.w #$0005 : BPL +
-			!ADD.w #$0008
+		LDA.b Scrap04 : SEC : SBC.w #$0005 : BPL +
+			CLC : ADC.w #$0008
 			INC.b Scrap02
 		+ : STA.b Scrap04
 
-	LDA.b Scrap00 : INC : STA.b Scrap00 : CMP.w #$0010 : !BLT -
+	LDA.b Scrap00 : INC : STA.b Scrap00 : CMP.w #$0010 : BCC -
 RTS
 
 LoadPasswordStripeTemplate:
@@ -255,9 +255,9 @@ LoadPasswordStripeTemplate:
 	LDA.b #Password_StripeImageTemplate>>8 : STA.w A1T0H ; set bus A source address
 	LDA.b #Password_StripeImageTemplate>>16 : STA.w A1B0 ; set bus A source bank
 
-	LDA.b #Password_StripeImageTemplate_end-Password_StripeImageTemplate
+	LDA.b #Password_StripeImageTemplate.size
 	STA.w DAS0L ;
-	LDA.b #Password_StripeImageTemplate_end-Password_StripeImageTemplate>>8
+	LDA.b #Password_StripeImageTemplate.size>>8
 	STA.w DAS0H ; set transfer size
 
 	LDA.b #$01 : STA.w DMAENABLE ; begin DMA transfer
@@ -274,22 +274,22 @@ PasswordEraseOldCursors:
 	;Code Cursor
 	LDA.b PasswordCodePosition : AND.w #$00FF : ASL : TAX
 	LDA.l .code_offsets, X
-	!ADD.w #$20*Scrap04+Scrap04+$6000
+	CLC : ADC.w #$20*$04+$04+$6000
 	XBA ; because big endian is needed
-	STA.l $1002+Password_StripeImageTemplate_CodeCursorErase-Password_StripeImageTemplate
+	STA.l $1002+Password_StripeImageTemplate.CodeCursorErase
 
 	;selection cursor
 	LDA.b PasswordSelectPosition : AND.w #$00FF : ASL : TAX
 	LDA.l .selection_offsets, X
-	!ADD.w #$20*Scrap0D+Scrap03+$6000
+	CLC : ADC.w #$20*$0D+$03+$6000
 	XBA ; because big endian is needed
-	STA.l $1002+Password_StripeImageTemplate_SelectionCursorErase-Password_StripeImageTemplate
-	XBA : !ADD.w #$0020 : XBA
-	STA.l $1002+$0C+Password_StripeImageTemplate_SelectionCursorErase-Password_StripeImageTemplate
-	XBA : !ADD.w #$0003 : XBA
-	STA.l $1002+$14+Password_StripeImageTemplate_SelectionCursorErase-Password_StripeImageTemplate
-	XBA : !ADD.w #$0040-$0003 : XBA
-	STA.l $1002+$1C+Password_StripeImageTemplate_SelectionCursorErase-Password_StripeImageTemplate
+	STA.l $1002+Password_StripeImageTemplate.SelectionCursorErase
+	XBA : CLC : ADC.w #$0020 : XBA
+	STA.l $1002+$0C+Password_StripeImageTemplate.SelectionCursorErase
+	XBA : CLC : ADC.w #$0003 : XBA
+	STA.l $1002+$14+Password_StripeImageTemplate.SelectionCursorErase
+	XBA : CLC : ADC.w #$0040-$0003 : XBA
+	STA.l $1002+$1C+Password_StripeImageTemplate.SelectionCursorErase
 
 	SEP #$20 ; restore 8-bit accumulator
 RTS
@@ -306,23 +306,23 @@ PasswordSetNewCursors:
 	REP #$20 ; set 16-bit accumulator
 	;Code Cursor
 	LDA.b PasswordCodePosition : AND.w #$00FF : ASL : TAX
-	LDA.l PasswordEraseOldCursors_code_offsets, X
-	!ADD.w #$20*Scrap04+Scrap04+$6000
+	LDA.l PasswordEraseOldCursors.code_offsets, X
+	CLC : ADC.w #$20*$04+$04+$6000
 	XBA ; because big endian is needed
-	STA.l $1002+Password_StripeImageTemplate_CodeCursorDraw-Password_StripeImageTemplate
+	STA.l $1002+Password_StripeImageTemplate.CodeCursorDraw
 
 	;Selection cursor
 	LDA.b PasswordSelectPosition : AND.w #$00FF : ASL : TAX
-	LDA.l PasswordEraseOldCursors_selection_offsets, X
-	!ADD.w #$20*Scrap0D+Scrap03+$6000
+	LDA.l PasswordEraseOldCursors.selection_offsets, X
+	CLC : ADC.w #$20*$0D+$03+$6000
 	XBA ; because big endian is needed
-	STA.l $1002+Password_StripeImageTemplate_SelectionCursorDraw-Password_StripeImageTemplate
-	XBA : !ADD.w #$0020 : XBA
-	STA.l $1002+$0C+Password_StripeImageTemplate_SelectionCursorDraw-Password_StripeImageTemplate
-	XBA : !ADD.w #$0003 : XBA
-	STA.l $1002+$14+Password_StripeImageTemplate_SelectionCursorDraw-Password_StripeImageTemplate
-	XBA : !ADD.w #$0040-$0003 : XBA
-	STA.l $1002+$1C+Password_StripeImageTemplate_SelectionCursorDraw-Password_StripeImageTemplate
+	STA.l $1002+Password_StripeImageTemplate.SelectionCursorDraw
+	XBA : CLC : ADC.w #$0020 : XBA
+	STA.l $1002+$0C+Password_StripeImageTemplate.SelectionCursorDraw
+	XBA : CLC : ADC.w #$0003 : XBA
+	STA.l $1002+$14+Password_StripeImageTemplate.SelectionCursorDraw
+	XBA : CLC : ADC.w #$0040-$0003 : XBA
+	STA.l $1002+$1C+Password_StripeImageTemplate.SelectionCursorDraw
 
 	SEP #$20 ; restore 8-bit accumulator
 RTS
@@ -360,185 +360,186 @@ PasswordMoveCursorLeft:
 RTS
 
 macro dw_big_endian(value)
-	db <value>>>8
-	db <value>
+	db ({value})>>8
+	db ({value})
 endmacro
+
 macro Layer3_VRAM_Address(x,y)
-	%dw_big_endian(<y>*$20+<x>+$6000)
+	%dw_big_endian($20*({y})+({x})+$6000)
 endmacro
 
 
 Password_Tilemap:
 ;Add any graphics for background 0 here
-%Layer3_VRAM_Address(Scrap03,Scrap0D+0)
+%Layer3_VRAM_Address($03, $0D)
 %dw_big_endian(51) ;(9*4)+(8*2)-1
-dw #$0201|!FS_COLOR_YELLOW, #$0202|!FS_COLOR_YELLOW ;BOW
-dw #$0200
-dw #$0205|!FS_COLOR_BLUE, #$0206|!FS_COLOR_BLUE ;BOOM
-dw #$0200
-dw #$0200|!FS_COLOR_RED, #$0215|!FS_COLOR_RED ;HOOK
-dw #$0200
-dw #$020C|!FS_COLOR_BLUE, #$020D|!FS_COLOR_BLUE ;BOMB
-dw #$0200
-dw #$0262|!FS_COLOR_RED, #$0263|!FS_COLOR_RED ;SHROOM
-dw #$0200
-dw #$020A|!FS_COLOR_BROWN, #$020B|!FS_COLOR_BROWN ;POWDER
-dw #$0200
-dw #$0220|!FS_COLOR_BLUE, #$0221|!FS_COLOR_BLUE ;ROD
-dw #$0200
-dw #$0285|!FS_COLOR_GREEN, #$0286|!FS_COLOR_GREEN ;PENDANT
-dw #$0200
-dw #$02AB|!FS_COLOR_BW, #$02AB|!FS_COLOR_BW ;placeholder upper half action button
+dw $0201|!FS_COLOR_YELLOW, $0202|!FS_COLOR_YELLOW ;BOW
+dw $0200
+dw $0205|!FS_COLOR_BLUE, $0206|!FS_COLOR_BLUE ;BOOM
+dw $0200
+dw $0200|!FS_COLOR_RED, $0215|!FS_COLOR_RED ;HOOK
+dw $0200
+dw $020C|!FS_COLOR_BLUE, $020D|!FS_COLOR_BLUE ;BOMB
+dw $0200
+dw $0262|!FS_COLOR_RED, $0263|!FS_COLOR_RED ;SHROOM
+dw $0200
+dw $020A|!FS_COLOR_BROWN, $020B|!FS_COLOR_BROWN ;POWDER
+dw $0200
+dw $0220|!FS_COLOR_BLUE, $0221|!FS_COLOR_BLUE ;ROD
+dw $0200
+dw $0285|!FS_COLOR_GREEN, $0286|!FS_COLOR_GREEN ;PENDANT
+dw $0200
+dw $02AB|!FS_COLOR_BW, $02AB|!FS_COLOR_BW ;placeholder upper half action button
 
-%Layer3_VRAM_Address(Scrap03,Scrap0D+1)
+%Layer3_VRAM_Address($03, $0D+1)
 %dw_big_endian(51) ;(9*4)+(8*2)-1
-dw #$0211|!FS_COLOR_YELLOW, #$0212|!FS_COLOR_YELLOW ;BOW
-dw #$0200
-dw #$0200|!FS_COLOR_BW, #$0216|!FS_COLOR_BLUE ;BOOM
-dw #$0200
-dw #$0230|!FS_COLOR_RED, #$0200|!FS_COLOR_BW ;HOOK
-dw #$0200
-dw #$021C|!FS_COLOR_BLUE, #$021C|!FS_COLOR_BLUE|!FS_HFLIP ;BOMB
-dw #$0200
-dw #$0272|!FS_COLOR_RED, #$0273|!FS_COLOR_RED ;SHROOM
-dw #$0200
-dw #$021A|!FS_COLOR_BROWN, #$021B|!FS_COLOR_BROWN ;POWDER
-dw #$0200
-dw #$0230|!FS_COLOR_BLUE, #$0231|!FS_COLOR_BLUE ;ROD
-dw #$0200
-dw #$0295|!FS_COLOR_GREEN, #$0296|!FS_COLOR_GREEN ;PENDANT
-dw #$0200
-dw #$02AB|!FS_COLOR_BW, #$02AB|!FS_COLOR_BW ;placeholder lower half action button
+dw $0211|!FS_COLOR_YELLOW, $0212|!FS_COLOR_YELLOW ;BOW
+dw $0200
+dw $0200|!FS_COLOR_BW, $0216|!FS_COLOR_BLUE ;BOOM
+dw $0200
+dw $0230|!FS_COLOR_RED, $0200|!FS_COLOR_BW ;HOOK
+dw $0200
+dw $021C|!FS_COLOR_BLUE, $021C|!FS_COLOR_BLUE|!FS_HFLIP ;BOMB
+dw $0200
+dw $0272|!FS_COLOR_RED, $0273|!FS_COLOR_RED ;SHROOM
+dw $0200
+dw $021A|!FS_COLOR_BROWN, $021B|!FS_COLOR_BROWN ;POWDER
+dw $0200
+dw $0230|!FS_COLOR_BLUE, $0231|!FS_COLOR_BLUE ;ROD
+dw $0200
+dw $0295|!FS_COLOR_GREEN, $0296|!FS_COLOR_GREEN ;PENDANT
+dw $0200
+dw $02AB|!FS_COLOR_BW, $02AB|!FS_COLOR_BW ;placeholder lower half action button
 
-%Layer3_VRAM_Address(Scrap03,Scrap0D+3)
+%Layer3_VRAM_Address($03, $0D+3)
 %dw_big_endian(51) ;(9*4)+(8*2)-1
-dw #$0207|!FS_COLOR_YELLOW, #$0217|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP ;BOMBOS
-dw #$0200
-dw #$0208|!FS_COLOR_YELLOW, #$0218|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP ;ETHER
-dw #$0200
-dw #$0209|!FS_COLOR_YELLOW, #$0219|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP ;QUAKE
-dw #$0200
-dw #$022C|!FS_COLOR_RED, #$022C|!FS_COLOR_RED|!FS_HFLIP ;LAMP
-dw #$0200
-dw #$0222|!FS_COLOR_BROWN, #$0223|!FS_COLOR_BROWN ;HAMMER
-dw #$0200
-dw #$0224|!FS_COLOR_BROWN, #$0225|!FS_COLOR_BROWN ;SHOVEL
-dw #$0200
-dw #$0226|!FS_COLOR_BLUE, #$0227|!FS_COLOR_BLUE ;FLUTE
-dw #$0200
-dw #$0228|!FS_COLOR_YELLOW, #$0229|!FS_COLOR_YELLOW ;NET
-dw #$0200
-dw #$018A|!FS_COLOR_BW, #$0200 ; Left
+dw $0207|!FS_COLOR_YELLOW, $0217|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP ;BOMBOS
+dw $0200
+dw $0208|!FS_COLOR_YELLOW, $0218|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP ;ETHER
+dw $0200
+dw $0209|!FS_COLOR_YELLOW, $0219|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP ;QUAKE
+dw $0200
+dw $022C|!FS_COLOR_RED, $022C|!FS_COLOR_RED|!FS_HFLIP ;LAMP
+dw $0200
+dw $0222|!FS_COLOR_BROWN, $0223|!FS_COLOR_BROWN ;HAMMER
+dw $0200
+dw $0224|!FS_COLOR_BROWN, $0225|!FS_COLOR_BROWN ;SHOVEL
+dw $0200
+dw $0226|!FS_COLOR_BLUE, $0227|!FS_COLOR_BLUE ;FLUTE
+dw $0200
+dw $0228|!FS_COLOR_YELLOW, $0229|!FS_COLOR_YELLOW ;NET
+dw $0200
+dw $018A|!FS_COLOR_BW, $0200 ; Left
 
-%Layer3_VRAM_Address(Scrap03,Scrap0D+4)
+%Layer3_VRAM_Address($03, $0D+4)
 %dw_big_endian(51) ;(9*4)+(8*2)-1
-dw #$0217|!FS_COLOR_YELLOW, #$0207|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP ;BOMBOS
-dw #$0200
-dw #$0218|!FS_COLOR_YELLOW, #$0208|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP ;ETHER
-dw #$0200
-dw #$0219|!FS_COLOR_YELLOW, #$0209|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP ;QUAKE
-dw #$0200
-dw #$023C|!FS_COLOR_RED, #$023D|!FS_COLOR_RED ;LAMP
-dw #$0200
-dw #$0232|!FS_COLOR_BROWN, #$0233|!FS_COLOR_BROWN ;HAMMER
-dw #$0200
-dw #$0234|!FS_COLOR_BROWN, #$0235|!FS_COLOR_BROWN ;SHOVEL
-dw #$0200
-dw #$0236|!FS_COLOR_BLUE, #$0237|!FS_COLOR_BLUE ;FLUTE
-dw #$0200
-dw #$0238|!FS_COLOR_YELLOW, #$0239|!FS_COLOR_YELLOW ;NET
-dw #$0200
-dw #$019A|!FS_COLOR_BW, #$0200 ; Left
+dw $0217|!FS_COLOR_YELLOW, $0207|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP ;BOMBOS
+dw $0200
+dw $0218|!FS_COLOR_YELLOW, $0208|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP ;ETHER
+dw $0200
+dw $0219|!FS_COLOR_YELLOW, $0209|!FS_COLOR_YELLOW|!FS_HFLIP|!FS_VFLIP ;QUAKE
+dw $0200
+dw $023C|!FS_COLOR_RED, $023D|!FS_COLOR_RED ;LAMP
+dw $0200
+dw $0232|!FS_COLOR_BROWN, $0233|!FS_COLOR_BROWN ;HAMMER
+dw $0200
+dw $0234|!FS_COLOR_BROWN, $0235|!FS_COLOR_BROWN ;SHOVEL
+dw $0200
+dw $0236|!FS_COLOR_BLUE, $0237|!FS_COLOR_BLUE ;FLUTE
+dw $0200
+dw $0238|!FS_COLOR_YELLOW, $0239|!FS_COLOR_YELLOW ;NET
+dw $0200
+dw $019A|!FS_COLOR_BW, $0200 ; Left
 
-%Layer3_VRAM_Address(Scrap03,Scrap0D+6)
+%Layer3_VRAM_Address($03, $0D+6)
 %dw_big_endian(51) ;(9*4)+(8*2)-1
-dw #$022A|!FS_COLOR_GREEN, #$022B|!FS_COLOR_GREEN ;BOOK
-dw #$0200
-dw #$0240|!FS_COLOR_BW, #$0241|!FS_COLOR_BW ;BOTTLE
-dw #$0200
-dw #$0242|!FS_COLOR_GREEN, #$0242|!FS_COLOR_GREEN|!FS_HFLIP ;POTION
-dw #$0200
-dw #$021D|!FS_COLOR_RED, #$021E|!FS_COLOR_RED
-dw #$0200
-dw #$0248|!FS_COLOR_RED, #$0249|!FS_COLOR_RED
-dw #$0200
-dw #$024A|!FS_COLOR_BLUE, #$024B|!FS_COLOR_BLUE
-dw #$0200
-dw #$024C|!FS_COLOR_BOOTS, #$024D|!FS_COLOR_BOOTS
-dw #$0200
-dw #$024E|!FS_COLOR_BROWN, #$024F|!FS_COLOR_BROWN
-dw #$0200
-dw #$0200, #$018B|!FS_COLOR_BW ; Right
+dw $022A|!FS_COLOR_GREEN, $022B|!FS_COLOR_GREEN ;BOOK
+dw $0200
+dw $0240|!FS_COLOR_BW, $0241|!FS_COLOR_BW ;BOTTLE
+dw $0200
+dw $0242|!FS_COLOR_GREEN, $0242|!FS_COLOR_GREEN|!FS_HFLIP ;POTION
+dw $0200
+dw $021D|!FS_COLOR_RED, $021E|!FS_COLOR_RED
+dw $0200
+dw $0248|!FS_COLOR_RED, $0249|!FS_COLOR_RED
+dw $0200
+dw $024A|!FS_COLOR_BLUE, $024B|!FS_COLOR_BLUE
+dw $0200
+dw $024C|!FS_COLOR_BOOTS, $024D|!FS_COLOR_BOOTS
+dw $0200
+dw $024E|!FS_COLOR_BROWN, $024F|!FS_COLOR_BROWN
+dw $0200
+dw $0200, $018B|!FS_COLOR_BW ; Right
 
-%Layer3_VRAM_Address(Scrap03,Scrap0D+7)
+%Layer3_VRAM_Address($03, $0D+7)
 %dw_big_endian(51) ;(9*4)+(8*2)-1
-dw #$023A|!FS_COLOR_GREEN, #$023B|!FS_COLOR_GREEN ;BOOK
-dw #$0200
-dw #$0250|!FS_COLOR_BW, #$0251|!FS_COLOR_BW ;BOTTLE
-dw #$0200
-dw #$0252|!FS_COLOR_GREEN, #$0253|!FS_COLOR_GREEN ;POTION
-dw #$0200
-dw #$022D|!FS_COLOR_RED, #$022E|!FS_COLOR_RED ;CANE
-dw #$0200
-dw #$0258|!FS_COLOR_RED, #$0259|!FS_COLOR_RED ;CAPE
-dw #$0200
-dw #$025A|!FS_COLOR_BLUE, #$025B|!FS_COLOR_BLUE ;MIRROR
-dw #$0200
-dw #$025C|!FS_COLOR_BOOTS, #$025D|!FS_COLOR_BOOTS ;BOOTS
-dw #$0200
-dw #$025E|!FS_COLOR_BROWN, #$025F|!FS_COLOR_BROWN ;GLOVES
-dw #$0200
-dw #$0200, #$019B|!FS_COLOR_BW ; Right
+dw $023A|!FS_COLOR_GREEN, $023B|!FS_COLOR_GREEN ;BOOK
+dw $0200
+dw $0250|!FS_COLOR_BW, $0251|!FS_COLOR_BW ;BOTTLE
+dw $0200
+dw $0252|!FS_COLOR_GREEN, $0253|!FS_COLOR_GREEN ;POTION
+dw $0200
+dw $022D|!FS_COLOR_RED, $022E|!FS_COLOR_RED ;CANE
+dw $0200
+dw $0258|!FS_COLOR_RED, $0259|!FS_COLOR_RED ;CAPE
+dw $0200
+dw $025A|!FS_COLOR_BLUE, $025B|!FS_COLOR_BLUE ;MIRROR
+dw $0200
+dw $025C|!FS_COLOR_BOOTS, $025D|!FS_COLOR_BOOTS ;BOOTS
+dw $0200
+dw $025E|!FS_COLOR_BROWN, $025F|!FS_COLOR_BROWN ;GLOVES
+dw $0200
+dw $0200, $019B|!FS_COLOR_BW ; Right
 
-%Layer3_VRAM_Address(Scrap03,Scrap0D+9)
+%Layer3_VRAM_Address($03, $0D+9)
 %dw_big_endian(51) ;(9*4)+(8*2)-1
-dw #$020E|!FS_COLOR_BLUE, #$020F|!FS_COLOR_BLUE ;FLIPPERS
-dw #$0200
-dw #$0264|!FS_COLOR_RED, #$0265|!FS_COLOR_RED  ;PEARL
-dw #$0200
-dw #$026D|!FS_COLOR_YELLOW, #$026E|!FS_COLOR_YELLOW ;SHIELD
-dw #$0200
-dw #$026F|!FS_COLOR_GREEN, #$026F|!FS_COLOR_GREEN|!FS_HFLIP ;TUNIC
-dw #$0200
-dw #$0281|!FS_COLOR_RED, #$0281|!FS_COLOR_RED|!FS_HFLIP ;HEART
-dw #$0200
-dw #$0282|!FS_COLOR_YELLOW, #$0283|!FS_COLOR_YELLOW ;MAP
-dw #$0200
-dw #$0284|!FS_COLOR_RED, #$0284|!FS_COLOR_RED|!FS_HFLIP ;COMPASS
-dw #$0200
-dw #$022F|!FS_COLOR_YELLOW|!FS_HFLIP, #$022F|!FS_COLOR_YELLOW ;KEY
-dw #$0200
-dw #$0267|!FS_COLOR_BW|!FS_HFLIP, #$0267|!FS_COLOR_BW ;cancel
+dw $020E|!FS_COLOR_BLUE, $020F|!FS_COLOR_BLUE ;FLIPPERS
+dw $0200
+dw $0264|!FS_COLOR_RED, $0265|!FS_COLOR_RED  ;PEARL
+dw $0200
+dw $026D|!FS_COLOR_YELLOW, $026E|!FS_COLOR_YELLOW ;SHIELD
+dw $0200
+dw $026F|!FS_COLOR_GREEN, $026F|!FS_COLOR_GREEN|!FS_HFLIP ;TUNIC
+dw $0200
+dw $0281|!FS_COLOR_RED, $0281|!FS_COLOR_RED|!FS_HFLIP ;HEART
+dw $0200
+dw $0282|!FS_COLOR_YELLOW, $0283|!FS_COLOR_YELLOW ;MAP
+dw $0200
+dw $0284|!FS_COLOR_RED, $0284|!FS_COLOR_RED|!FS_HFLIP ;COMPASS
+dw $0200
+dw $022F|!FS_COLOR_YELLOW|!FS_HFLIP, $022F|!FS_COLOR_YELLOW ;KEY
+dw $0200
+dw $0267|!FS_COLOR_BW|!FS_HFLIP, $0267|!FS_COLOR_BW ;cancel
 
-%Layer3_VRAM_Address(Scrap03,Scrap0D+10)
+%Layer3_VRAM_Address($03, $0D+10)
 %dw_big_endian(51) ;(9*4)+(8*2)-1
-dw #$021F|!FS_COLOR_BLUE|!FS_HFLIP, #$021F|!FS_COLOR_BLUE ;FLIPPERS
-dw #$0200
-dw #$0274|!FS_COLOR_RED, #$0275|!FS_COLOR_RED ;PEARL
-dw #$0200
-dw #$027D|!FS_COLOR_YELLOW, #$027E|!FS_COLOR_YELLOW ;SHIELD
-dw #$0200
-dw #$027F|!FS_COLOR_GREEN, #$027F|!FS_COLOR_GREEN|!FS_HFLIP ;TUNIC
-dw #$0200
-dw #$0291|!FS_COLOR_RED, #$0291|!FS_COLOR_RED|!FS_HFLIP ;HEART
-dw #$0200
-dw #$0292|!FS_COLOR_YELLOW, #$0293|!FS_COLOR_YELLOW ;MAP
-dw #$0200
-dw #$0294|!FS_COLOR_RED, #$0294|!FS_COLOR_RED|!FS_HFLIP ;COMPASS
-dw #$0200
-dw #$023E|!FS_COLOR_YELLOW, #$023F|!FS_COLOR_YELLOW ;KEY
-dw #$0200
-dw #$0267|!FS_COLOR_BW|!FS_HFLIP|!FS_VFLIP, #$0267|!FS_VFLIP|!FS_COLOR_BW ;cancel
+dw $021F|!FS_COLOR_BLUE|!FS_HFLIP, $021F|!FS_COLOR_BLUE ;FLIPPERS
+dw $0200
+dw $0274|!FS_COLOR_RED, $0275|!FS_COLOR_RED ;PEARL
+dw $0200
+dw $027D|!FS_COLOR_YELLOW, $027E|!FS_COLOR_YELLOW ;SHIELD
+dw $0200
+dw $027F|!FS_COLOR_GREEN, $027F|!FS_COLOR_GREEN|!FS_HFLIP ;TUNIC
+dw $0200
+dw $0291|!FS_COLOR_RED, $0291|!FS_COLOR_RED|!FS_HFLIP ;HEART
+dw $0200
+dw $0292|!FS_COLOR_YELLOW, $0293|!FS_COLOR_YELLOW ;MAP
+dw $0200
+dw $0294|!FS_COLOR_RED, $0294|!FS_COLOR_RED|!FS_HFLIP ;COMPASS
+dw $0200
+dw $023E|!FS_COLOR_YELLOW, $023F|!FS_COLOR_YELLOW ;KEY
+dw $0200
+dw $0267|!FS_COLOR_BW|!FS_HFLIP|!FS_VFLIP, $0267|!FS_VFLIP|!FS_COLOR_BW ;cancel
 
 dw $FFFF
 
 macro PasswordDisplaySlot(x,y)
-	%Layer3_VRAM_Address(Scrap04+<x>,Scrap04+<y>)
+	%Layer3_VRAM_Address(4+{x},4+{y})
 	%dw_big_endian(3)
-	dw #$0186|!FS_COLOR_BW, #$0186|!FS_COLOR_BW
-	%Layer3_VRAM_Address(Scrap04+<x>,Scrap04+1+<y>)
+	dw $0186|!FS_COLOR_BW, $0186|!FS_COLOR_BW
+	%Layer3_VRAM_Address(4+{x},4+1+{y})
 	%dw_big_endian(3)
-	dw #$0196|!FS_COLOR_BW, #$0196|!FS_COLOR_BW
+	dw $0196|!FS_COLOR_BW, $0196|!FS_COLOR_BW
 endmacro
 !FS_VERT_STRIPE = $8000
 Password_StripeImageTemplate:
@@ -558,39 +559,39 @@ Password_StripeImageTemplate:
 	%PasswordDisplaySlot(15,3)
 	%PasswordDisplaySlot(18,3)
 	%PasswordDisplaySlot(21,3)
-.CodeCursorErase ; a code cursor erase (position get be updated)
-	%Layer3_VRAM_Address(Scrap04,Scrap04+2)
+^.CodeCursorErase ; a code cursor erase (position get be updated)
+	%Layer3_VRAM_Address($04,$04+2)
 	%dw_big_endian(3)
-	dw #$0200, #$0200
-.CodeCursorDraw ; Then comes a code cursor draw (will override the erase if same position)
-	%Layer3_VRAM_Address(Scrap04,Scrap04+2)
+	dw $0200, $0200
+^.CodeCursorDraw ; Then comes a code cursor draw (will override the erase if same position)
+	%Layer3_VRAM_Address($04,$04+2)
 	%dw_big_endian(3)
-	dw #$0267|!FS_COLOR_BW|!FS_HFLIP|!FS_VFLIP, #$0267|!FS_VFLIP|!FS_COLOR_BW
-.SelectionCursorErase ; a selection cursor erase (position get be updated)
-	%Layer3_VRAM_Address(Scrap03-1,Scrap0D-1)
+	dw $0267|!FS_COLOR_BW|!FS_HFLIP|!FS_VFLIP, $0267|!FS_VFLIP|!FS_COLOR_BW
+^.SelectionCursorErase ; a selection cursor erase (position get be updated)
+	%Layer3_VRAM_Address($03-1, $0D-1)
 	%dw_big_endian(7)
-	dw #$0200, #$0200, #$0200, #$0200
-	%Layer3_VRAM_Address(Scrap03-1,Scrap0D)
+	dw $0200, $0200, $0200, $0200
+	%Layer3_VRAM_Address($03-1, $0D)
 	%dw_big_endian(3|!FS_VERT_STRIPE)
-	dw #$0200, #$0200
-	%Layer3_VRAM_Address(Scrap03+2,Scrap0D)
+	dw $0200, $0200
+	%Layer3_VRAM_Address($03+2, $0D)
 	%dw_big_endian(3|!FS_VERT_STRIPE)
-	dw #$0200, #$0200
-	%Layer3_VRAM_Address(Scrap03-1,Scrap0D+2)
+	dw $0200, $0200
+	%Layer3_VRAM_Address($03-1, $0D+2)
 	%dw_big_endian(7)
-	dw #$0200, #$0200, #$0200, #$0200
-.SelectionCursorDraw ; Then comes a selection cursor draw (will override the erase if same position)
-	%Layer3_VRAM_Address(Scrap03-1,Scrap0D-1)
+	dw $0200, $0200, $0200, $0200
+^.SelectionCursorDraw ; Then comes a selection cursor draw (will override the erase if same position)
+	%Layer3_VRAM_Address($03-1, $0D-1)
 	%dw_big_endian(7)
-	dw #$02BB|!FS_COLOR_GREEN, #$02BC|!FS_COLOR_GREEN, #$02BC|!FS_COLOR_GREEN|!FS_HFLIP, #$02BB|!FS_COLOR_GREEN|!FS_HFLIP
-	%Layer3_VRAM_Address(Scrap03-1,Scrap0D)
+	dw $02BB|!FS_COLOR_GREEN, $02BC|!FS_COLOR_GREEN, $02BC|!FS_COLOR_GREEN|!FS_HFLIP, $02BB|!FS_COLOR_GREEN|!FS_HFLIP
+	%Layer3_VRAM_Address($03-1, $0D)
 	%dw_big_endian(3|!FS_VERT_STRIPE)
-	dw #$02BD|!FS_COLOR_GREEN, #$02BD|!FS_COLOR_GREEN|!FS_VFLIP
-	%Layer3_VRAM_Address(Scrap03+2,Scrap0D)
+	dw $02BD|!FS_COLOR_GREEN, $02BD|!FS_COLOR_GREEN|!FS_VFLIP
+	%Layer3_VRAM_Address($03+2, $0D)
 	%dw_big_endian(3|!FS_VERT_STRIPE)
-	dw #$02BD|!FS_COLOR_GREEN|!FS_HFLIP, #$02BD|!FS_COLOR_GREEN|!FS_HFLIP|!FS_VFLIP
-	%Layer3_VRAM_Address(Scrap03-1,Scrap0D+2)
+	dw $02BD|!FS_COLOR_GREEN|!FS_HFLIP, $02BD|!FS_COLOR_GREEN|!FS_HFLIP|!FS_VFLIP
+	%Layer3_VRAM_Address($03-1, $0D+2)
 	%dw_big_endian(7)
-	dw #$02BB|!FS_COLOR_GREEN|!FS_VFLIP, #$02BC|!FS_COLOR_GREEN|!FS_VFLIP, #$02BC|!FS_COLOR_GREEN|!FS_HFLIP|!FS_VFLIP, #$02BB|!FS_COLOR_GREEN|!FS_HFLIP|!FS_VFLIP
+	dw $02BB|!FS_COLOR_GREEN|!FS_VFLIP, $02BC|!FS_COLOR_GREEN|!FS_VFLIP, $02BC|!FS_COLOR_GREEN|!FS_HFLIP|!FS_VFLIP, $02BB|!FS_COLOR_GREEN|!FS_HFLIP|!FS_VFLIP
 dw $FFFF
-.end
+^.size

@@ -11,15 +11,15 @@ RefillHealth:
 		BRA .done
 	+
 	SEP #$20 ; set 8-bit accumulator
-	LDA.l PotionHealthRefill : CMP.b #$A0 : !BGE .done
+	LDA.l PotionHealthRefill : CMP.b #$A0 : BCS .done
 		LDA.l BusyHealth : BNE ++
 			LDA.l PotionHealthRefill ; load refill amount
-			!ADD.l CurrentHealth ; add to current health
-			CMP.l MaximumHealth : !BLT +++ : LDA.l MaximumHealth : +++
+			CLC : ADC.l CurrentHealth ; add to current health
+			CMP.l MaximumHealth : BCC +++ : LDA.l MaximumHealth : +++
 			STA.l BusyHealth
 		++
 
-		LDA.l CurrentHealth : CMP.l BusyHealth : !BLT ++
+		LDA.l CurrentHealth : CMP.l BusyHealth : BCC ++
 			LDA.b #$00 : STA.l HeartsFiller
 			LDA.w $020A : BNE .notDone
 			LDA.b #$00 : STA.l BusyHealth
@@ -57,15 +57,15 @@ RefillMagic:
 		BRA .done
 	+
 	SEP #$20 ; set 8-bit accumulator
-	LDA.l PotionMagicRefill : CMP.b #$80 : !BGE .done
+	LDA.l PotionMagicRefill : CMP.b #$80 : BCS .done
 		LDA.l BusyMagic : BNE ++
 			LDA.l PotionMagicRefill ; load refill amount
-			!ADD.l CurrentMagic ; add to current magic
-			CMP.b #$80 : !BLT +++ : LDA.b #$80 : +++
+			CLC : ADC.l CurrentMagic ; add to current magic
+			CMP.b #$80 : BCC +++ : LDA.b #$80 : +++
 			STA.l BusyMagic
 		++
 
-		LDA.l CurrentMagic : CMP.l BusyMagic : !BLT ++
+		LDA.l CurrentMagic : CMP.l BusyMagic : BCC ++
 			LDA.b #$00 : STA.l BusyMagic
 			SEC
 			RTL

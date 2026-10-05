@@ -113,7 +113,7 @@ db $00 ; $00 = default behavior (silver arrows)
 ;--------------------------------------------------------------------------------
 org $B0902F
 SpecialWeapons:
-db #$00
+db $00
 ; s - - -  m m m m (bitfield) - NYI
 ; s - only swords damage can hurt enemies
 ; m - special weapon mode
@@ -155,7 +155,7 @@ db $00 ; $00 = Off | $01 = Display TotalItemCounter / TotalItemCount display on 
 ;--------------------------------------------------------------------------------
 org $B0803A ; PC 0x18003A-0x18003C
 MapHUDMode:
-db #$00 ; #$00 = Off (default) - #$01 = Display Dungeon Count w/Map - #$02 = Display Dungeon Count Always
+db $00 ; #$00 = Off (default) - #$01 = Display Dungeon Count w/Map - #$02 = Display Dungeon Count Always
 MapMode:
 db $00 ; #$00 = Always On (default) - #$01 = Require Map Item
 CompassMode:
@@ -190,7 +190,7 @@ db $00 ; #$00 = Off (default) - #$01 = On
 ;--------------------------------------------------------------------------------
 org $B08043 ; PC 0x180043
 SmithDeleteOnSave:
-db #$00 ; #$00 = Off (default) - #$01 = On (frog/smith gets deleted on S+Q)
+db $00 ; #$00 = Off (default) - #$01 = On (frog/smith gets deleted on S+Q)
 ;--------------------------------------------------------------------------------
 org $B08044 ; PC 0x180044
 AllowHammerTablets:
@@ -389,7 +389,7 @@ db $00 ; #$00 - Normal, $01 - Block them (Used by Entrance Rando in Standard Mod
 ;--------------------------------------------------------------------------------
 org $B0808B ; PC 0x18008B
 AllowAgaDamageBeforeZeldaRescued:
-db #$00 ; #$00 - No damage, $01 - Damage (Used by Entrance Rando in Standard Mode)
+db $00 ; #$00 - No damage, $01 - Damage (Used by Entrance Rando in Standard Mode)
 ;--------------------------------------------------------------------------------
 ; 0x18008C-0x18008D (unused)
 ;--------------------------------------------------------------------------------
@@ -523,7 +523,7 @@ CapeMagicUse:
 db $04, $08, $10 ; change to db $04, $08, $08 for original cape behavior
 org $88DC42 ; PC 0x45C42 - ancilla_cane_spark.asm:200 - (db 4, 2, 1)
 ByrnaMagicUsage:
-db $04, #$02, #$01 ; normal, 1/2, 1/4 magic
+db $04, $02, $01 ; normal, 1/2, 1/4 magic
 ;--------------------------------------------------------------------------------
 ;Dungeon Music
 ;org EntranceData_song ; PC 0x15592
@@ -827,10 +827,10 @@ db $00 ; #00 = Off (default)
 ;================================================================================
 org $B0816B ; PC 0x18016B - 0x18016D
 HardModeExclusionCaneOfByrnaUsage:
-db $04, #$02, #$01 ; Normal, 1/2, 1/4 Magic
+db $04, $02, $01 ; Normal, 1/2, 1/4 Magic
 org $B0816E ; PC 0x18016E - 308170
 HardModeExclusionCapeUsage:
-db $04, #$08, #$10 ; Normal, 1/2, 1/4 Magic
+db $04, $08, $10 ; Normal, 1/2, 1/4 Magic
 ;================================================================================
 org $B08171 ; PC 0x180171
 GanonPyramidRespawn:
@@ -1021,11 +1021,11 @@ db $00, $00
 ;================================================================================
 org $B08200 ; PC 0x180200 - 0x18020B
 RedClockAmount:
-dw $4650, #$0000 ; $00004650 = +5 minutes
+dw $4650, $0000 ; $00004650 = +5 minutes
 BlueClockAmount:
-dw $B9B0, #$FFFF ; $FFFFB9B0 = -5 minutes
+dw $B9B0, $FFFF ; $FFFFB9B0 = -5 minutes
 GreenClockAmount:
-dw $0000, #$0000
+dw $0000, $0000
 ;--------------------------------------------------------------------------------
 ; 0x18020C-0x18020F (unused)
 ;--------------------------------------------------------------------------------
@@ -1455,7 +1455,7 @@ dw $0000
 ; 0x182305 - 182FFF (unused)
 ;================================================================================
 org $B0B000 ; PC 0x183000 - 0x1834FF
-incsrc initsramtable.asm
+incsrc "initsramtable.asm"
 
 ;--------------------------------------------------------------------------------
 ; 0x183500 - 183FFF (unused)
@@ -2523,141 +2523,141 @@ dl $000000, $000000, $000000, $000000, $000000, $000000, $000000, $000000
 dl $000000, $000000, $000000, $000000, $000000, $000000, $000000, $000000
 dl $000000, $000000, $000000, $000000, $000000, $000000, $000000, $000000
 MushroomItem_Player: ; EDF8
-db #$00
+db $00
 BottleMerchant_Player: ; EDF9
-db #$00
+db $00
 StandingKey_Hera_Player: ; EDFA
-db #$00
+db $00
 EtherItem_Player: ; EDFB
-db #$00
+db $00
 BombosItem_Player: ; EDFC
-db #$00
+db $00
 HauntedGroveItem_Player: ; EDFD
-db #$00
+db $00
 HeartContainer_ArmosKnights_Player: ; EDFE
-db #$00
+db $00
 HeartContainer_Lanmolas_Player: ; EDFF
-db #$00
+db $00
 HeartContainer_Moldorm_Player: ; EE00
-db #$00
+db $00
 HeartContainer_HelmasaurKing_Player: ; EE01
-db #$00
+db $00
 HeartContainer_Arrghus_Player: ; EE02
-db #$00
+db $00
 HeartContainer_Mothula_Player: ; EE03
-db #$00
+db $00
 HeartContainer_Blind_Player: ; EE04
-db #$00
+db $00
 HeartContainer_Kholdstare_Player: ; EE05
-db #$00
+db $00
 HeartContainer_Vitreous_Player: ; EE06
-db #$00
+db $00
 HeartContainer_Trinexx_Player: ; EE07
-db #$00
+db $00
 HeartPiece_Forest_Thieves_Player: ; EE08
-db #$00
+db $00
 HeartPiece_Lumberjack_Tree_Player: ; EE09
-db #$00
+db $00
 HeartPiece_Spectacle_Cave_Player: ; EE0A
-db #$00
+db $00
 HeartPiece_Circle_Bushes_Player: ; EE0B
-db #$00
+db $00
 HeartPiece_Graveyard_Warp_Player: ; EE0C
-db #$00
+db $00
 HeartPiece_Mire_Warp_Player: ; EE0D
-db #$00
+db $00
 HeartPiece_Smith_Pegs_Player: ; EE0E
-db #$00
+db $00
 HeartPiece_Spectacle_Player: ; EE0F
-db #$00
+db $00
 HeartPiece_Mountain_Warp_Player: ; EE10
-db #$00
+db $00
 HeartPiece_Maze_Player: ; EE11
-db #$00
+db $00
 HeartPiece_Desert_Player: ; EE12
-db #$00
+db $00
 HeartPiece_Lake_Player: ; EE13
-db #$00
+db $00
 HeartPiece_Swamp_Player: ; EE14
-db #$00
+db $00
 HeartPiece_Cliffside_Player: ; EE15
-db #$00
+db $00
 HeartPiece_Pyramid_Player: ; EE16
-db #$00
+db $00
 HeartPiece_Digging_Player: ; EE17
-db #$00
+db $00
 HeartPiece_Zora_Player: ; EE18
-db #$00
+db $00
 PurpleChest_Item_Player: ; EE19
-db #$00
+db $00
 RupeeNPC_MoldormCave_Player: ; EE1A
-db #$00
+db $00
 RupeeNPC_NortheastDarkSwampCave_Player: ; EE1B
-db #$00
+db $00
 LibraryItem_Player: ; EE1C
-db #$00
+db $00
 WitchItem_Player: ; EE1D
-db #$00
+db $00
 MagicBatItem_Player: ; EE1E
-db #$00
+db $00
 UncleItem_Player: ; EE1F
-db #$00
+db $00
 ZoraItem_Player: ; EE20
-db #$00
+db $00
 CatfishItem_Player: ; EE21
-db #$00
+db $00
 BonkKey_Desert_Player: ; EE262
-db #$00
+db $00
 BonkKey_GTower_Player: ; EE23
-db #$00
+db $00
 OldManItem_Player: ; EE24
-db #$00
+db $00
 SahasralaItem_Player: ; EE25
-db #$00
+db $00
 SmithItem_Player: ; EE26
-db #$00
+db $00
 SickKidItem_Player: ; EE27
-db #$00
+db $00
 HoboItem_Player: ; EE28
-db #$00
+db $00
 PedestalSword_Player: ; EE29
-db #$00
+db $00
 TreeKidItem_Player: ; EE2A
-db #$00
+db $00
 ChestGameItem_Player: ; EE2B
-db #$00
+db $00
 Prize_ArmosKnights_Player: ; EE2C
-db #$00
+db $00
 Prize_Lanmolas_Player: ; EE2D
-db #$00
+db $00
 Prize_Moldorm_Player: ; EE2E
-db #$00
+db $00
 Prize_HelmasaurKing_Player: ; EE2F
-db #$00
+db $00
 Prize_Arrghus_Player: ; EE30
-db #$00
+db $00
 Prize_Mothula_Player: ; EE31
-db #$00
+db $00
 Prize_Blind_Player: ; EE32
-db #$00
+db $00
 Prize_Kholdstare_Player: ; EE33
-db #$00
+db $00
 Prize_Vitreous_Player: ; EE34
-db #$00
+db $00
 Prize_Trinexx_Player: ; EE35
-db #$00
+db $00
 ;--------------------------------------------------------------------------------
 org $B0EE30 ; PC 0x18636C
 RemoteItems:
-db #$00 ; $00 = off; $01 = on (default: off)
+db $00 ; $00 = off; $01 = on (default: off)
 
 ;Shop slot count as check
 org $B0EE40 ;
 EnableShopItemCount:
-db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
-db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
-db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
-db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
+db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 ;--------------------------------------------------------------------------------
 ; 0x30EE80 - 30EFDF (unused)
@@ -2697,17 +2697,17 @@ db $01, $01, $00, $01, $02, $01, $06, $03, $03, $02, $01, $01, $04, $04, $00, $0
 org $B0F020
 HUDHeartColors: ; PC 0x187020
 .index          ; $00 = Red | $01 = Blue | $02 = Green | $03 = Yellow
-dw #$0000
+dw $0000
 .masks_game_hud    ; PC 0x187022
-dw #$0400          ; Red
-dw #$0C00          ; Blue
-dw #$1C00          ; Green
-dw #$0800          ; Yellow
+dw $0400          ; Red
+dw $0C00          ; Blue
+dw $1C00          ; Green
+dw $0800          ; Yellow
 .masks_file_select ; PC 0x18702A
-dw #$0400          ; Red
-dw #$0C00          ; Blue
-dw #$1800          ; Green
-dw #$0800          ; Yellow
+dw $0400          ; Red
+dw $0C00          ; Blue
+dw $1800          ; Green
+dw $0800          ; Yellow
 
 org $B0F032 ; PC 0x187032
 RomSpeed:

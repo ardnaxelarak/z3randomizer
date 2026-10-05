@@ -36,7 +36,7 @@ RTL
 	.isBlueBoomerang
 	.isBow
 	.isBowAndArrows
-	CMP.b [Scrap00] : !BGE .done ; finished if we're upgrading
+	CMP.b [Scrap00] : BCS .done ; finished if we're upgrading
 	LDA.b [Scrap00] ; reload old value
 RTL
 	.isSilverArrowBow
@@ -59,8 +59,8 @@ RTL
 		TYA ; load sword item
 		CMP.b #$49 : BNE + : LDA.b #$00 : + ; convert extra fighter's sword to normal one
 		CMP.b #$50 : BNE + : LDA.b #$01 : + ; convert extra master sword to normal one
-		INC : CMP.b Scrap04 : !BGE + ; skip if highest is lower (this is an upgrade)
-			LDA.b Scrap04 : DEC ; convert to item id
+		INC A : CMP.b Scrap04 : BCS + ; skip if highest is lower (this is an upgrade)
+			LDA.b Scrap04 : DEC A ; convert to item id
 			TAY : PLA : LDA.b Scrap04 ; put sword id into the thing to write
 			JMP .done
 		+

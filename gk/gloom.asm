@@ -12,7 +12,7 @@ AdjustDefaultGraphics:
 	LDA.w #$7500
 	STA.w $2116
 
-	LDY.b #SkullGfx_end-SkullGfx
+	LDY.b #SkullGfx.size
 	LDX.b #$00
 
 -	LDA.l SkullGfx, X
@@ -25,5 +25,5 @@ AdjustDefaultGraphics:
 	RTL
 
 SkullGfx:
-	incbin "data/skull.bin"
-.end
+	incbin "../data/skull.bin"
+^.size

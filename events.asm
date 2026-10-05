@@ -128,12 +128,12 @@ OnFileCreation:
         LDA.w #$03D7
         LDX.w #$B000
         LDY.w #$0000
-        MVN CartridgeSRAM>>16, InitSRAMTable>>16
+        MVN ^InitSRAMTable, ^CartridgeSRAM
         ; Skip file name and validity value
         LDA.w #$010C
         LDX.w #$B3E3
         LDY.w #$03E3
-        MVN CartridgeSRAM>>16, InitSRAMTable>>16
+        MVN ^InitSRAMTable, ^CartridgeSRAM
         PLB
 
         ; Resolve instant post-aga if standard

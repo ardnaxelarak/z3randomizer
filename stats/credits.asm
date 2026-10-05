@@ -1,78 +1,74 @@
+encoder creditsBigHi = "../data/creditscharmapbighi.txt"
+encoder creditsBigLo = "../data/creditscharmapbiglo.txt"
+encoder creditsSmall_red = "../data/creditscharmapsmall_red.txt"
+encoder creditsSmall_green = "../data/creditscharmapsmall_green.txt"
+encoder creditsSmall_yellow = "../data/creditscharmapsmall_yellow.txt"
+
 ;===================================================================================================
 ; LEAVE THIS HERE FOR PHP WRITES
 ;===================================================================================================
-table "data/creditscharmapbighi.txt"
+encoder creditsBigHi
 YourSpriteCreditsHi:
-db 2
-db 55
-db "                            " ; $238002
+         db 2, 55
+|A38002| db "                            "
 
-table "data/creditscharmapbiglo.txt"
+encoder creditsBigLo
 YourSpriteCreditsLo:
-db 2
-db 55
-db "                            " ; $238020
+         db 2, 55
+|A38020| db "                            "
 
+encoder creditsBigHi
 CollectionRateHi:
 db 2, 55
-db $5F, $6B, $68, $68, $61, $5F, $70, $65, $6B, $6A, $9F, $6E, $5D, $70, $61  ; "Collection Rate"
-db $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F ; "        " 8 spaces
+db "COLLECTION RATE        "
 print "Collection Rate High Start: ", pc
 warnpc $A38055
-db $9F, $DB ; " /"
-db $55, $54, $59 ; 216
+db " /216"
 
+encoder creditsBigLo
 CollectionRateLo:
 db 2, 55
-db $85, $91, $8E, $8E, $87, $85, $96, $8B, $91, $90, $9F, $94, $83, $96, $87  ; "Collection Rate"
-db $9F, $9F, $9F, $9F, $9F, $9F, $9F, $9F  ; "        " 8 spaces
+db "COLLECTION RATE        "
 print "Collection Rate Low Start: ", pc
 warnpc $A38073
-db $9F, $EE ; " /"
-db $7B, $7A, $7F ; 216
+db " /216"
 
 !FEATURE_PATREON_SUPPORTERS ?= 0
 
-table "data/creditscharmapbighi.txt"
+encoder creditsBigHi
 PatronCredit1Hi:
-db 2
-db 55
-db "                            " ; $23803E
+         db 2, 55
+|A3807A| db "                            "
 
-table "data/creditscharmapbiglo.txt"
+encoder creditsBigLo
 PatronCredit1Lo:
-db 2
-db 55
-db "                            " ; $23805C
+         db 2, 55
+|A38098| db "                            "
 
-table "data/creditscharmapbighi.txt"
+encoder creditsBigHi
 PatronCredit2Hi:
-db 2
-db 55
-db "                            " ; $23807A
+         db 2, 55
+|A380B6| db "                            "
 
-table "data/creditscharmapbiglo.txt"
+encoder creditsBigLo
 PatronCredit2Lo:
-db 2
-db 55
-db "                            " ; $238098
+         db 2, 55
+|A380D4| db "                            "
 
-table "data/creditscharmapbighi.txt"
+encoder creditsBigHi
 PatronCredit3Hi:
-db 2
-db 55
-db "                            " ; $2380B6
+         db 2, 55
+|A380F2| db "                            "
 
-table "data/creditscharmapbiglo.txt"
+encoder creditsBigLo
 PatronCredit3Lo:
-db 2
-db 55
-db "                            " ; $2380D4
+         db 2, 55
+|A38110| db "                            "
 
 ;===================================================================================================
 
 CreditsLineTable:
-	fillword CreditsLineBlank : fill 800
+fill word size 800 :: CreditsLineBlank
 
 ;===================================================================================================
 
@@ -81,105 +77,104 @@ CreditsLineTable:
 ;---------------------------------------------------------------------------------------------------
 
 macro smallcredits(text, color)
-	!CLINE #= !CLINE+1
-	table "data/creditscharmapsmall_<color>.txt"
+	!CLINE = !CLINE+1
+	encoder creditsSmall_{color}
 
-	?line:
-		db (32-(?end-?text))/2
-		db 2*(?end-?text)-1
-	?text:
-		db "<text>"
-	?end:
+	{?}_line:
+		db (32-.text.size)/2
+		db 2*(.text.size)-1
+	.text
+		db "{text}"
+	^..size
 
 	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw ?line
+	org CreditsLineTable+!CLINE+!CLINE : dw {?}_line
 	pullpc
 
 endmacro
 
 ;---------------------------------------------------------------------------------------------------
 macro bigcredits(text)
-	!CLINE #= !CLINE+1
-	table "data/creditscharmapbighi.txt"
+	!CLINE = !CLINE+1
+	encoder creditsBigHi
 
-	?line_top:
-		db (32-(?end-?text))/2
-		db 2*(?end-?text)-1
-	?text:
-		db "<text>"
-	?end:
+	{?}_line_top:
+		db (32-.text.size)/2
+		db 2*(.text.size)-1
+	.text
+		db "{text}"
+	^..size
 
 	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw ?line_top
+	org CreditsLineTable+!CLINE+!CLINE : dw {?}_line_top
 	pullpc
 
+	encoder creditsBigLo
+	{?}_line_bottom:
+		db (32-.text.size)/2
+		db 2*(.text.size)-1
+	.text
+		db "{text}"
+	^..size
 
-	table "data/creditscharmapbiglo.txt"
-	?line_bottom:
-		db (32-(?end-?text))/2
-		db 2*(?end-?text)-1
-		db "<text>"
-
-
-	!CLINE #= !CLINE+1
+	!CLINE = !CLINE+1
 	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw ?line_bottom
+	org CreditsLineTable+!CLINE+!CLINE : dw {?}_line_bottom
 	pullpc
-
 endmacro
 
 ;---------------------------------------------------------------------------------------------------
 
 macro bigcreditsleft(text)
-	!CLINE #= !CLINE+1
-	table "data/creditscharmapbighi.txt"
+	!CLINE = !CLINE+1
+	encoder creditsBigHi
 
-	?line_top:
+	{?}_line_top:
 		db 2
-		db 2*(?end-?text)-1
-	?text:
-		db "<text>"
-	?end:
+		db 2*(.text.size)-1
+	.text
+		db "{text}"
+	^..size
 
 	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw ?line_top
+	org CreditsLineTable+!CLINE+!CLINE : dw {?}_line_top
 	pullpc
 
-
-	table "data/creditscharmapbiglo.txt"
-	?line_bottom:
+	encoder creditsBigLo
+	{?}_line_bottom:
 		db 2
-		db 2*(?end-?text)-1
-		db "<text>"
+		db 2*(.text.size)-1
+	.text
+		db "{text}"
+	^..size
 
 
-	!CLINE #= !CLINE+1
+	!CLINE = !CLINE+1
 	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw ?line_bottom
+	org CreditsLineTable+!CLINE+!CLINE : dw {?}_line_bottom
 	pullpc
-
 endmacro
 
 ;---------------------------------------------------------------------------------------------------
 
 macro emptyline()
-	!CLINE #= !CLINE+1
+	!CLINE = !CLINE+1
 	pushpc
 	org CreditsLineTable+!CLINE+!CLINE : dw CreditsEmptyLine
 	pullpc
 endmacro
 
 macro blankline()
-	!CLINE #= !CLINE+1
+	!CLINE = !CLINE+1
 	pushpc
 	org CreditsLineTable+!CLINE+!CLINE : dw CreditsLineBlank
 	pullpc
 endmacro
 
 macro addarbline(l)
-	!CLINE #= !CLINE+1
+	!CLINE = !CLINE+1
 	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw <l>
+	org CreditsLineTable+!CLINE+!CLINE : dw {l}
 	pullpc
 endmacro
 
@@ -651,7 +646,7 @@ endif
 
 ;===================================================================================================
 
-print "Credits line number: !CLINE | Expected: 302"
+printf "Credits line number: {0} | Expected: 302", !CLINE
 
 if !CLINE > 302
 	error "Too many credits lines. !CLINE > 302"
@@ -663,7 +658,7 @@ endif
 
 
 ; Set line always to line up with stats
-!CLINE #= 302
+!CLINE = 302
 
 ;===================================================================================================
 

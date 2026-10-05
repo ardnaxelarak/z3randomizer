@@ -7,7 +7,7 @@ NMIHookActionEnemizer:
     PHP
 
     SEP #$20 ; get into 8-bit mode
-    
+
     LDA.l !SHELL_DMA_FLAG : BEQ .return ; check our draw flag
     AND.b #$01 : BNE .loadKholdstare
     LDA.l !SHELL_DMA_FLAG : AND.b #$02 : BNE .loadTrinexx

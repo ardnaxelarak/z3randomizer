@@ -83,13 +83,13 @@ IsMedallion:
 		++
 	+
 	CMP.w #$03 : BNE + ; Death Mountain
-		LDA.b LinkPosX : CMP.w #1890 : !BGE ++
+		LDA.b LinkPosX : CMP.w #1890 : BCS ++
 			SEC
 			BRA .done
 		++
 		BRA .false
 	+ CMP.w #$30 : BNE + ; Desert
-		LDA.b LinkPosX : CMP.w #512 : !BLT ++
+		LDA.b LinkPosX : CMP.w #512 : BCC ++
 			SEC
 			BRA .done
 		++
@@ -101,7 +101,7 @@ IsMedallion:
 RTL
 ;--------------------------------------------------------------------------------
 LoadNarrowObject:
-	LDA.l SpriteProperties_standing_width, X : STA.b ($92), Y ; AddReceiveItem.wide_item_flag?
+	LDA.l SpriteProperties.standing_width, X : STA.b ($92), Y ; AddReceiveItem.wide_item_flag?
 RTL
 ;--------------------------------------------------------------------------------
 CheckTabletItem:
@@ -111,7 +111,7 @@ CheckTabletItem:
 ;--------------------------------------------------------------------------------
     JSL IsMedallion : BCS .tablet
     PHX
-        LDA.b 5,S : TAX : LDA.w SpriteSpawnStep, X : BEQ .vanilla-1
+        LDA 5,S : TAX : LDA.w SpriteSpawnStep, X : BEQ .vanilla-1
     PLX
     .bonk_item
     LDA.b #$00
@@ -125,11 +125,11 @@ RTL
 RTL
 ;--------------------------------------------------------------------------------
 SaveTabletItem:
-    LDA.b 4,S : TAY : LDA.w SpriteSpawnStep,Y : BEQ .normal_behavior
-	.bonk_item
+    LDA 4,S : TAY : LDA.w SpriteSpawnStep,Y : BEQ .normal_behavior
+.bonk_item
     ORA.l OverworldEventDataWRAM, X : STA.l OverworldEventDataWRAM, X
 RTL
 
-    .normal_behavior
+.normal_behavior
     LDA.l OverworldEventDataWRAM, X : ORA.b #$40 : STA.l OverworldEventDataWRAM, X
 RTL

@@ -33,7 +33,7 @@ DRHUD_DrawIndicators:
 DRHUD_BossIndicator:
 	LDA.w DungeonID : CMP.b #$FF : BNE .in_dungeon
 	LDA.w NpcItemIndicator : BEQ .early_exit
-	LDA.l HudItems_enabled : BEQ .early_exit
+	LDA.l HudItems.enabled : BEQ .early_exit
 	REP #$10
 	LDY.w #!NPCIcon : STY.w HUDMultiIndicator
 	JMP DRHUD_Finished
@@ -152,7 +152,7 @@ DrHudDungeonItemsAdditions:
 	sta.w $1644 : sta.w $164a : sta.w $1652 : sta.w $1662 : sta.w $1684 : sta.w $16c4
 	ldx.w #$0000
 	- sta.w $1704, x : sta.w $170e, x : sta.w $1718, x
-	inx #2 : cpx.w #$0008 : !BLT -
+	inx #2 : cpx.w #$0008 : BCC -
 
 	lda.l HudFlag : and.w #$0020 : beq + : JMP ++ : +
 	lda.l HUDDungeonItems : and.w #$001F : bne + : JMP ++ : +
@@ -164,7 +164,7 @@ DrHudDungeonItemsAdditions:
 		lda.w #$24f5 : sta.w $1724
 
 		ldx.w #$0002
-			- lda.w #$0000 : !ADD.l RowOffsets,x : !ADD.l ColumnOffsets, x : tay
+			- lda.w #$0000 : CLC : ADC.l RowOffsets,x : CLC : ADC.l ColumnOffsets, x : tay
 			JSR BossStatus : STA.w $1644, Y
 			INY #2
 			lda.w #$24f5 : sta.w $1644, y
@@ -175,7 +175,7 @@ DrHudDungeonItemsAdditions:
 			.smallKey
 			+ iny #2
 			cpx.w #$001a : bne +
-				tya : !ADD.w #$003c : tay
+				tya : CLC : ADC.w #$003c : tay
 			+ stx.b Scrap00
 				txa : lsr : tax
 				lda.w #$24f5 : sta.w $1644, y
@@ -187,7 +187,7 @@ DrHudDungeonItemsAdditions:
 					LDA.l MapField : ORA.l MapCountDisplay : AND.l DungeonMask, x : BEQ .key_info_done ; must have map
 						plx : sep #$30 : lda.l ChestKeys, x : sta.b Scrap02
 				lda.l GenericKeys : bne +++
-					lda.b Scrap02 : !SUB.l DungeonCollectedKeys, x : sta.b Scrap02
+					lda.b Scrap02 : SEC : SBC.l DungeonCollectedKeys, x : sta.b Scrap02
 				+++ lda.b Scrap02
 				rep #$30
 				jsr ConvertToDisplay2 : sta.w $1644, y ; small key totals
@@ -210,7 +210,7 @@ DrHudDungeonItemsAdditions:
 		lda.w #$24f5 : sta.w $1624 : sta.w $1724
 		ldx.w #$0002
 			- lda.w #$0000 ; start of hud area
-			!ADD.l RowOffsets, x : !ADD.l ColumnOffsets, x : tay
+			CLC : ADC.l RowOffsets, x : CLC : ADC.l ColumnOffsets, x : tay
 			JSR BossStatus : STA.w $1644, Y
 			INY #2
 			lda.w #$24f5 : sta.w $1644, y ; blank out map spot
@@ -219,11 +219,11 @@ DrHudDungeonItemsAdditions:
 				JSR MapIndicatorShort : STA.w $1644, Y
 			+ iny #2
 			cpx.w #$001a : bne +
-				tya : !ADD.w #$003c : tay
+				tya : CLC : ADC.w #$003c : tay
 			+ lda.l CompassField : ora.l CompassCountDisplay
 			and.l DungeonMask, x : beq + ; must have compass
 				phx ; total chest counts
-					LDA.l CompassTotalsWRAM, x : !SUB.l DungeonLocationsChecked, x
+					LDA.l CompassTotalsWRAM, x : SEC : SBC.l DungeonLocationsChecked, x
 					SEP #$30 : JSR HudHexToDec2DigitCopy : REP #$30
 					lda.b Scrap06 : jsr ConvertToDisplay2 : sta.w $1644, y : iny #2
 					lda.b Scrap07 : jsr ConvertToDisplay2 : sta.w $1644, y
@@ -233,7 +233,7 @@ DrHudDungeonItemsAdditions:
 			.skipBlanks iny #2
 			cpx.w #$001a : beq +
 				lda.w #$24f5 : sta.w $1644, y ; blank out spot
-			+ inx #2 : cpx.w #$001b : !BGE ++ : JMP -
+			+ inx #2 : cpx.w #$001b : BCS ++ : JMP -
 	++
 	plp : ply : plx : rtl
 }
@@ -363,12 +363,12 @@ HudHexToDec2DigitCopy: ; modified
 	PHY
 		LDY.b #$00
 		-
-			CMP.b #10 : !BLT +
+			CMP.b #10 : BCC +
 			INY
 			SBC.b #10 : BRA -
 		+
 		STY.b Scrap06 : LDY.b #$00 ; Store 10s digit and reset Y
-		CMP.b #1 : !BLT +
+		CMP.b #1 : BCC +
 		-
 			INY
 			DEC : BNE -

@@ -85,8 +85,8 @@ lda.b IndoorsFlag : eor.b #1 : nop #2
 
 ; allows Frog to be accepted at Blacksmith
 org $86b3ee ; < 333ee - sprite_smithy_bros.asm:347 (LDA $7EF3CC : CMP.b #$08 : BEQ .no_returning_smithy_tagalong)
-jsl OWSmithAccept : nop #2
-db #$b0 ; BCS to replace BEQ
+JSL OWSmithAccept : NOP #2
+BCS *
 
 ; load Stumpy per screen's original world, not current world flag
 org $86907f ; < 3107f - sprite_prep.asm:2170 (LDA $7EF3CA)
@@ -552,7 +552,7 @@ LoadMapOppositeWorld:
 FluteMenu_MoveLinkSprite:
 {
     JSR MoveMapSprite
-    BRA WorldMap_SkipHandleSprites_vanilla
+    BRA WorldMap_SkipHandleSprites.vanilla
 }
 WorldMap_SkipHandleSprites:
 {
@@ -757,7 +757,7 @@ OWBonkDrops:
 {
     PHB : PHK : PLB
     LDA.b IndoorsFlag : BEQ +
-        LDX.b #((UWBonkPrizeData-OWBonkPrizeData)+1)
+        LDX.b #(OWBonkPrizeData.size+1)
         BRA .found_match
     +
     JSR OWBonkDropLookup : BCS .found_match
@@ -768,9 +768,9 @@ OWBonkDrops:
     JSR OWBonkDropCollected : PHA : BCS .load_item_and_mw ; S = Collected, FlagBitmask, X (row + 2)
         LDA.b #$1B : STA.w SFX3 ; JSL Sound_SetSfx3PanLong ; seems that when you bonk, there is a pending bonk sfx, so we clear that out and replace with reveal secret sfx
         ; JSLSpriteSFX_QueueSFX3WithPan
-    
+
     .load_item_and_mw
-    LDA.b 3,S : TAX : INX : LDA.w OWBonkPrizeData,X
+    LDA 3,S : TAX : INX : LDA.w OWBonkPrizeData,X
     PHA : INX : LDA.w OWBonkPrizeData,X : BEQ +
         ; multiworld item
         DEX : PLA ; A = item id; X = row + 3
@@ -812,10 +812,10 @@ OWBonkDrops:
     + CMP.b #$D3 : BNE .spawn_item
         INX : INX : LDA.w OWBonkPrizeData,X ; X = row + 5
         CLC : ADC.b #$08 : PHA
-        LDA.w SpritePosYLow,Y : SEC : SBC.b 1,S : STA.w SpritePosYLow,Y
+        LDA.w SpritePosYLow,Y : SEC : SBC 1,S : STA.w SpritePosYLow,Y
             LDA.w SpritePosYHigh,Y : SBC.b #$00 : STA.w SpritePosYHigh,Y : PLX
         LDA.b #$0B ; BRA .sprite_transform ; transform to chicken
-    
+
     .sprite_transform
     JSL OWBonkSpritePrep
 
@@ -823,8 +823,8 @@ OWBonkDrops:
     PLA : BEQ + : - : JMP .return : + ; S = FlagBitmask, X (row + 2)
     TYX : JSL Sprite_IsOnscreen : BCC -
         LDA.b IndoorsFlag : BEQ +
-            LDA.l RoomDataWRAM[$0120].high : ORA.b 1,S : STA.l RoomDataWRAM[$0120].high
-            LDA.w $0400 : ORA.b 1,S : STA.w $0400
+            LDA.l roomDataHigh($120) : ORA 1,S : STA.l roomDataHigh($120)
+            LDA.w $0400 : ORA 1,S : STA.w $0400
             BRA .increment_collection
         +
         LDA.b OverworldIndex
@@ -832,8 +832,8 @@ OWBonkDrops:
                 LDA.l ProgressIndicator : CMP.b #$02
             LDA.b OverworldIndex : BCS + : AND.b #$BF
         +
-        TAX : LDA.l OverworldEventDataWRAM,X : ORA.b 1,S : STA.l OverworldEventDataWRAM,X
-        
+        TAX : LDA.l OverworldEventDataWRAM,X : ORA 1,S : STA.l OverworldEventDataWRAM,X
+
         .increment_collection
         REP #$20
             LDA.l TotalItemCounter : INC : STA.l TotalItemCounter
@@ -897,7 +897,7 @@ OWBonkDropLookup:
             LDA.b OverworldIndex : BCS ++ : AND.b #$BF
         ++
     +
-    LDX.b #((UWBonkPrizeData-OWBonkPrizeData)-sizeof(OWBonkPrizeTable)) ; 41 bonk items, 6 bytes each
+    LDX.b #(OWBonkPrizeData.size-OWBonkPrizeTable.size) ; 41 bonk items, 6 bytes each
     - CMP.w OWBonkPrizeData,X : BNE +
         INX
         PHA
@@ -915,7 +915,7 @@ OWBonkDropCollected:
 {
     ; check if collected
     LDA.b IndoorsFlag : BEQ +
-        LDA.l RoomDataWRAM[$0120].high : AND.b 3,S : BEQ .return ; S = Collected, FlagBitmask, X (row + 2)
+        LDA.l roomDataHigh($120) : AND 3,S : BEQ .return ; S = Collected, FlagBitmask, X (row + 2)
             SEC : RTS
     +
     LDA.b OverworldIndex
@@ -925,7 +925,7 @@ OWBonkDropCollected:
         ++
     +
     TAX
-    LDA.l OverworldEventDataWRAM,X : AND.b 3,S : BEQ .return ; S = Collected, FlagBitmask, X (row + 2)
+    LDA.l OverworldEventDataWRAM,X : AND 3,S : BEQ .return ; S = Collected, FlagBitmask, X (row + 2)
         SEC : RTS
 
     .return
@@ -1035,7 +1035,7 @@ OWEdgeTransition:
     .unshuffled
     LDA.l Overworld_ActualScreenID,X : ORA.l CurrentWorld ; what we wrote over
     TAX : LDA.l OWMode+1 : AND.b #!FLAG_OW_MIXED : BEQ .vanilla
-        JML OWApplyWorld_fromScreen
+        JML OWApplyWorld.fromScreen
 
     .vanilla
     TXA : RTL
@@ -1071,9 +1071,9 @@ OWShuffle:
     ldx.b OverworldIndex : lda.l OWTileWorldAssoc,X : eor.l CurrentWorld : beq +
         ; fake world, will treat this OW area as opposite world
         txa : eor.b #$40 : tax
-    + txa : and.b #$40 : !ADD.w OverworldSlotPosition : rep #$30 : and.w #$00ff : asl #3
+    + txa : and.b #$40 : CLC : ADC.w OverworldSlotPosition : rep #$30 : and.w #$00ff : asl #3
 
-    adc.b 1,S : tax
+    adc 1,S : tax
     asl.w OverworldSlotPosition : pla
     ;x = offset to edgeoffsets table
     
@@ -1090,8 +1090,8 @@ OWShuffle:
 
     .nextTransition
     pha
-        jsr OWSearchTransition_entry : bcs .newDestination
-        txa : !ADD.w #$0010 : tax
+        jsr OWSearchTransition.entry : bcs .newDestination
+        txa : CLC : ADC.w #$0010 : tax
     pla : dec : bne .nextTransition : bra .noTransition
 
     .newDestination
@@ -1113,8 +1113,8 @@ OWSearchTransition:
     ;A-16 XY-16
     lda.w TransitionDirection : bne + ;north
         lda.l OWNorthEdges,x : dec
-        cmp.b LinkPosX : !BGE .exitloop
-        lda.l OWNorthEdges+2,x : cmp.b LinkPosX : !BLT .exitloop
+        cmp.b LinkPosX : BCS .exitloop
+        lda.l OWNorthEdges+2,x : cmp.b LinkPosX : BCC .exitloop
             ;MATCH
             lda.l OWNorthEdges+14,x : tay ;y = record id of dest
             lda.l OWNorthEdges+12,x ;a = current terrain
@@ -1122,8 +1122,8 @@ OWSearchTransition:
             bra .matchfound
     + dec : bne + ;south
         lda.l OWSouthEdges,x : dec
-        cmp.b LinkPosX : !BGE .exitloop
-        lda.l OWSouthEdges+2,x : cmp.b LinkPosX : !BLT .exitloop
+        cmp.b LinkPosX : BCS .exitloop
+        lda.l OWSouthEdges+2,x : cmp.b LinkPosX : BCC .exitloop
             ;MATCH
             lda.l OWSouthEdges+14,x : tay ;y = record id of dest
             lda.l OWSouthEdges+12,x ;a = current terrain
@@ -1131,16 +1131,16 @@ OWSearchTransition:
             bra .matchfound
     + dec : bne + ; west
         lda.l OWWestEdges,x : dec
-        cmp.b LinkPosY : !BGE .exitloop
-        lda.l OWWestEdges+2,x : cmp.b LinkPosY : !BLT .exitloop
+        cmp.b LinkPosY : BCS .exitloop
+        lda.l OWWestEdges+2,x : cmp.b LinkPosY : BCC .exitloop
             ;MATCH
             lda.l OWWestEdges+14,x : tay ;y = record id of dest
             lda.l OWWestEdges+12,x ;a = current terrain
             ldx.w #OWEastEdges ;x = address of table
             bra .matchfound
     + lda.l OWEastEdges,x : dec ;east
-        cmp.b LinkPosY : !BGE .exitloop
-        lda.l OWEastEdges+2,x : cmp.b LinkPosY : !BLT .exitloop
+        cmp.b LinkPosY : BCS .exitloop
+        lda.l OWEastEdges+2,x : cmp.b LinkPosY : BCC .exitloop
             ;MATCH
             lda.l OWEastEdges+14,x : tay ;y = record id of dest
             lda.l OWEastEdges+12,x ;a = current terrain
@@ -1154,7 +1154,7 @@ OWSearchTransition:
 OWNewDestination:
 {
     tya : sta.w CPUMULTA : lda.b #16 : sta.w CPUMULTB ;wait 8 cycles
-    rep #$20 : txa : nop : !ADD.w CPUPRODUCT : tax ;a = offset to dest record
+    rep #$20 : txa : nop : CLC : ADC.w CPUPRODUCT : tax ;a = offset to dest record
     lda.w $0008,x : sta.b Scrap04 ;save dest OW slot/ID
     ldy.b LinkPosY : lda.w TransitionDirection : dec #2 : bpl + : ldy.b LinkPosX : + sty.b Scrap06
     
@@ -1165,17 +1165,17 @@ OWNewDestination:
     LDA.l OWMode : AND.w #$0007 : BEQ .noLayoutShuffle ;temporary fix until VRAM issues are solved
         lda.w $0006,x : sta.b Scrap06 ;set coord
         lda.w $000a,x : sta.b OverworldMap16Buffer ;VRAM
-        tya : and.w #$01ff : cmp.b 3,s : !BLT .adjustMainAxis
-        dec : cmp.b 1,s : !BGE .adjustMainAxis
-            inc : pha : lda.b Scrap06 : and.w #$fe00 : !ADD.b 1,s : sta.b Scrap06 : pla
+        tya : and.w #$01ff : cmp 3,s : BCC .adjustMainAxis
+        dec : cmp 1,s : BCS .adjustMainAxis
+            inc : pha : lda.b Scrap06 : and.w #$fe00 : CLC : ADC 1,s : sta.b Scrap06 : pla
 
             ; adjust and set other VRAM addresses
-            lda.w $0006,x : pha : lda.b Scrap06 : !SUB 1,s 
+            lda.w $0006,x : pha : lda.b Scrap06 : SEC : SBC 1,s 
             jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : pha ; number of tiles
             lda.w TransitionDirection : dec #2 : bmi +
                 pla : pea.w $0000 : bra ++ ;pla : asl #7 : pha : bra ++ ; y-axis shifts VRAM by increments of 0x80 (disabled for now)
             + pla : asl : pha ; x-axis shifts VRAM by increments of 0x02
-            ++ lda.b OverworldMap16Buffer : !ADD.b 1,s : sta.b OverworldMap16Buffer : pla : pla
+            ++ lda.b OverworldMap16Buffer : CLC : ADC 1,s : sta.b OverworldMap16Buffer : pla : pla
 
         .adjustMainAxis
         LDA.b OverworldMap16Buffer : SEC : SBC.w #$0400 : AND.w #$0F00 : ASL : XBA : STA.b OverworldTilemapIndexY ; vram
@@ -1197,47 +1197,47 @@ OWNewDestination:
     pla : pla : sep #$10 : ldy.w TransitionDirection
     ldx.w OWCoordIndex,y : lda.b LinkPosY,x : and.w #$fe00 : pha
         lda.b LinkPosY,x : and.w #$01ff : pha ;s1 = relative cur, s3 = ow cur
-    lda.b Scrap06 : and.w #$fe00 : !SUB.b 3,s : pha ;set coord, s1 = ow diff, s3 = relative cur, s5 = ow cur
-    lda.b Scrap06 : and.w #$01ff : !SUB.b 3,s : pha ;s1 = rel diff, s3 = ow diff, s5 = relative cur, s7 = ow cur
+    lda.b Scrap06 : and.w #$fe00 : SEC : SBC 3,s : pha ;set coord, s1 = ow diff, s3 = relative cur, s5 = ow cur
+    lda.b Scrap06 : and.w #$01ff : SEC : SBC 3,s : pha ;s1 = rel diff, s3 = ow diff, s5 = relative cur, s7 = ow cur
     lda.b Scrap06 : sta.b LinkPosY,x : and.w #$fe00 : sta.b Scrap06 ;set coord
-    ldx.w OWBGIndex,y : lda.b BG2H,x : !ADD.b 1,s : adc.b 3,s : sta.b BG2H,x
-    ldx.w OWCameraIndex,y : lda.w CameraScrollN,x : !ADD.b 1,s : adc.b 3,s : sta.w CameraScrollN,x
-    ldx.w OWCameraIndex,y : lda.w CameraScrollS,x : !ADD.b 1,s : adc.b 3,s : sta.w CameraScrollS,x
+    ldx.w OWBGIndex,y : lda.b BG2H,x : CLC : ADC 1,s : adc 3,s : sta.b BG2H,x
+    ldx.w OWCameraIndex,y : lda.w CameraScrollN,x : CLC : ADC 1,s : adc 3,s : sta.w CameraScrollN,x
+    ldx.w OWCameraIndex,y : lda.w CameraScrollS,x : CLC : ADC 1,s : adc 3,s : sta.w CameraScrollS,x
     pla : jsl DivideByTwoPreserveSign : pha
-    ldx.w OWBGIndex,y : lda.b BG1H,x : !ADD.b 1,s : sta.b BG1H,x : pla
-    ldx.w OWBGIndex,y : lda.b BG1H,x : !ADD.b 1,s : sta.b BG1H,x : pla
+    ldx.w OWBGIndex,y : lda.b BG1H,x : CLC : ADC 1,s : sta.b BG1H,x : pla
+    ldx.w OWBGIndex,y : lda.b BG1H,x : CLC : ADC 1,s : sta.b BG1H,x : pla
     pla : pla
 
     ;fix camera unlock
-    lda.b BG2H,x : !SUB.b Scrap06 : bpl +
+    lda.b BG2H,x : SEC : SBC.b Scrap06 : bpl +
         pha : lda.b Scrap06 : sta.b BG2H,x
-        ldx.w OWCameraIndex,y : lda.w CameraScrollN,x : !SUB.b 1,s : sta.w CameraScrollN,x
-        lda.w CameraScrollS,x : !SUB.b 1,s : sta.w CameraScrollS,x : pla
+        ldx.w OWCameraIndex,y : lda.w CameraScrollN,x : SEC : SBC 1,s : sta.w CameraScrollN,x
+        lda.w CameraScrollS,x : SEC : SBC 1,s : sta.w CameraScrollS,x : pla
         bra .adjustOppositeAxis
-    + lda.b Scrap06 : ldx.w OWCameraRangeIndex,y : !ADD.w OWCameraRange,x : sta.b Scrap06
-    ldx.w OWBGIndex,y : !SUB.b BG2H,x : bcs .adjustOppositeAxis
+    + lda.b Scrap06 : ldx.w OWCameraRangeIndex,y : CLC : ADC.w OWCameraRange,x : sta.b Scrap06
+    ldx.w OWBGIndex,y : SEC : SBC.b BG2H,x : bcs .adjustOppositeAxis
         pha : lda.b Scrap06 : sta.b BG2H,x
-        ldx.w OWCameraIndex,y : lda.w CameraScrollN,x : !ADD.b 1,s : sta.w CameraScrollN,x
-        lda.w CameraScrollS,x : !ADD.b 1,s : sta.w CameraScrollS,x : pla
+        ldx.w OWCameraIndex,y : lda.w CameraScrollN,x : CLC : ADC 1,s : sta.w CameraScrollN,x
+        lda.w CameraScrollS,x : CLC : ADC 1,s : sta.w CameraScrollS,x : pla
 
     .adjustOppositeAxis
     ;opposite coord stuff
     rep #$30 : lda.w OWOppDirectionOffset,y : and.w #$00ff : bit.w #$0080 : beq +
         ora.w #$ff00 ;extend 8-bit negative to 16-bit negative
-    + pha : cpy.w #$0002 : lda.w OverworldSlotPosition : !BGE +
-        and.w #$00f0 : pha : lda.b Scrap04 : asl : and.w #$0070 : !SUB.b 1,s : tax : pla : txa
-        !ADD.b 1,s : tax : pla : txa : asl : asl : asl : asl : asl : pha : bra ++
-    + and.w #$000f : pha : lda.b Scrap04 : asl : and.w #$000f : !SUB.b 1,s : !ADD.b 3,s
+    + pha : cpy.w #$0002 : lda.w OverworldSlotPosition : BCS +
+        and.w #$00f0 : pha : lda.b Scrap04 : asl : and.w #$0070 : SEC : SBC 1,s : tax : pla : txa
+        CLC : ADC 1,s : tax : pla : txa : asl : asl : asl : asl : asl : pha : bra ++
+    + and.w #$000f : pha : lda.b Scrap04 : asl : and.w #$000f : SEC : SBC 1,s : CLC : ADC 3,s
         sep #$10 : tax : phx : ldx.b #$0 : phx : rep #$10 : pla : plx : plx : pha
     
-    ++ sep #$10 : ldx.w OWOppCoordIndex,y : lda.b LinkPosY,x : !ADD.b 1,s : sta.b LinkPosY,x ;set coord
-    ldx.w OWOppBGIndex,y : lda.b BG2H,x : !ADD.b 1,s : sta.b BG2H,x
-    ldx.w OWOppCameraIndex,y : lda.w CameraScrollN,x : !ADD.b 1,s : sta.w CameraScrollN,x
-    ldx.w OWOppCameraIndex,y : lda.w CameraScrollS,x : !ADD.b 1,s : sta.w CameraScrollS,x
-    ldx.w OWOppBGIndex,y : lda.b BG1H,x : !ADD.b 1,s : sta.b BG1H,x
-    lda.w TransitionDirection : asl : tax : lda.w CameraTargetN,x : !ADD.b 1,s : sta.w CameraTargetN,x : pla
+    ++ sep #$10 : ldx.w OWOppCoordIndex,y : lda.b LinkPosY,x : CLC : ADC 1,s : sta.b LinkPosY,x ;set coord
+    ldx.w OWOppBGIndex,y : lda.b BG2H,x : CLC : ADC 1,s : sta.b BG2H,x
+    ldx.w OWOppCameraIndex,y : lda.w CameraScrollN,x : CLC : ADC 1,s : sta.w CameraScrollN,x
+    ldx.w OWOppCameraIndex,y : lda.w CameraScrollS,x : CLC : ADC 1,s : sta.w CameraScrollS,x
+    ldx.w OWOppBGIndex,y : lda.b BG1H,x : CLC : ADC 1,s : sta.b BG1H,x
+    lda.w TransitionDirection : asl : tax : lda.w CameraTargetN,x : CLC : ADC 1,s : sta.w CameraTargetN,x : pla
 
-    sep #$30 : lda.b Scrap04 : and.b #$3f : !ADD.w OWOppSlotOffset,y : asl : sta.w OverworldSlotPosition
+    sep #$30 : lda.b Scrap04 : and.b #$3f : CLC : ADC.w OWOppSlotOffset,y : asl : sta.w OverworldSlotPosition
     
     ; crossed OW shuffle and terrain
     ldx.b Scrap05 : ldy.b Scrap08 : jsr OWWorldTerrainUpdate
@@ -1995,16 +1995,21 @@ db 0, 0
 ; on the same screen (15 on megatile screens) but there are no bonk sprites that
 ; have collision in this regard.
 ;--------------------------------------------------------------------------------
-struct OWBonkPrizeTable $AABB00
-    .owid: skip 1
-    .yx: skip 1
-    .flag: skip 1
-    .loot: skip 1
-    .mw_player: skip 1
-    .vert_offset: skip 1
-endstruct align 6
+org $AABB00
+OWBonkPrizeTable:
+    .owid : skip 1
+    .yx : skip 1
+    .flag : skip 1
+    .loot : skip 1
+    .mw_player : skip 1
+    .vert_offset : skip 1
+^.size
 
-org $aabb00 ;PC 153b00
+macro ldaOWBonkPrize(idx, label)
+	LDA.l OWBonkPrizeTable.{label}+OWBonkPrizeTable.size*{idx}
+endmacro
+
+org OWBonkPrizeTable
 OWBonkPrizeData:
 ; OWID  YX  Flag  Item  MW Offset
 db $00, $59, $10, $b0, $00, $20
@@ -2050,8 +2055,10 @@ db $6e, $8c, $10, $35, $00, $10
 db $6e, $90, $08, $b0, $00, $10
 db $6e, $a4, $04, $b1, $00, $10
 db $74, $4e, $10, $b1, $00, $1c
+^.size
 UWBonkPrizeData:
 db $ff, $00, $02, $b5, $00, $08
+^.size
 
 org $AABC80 ;PC 153C80
 OWMapGridLight:

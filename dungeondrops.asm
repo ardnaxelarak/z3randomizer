@@ -15,7 +15,7 @@ SpawnDungeonPrize:
 
         STA.w ItemReceiptID
         TAX
-        LDA.b $06,S : STA.b ScrapBuffer72 ; Store current RoomTag index
+        LDA 6,S : STA.b ScrapBuffer72 ; Store current RoomTag index
         LDA.b #$29 : LDY.b #$06
 
         JSL AddAncillaLong
@@ -28,7 +28,7 @@ SpawnDungeonPrize:
         PLB : PLX
 RTL
 
-.skip_prize_drop:
+.skip_prize_drop
         PLA : PLB : PLX
 RTL
 
@@ -146,7 +146,7 @@ SetCutsceneFlag:
                 LDA.w ItemReceiptID
                 REP #$30
                 AND.w #$00FF : ASL : TAX
-                LDA.l InventoryTable_properties,X : BIT.w #$0080 : BEQ .no_cutscene
+                LDA.l InventoryTable.properties,X : BIT.w #$0080 : BEQ .no_cutscene
                         SEP #$31
                         PLX
 RTL
@@ -231,7 +231,7 @@ PendantMusicCheck:
                 TYA
                 REP #$30
                 AND.w #$00FF : ASL : TAX
-                LDA.l InventoryTable_properties,X : BIT.w #$0080 : BNE .dont_wait
+                LDA.l InventoryTable.properties,X : BIT.w #$0080 : BNE .dont_wait
                         SEP #$31
                         PLX
                         RTL
@@ -302,7 +302,7 @@ PrepPrizeOAMCoordinates:
         .check_width
         PLX
         SEP #$20
-        LDA.l SpriteProperties_chest_width,X : BNE .wide
+        LDA.l SpriteProperties.chest_width,X : BNE .wide
                 TYX
                 LDA.w AncillaID,X : CMP.b #$3E : BEQ .rising_crystal
                         REP #$20
@@ -345,7 +345,7 @@ RTL
 
 PrepPrizeVRAM:
         PHY
-                LDA.b 9,S : TAY
+                LDA 9,S : TAY
                 LDA.w AncillaID,Y : CMP.b #$29 : BEQ +
                         PLY : CLC : RTL  ; not a prize drop ancilla
                 + LDA.b Scrap0C,X : CMP.b #$24 : BEQ + : CMP.b #$34 : BEQ +
@@ -366,8 +366,8 @@ RTL
 
 PrepPrizeShadow:
         PHX
-        LDA.b 5,S : TAX : LDA.w AncillaGet,X : TAX
-        LDA.l SpriteProperties_standing_width,X : BNE .wide
+        LDA 5,S : TAX : LDA.w AncillaGet,X : TAX
+        LDA.l SpriteProperties.standing_width,X : BNE .wide
                 LDA.b Scrap02
                 SEC : SBC.b #$04
                 STA.b Scrap02
@@ -390,7 +390,7 @@ CheckPoseItemCoordinates:
         LDA.w ItemReceiptPose : BEQ .done
                    BIT.b #$02 : BEQ .done
                 LDA.w AncillaGet,X : TAX
-                LDA.l SpriteProperties_chest_width,X : BNE .done
+                LDA.l SpriteProperties.chest_width,X : BNE .done
                         LDA.b Scrap02
                         CLC : ADC.b #$04
                         STA.b Scrap02
@@ -406,7 +406,7 @@ CrystalOrPendantBehavior:
         LDA.w AncillaGet,X
         REP #$31
         AND.w #$00FF : ASL : TAX
-        LDA.l InventoryTable_properties,X : BIT.w #$0080 : BNE .crystal_behavior
+        LDA.l InventoryTable.properties,X : BIT.w #$0080 : BNE .crystal_behavior
                 SEP #$30
                 LDA.w ItemReceiptPose : BEQ +
                         LDA.b #$02 : STA.b LinkDirection
@@ -469,7 +469,7 @@ MaybeSkipCrystalCutsceneFollowerReset:
 PHA
         LDA.l FollowerTravelAllowed : CMP.b #$02 : BEQ .skip
         ; skip if prizes are shuffled outside of normal boss drops
-        LDA.l InventoryTable_properties+($37*2) : AND.b #$01 : BEQ .continue
+        LDA.l InventoryTable.properties+($37*2) : AND.b #$01 : BEQ .continue
 .skip
 PLA : PLA : PLA : PLA
 JML CrystalCutscene_SpawnMaiden_PostFollowerGfx

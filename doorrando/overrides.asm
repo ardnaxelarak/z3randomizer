@@ -36,8 +36,8 @@ BlockEraseFix:
     + rtl
 
 FixShopCode:
-    cpx.w #$0300 : !BGE +
-        sta.l RoomDataWRAM[$00].l, x
+    cpx.w #$0300 : BCS +
+        sta.l RoomDataWRAM, x
     + rtl
 
 VitreousKeyReset:
@@ -46,8 +46,8 @@ VitreousKeyReset:
     + JML SpritePrep_LoadProperties ; what we wrote over
 
 GuruguruFix:
-    lda.b RoomIndex : cmp.b #$df : !BGE +
-        and.b #$0f : cmp.b #$0e : !BLT +
+    lda.b RoomIndex : cmp.b #$df : BCS +
+        and.b #$0f : cmp.b #$0e : BCC +
             iny #2
     + rtl
 
@@ -76,9 +76,9 @@ CutoffEntranceRug:
     PLX : PLA : LDA.w $9B52, Y : STA.l TileMapA, X ; what we wrote over
     RTL
     .check
-    LDA.b Scrap0C : CMP.w #$0004 : !BGE .skip
-    LDA.b Scrap0E : CMP.w #$0008 : !BGE .skip
-    CMP.w #$0004 : !BLT .skip
+    LDA.b Scrap0C : CMP.w #$0004 : BCS .skip
+    LDA.b Scrap0E : CMP.w #$0008 : BCS .skip
+    CMP.w #$0004 : BCC .skip
     BRA .norm
 .skip
 PLX : PLA : RTL
@@ -117,7 +117,7 @@ StandardSaveAndQuit:
 BlindsAtticHint:
 	REP #$20
 	CMP.w #$0122 : BNE +
-	LDA.l RoomDataWRAM[$65].low : AND.w #$0100 : BEQ +
+	LDA.l roomDataLow($65) : AND.w #$0100 : BEQ +
 		SEP #$20 : RTL ; skip the dialog box if the hole is already open
 	+ SEP #$20 : JML Main_ShowTextMessage
 

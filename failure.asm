@@ -13,9 +13,8 @@ CheckZSNES:
 
 ;===================================================================================================
 
-pushtable
-
-table "data/bsodencode.txt"
+encoder bsod = "data/bsodencode.txt"
+encoder bsod
 
 ; Uncomment this to force a crash to test message
 ; pushpc : org $008132 : db 0 : pullpc
@@ -570,5 +569,3 @@ BSODCharWidths:
 	db 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 5, 8, 3, 3, 2, 1
 
 ;===================================================================================================
-
-pulltable

@@ -21,6 +21,5 @@ db $01, $03, $00
 warnpc $B9EEF0
 org $B9EEF0
 GKRandomizerVersion:
-padbyte $00
-pad $B9EF00
+fill byte until $B9EF00 :: $00
 ;--------------------------------------------------------------------------------

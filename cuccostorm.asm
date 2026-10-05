@@ -19,7 +19,7 @@ CuccoStorm:
 
 		LDY.b #$FF : PHY ; push "cucco not found"
 
-		LDX.b #$00 : -- : CPX.b #$10 : !BGE .ldone
+		LDX.b #$00 : -- : CPX.b #$10 : BCS .ldone
 			LDA.w SpriteAITable, X : CMP.b #!ALIVE : BEQ +++
 				; enemy not found
 				CMP.b #!INERT : BNE ++
@@ -31,7 +31,7 @@ CuccoStorm:
 			LDA.l SpriteTypeTable, X : CMP.b #!CUCCO : BNE ++
 				; it's a cucco
 				TXY ; record where we found the living cucco in case we don't find any angry ones
-				LDA.w SpriteAuxTable, X : CMP.b #!CUCCO_ENRAGED : !BLT ++
+				LDA.w SpriteAuxTable, X : CMP.b #!CUCCO_ENRAGED : BCC ++
 					PLA : BRA + ; we found an angry cucco, done
 		++ : INX : BRA -- : .ldone
 		

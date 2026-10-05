@@ -455,7 +455,7 @@ OverworldMapChangePointers2:
 	dw !OWW_SkipIfNotFlagSet
 		dl SwapAgaGanonsTower
 		db $01
-		dw #ReliableOWWSentinel
+		dw ReliableOWWSentinel
 
 	dw $0101, $222C ; tower entry sign
 

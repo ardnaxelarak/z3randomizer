@@ -1,5 +1,3 @@
-lorom
-
 ; Custom addresses. Most are arbitrary. Feel free to make sure they're okay or moving them elsewhere within ZP
 CreditsPtr = $7C   ; 3 bytes
 Temp = $B3         ; 2 bytes
@@ -70,11 +68,11 @@ BitMasks:
 macro StripeStart(xPos, length)
 	LDA.b $C8
 	CLC
-	ADC.w #<xPos>
+	ADC.w #{xPos}
 	XBA
 	STA.w $1002,x
 
-	LDA.w #<length>*2-1
+	LDA.w #{length}*2-1
 	XBA
 	LDA.w #$0500
 	STA.w $1004,x
@@ -100,25 +98,25 @@ HexToDecStats:
 		STA.l HexToDecDigit1 : STA.l HexToDecDigit3 : STA.l HexToDecDigit4 ; clear digit storage
 	PLA
 	-
-	CMP.w #10000 : !BLT +
+	CMP.w #10000 : BCC +
 	PHA : SEP #$20 : LDA.l HexToDecDigit1 : INC : STA.l HexToDecDigit1 : REP #$20 : PLA
-	!SUB.w #10000 : BRA -
+	SEC : SBC.w #10000 : BRA -
 	+ -
-	CMP.w #1000 : !BLT +
+	CMP.w #1000 : BCC +
 	PHA : SEP #$20 : LDA.l HexToDecDigit2 : INC : STA.l HexToDecDigit2 : REP #$20 : PLA
-	!SUB.w #1000 : BRA -
+	SEC : SBC.w #1000 : BRA -
 	+ -
-	CMP.w #100 : !BLT +
+	CMP.w #100 : BCC +
 	PHA : SEP #$20 : LDA.l HexToDecDigit3 : INC : STA.l HexToDecDigit3 : REP #$20 : PLA
-	!SUB.w #100 : BRA -
+	SEC : SBC.w #100 : BRA -
 	+ -
-	CMP.w #10 : !BLT +
+	CMP.w #10 : BCC +
 	PHA : SEP #$20 : LDA.l HexToDecDigit4 : INC : STA.l HexToDecDigit4 : REP #$20 : PLA
-	!SUB.w #10 : BRA -
+	SEC : SBC.w #10 : BRA -
 	+ -
-	CMP.w #1 : !BLT +
+	CMP.w #1 : BCC +
 	PHA : SEP #$20 : LDA.l HexToDecDigit5 : INC : STA.l HexToDecDigit5 : REP #$20 : PLA
-	!SUB.w #1 : BRA -
+	SEC : SBC.w #1 : BRA -
 	+ 
 	PLA
 RTL
@@ -177,21 +175,21 @@ FindLine:
 !MAX_FRAME_COUNT = (99*60*60*60)+(59*60*60)+(59*60)+59
 
 macro CountUnits(framesPerUnit, unitCounter)
-	STZ.b <unitCounter>
-?loop:
+	STZ.b {unitCounter}
+#{?}_loop:
 	LDA.b ValueLow
 	SEC
-	SBC.w #<framesPerUnit>
+	SBC.w #{framesPerUnit}
 	STA.b Temp
 	LDA.b ValueHigh
-	SBC.w #<framesPerUnit>>>16
-	BCC ?end
+	SBC.w #{framesPerUnit}>>16
+	BCC {?}_end
 	STA.b ValueHigh
 	LDA.b Temp
 	STA.b ValueLow
-	INC.b <unitCounter>
-	BRA ?loop
-?end:
+	INC.b {unitCounter}
+	BRA {?}_loop
+#{?}_end:
 endmacro
 
 !ColonOffset = $8A
@@ -280,7 +278,7 @@ RenderCreditsStatCounter:
 	ASL : TAX
 	LDA.l ValueCaps,x
 	CMP.b ValueLow
-	!BGE +
+	BCS +
 	STA.b ValueLow
 +
 	; == Display value ==
@@ -364,8 +362,8 @@ RenderCreditsStatCounter:
 	LDA.b [StatsPtr]
 	STA.b ValueHigh
 
-	CMP.w #!MAX_FRAME_COUNT>>16+1
-	!BGE ++
+	CMP.w #(!MAX_FRAME_COUNT>>16)+1
+	BCS ++
 
 	; == Convert total frames into hours, minutes, seconds and frames ==
 	%CountUnits(!FRAMES_PER_HOUR, Hours)
@@ -375,7 +373,7 @@ RenderCreditsStatCounter:
 	; == Cap at 99:59:59.59 ==
 	LDA.b Hours
 	CMP.w #100
-	!BLT +
+	BCC +
 ++	LDA.w #99
 	STA.b Hours
 	LDA.w #59

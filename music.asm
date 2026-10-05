@@ -86,7 +86,7 @@ RTL
 ;--------------------------------------------------------------------------------
 ;X to be set to music track to load
 Overworld_DetermineMusic:
-    LDA.l ProgressIndicator : CMP.b #$02 : !BGE +
+    LDA.l ProgressIndicator : CMP.b #$02 : BCS +
         LDX.b #$03 ; If phase < 2, play the rain music
         BRA .done
     +
@@ -105,7 +105,7 @@ Overworld_DetermineMusic:
     ; Check if we're entering the village
     LDA.b OverworldIndex : CMP.b #$18 : BNE +
         ; Check what phase we're in
-        ; LDA ProgressIndicator : CMP.b #$03 : !BGE .bunny
+        ; LDA ProgressIndicator : CMP.b #$03 : BCS .bunny
             LDX.b #$07 ; Default village theme (phase <3)
             BRA .bunny
     
@@ -135,9 +135,9 @@ Overworld_DetermineMusic:
 ;--------------------------------------------------------------------------------
 ;$012D to be set to any ambient SFX for the area
 Overworld_DetermineAmbientSFX:
-    LDA.l ProgressIndicator : CMP.b #$02 : !BGE +
+    LDA.l ProgressIndicator : CMP.b #$02 : BCS +
         BRA .done ; rain state sfx handled elsewhere
-    
+
     + LDA.b OverworldIndex : CMP.b #$43 : BEQ .darkMountain
     CMP.b #$45 : BEQ .darkMountain
     CMP.b #$47 : BEQ .darkMountain
@@ -147,7 +147,7 @@ Overworld_DetermineAmbientSFX:
     LDA.b #$05 : BRA .setSfx ; silence
 
 .mire
-    LDA OverworldEventDataWRAM+$70 : AND.b #$20 : BNE .done
+    LDA.l OverworldEventDataWRAM+$70 : AND.b #$20 : BNE .done
         LDA.b #$01 : BRA .setSfx ; Misery Mire rain SFX
 
 .darkMountain
@@ -196,7 +196,7 @@ pullpc
 ; On entry, A=16bit XY=8bit, A & X safe to mod, Y unknown
 Underworld_DoorDown_Entry:
     LDX.b #$FF ; some junk value to be used later to determine if the below lines will change the track
-    LDA.l ProgressIndicator : AND.w #$00FF : CMP.w #2 : !BLT .vanilla
+    LDA.l ProgressIndicator : AND.w #$00FF : CMP.w #2 : BCC .vanilla
     LDA.l DRMode : BNE .done
 
 .vanilla ; thing we wrote over
@@ -215,7 +215,7 @@ LDA.w LastAPUCommand : AND.w #$00FF : CMP.w #$0015 : BNE + ; if boss music is pl
 
 ; Check if the boss in ToH has been defeated (16-bit accumulator)
 CheckHeraBossDefeated:
-LDA.l RoomDataWRAM[$07].high : AND.w #$00FF : BNE +
+LDA.l roomDataHigh($07) : AND.w #$00FF : BNE +
     CLC : RTL
 + SEC : RTL
 

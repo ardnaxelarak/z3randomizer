@@ -5,22 +5,22 @@ PHX : PHY : PHP
 	REP #$30
 	LDX.w #$0000
 	-
-	CPX.w <hdr_len> : !BGE ++
-		LDA.l <hdr>, X
+	CPX.w {hdr_len} : BCS ++
+		LDA.l {hdr}, X
 		STA.l !MULTIWORLD_HUD_CHARACTER_DATA, X
 		INX #2
 		BRA -
 	++
-	LDY.w <hdr_len>
+	LDY.w {hdr_len}
 
-	LDA.l <player_id>
+	LDA.l {player_id}
 	AND.w #$00FF
 	DEC
-	CMP.w #$00FF : !BGE .textdone
+	CMP.w #$00FF : BCS .textdone
 	ASL #5
 	TAX
 	-
-	CPY.w <hdr_len>+$20 : !BGE ++
+	CPY.w {hdr_len}+$20 : BCS ++
 		LDA.l PlayerNames, X
 		PHX : TYX : STA.l !MULTIWORLD_HUD_CHARACTER_DATA, X : PLX
 		INX #2 : INY #2
@@ -29,7 +29,7 @@ PHX : PHY : PHP
 
 	TYX
 	-
-	CPX.w #$0040 : !BGE ++
+	CPX.w #$0040 : BCS ++
 		LDA.w #$007F
 		STA.l !MULTIWORLD_HUD_CHARACTER_DATA, X
 		INX #2
@@ -38,7 +38,7 @@ PHX : PHY : PHP
 
 	SEP #$20
 	LDA.b #$01 : STA.l !NMI_MW+1 : STA.l !NMI_MW
-	LDA.b !MULTIWORLD_HUD_DELAY
+	LDA.b #!MULTIWORLD_HUD_DELAY
 	STA.l !MULTIWORLD_HUD_TIMER
 .textdone
 PLP : PLY : PLX
@@ -100,13 +100,13 @@ GetMultiworldItem:
 	+
 
 	LDA.l !MULTIWORLD_HUD_TIMER : BEQ .textend
-		DEC.b #$01 : STA.l !MULTIWORLD_HUD_TIMER
+		DEC A : STA.l !MULTIWORLD_HUD_TIMER
 		CMP.b #$00 : BNE .textend
 			; Clear text
 			PHP : REP #$30
 			LDX.w #$0000
 			-
-			CPX.w #$0040 : !BGE ++
+			CPX.w #$0040 : BCS ++
 				LDA.w #$007F
 				STA.l !MULTIWORLD_HUD_CHARACTER_DATA, X
 				INX #2

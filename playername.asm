@@ -7,29 +7,29 @@ WriteBlanksToPlayerName:
 
 	STA.l ExtendedFileNameSRAM+8
 	STA.l ExtendedFileNameSRAM+10
-        STA.l ExtendedFileNameSRAM+12
+	STA.l ExtendedFileNameSRAM+12
 	STA.l ExtendedFileNameSRAM+14
 
-        STA.l ExtendedFileNameSRAM+16
+	STA.l ExtendedFileNameSRAM+16
 	STA.l ExtendedFileNameSRAM+18
 	STA.l ExtendedFileNameSRAM+20
 	STA.l ExtendedFileNameSRAM+22
 
-        STA.l FileNameVanillaSRAM, X ;What we wrote over (clear first byte of vanilla name slot)
+	STA.l FileNameVanillaSRAM, X ;What we wrote over (clear first byte of vanilla name slot)
 RTL
 
 WriteCharacterToPlayerName:
 	STA.l ExtendedFileNameSRAM, X
-        CPX.w #$0008 : !BGE +
-	    STA.l FileNameVanillaSRAM, X ;what we wrote over
-        +
+	CPX.w #$0008 : BCS +
+		STA.l FileNameVanillaSRAM, X ;what we wrote over
+	+
 RTL
 
 ReadCharacterFromPlayerName: ;Only for use on Name Screen
-        LDA.l ExtendedFileNameSRAM, X
-        CPX.w #$0008 : !BGE +
-            LDA.l FileNameVanillaSRAM, X ;what we wrote over
-        +
+	LDA.l ExtendedFileNameSRAM, X
+	CPX.w #$0008 : BCS +
+		LDA.l FileNameVanillaSRAM, X ;what we wrote over
+	+
 RTL
 
 GetCharacterPosition:
@@ -43,7 +43,7 @@ WrapCharacterPosition:
 	LDA.w PlayerNameCursor : BPL +
 		LDA.b #$0B
 	+
-	CMP.b #$0C : !BLT +
+	CMP.b #$0C : BCC +
 		LDA.b #$00
 	+
 	STA.w PlayerNameCursor

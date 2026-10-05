@@ -33,7 +33,7 @@ DrawLoot:
 	LDA.l DRMode
 	BNE .skip
 
-	LDA.l MapItems_enabled
+	LDA.l MapItems.enabled
 	BEQ .skip
 
 	REP #$30

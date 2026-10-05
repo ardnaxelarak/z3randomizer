@@ -3,7 +3,7 @@ LoadDungeonIndicator:
 	JSL InitializeTilesets
 
 	LDA.w DungeonID
-	CMP.b #DungeonIndicatorMap_end-DungeonIndicatorMap : BCS .done
+	CMP.b #DungeonIndicatorMap.size : BCS .done
 	TAX
 
 	; mark dungeon as entered
@@ -51,9 +51,8 @@ dw $0030
 dw $0080
 dw $00B0
 dw $00C0
-.end
+^.size
 
 DungeonIndicatorGfx:
-	incbin "menu/dr_dungeon_indicators.2bpp"
-.end
-
+	incbin "../menu/dr_dungeon_indicators.2bpp"
+^.size

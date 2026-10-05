@@ -1,6 +1,3 @@
-!DynamicDropGFXSlotCount_UW = (FreeUWGraphics_end-FreeUWGraphics)>>1
-!DynamicDropGFXSlotCount_OW = (FreeOWGraphics_end-FreeOWGraphics)>>1
-
 ; Come in with
 ;   A = item receipt ID
 ;   X = sprite slot
@@ -24,15 +21,15 @@ RequestStandingItemVRAMSlot:
 		+
 
 		; setup the palette
-		LDA.b 1,S : PHX : JSL GetSpritePalette_resolved : PLX : STA.w SpriteOAMProp, X
+		LDA 1,S : PHX : JSL GetSpritePalette.resolved : PLX : STA.w SpriteOAMProp, X
 	PLA
 	
 	; gfx that are already present in vanilla, use that instead of a new slot
 	CMP.b #$34 : BCC + : CMP.b #$36+1 : BCS + ; if rupees, use animated rupee OAM slot
 		LDA.b IndoorsFlag : BEQ ++
-			LDA.b #!DynamicDropGFXSlotCount_UW
+			LDA.b #DynamicDropGFXSlotCount_UW
 			BRA +++
-		++ LDA.b #!DynamicDropGFXSlotCount_OW
+		++ LDA.b #DynamicDropGFXSlotCount_OW
 		+++ INC : STA.w SprItemGFXSlot,X
 		JMP .success
 	+ CMP.b #$24 : BEQ .key : CMP.b #$A0 : BCC + : CMP.b #$AF+1 : BCS + ; if key, use key OAM slot
@@ -41,38 +38,38 @@ RequestStandingItemVRAMSlot:
 			BRA +
 		++
 		LDA.b IndoorsFlag : BEQ ++
-			LDA.b #!DynamicDropGFXSlotCount_UW
+			LDA.b #DynamicDropGFXSlotCount_UW
 			BRA +++
-		++ LDA.b #!DynamicDropGFXSlotCount_OW
+		++ LDA.b #DynamicDropGFXSlotCount_OW
 		+++ INC #2 : STA.w SprItemGFXSlot,X
 		JMP .success
 	+ CMP.b #$D6 : BNE + ; if good bee, use bee OAM slot
 		LDA.b IndoorsFlag : BEQ ++
-			LDA.b #!DynamicDropGFXSlotCount_UW
+			LDA.b #DynamicDropGFXSlotCount_UW
 			BRA +++
-		++ LDA.b #!DynamicDropGFXSlotCount_OW
+		++ LDA.b #DynamicDropGFXSlotCount_OW
 		+++ INC #3 : STA.w SprItemGFXSlot,X
 		JMP .success
 	+ CMP.b #$D2 : BNE + ; if fairy, use fairy OAM slot
 		LDA.b IndoorsFlag : BEQ ++
-			LDA.b #!DynamicDropGFXSlotCount_UW
+			LDA.b #DynamicDropGFXSlotCount_UW
 			BRA +++
-		++ LDA.b #!DynamicDropGFXSlotCount_OW
+		++ LDA.b #DynamicDropGFXSlotCount_OW
 		+++ INC : STA.w SprItemGFXSlot,X
 		JMP .success
 	+ CMP.b #$D1 : BNE + ; if apple, use apple OAM slot
 		LDA.b IndoorsFlag : BEQ ++
-			LDA.b #!DynamicDropGFXSlotCount_UW
+			LDA.b #DynamicDropGFXSlotCount_UW
 			BRA +++
-		++ LDA.b #!DynamicDropGFXSlotCount_OW
+		++ LDA.b #DynamicDropGFXSlotCount_OW
 		+++ INC #2 : STA.w SprItemGFXSlot,X
 		JMP .success
 	+
 	PHA
 		; check if gfx that are already present from previous requests
 		LDY.b #$00
-		- LDA.w DynamicDropGFXSlots, Y : CMP.b 1,S : BEQ +
-			INY : CPY.b #$0F : !BLT -
+		- LDA.w DynamicDropGFXSlots, Y : CMP 1,S : BEQ +
+			INY : CPY.b #$0F : BCC -
 			STZ.w RandoOverworldTargetEdge ; some free ram OWR also uses
 			BRA .newSlot
 		+ TYA : STA.w SprItemGFXSlot,X
@@ -81,9 +78,9 @@ RequestStandingItemVRAMSlot:
 		.newSlot
 		PHX
 			LDY.b IndoorsFlag : BEQ +
-				LDA.b #!DynamicDropGFXSlotCount_UW-1
+				LDA.b #DynamicDropGFXSlotCount_UW-1
 				BRA ++
-			+ LDA.b #!DynamicDropGFXSlotCount_OW-1
+			+ LDA.b #DynamicDropGFXSlotCount_OW-1
 			++ STA.w DynamicDropGFXIndex
 
 			.next
@@ -93,7 +90,7 @@ RequestStandingItemVRAMSlot:
 
 			; loop thru other sprites, check if any use the same gfx slot
 			+ LDY.b #$0F
-			- TYA : CMP.b 1,S : BEQ + ; don't check self
+			- TYA : CMP 1,S : BEQ + ; don't check self
 			LDA.w SpriteAITable,Y : BEQ +
 			LDA.w SprRedrawFlag, Y : BNE +
 			LDA.w SpriteTypeTable,Y ; don't need E5 enemy big key drop and E9 powder item
@@ -120,14 +117,14 @@ RequestStandingItemVRAMSlot:
 		STZ.w RandoOverworldTargetEdge
 		LDA.b #$02 : STA.w SprRedrawFlag, X
 		LDA.b IndoorsFlag : BEQ ++
-			LDA.b #!DynamicDropGFXSlotCount_UW
+			LDA.b #DynamicDropGFXSlotCount_UW
 			BRA +++
-		++ LDA.b #!DynamicDropGFXSlotCount_OW
+		++ LDA.b #DynamicDropGFXSlotCount_OW
 		+++ STA.w SprItemGFXSlot,X
 		PLX : PLA : BRA .return
 	
 		.initRequest
-		LDA.b 1,S
+		LDA 1,S
 		LDY.w DynamicDropGFXIndex : STA.w DynamicDropGFXSlots, Y
 		TYA : STA.w SprItemGFXSlot, X
 	PLA
@@ -163,7 +160,7 @@ FreeUWGraphics:
 ;	dw $9CA0>>1 ; Apple
 	dw $9DC0>>1 ; Whirlpool
 	; add new slots above this line
-.end
+^.size
 
 FreeOWGraphics:
 	dw $8180>>1 ; Push Block
@@ -173,7 +170,7 @@ FreeOWGraphics:
 	;dw $9CA0>>1 ; Apple
 	;dw $9DC0>>1 ; Whirlpool
 	; add new slots above this line
-.end
+^.size
 
 FixedItemGraphics:
 	dw $9400>>1 ; (overflow full slot)
@@ -184,6 +181,9 @@ FixedItemGraphics:
 	dw $8160>>1 ; Rupee
 	dw $8D60>>1 ; Key
 	dw $9C80>>1 ; Bee
+
+DynamicDropGFXSlotCount_UW = (FreeUWGraphics.size)>>1
+DynamicDropGFXSlotCount_OW = (FreeOWGraphics.size)>>1
 
 ; Below are the two default 16-byte tables that are loaded
 ; into SpriteDynamicOAM, and adjustments are applied afterwards
@@ -233,7 +233,7 @@ DrawPotItem:
 	LDA.l BeeTrapDisguise : BEQ +
 		TAX : STA.b Scrap07
 	+ 
-	LDA.l SpriteProperties_standing_width,X : BEQ .narrow
+	LDA.l SpriteProperties.standing_width,X : BEQ .narrow
 
 	.full
 	PLX
@@ -262,17 +262,17 @@ DrawPotItem:
 		LDY.b #FreeUWGraphics>>16 : PHB : PHY : PLB
 		LDA.w SprItemGFXSlot,X : AND.w #$00FF : ASL : TAY
 		LDA.b IndoorsFlag : AND.w #$00FF : BEQ +
-			CPY.b #(FreeUWGraphics_end-FreeUWGraphics) : BCC ++
-			TYA : SEC : SBC.w #(FreeUWGraphics_end-FreeUWGraphics) : TAY : BRA .fixed
+			CPY.b #(FreeUWGraphics.size) : BCC ++
+			TYA : SEC : SBC.w #(FreeUWGraphics.size) : TAY : BRA .fixed
 			++ LDA.w FreeUWGraphics, Y : BRA .setVRAM
-		+ CPY.b #(FreeOWGraphics_end-FreeOWGraphics) : BCC ++
-			TYA : SEC : SBC.w #(FreeOWGraphics_end-FreeOWGraphics) : TAY : BRA .fixed
+		+ CPY.b #(FreeOWGraphics.size) : BCC ++
+			TYA : SEC : SBC.w #(FreeOWGraphics.size) : TAY : BRA .fixed
 			++ LDA.w FreeOWGraphics, Y : BRA .setVRAM
 
 		.fixed
 		LDA.b Scrap06 : LSR : BCC +
 			LDA.w FixedItemGraphics, Y : BRA .setVRAM
-		+ LDA.w FixedItemGraphics_thin, Y
+		+ LDA.w FixedItemGraphics.thin, Y
 
 		.setVRAM
 		LSR #4 : AND.w #$FBFF : PLB : PHA

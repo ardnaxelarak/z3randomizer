@@ -3,7 +3,7 @@
 ;================================================================================
 ;--------------------------------------------------------------------------------
 ; ProcessMenuButtons:
-; out:	Carry - 0 = No Button, 1 = Yes Button
+; out:  Carry - 0 = No Button, 1 = Yes Button
 ;--------------------------------------------------------------------------------
 ProcessMenuButtons:
 	LDA.b Joy1A_New : BIT.b #$40 : BNE .y_pressed ; check for P1 Y-button
@@ -19,15 +19,16 @@ ProcessMenuButtons:
 	.sel_held
 	CLC ; no buttons
 RTL
-	.sel_pressed
-        LDA.l HUDDungeonItems : BIT.b #$0C : BNE +
-	        LDA.b #$40
-                BRA .store_flag
-        +
+
+.sel_pressed
+	LDA.l HUDDungeonItems : BIT.b #$0C : BNE +
+		LDA.b #$40
+		BRA .store_flag
+	+
 	LDA.b #$60
-        .store_flag
-        STA.l HudFlag
-        JSL MaybePlaySelectSFX
+	.store_flag
+	STA.l HudFlag
+	JSL MaybePlaySelectSFX
 	JSL ResetEquipment
 RTL
 	.y_pressed ; Note: used as entry point by quickswap code. Must preserve X. 
@@ -41,7 +42,7 @@ RTL
 	+ CMP.b #$01 : BNE + ; bow
 		LDA.l BowTracking : AND.b #$C0 : CMP.b #$C0 : BNE .errorJump ; make sure we have both bows
 		PHX : LDX.b #$00 ; scan ancilla table for arrows
-			-- : CPX.b #$0A : !BGE ++
+			-- : CPX.b #$0A : BCS ++
 				LDA.w AncillaID, X : CMP.b #$09 : BNE +++
 					PLX : BRA .errorJump2 ; found an arrow, don't allow the swap
 				+++
@@ -49,10 +50,10 @@ RTL
 		PLX
 		LDA.l SilverArrowsUseRestriction : BEQ ++
 		LDA.b RoomIndex : ORA.b RoomIndex+1 : BEQ ++ ; not in ganon's room in restricted mode
-				LDA.l BowEquipment : CMP.b #$03 : !BLT .errorJump : !SUB.b #$02 : STA.l BowEquipment
+				LDA.l BowEquipment : CMP.b #$03 : BCC .errorJump : SEC : SBC.b #$02 : STA.l BowEquipment
 				BRA .errorJump2
 		++
-		LDA.l BowEquipment : !SUB.b #$01 : EOR.b #$02 : !ADD.b #$01 : STA.l BowEquipment ; swap bows
+		LDA.l BowEquipment : SEC : SBC.b #$01 : EOR.b #$02 : CLC : ADC.b #$01 : STA.l BowEquipment ; swap bows
 		LDA.b #$20 : STA.w SFX3 ; menu select sound
 		JMP .captured
 	+ BRA +
@@ -103,7 +104,7 @@ ProcessBottleMenu:
 	LDA.l BottleIndex ; check bottle state
 	BEQ .no_bottles ; skip if we have no bottles
 	PHX
-		INC : CMP.b #$05 : !BLT + : LDA.b #$01 : + ;increment and wrap 1-4
+		INC : CMP.b #$05 : BCC + : LDA.b #$01 : + ;increment and wrap 1-4
 		TAX : LDA.l BottleContents-1, X ; check bottle
 		BNE + : LDX.b #$01 : + ; wrap if we reached the last bottle
 		TXA : STA.l BottleIndex ; set bottle index
@@ -119,7 +120,7 @@ RTL
 OpenBottleMenu:
 	LDA.b Joy1B_New : AND.b #$40 : BEQ .x_not_pressed ; skip if X is not down
 		LDA.b #$10 : STA.w MenuBlink ; set 16 frame cool off
-	    LDA.b #$20 : STA.w SFX3 ; make menu sound
+		LDA.b #$20 : STA.w SFX3 ; make menu sound
 		LDA.b #$07 : STA.w SubModuleInterface ; thing we wrote over - opens bottle menu
 	.x_not_pressed
 RTL
@@ -144,25 +145,25 @@ RTL
 AddInventory:
 ; In: Y - Receipt ID
 ; Uses $0B-$0D for long absolute addressing
-	PHA : PHX : PHY : PHP : PHB
-        PHK : PLB
-        LDA.b #$7E : STA.b Scrap0D
-	LDA.l StatsLocked : BNE .done
-	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .countDungeonChecks
+    PHA : PHX : PHY : PHP : PHB
+    PHK : PLB
+    LDA.b #$7E : STA.b Scrap0D
+    LDA.l StatsLocked : BNE .done
+    LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .countDungeonChecks
                 REP #$30
                 TYA : AND.w #$00FF : ASL : TAX
                 SEP #$20
-                LDA.w InventoryTable_properties,X : BIT.b #$01 : BEQ .done
+                LDA.w InventoryTable.properties,X : BIT.b #$01 : BEQ .done
                 JSR ShopCheck : BCS .done
                 .countDungeonChecks
                 JSR DungeonIncrement : BCS .done
-                		LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .totalCount
+                        LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BNE .totalCount
                         JSR IncrementByOne
                         JSR StampItem
                         SEP #$20
                         JSR IncrementYAItems
-                        		.totalCount
-                        		LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .done
+                                .totalCount
+                                LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .done
                                 REP #$30
                                 LDA.l TotalItemCounter : INC : TAY
                                 JSL UpdateLootHUD
@@ -177,9 +178,9 @@ AddInventory:
                                 +
                                 TYA
                                 STA.l TotalItemCounter
-	.done
+    .done
     SEP #$30
-	PLB : PLP : PLY : PLX : PLA
+    PLB : PLP : PLY : PLX : PLA
 RTL
 
 ShopCheck:
@@ -189,7 +190,7 @@ ShopCheck:
         LDA.b IndoorsFlag : BEQ .count
         LDA.w ItemReceiptMethod : CMP.b #$01 : BEQ .count
         LDA.l ShopEnableCount : BNE .count
-        LDA.w InventoryTable_properties,X : BIT.b #$02 : BNE .count
+        LDA.w InventoryTable.properties,X : BIT.b #$02 : BNE .count
                 REP #$20
                 LDA.b RoomIndex
                 CMP.w #274 : BEQ .nocount ; dark world death mountain shop, ornamental shield shop
@@ -199,11 +200,11 @@ ShopCheck:
                 CMP.w #265 : BEQ .nocount ; potion shop - powder is flagged as "ShopEnableCount" in CollectPowder
                 ; these room contain pots so you must check the quadrant as well for pottery lottery
                 CMP.w #287 : BNE + : LDA.b LinkQuadrantH : CMP.w #$0201 : BEQ .nocount ; kakariko shop
-                	LDA.b RoomIndex
+                    LDA.b RoomIndex
                 + CMP.w #255 : BNE + : LDA.b LinkQuadrantH : BEQ .nocount ; light world death mountain shop
-                	LDA.b RoomIndex
+                    LDA.b RoomIndex
                 + CMP.w #276 : BNE + : LDA.b LinkQuadrantH : CMP.w #$0200 : BEQ .nocount ; waterfall fairy
-                	LDA.b RoomIndex
+                    LDA.b RoomIndex
                 + CMP.w #277 : BEQ .nocount ; upgrade fairy (shop)
                 CMP.w #278 : BEQ .nocount ; pyramid fairy
                 SEP #$20
@@ -218,26 +219,26 @@ RTS
 
 DungeonIncrement:
 ; In: X - Receipt ID << 1
-   REP #$10
-   PHX
-   LDA.w InventoryTable_properties,X : BIT.b #$40 : BEQ +
-   		JSL CountChestKeyLong
-   +
-   LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .done
-	SEP #$10
-	LDA.b IndoorsFlag : BEQ .done
+    REP #$10
+    PHX
+    LDA.w InventoryTable.properties,X : BIT.b #$40 : BEQ +
+        JSL CountChestKeyLong
+    +
+    LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .done
+    SEP #$10
+    LDA.b IndoorsFlag : BEQ .done
         LDA.w DungeonID : BMI .done
                 CMP.l BallNChainDungeon : BNE +
                         CPY.b #$32 : BEQ .ballchain_bigkey
-	        +
+            +
                 CMP.b #$00 : BNE +
-                	INC #2
+                    INC #2
                 + TAX : REP #$20 : LDA.l DungeonLocationsChecked, X : INC : STA.l DungeonLocationsChecked, X : SEP #$20
-	        CPX.b #$0D : BNE +
+            CPX.b #$0D : BNE +
                         LDA.l BigKeyField : BIT.b #$04 : BNE ++
                                 LDA.l PreGTBKLocations : INC : STA.l PreGTBKLocations
                         ++
-	        +
+            +
         .done
         REP #$11
         PLX
@@ -250,7 +251,7 @@ RTS
 
 StampItem:
         REP #$30
-        LDA.w InventoryTable_stamp,X : BEQ .skip
+        LDA.w InventoryTable.stamp,X : BEQ .skip
                 STA.b Scrap0B
                 LDA.b [Scrap0B] : BNE .skip
                 INC.b Scrap0B : INC.b Scrap0B
@@ -264,12 +265,12 @@ RTS
 
 IncrementYAItems:
         PHX
-        LDA.w InventoryTable_properties,X
+        LDA.w InventoryTable.properties,X
         BIT.b #$10 : BNE .bomb_check
         BIT.b #$20 : BNE .bow_check
         BIT.b #$04 : BEQ .not_y
                 .y_item
-                LDA.l YAItemCounter : !ADD.b #$08 : STA.l YAItemCounter
+                LDA.l YAItemCounter : CLC : ADC.b #$08 : STA.l YAItemCounter
                 BRA .done
         .not_y
         BIT.b #$08 : BEQ .done
@@ -294,7 +295,7 @@ RTS
 IncrementByOne:
         PHX
         REP #$20
-        LDA.w InventoryTable_stat,X : BEQ .skip
+        LDA.w InventoryTable.stat,X : BEQ .skip
                 STA.b Scrap0B
                 SEP #$21
                 LDA.b #$00 : ADC.b [Scrap0B] : STA.b [Scrap0B]
@@ -356,10 +357,10 @@ IncrementFinalSword:
         LDA.b RoomIndex : BNE .done
                 SEP #$20
                 LDA.l SwordEquipment : CMP.b #$FF : BNE +
-                        BRA IncrementBossSword_none
+                        BRA IncrementBossSword.none
                 +
                 ASL : TAX
-                JMP (IncrementBossSword_vectors,X)
+                JMP (IncrementBossSword.vectors,X)
         .done
         SEP #$20
         PLX
@@ -459,8 +460,8 @@ RTS
 ; UpgradeFlute:
 ;--------------------------------------------------------------------------------
 UpgradeFlute:
-	LDA.l InventoryTracking : AND.b #$FC : ORA.b #$01 : STA.l InventoryTracking ; switch to the working flute
-	LDA.b #$03 : STA.l FluteEquipment ; upgrade primary inventory
+    LDA.l InventoryTracking : AND.b #$FC : ORA.b #$01 : STA.l InventoryTracking ; switch to the working flute
+    LDA.b #$03 : STA.l FluteEquipment ; upgrade primary inventory
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -469,14 +470,14 @@ RTL
 ;--------------------------------------------------------------------------------
 ; sets A to #$02 to ignore summoning the duck
 FluteCallForDuck:
-	LDA.l OverworldEventDataWRAM+$18 : AND.b #$20 : BNE .vanilla ; allow flute in rain state if weathervane activated
-	LDA.l ProgressIndicator : CMP.b #$02 : BCS .vanilla ; must rescue Zelda first
+    LDA.l OverworldEventDataWRAM+$18 : AND.b #$20 : BNE .vanilla ; allow flute in rain state if weathervane activated
+    LDA.l ProgressIndicator : CMP.b #$02 : BCS .vanilla ; must rescue Zelda first
 
-	.noDuck
-	LDA.b #$02 : RTL
+    .noDuck
+    LDA.b #$02 : RTL
 
-	.vanilla
-	LDA.l FluteEquipment ; what we wrote over
+    .vanilla
+    LDA.l FluteEquipment ; what we wrote over
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -484,8 +485,8 @@ RTL
 ; CheckKeys:
 ;--------------------------------------------------------------------------------
 CheckKeys:
-	LDA.l GenericKeys : BEQ + : RTL : +
-	LDA.w DungeonID : CMP.b #$FF
+    LDA.l GenericKeys : BEQ + : RTL : +
+    LDA.w DungeonID : CMP.b #$FF
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -493,8 +494,8 @@ RTL
 ; DrawKeyIcon:
 ;--------------------------------------------------------------------------------
 DrawKeyIcon:
-	LDA.b Scrap04 : AND.w #$00FF : CMP.w #$0090 : BNE + : LDA.w #$007F : + : ORA.w #$2400 : STA.l HUDKeyDigits
-	LDA.b Scrap05 : AND.w #$00FF : ORA.w #$2400 : STA.l HUDTileMapBuffer+$66
+    LDA.b Scrap04 : AND.w #$00FF : CMP.w #$0090 : BNE + : LDA.w #$007F : + : ORA.w #$2400 : STA.l HUDKeyDigits
+    LDA.b Scrap05 : AND.w #$00FF : ORA.w #$2400 : STA.l HUDTileMapBuffer+$66
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -502,11 +503,11 @@ RTL
 ; LoadKeys:
 ;--------------------------------------------------------------------------------
 LoadKeys:
-	LDA.l GenericKeys : BEQ +
-		LDA.l CurrentGenericKeys
-		RTL
-	+
-	LDA.l DungeonKeys, X
+    LDA.l GenericKeys : BEQ +
+        LDA.l CurrentGenericKeys
+        RTL
+    +
+    LDA.l DungeonKeys, X
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -552,7 +553,7 @@ RTL
 PrepItemScreenBigKey:
     STZ.b Scrap02
     STZ.b Scrap03
-	REP #$30 ; thing we wrote over - set 16-bit accumulator
+    REP #$30 ; thing we wrote over - set 16-bit accumulator
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -569,7 +570,7 @@ LoadPowder:
     JSL ResolveLootIDLong
     STA.l PowderFlag
     PHX : TYX : PLY
-        JSL RequestStandingItemVRAMSlot_resolved
+        JSL RequestStandingItemVRAMSlot.resolved
     PHY : TXY : PLX
 RTL
 ;--------------------------------------------------------------------------------
@@ -598,7 +599,7 @@ DrawPowder:
 		JSL AttemptItemSubstitution
 		JSL ResolveLootIDLong
 		STA.l PowderFlag
-		JML RequestStandingItemVRAMSlot_resolved
+		JML RequestStandingItemVRAMSlot.resolved
 	+
 	; this fights with the shopkeep code, so had to move the powder draw there when potion shop is custom
 	; LDA.l ShopType : CMP.b #$FF : BNE .defer
@@ -630,7 +631,7 @@ RTL
 DrawMushroom:
 	PHA : PHY
 		LDA.w SprRedrawFlag, X : BEQ .draw ; skip init if already ready
-			JSL LoadMushroom_justGFX
+			JSL LoadMushroom.justGFX
 			LDA.w SprRedrawFlag, X : CMP.b #$02 : BEQ .draw
 			BRA .done ; don't draw on the init frame
 
@@ -647,18 +648,18 @@ RTL
 ; CollectPowder:
 ;--------------------------------------------------------------------------------
 CollectPowder:
-  LDY.w SprSourceItemId, X ; Retrieve stored item type
-  BNE +
-	; if for any reason the item value is 0 reload it, just in case
-	  %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues) : TAY
-  + PHA
-    LDA.l WitchItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
-    LDA.b #$01 : STA.l ShopEnableCount
-  PLA
-  STZ.w ItemReceiptMethod ; item from NPC
-  JSL Link_ReceiveItem
-  PHA : LDA.b #$00 : STA.l ShopEnableCount : STA.l PowderFlag : PLA
-  JSL ItemSet_Powder
+    LDY.w SprSourceItemId, X ; Retrieve stored item type
+    BNE +
+    ; if for any reason the item value is 0 reload it, just in case
+        %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues) : TAY
+    + PHA
+        LDA.l WitchItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+        LDA.b #$01 : STA.l ShopEnableCount
+    PLA
+    STZ.w ItemReceiptMethod ; item from NPC
+    JSL Link_ReceiveItem
+    PHA : LDA.b #$00 : STA.l ShopEnableCount : STA.l PowderFlag : PLA
+    JSL ItemSet_Powder
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -679,13 +680,13 @@ RTL
 ; DrawMagicHeader:
 ;--------------------------------------------------------------------------------
 DrawMagicHeader:
-	LDA.l MagicConsumption : AND.w #$00FF : CMP.w #$0002 : BEQ .quarterMagic
-	.halfMagic
+    LDA.l MagicConsumption : AND.w #$00FF : CMP.w #$0002 : BEQ .quarterMagic
+    .halfMagic
     LDA.w #$28F7 : STA.l HUDTileMapBuffer+$04
     LDA.w #$2851 : STA.l HUDTileMapBuffer+$06
     LDA.w #$28FA : STA.l HUDTileMapBuffer+$08
 RTL
-	.quarterMagic
+    .quarterMagic
     LDA.w #$28F7 : STA.l HUDTileMapBuffer+$04
     LDA.w #$2800 : STA.l HUDTileMapBuffer+$06
     LDA.w #$2801 : STA.l HUDTileMapBuffer+$08
@@ -726,7 +727,7 @@ RTL
 ;--------------------------------------------------------------------------------
 SpawnShovelItem:
 	LDA.w YButtonOverride : BEQ +
-    	JSL DiggingGameGuy_AttemptPrizeSpawn
+		JSL DiggingGameGuy_AttemptPrizeSpawn
 		JMP .skip
 	+
 
@@ -761,11 +762,11 @@ SpawnShovelItem:
 		LDA.b #$FF : STA.w EnemyStunTimer, Y
 		LDA.b #$30 : STA.w SpriteTimerE, Y
 
-		LDA.b LinkPosX : !ADD.l .x_offsets, X
+		LDA.b LinkPosX : CLC : ADC.l .x_offsets, X
 		                        AND.b #$F0 : STA.w SpritePosXLow, Y
 		LDA.b LinkPosX+1 : ADC.b #$00               : STA.w SpritePosXHigh, Y
 
-		LDA.b LinkPosY : !ADD.b #$16 : AND.b #$F0 : STA.w SpritePosYLow, Y
+		LDA.b LinkPosY : CLC : ADC.b #$16 : AND.b #$F0 : STA.w SpritePosYLow, Y
 		LDA.b LinkPosY+1 : ADC.b #$00               : STA.w SpritePosYHigh, Y
 
 		LDA.b #$00 : STA.w SpriteLayer, Y

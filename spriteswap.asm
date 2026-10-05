@@ -7,7 +7,7 @@ RTL ; 1byte
 NOP
 
 org $1BEE1B
-JSL SpriteSwap_Palette_ArmorAndGloves_part_two
+JSL SpriteSwap_Palette_ArmorAndGloves.part_two
 RTL
 
 !BANK_BASE = $A9
@@ -19,7 +19,7 @@ SwapSpriteIfNecessary:
 		LDA.l SpriteSwapper : BEQ + : CLC : ADC.b #!BANK_BASE : CMP.b PlayerSpriteBank : BEQ +
 			STA.b PlayerSpriteBank
 			STZ.w SkipOAM ; Set Normal Sprite NMI
-			JSL SpriteSwap_Palette_ArmorAndGloves_part_two
+			JSL SpriteSwap_Palette_ArmorAndGloves.part_two
 		+
 	PLP
 RTL

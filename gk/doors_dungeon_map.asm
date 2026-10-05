@@ -150,7 +150,7 @@ DrawFullRoomTile:
 	RTL
 
 DrawSingleRoomLoot:
-	LDA.l MapItems_enabled : AND.w #$00FF : BNE +
+	LDA.l MapItems.enabled : AND.w #$00FF : BNE +
 		RTL
 
 +	PHX : PHY
@@ -197,7 +197,7 @@ DrawSingleRoomLoot:
 DrawConnectedRooms:
 	PHB : PHK : PLB
 
-	LDA.l ShowRooms_default
+	LDA.l ShowRooms.default
 	AND.w #$00FF
 	STA.b $0A
 
@@ -205,7 +205,7 @@ DrawConnectedRooms:
 	LDA.l MapField
 	AND.l DungeonMask, X
 	BEQ +
-	LDA.l ShowRooms_have_map
+	LDA.l ShowRooms.have_map
 	AND.w #$00FF
 	CMP.b $0A
 	BCC +
@@ -216,7 +216,7 @@ DrawConnectedRooms:
 	LDA.l CompassField
 	AND.l DungeonMask, X
 	BEQ +
-	LDA.l ShowRooms_have_compass
+	LDA.l ShowRooms.have_compass
 	AND.w #$00FF
 	CMP.b $0A
 	BCC +
@@ -636,7 +636,7 @@ GetSpecificRoomVisibility:
 	TAX
 	LDA.l RoomHeaderPointers, X
 	TAX
-	LDA.l bank(RoomHeaders)<<16, X
+	LDA.l ^&RoomHeaders, X
 	AND.w #$0001
 	BEQ .not_dark
 
@@ -649,7 +649,7 @@ GetSpecificRoomVisibility:
 	BIT.w #$0020 ; all rooms are lit
 	BNE .not_dark
 
-	LDA.l ShowRooms_dark_room_cap
+	LDA.l ShowRooms.dark_room_cap
 	AND.w #$00FF
 	CMP.w #$0006
 	BCS .not_dark
@@ -664,7 +664,7 @@ GetSpecificRoomVisibility:
 
 .check_visibility
 	SEP #$20
-	LDA.l ShowRooms_default
+	LDA.l ShowRooms.default
 	STA.b $0A
 
 	REP #$20
@@ -673,7 +673,7 @@ GetSpecificRoomVisibility:
 	AND.l DungeonMask, X
 	BEQ +
 	SEP #$20
-	LDA.l ShowRooms_have_map
+	LDA.l ShowRooms.have_map
 	CMP.b $0A
 	BCC +
 	STA.b $0A
@@ -685,7 +685,7 @@ GetSpecificRoomVisibility:
 	AND.l DungeonMask, X
 	BEQ +
 	SEP #$20
-	LDA.l ShowRooms_have_compass
+	LDA.l ShowRooms.have_compass
 	CMP.b $0A
 	BCC +
 	STA.b $0A
@@ -708,7 +708,7 @@ GetSpecificRoomVisibility:
 	STA.b $0E
 	BEQ +
 	SEP #$20
-	LDA.l ShowRooms_visited_tile
+	LDA.l ShowRooms.visited_tile
 	CMP.b $0A
 	BCC +
 	CMP.b $0B
@@ -870,19 +870,19 @@ GetWhichDoorPosition:
 	DEC A : BEQ .south
 
 .east
-	LDA.l EdgePositions_east, X
+	LDA.l EdgePositions.east, X
 	BRA .done
 
 .north
-	LDA.l EdgePositions_north, X
+	LDA.l EdgePositions.north, X
 	BRA .done
 
 .west
-	LDA.l EdgePositions_west, X
+	LDA.l EdgePositions.west, X
 	BRA .done
 
 .south
-	LDA.l EdgePositions_south, X
+	LDA.l EdgePositions.south, X
 
 .done
 	AND.w #$00FF
@@ -890,61 +890,61 @@ GetWhichDoorPosition:
 	RTS
 
 macro Draw3x2Connector(offset, label)
-	LDA.w SingleEdgeCurrentRoomConnectors_<label>+0, Y
+	LDA.w SingleEdgeCurrentRoomConnectors.{label}+0, Y
 	EOR.w #!ConnectorPalette
-	STA.l $7F0000+!CenterTile+<offset>+$00
-	LDA.w SingleEdgeCurrentRoomConnectors_<label>+2, Y
+	STA.l $7F0000+!CenterTile+{offset}+$00
+	LDA.w SingleEdgeCurrentRoomConnectors.{label}+2, Y
 	EOR.w #!ConnectorPalette
-	STA.l $7F0000+!CenterTile+<offset>+$02
-	LDA.w SingleEdgeCurrentRoomConnectors_<label>+4, Y
+	STA.l $7F0000+!CenterTile+{offset}+$02
+	LDA.w SingleEdgeCurrentRoomConnectors.{label}+4, Y
 	EOR.w #!ConnectorPalette
-	STA.l $7F0000+!CenterTile+<offset>+$04
-	LDA.w SingleEdgeCurrentRoomConnectors_<label>+6, Y
+	STA.l $7F0000+!CenterTile+{offset}+$04
+	LDA.w SingleEdgeCurrentRoomConnectors.{label}+6, Y
 	EOR.w #!ConnectorPalette
-	STA.l $7F0000+!CenterTile+<offset>+$40
-	LDA.w SingleEdgeCurrentRoomConnectors_<label>+8, Y
+	STA.l $7F0000+!CenterTile+{offset}+$40
+	LDA.w SingleEdgeCurrentRoomConnectors.{label}+8, Y
 	EOR.w #!ConnectorPalette
-	STA.l $7F0000+!CenterTile+<offset>+$42
-	LDA.w SingleEdgeCurrentRoomConnectors_<label>+10, Y
+	STA.l $7F0000+!CenterTile+{offset}+$42
+	LDA.w SingleEdgeCurrentRoomConnectors.{label}+10, Y
 	EOR.w #!ConnectorPalette
-	STA.l $7F0000+!CenterTile+<offset>+$44
+	STA.l $7F0000+!CenterTile+{offset}+$44
 endmacro
 
 macro Draw2x3Connector(offset, label)
-	LDA.w SingleEdgeCurrentRoomConnectors_<label>+0, Y
+	LDA.w SingleEdgeCurrentRoomConnectors.{label}+0, Y
 	EOR.w #!ConnectorPalette
-	STA.l $7F0000+!CenterTile+<offset>+$00
-	LDA.w SingleEdgeCurrentRoomConnectors_<label>+2, Y
+	STA.l $7F0000+!CenterTile+{offset}+$00
+	LDA.w SingleEdgeCurrentRoomConnectors.{label}+2, Y
 	EOR.w #!ConnectorPalette
-	STA.l $7F0000+!CenterTile+<offset>+$02
-	LDA.w SingleEdgeCurrentRoomConnectors_<label>+4, Y
+	STA.l $7F0000+!CenterTile+{offset}+$02
+	LDA.w SingleEdgeCurrentRoomConnectors.{label}+4, Y
 	EOR.w #!ConnectorPalette
-	STA.l $7F0000+!CenterTile+<offset>+$40
-	LDA.w SingleEdgeCurrentRoomConnectors_<label>+6, Y
+	STA.l $7F0000+!CenterTile+{offset}+$40
+	LDA.w SingleEdgeCurrentRoomConnectors.{label}+6, Y
 	EOR.w #!ConnectorPalette
-	STA.l $7F0000+!CenterTile+<offset>+$42
-	LDA.w SingleEdgeCurrentRoomConnectors_<label>+8, Y
+	STA.l $7F0000+!CenterTile+{offset}+$42
+	LDA.w SingleEdgeCurrentRoomConnectors.{label}+8, Y
 	EOR.w #!ConnectorPalette
-	STA.l $7F0000+!CenterTile+<offset>+$80
-	LDA.w SingleEdgeCurrentRoomConnectors_<label>+10, Y
+	STA.l $7F0000+!CenterTile+{offset}+$80
+	LDA.w SingleEdgeCurrentRoomConnectors.{label}+10, Y
 	EOR.w #!ConnectorPalette
-	STA.l $7F0000+!CenterTile+<offset>+$82
+	STA.l $7F0000+!CenterTile+{offset}+$82
 endmacro
 
 macro Draw2TileConnector(offset1, offset2, flip, sublabel)
-	LDA.w DoorConnectionTiles_<sublabel>, Y
-	BEQ ?+
+	LDA.w DoorConnectionTiles.{sublabel}, Y
+	BEQ {?}_1
 	ORA.w #!ConnectorPalette
-	EOR.w #<flip>
-	STA.l $7F0000+<offset1>, X
-?+
+	EOR.w #{flip}
+	STA.l $7F0000+{offset1}, X
+#{?}_1:
 
-	LDA.w DoorConnectionTiles_<sublabel>+2, Y
-	BEQ ?+
+	LDA.w DoorConnectionTiles.{sublabel}+2, Y
+	BEQ {?}_2
 	ORA.w #!ConnectorPalette
-	EOR.w #<flip>
-	STA.l $7F0000+<offset2>, X
-?+
+	EOR.w #{flip}
+	STA.l $7F0000+{offset2}, X
+#{?}_2:
 endmacro
 
 GetConnectorIndex:
@@ -1135,19 +1135,19 @@ DrawDoubleConnector:
 	LDA.b $00
 	AND.w #$0001
 	TAY
-	LDA.w MultiConnectorTiles_increment, Y
+	LDA.w MultiConnectorTiles.increment, Y
 	AND.w #$00FF
 	STA.b $0C
 
 	LDA.b $00
 	ASL A
 	TAY
-	LDA.w MultiConnectorTiles_start_offset, Y
+	LDA.w MultiConnectorTiles.start_offset, Y
 	CLC : ADC.w #!CenterTile
 	TAX
 
 	LDY.b $00
-	LDA.w MultiConnectorTiles_direction_index, Y
+	LDA.w MultiConnectorTiles.direction_index, Y
 	AND.w #$00FF
 	TAY
 
@@ -1170,19 +1170,19 @@ DrawTripleConnector:
 	LDA.b $00
 	AND.w #$0001
 	TAY
-	LDA.w MultiConnectorTiles_increment, Y
+	LDA.w MultiConnectorTiles.increment, Y
 	AND.w #$00FF
 	STA.b $0C
 
 	LDA.b $00
 	ASL A
 	TAY
-	LDA.w MultiConnectorTiles_start_offset_three, Y
+	LDA.w MultiConnectorTiles.start_offset.three, Y
 	CLC : ADC.w #!CenterTile
 	TAX
 
 	LDY.b $00
-	LDA.w MultiConnectorTiles_direction_index, Y
+	LDA.w MultiConnectorTiles.direction_index, Y
 	AND.w #$00FF
 	TAY
 
@@ -1408,12 +1408,12 @@ MoveDoorsMapCursor:
 
 	AND.b #$0F
 	TAX
-	LDA.l NextCursorSpecial_center_offset, X
+	LDA.l NextCursorSpecial.center_offset, X
 	TAX
 	DEX
 .try_next
 	INX
-	LDA.l NextCursorSpecial_center, X
+	LDA.l NextCursorSpecial.center, X
 	BMI .no_move
 	PHX
 	ASL A
@@ -1422,7 +1422,7 @@ MoveDoorsMapCursor:
 	PLX
 	CMP.b #$00
 	BMI .try_next
-	LDA.l NextCursorSpecial_center, X
+	LDA.l NextCursorSpecial.center, X
 	STA.b $01
 	BRA .write
 
@@ -1433,17 +1433,17 @@ MoveDoorsMapCursor:
 .from_start
 	AND.b #$0F
 	TAX
-	LDA.l NextCursorSpecial_start_direction, X
+	LDA.l NextCursorSpecial.start_direction, X
 	STA.b $00
-	LDA.l NextCursorSpecial_start_index, X
+	LDA.l NextCursorSpecial.start_index, X
 	BRA .easy
 
 .from_end
 	AND.b #$0F
 	TAX
-	LDA.l NextCursorSpecial_end_direction, X
+	LDA.l NextCursorSpecial.end_direction, X
 	STA.b $00
-	LDA.l NextCursorSpecial_end_index, X
+	LDA.l NextCursorSpecial.end_index, X
 	BRA .easy
 
 .easy

@@ -115,7 +115,7 @@ MaybeDeleteFollowersOnDeath:
         LDA.b GameMode : CMP.b #$17 : BEQ .keep
         LDA.w DungeonID : NOP #2 : BPL .keep
         LDA.l InitFollowerIndicator : BEQ .keep
-        JSL DetermineFollowerSpawn_check_resolved : BCS .keep
+        JSL DetermineFollowerSpawn.check_resolved : BCS .keep
         LDA.l ProgressIndicator : CMP.b #$02 : BCS .delete
         LDA.l FollowerIndicator : CMP.b #$01 : BEQ .keep
 .delete
@@ -145,7 +145,7 @@ StartingFollower:
         LDA.l FollowerDropped : CMP.b #$80 : PLA : BCC .return : PHA
     + LDA.l ProgressIndicator : CMP.b #$02 : PLA : BCC .escape_check
         PHA
-            JSL DetermineFollowerSpawn_check_resolved
+            JSL DetermineFollowerSpawn.check_resolved
         PLA
         BCC .issue_follower
         BRA .return
@@ -213,7 +213,7 @@ FollowerGfxRedraw:
 TransferAndDrawFollowerGfx:
     PHA
     LDA.w SpriteTimerE, X : AND.w #$0008 : BNE .skip_draw ; skip drawing every other frame
-        LDA.b 1,S
+        LDA 1,S
         JSR TransferFollowerSpriteGfx ; returns with SEP #$20
         LDA.w SpriteTypeTable, X : CMP.b #$39 : BNE +
             ; locksmith location flicker if quest completed but purple chest remains
@@ -235,9 +235,12 @@ TransferAndDrawFollowerGfx:
     RTL
 
 ; A = 2 byte VRAM position in OAM2 for head/body
-TransferFollowerSpriteGfx_skip_transfer:
+pool TransferFollowerSpriteGfx
+.skip_transfer
     PLA : PLA
     RTS
+endpool
+
 TransferFollowerSpriteGfx:
     PHA : SEP #$20
     LDA.w SprRedrawFlag, X : BEQ .skip_transfer
@@ -387,7 +390,7 @@ SetAndLoadFollower:
         LDA.b #$00 : STA.l FollowerDropped
         JSL DetermineFollower : STA.l FollowerIndicator
         CMP.b #$01 : BNE +
-            JSL DetermineFollower_skip_stored : CMP.b #$01 : BNE +
+            JSL DetermineFollower.skip_stored : CMP.b #$01 : BNE +
                 LDA.b #$02 : STA.l StartingEntrance
                 JSL SaveDeathCount
                 PHX
@@ -409,7 +412,7 @@ StoreAndLoadFollower:
     LDA.l FollowerDropped : BNE .no_storage
     LDA.l FollowerIndicator : BEQ .no_storage
         PHA
-        JSL SetAndLoadFollower_skip_current
+        JSL SetAndLoadFollower.skip_current
         PLA : STA.w SpriteAux, X
         LDA.b #$13 : JSL Sound_SetSfx3PanLong
         LDA.b #$01 : STA.w SprRedrawFlag, X
@@ -417,14 +420,14 @@ StoreAndLoadFollower:
         LDA.b #$90 : STA.w SpriteTimerE, X
         SEC : RTL
 .no_storage
-    JSL SetAndLoadFollower_skip_current
+    JSL SetAndLoadFollower.skip_current
     CLC : RTL
 
 ; return SEC if destination resolved
 DetermineFollowerSpawn_locksmith_check:
     ; locksmith location needs to spawn if purple chest reward not acquired
     LDA.l FollowerIndicator : CMP.b #$0C : BEQ .always_spawn
-    JSL DetermineFollower_skip_stored : CMP.l FollowerIndicator : BEQ .matched_following
+    JSL DetermineFollower.skip_stored : CMP.l FollowerIndicator : BEQ .matched_following
     LDA.l NpcFlagsVanilla : AND.b #$10 : BEQ .always_spawn
     BRA DetermineFollowerSpawn
 .always_spawn
@@ -434,9 +437,9 @@ DetermineFollowerSpawn_locksmith_check:
 
 DetermineFollowerSpawn_include_stored:
     JSL DetermineFollower
-    BRA DetermineFollowerSpawn_byof
+    BRA DetermineFollowerSpawn.byof
 DetermineFollowerSpawn:
-    JSL DetermineFollower_skip_stored
+    JSL DetermineFollower.skip_stored
 .byof
     CMP.l FollowerIndicator : BEQ .matched_following
 .skip_match_check
@@ -459,8 +462,8 @@ DetermineFollowerSpawn:
     + CMP.b #$04 : BNE +
         JML ItemCheck_OldMan
     + CMP.b #$06 : BNE +
-        LDA.l RoomDataWRAM[$AC].high : AND.b #$08 : CMP.b #$08 : BCS ++
-            LDA.l EnemizerFlags_close_blind_door : CMP.b #$01
+        LDA.l roomDataHigh($AC) : AND.b #$08 : CMP.b #$08 : BCS ++
+            LDA.l EnemizerFlags.close_blind_door : CMP.b #$01
         ++
         RTL
     + CMP.b #$09 : BCS + ; if frog or smith
@@ -547,7 +550,7 @@ SpritePrep_BlindMaiden:
         PLA : PLA : PEA.w $89C8-1 ; return to spawn
         RTL
 .vanilla
-    LDA.l RoomDataWRAM[$AC].high : AND.b #$08 ; what we wrote over
+    LDA.l roomDataHigh($AC) : AND.b #$08 ; what we wrote over
     RTL
 
 ; Prevent followers from causing blind/maiden to despawn:
@@ -568,20 +571,20 @@ SpriteDraw_ZeldaMaiden:
             REP #$20
             LDA.w #.oam_group : STA.b Scrap06
             LDA.w #0000 : STA.b Scrap09
-            LDA.l Follower_Zelda_vram
+            LDA.l Follower_Zelda.vram
             BRA .transfer
         +
         REP #$20
         LDA.w #.oam_group : STA.b Scrap06
         LDA.w #.palette_data_maiden : STA.b Scrap09
-        LDA.l Follower_Maiden_vram
+        LDA.l Follower_Maiden.vram
         .transfer
         JML TransferAndDrawFollowerGfx
 .skip_draw
     RTL
-.vanilla:
+.vanilla
     JML SpriteDraw_Maiden
-.oam_group:
+.oam_group
 dw 1, -7 : db $20, $00, $00, $02
 dw 1,  3 : db $22, $00, $00, $02
 .palette_data_maiden
@@ -622,7 +625,7 @@ SpriteDraw_OldManFollower:
         LDA.w #.oam_group : STA.b Scrap06
         LDA.w #0000 : STA.b Scrap09
         PLA : PEA.w $FF45-1 ; skip vanilla draw
-        LDA.l Follower_OldMan_vram
+        LDA.l Follower_OldMan.vram
         JML TransferAndDrawFollowerGfx
 .vanilla
     LDA.b #$02 : STA.b Scrap06 ; what we wrote over
@@ -673,12 +676,12 @@ SpriteDraw_FrogFollower:
         LDA.w #.oam_group : STA.b Scrap06
         LDA.w #0000 : STA.b Scrap09
         PLA : PEA.w $DCD6-1
-        LDA.l Follower_Frog_vram
+        LDA.l Follower_Frog.vram
         JML TransferAndDrawFollowerGfx
 .vanilla
     LDA.b #$01 : STA.b Scrap06 ; what we wrote over
     RTL
-.oam_group:
+.oam_group
 dw 1, -8 : db $FF, $00, $00, $02
 dw 1,  0 : db $C8, $00, $00, $02
 
@@ -714,11 +717,11 @@ SpriteDraw_PurpleChest:
         REP #$20
         LDA.w #.oam_group : STA.b Scrap06
         LDA.w #0000 : STA.b Scrap09
-        LDA.l Follower_PurpleChest_vram
+        LDA.l Follower_PurpleChest.vram
         JML TransferAndDrawFollowerGfx
 .vanilla
     JML Sprite_PrepAndDrawSingleLargeLong ; what we wrote over
-.oam_group:
+.oam_group
 dw 0, -8 : db $C8, $00, $00, $02
 dw 0,  0 : db $EE, $00, $00, $02
 
@@ -762,12 +765,12 @@ SpriteDraw_SuperBomb:
         LDA.w #.oam_group : STA.b Scrap06
         LDA.w #.palette_data : STA.b Scrap09
         PLA : PEA.w $E2E2-1 ; skip vanilla draw
-        LDA.l Follower_SuperBomb_vram
+        LDA.l Follower_SuperBomb.vram
         JML TransferAndDrawFollowerGfx
 .vanilla
     LDA.b #$01 : STA.b Scrap06 ; what we wrote over
     RTL
-.oam_group:
+.oam_group
 dw 0, -8 : db $AE, $08, $00, $02
 dw 0,  0 : db $4E, $08, $00, $02
 .palette_data
@@ -888,12 +891,12 @@ SpriteDraw_LocksmithFollower:
         LDA.w #.oam_group : STA.b Scrap06
         LDA.w #.palette_data : STA.b Scrap09
         PLA : PEA.w $DCD6-1 ; skip draw on exit
-        LDA.l Follower_Locksmith_vram
+        LDA.l Follower_Locksmith.vram
         JML TransferAndDrawFollowerGfx
 .vanilla
     LDA.b #$02 : STA.b Scrap06 ; what we wrote over
     RTL
-.oam_group:
+.oam_group
 dw 0, -8 : db $EA, $00, $00, $02
 dw 0,  0 : db $EC, $00, $00, $02
 .palette_data

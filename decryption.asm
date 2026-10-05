@@ -6,7 +6,7 @@ LoadStaticDecryptionKey:
 	LDX.w #StaticDecryptionKey  ; Source
 	LDY.w #KeyBase              ; Target
 	LDA.w #$000F                ; Length
-	MVN $307F
+	MVN $30, $7F
 
 	PLP : PLY : PLX : PLA : PLB
 RTL

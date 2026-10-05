@@ -349,7 +349,7 @@ JSL CopyExtendedWRAMSaveFileToSRAM
 org $80899C ; <- bank_00.asm : #_00899C (CLC)
 JSL WriteSaveChecksumAndBackup
 PLA : SEP #$30 : PLB : RTL
-padbyte $FF : pad $0089C2 ; Fill adjacent free rom forward. See bank_00.asm: #_0089C2
+fill byte until $8089C2 :: $FF ; Fill adjacent free rom forward. See bank_00.asm: #_0089C2
 ;--------------------------------------------------------------------------------
 org $8CD7AB ; <- Bank0C.asm : 3342 (STA $700400, X)
 JSL ClearExtendedSaveFile
@@ -515,7 +515,7 @@ SEP #$20
 LDX.w $04C8 : CPX.w #$FFFF : BEQ .vanilla
 JSL GetRandomInt
 LDA.l PegProbability : BEQ .vanilla : CMP.l $7E0FA1
-REP #$20 : !BGE .succeed
+REP #$20 : BCS .succeed
 .fail
 JMP TurtleRockPegFail
 .succeed
@@ -887,10 +887,10 @@ org $87B08B
 LinkItem_MagicCostBaseIndices:
 ;--------------------------------------------------------------------------------
 org $87B096 ; <- 3B096 - Bank07.asm : 7731 (LDA LinkItem_MagicCostBaseIndices, X : CLC : ADC $7EF37B : TAX)
-JSL LoadModifiedMagicLevel : !ADD.w LinkItem_MagicCostBaseIndices, X
+JSL LoadModifiedMagicLevel : CLC : ADC.w LinkItem_MagicCostBaseIndices, X
 ;--------------------------------------------------------------------------------
 org $87B0D5 ; <- 3B0D5 - Bank07.asm : 7783 (LDA LinkItem_MagicCostBaseIndices, X : CLC : ADC $7EF37B : TAX)
-JSL LoadModifiedMagicLevel : !ADD.w LinkItem_MagicCostBaseIndices, X
+JSL LoadModifiedMagicLevel : CLC : ADC.w LinkItem_MagicCostBaseIndices, X
 
 ;================================================================================
 ; Faster Great Fairies
@@ -937,40 +937,40 @@ JML Multiworld_AddReceivedItem_notCrystal
 NOP
 
 org $898611 ; 48611 - ancilla_init.asm:720 (LDA .item_target_addr+0, X)
-LDA.w ItemReceipts_target+0, X
+LDA.w ItemReceipts.target+0, X
 org $898616 ; 48616 - ancilla_init.asm:721 (LDA .item_target_addr+1, X)
-LDA.w ItemReceipts_target+1, X
+LDA.w ItemReceipts.target+1, X
 org $89861F ; 4861F - ancilla_init.asm:724 (LDA .item_values, Y)
-LDA.w ItemReceipts_value, Y
+LDA.w ItemReceipts.value, Y
 
 org $898627 ; 48627 - ancilla_init.asm:731 (LDA .item_target_addr+0, X)
-LDA.w ItemReceipts_target+0, X
+LDA.w ItemReceipts.target+0, X
 org $89862C ; 4862C - ancilla_init.asm:722 (LDA .item_target_addr+1, X)
-LDA.w ItemReceipts_target+1, X
+LDA.w ItemReceipts.target+1, X
 org $898635 ; 48635 - ancilla_init.asm:727 (LDA .item_values, Y)
-LDA.w ItemReceipts_value, Y
+LDA.w ItemReceipts.value, Y
 
 org $8986AA ; 486AA - ancilla_init.asm:848 (LDA .item_masks, X)
 LDA.w DungeonItemMasks, X
 
 org $898769 ; 48769 - ancilla_init.asm:1005 (LDA .item_graphics_indices, Y)
-LDA.w ItemReceipts_graphics, Y
+LDA.w ItemReceipts.graphics, Y
 
 org $898811
 JSL SetItemRiseTimer
 
 org $89884D ; 4884D - ancilla_init.asm:1137 (LDA $836C, Y)
-LDA.w ItemReceipts_offset_y, Y
+LDA.w ItemReceipts.offset_y, Y
 org $89885B ; 4885B - ancilla_init.asm:1139 (LDA .x_offsets, X) - I think the disassembly is wrong here, should have been LDA .x_offsets, Y
-LDA.w ItemReceipts_offset_x, Y
+LDA.w ItemReceipts.offset_x, Y
 
 org $8988B7 ; 488B7 - ancilla_init.asm:1199 (LDA .wide_item_flag, Y)
-LDA.w SpriteProperties_chest_width, Y
+LDA.w SpriteProperties.chest_width, Y
 
 org $8988EF ; 488EF - ancilla_init.asm:1248 (LDA $836C, Y)
-LDA.w ItemReceipts_offset_y, Y
+LDA.w ItemReceipts.offset_y, Y
 org $898908 ; 48908 - ancilla_init.asm:1258 (LDA .x_offsets, Y)
-LDA.w ItemReceipts_offset_x, Y
+LDA.w ItemReceipts.offset_x, Y
 
 org $88C6C8 ; 446C8 - ancilla_receive_item.asm:538 (LDA AddReceiveItem.properties, X)
 JSL CheckReceivedItemPropertiesBeforeLoad
@@ -1343,7 +1343,7 @@ org $88B6EA ; <- 436EA - ancilla_quake_spell.asm : 67
 JSL MedallionTrigger_Quake
 JMP _ancilla_quake_spell_83
 Ancilla_CheckIfEntranceTriggered:
-	JSR $F856
+	JSR.w $F856
 RTL
 warnpc $88B708
 org $88B708 ; <- 43708 - ancilla_quake_spell.asm : 83
@@ -1496,7 +1496,7 @@ JSL DrawHUDDungeonItems
 org $8DFA96 ; <- 6FA96 - headsup_display.asm : 626 (LDX.w #.hud_tilemap)
 LDX.w #HUD_TileMap
 org $8DFA9C ; <- 6FA9C - headsup_display.asm : 629 (MVN $0D, $7E ; $Transfer 0x014A bytes from $6FE77 -> $7EC700)
-MVN $A17E
+MVN $A1, $7E
 ;--------------------------------------------------------------------------------
 org $8DFB1F : JSL CheckHUDSilverArrows
 org $8DFB29 : BRA UpdateHUDBuffer_update_item_check_arrows
@@ -1961,7 +1961,7 @@ org $868BAC ; <- 30BAC - SpritePrep_FluteBoy : 1068
 JSL ItemCheck_TreeKid2
 
 org $86908D ; <- 3108D - SpritePrep_FluteBoy : 2175
-JSL ItemCheck_TreeKid : CMP.b #$08 : BEQ $0A
+JSL ItemCheck_TreeKid : CMP.b #$08 : BEQ *
 
 org $869095 ; <- 31095 - SpritePrep_FluteBoy : 2177
 JSL ItemCheck_TreeKid : CMP.b #$08
@@ -1973,7 +1973,7 @@ org $86AF9B ; <- 32F9B - FluteBoy_Chillin : 73 : LDA $7EF34C : CMP.b #$02 : BCS 
 LDA.l HasGroveItem : AND.b #$01
 db $D0 ; BNE
 
-org $86B062 ; <- 33062 - FluteAardvark_InitialStateFromFluteState : 225 : LDA $7EF34C : AND.b #$03 : !BGE #$05
+org $86B062 ; <- 33062 - FluteAardvark_InitialStateFromFluteState : 225 : LDA $7EF34C : AND.b #$03 : BCS #$05
 JSL ItemCheck_TreeKid2 : NOP #$02 ; remove pointless AND
 
 org $86B048 ; <- 33048
@@ -2331,13 +2331,13 @@ org $82895D ; <- Bank02.asm:1812 (JSL Dungeon_LoadRoom)
 JSL LoadRoomHook
 ;--------------------------------------------------------------------------------
 org $828BE7 ; <- Bank02.asm:2299 (JSL Dungeon_LoadRoom)
-JSL LoadRoomHook_noStats
+JSL LoadRoomHook.noStats
 ;--------------------------------------------------------------------------------
 org $829309 ; <- Bank02.asm:3533 (JSL Dungeon_LoadRoom)
-JSL LoadRoomHook_noStats
+JSL LoadRoomHook.noStats
 ;--------------------------------------------------------------------------------
 org $82C2F3 ; <- Bank02.asm:10391 (JSL Dungeon_LoadRoom)
-JSL LoadRoomHook_noStats
+JSL LoadRoomHook.noStats
 ;================================================================================
 
 ;================================================================================
@@ -2367,7 +2367,7 @@ org $87A055 ; <- Bank07.asm:5205 (LDA $0B99 : BEQ BRANCH_DELTA)
 JSL ArrowGame : BRA ++ : NOP #12 : ++
 
 org $87A06C ; <- Bank07.asm:5215 (LDA $7EF377 : BEQ BRANCH_EPSILON)
-JSL DecrementArrows : SKIP 2 : NOP : LDA CurrentArrows
+JSL DecrementArrows : SKIP 2 : NOP : LDA.l CurrentArrows
 ;================================================================================
 
 ;================================================================================
@@ -2753,7 +2753,7 @@ NOP #2 ; this fixes Link's direction after mirroring and falling after entering 
 ;--------------------------------------------------------------------------------
 ; Enable new room header table
 ;--------------------------------------------------------------------------------
-if not(!FEATURE_FIX_BASEROM)
+if !FEATURE_FIX_BASEROM == 0
 	org $81B5E6
 	LDA.b #$30
 endif

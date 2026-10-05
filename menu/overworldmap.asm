@@ -4,38 +4,38 @@ org $8ABABE : JSL WorldMap_LoadChrHalfSlot
 
 org $8ABDF6
 WorldMapIcon_DungeonPointers: ; dungeon idx order
-dw WorldMapIcon_pos_hc
+dw WorldMapIcon_pos.hc
 dw $0000
-dw WorldMapIcon_pos_ep
-dw WorldMapIcon_pos_dp
-dw WorldMapIcon_pos_at
-dw WorldMapIcon_pos_sp
-dw WorldMapIcon_pos_pod
-dw WorldMapIcon_pos_mm
+dw WorldMapIcon_pos.ep
+dw WorldMapIcon_pos.dp
+dw WorldMapIcon_pos.at
+dw WorldMapIcon_pos.sp
+dw WorldMapIcon_pos.pod
+dw WorldMapIcon_pos.mm
 
-dw WorldMapIcon_pos_sw
-dw WorldMapIcon_pos_ip
-dw WorldMapIcon_pos_toh
-dw WorldMapIcon_pos_tt
-dw WorldMapIcon_pos_tr
-dw WorldMapIcon_pos_gt
+dw WorldMapIcon_pos.sw
+dw WorldMapIcon_pos.ip
+dw WorldMapIcon_pos.toh
+dw WorldMapIcon_pos.tt
+dw WorldMapIcon_pos.tr
+dw WorldMapIcon_pos.gt
 
 WorldMapIcon_ExtraPointers: ; dungeon idx order
-dw WorldMapIcon_extrapos_hc
+dw WorldMapIcon_extrapos.hc
 dw $0000
 
 dw $0000
-dw WorldMapIcon_extrapos_dp
+dw WorldMapIcon_extrapos.dp
 dw $0000
 dw $0000
 dw $0000
 dw $0000
-dw WorldMapIcon_extrapos_sw
+dw WorldMapIcon_extrapos.sw
 dw $0000
 
 dw $0000
 dw $0000
-dw WorldMapIcon_extrapos_tr
+dw WorldMapIcon_extrapos.tr
 dw $0000
 
 warnpc $8ABE2E
@@ -294,7 +294,7 @@ WorldMap_DrawTileOverlay:
 		LDA.b Scrap05 : BIT.w #$0100 : BEQ .skip+1
 		LSR : AND.w #$000F : TAX
 		LDA.l CrystalPendantFlags_3,X : TAX : BEQ .skip+1
-		CPX.b #$08 : !BGE +
+		CPX.b #$08 : BCS +
 			LDA.b Scrap0C : PHA
 			LDA.l WorldMapIcon_Numbers-1,X
 				AND.w #$00FF : ORA.w #$3A00 : STA.b Scrap08
@@ -302,7 +302,7 @@ WorldMap_DrawTileOverlay:
 	+
 	LDA.b Scrap0C : PHA
 	AND.w #$FF00 : ORA.w #$006A : STA.b Scrap08 ; temp store overlay tile info
-	LDA.b 1,S : AND.w #$0EFF
+	LDA 1,S : AND.w #$0EFF
 	CMP.w #$0264 : BEQ .do_overlay ; red crystal
 	CMP.w #$0860 : BEQ .do_overlay ; green pendant
 
@@ -452,7 +452,7 @@ org $8AC3B6
 		STA.b Scrap00 ; linear term stored at high byte (Scrap01)
 
 		; calculate quadratic term: ((Y>>4)^2 * 49) >> 8
-		LDA.b 1,S
+		LDA 1,S
 		SEP #$20
 		XBA : TAX : XBA : TXA
 		JSR WorldMap_MultiplyAxB ; (Y>>4) ^ 2
@@ -583,8 +583,8 @@ RTL
 
 ; from (bank $A2 only), to (bank $7F only), length
 .list
-dw #PreloadedGraphicsROM+$140, $7F1140, $C0-2
-dw #PreloadedGraphicsROM+$320, $7F1320, $E0-2
+dw PreloadedGraphicsROM+$140, $7F1140, $C0-2
+dw PreloadedGraphicsROM+$320, $7F1320, $E0-2
 .list_flute
-dw #PreloadedGraphicsROM+$120, $7F13C0, $20-2
+dw PreloadedGraphicsROM+$120, $7F13C0, $20-2
 .list_end

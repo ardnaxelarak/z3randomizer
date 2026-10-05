@@ -3,20 +3,20 @@
 ; Scrap08 use for dpScratch/MXResult (lower 32 of dpScratch)
 
 CryptoDelta:
-dd #$9e3779b9
+dd $9e3779b9
 
 ; For use in an unrolled loop
 macro LSR32Single(value)
 	CLC;
-	LDA.b <value>+2 : ROR : STA.b <value>+2 ; do top part
-	LDA.b <value> : ROR : STA.b <value> ; do bottom part
+	LDA.b {value}+2 : ROR : STA.b {value}+2 ; do top part
+	LDA.b {value} : ROR : STA.b {value} ; do bottom part
 	; ROR handles the carry from the upper byte for us
 endmacro
 
 macro ASL32Single(value)
 	CLC
-	LDA.b <value> : ROL : STA.b <value> ; do bottom part
-	LDA.b <value>+2 : ROL : STA.b <value>+2 ; do top part
+	LDA.b {value} : ROL : STA.b {value} ; do bottom part
+	LDA.b {value}+2 : ROL : STA.b {value}+2 ; do top part
 	; ROL handles the carry from the lower byte for us
 endmacro
 
@@ -24,8 +24,8 @@ CryptoMX:
 	PHX
 
 	; upperScratch = (z>>5 ^ y <<2)
-	LDA.w z : STA.b Scrap08
-	LDA.w z+2 : STA.b Scrap08+2
+	LDA.w CryptoZ : STA.b Scrap08
+	LDA.w CryptoZ+2 : STA.b Scrap08+2
 	%LSR32Single(Scrap08)
 	%LSR32Single(Scrap08)
 	%LSR32Single(Scrap08)
@@ -33,8 +33,8 @@ CryptoMX:
 	%LSR32Single(Scrap08)
 	;%LSR32(Scrap08,#$05)
 
-	LDA.w y : STA.b Scrap08+4
-	LDA.w y+2 : STA.b Scrap08+6
+	LDA.w CryptoY : STA.b Scrap08+4
+	LDA.w CryptoY+2 : STA.b Scrap08+6
 	%ASL32Single(Scrap08+4)
 	%ASL32Single(Scrap08+4)
 	;%ASL32(Scrap08+4,#$02)
@@ -45,16 +45,16 @@ CryptoMX:
 	;================================
 	; upperscratch2 = (y>>3^z<<4)
 
-	LDA.w z : STA.b Scrap08
-	LDA.w z+2 : STA.b Scrap08+2
+	LDA.w CryptoZ : STA.b Scrap08
+	LDA.w CryptoZ+2 : STA.b Scrap08+2
 	%ASL32Single(Scrap08)
 	%ASL32Single(Scrap08)
 	%ASL32Single(Scrap08)
 	%ASL32Single(Scrap08)
 	;%ASL32(Scrap08,#$04)
 
-	LDA.w y : STA.b Scrap08+4
-	LDA.w y+2 : STA.b Scrap08+6
+	LDA.w CryptoY : STA.b Scrap08+4
+	LDA.w CryptoY+2 : STA.b Scrap08+6
 	%LSR32Single(Scrap08+4)
 	%LSR32Single(Scrap08+4)
 	%LSR32Single(Scrap08+4)
@@ -66,25 +66,25 @@ CryptoMX:
 	;================================
 	; upperscratch = upperscratch + upperscratch2 ( == (z>>5^y<<2) + (y>>3^z<<4) )
 
-	LDA.w CryptoScratch : !ADD.w CryptoScratch+4 : STA.w CryptoScratch
+	LDA.w CryptoScratch : CLC : ADC.w CryptoScratch+4 : STA.w CryptoScratch
 	LDA.w CryptoScratch+2 : ADC.w CryptoScratch+6 : STA.w CryptoScratch+2
 
 	;================================
 	; dpscratch = sum^y
 
-	LDA.w Sum : EOR.w y : STA.b Scrap08
-	LDA.w Sum+2 : EOR.w y+2 : STA.b Scrap08+2
+	LDA.w Sum : EOR.w CryptoY : STA.b Scrap08
+	LDA.w Sum+2 : EOR.w CryptoY+2 : STA.b Scrap08+2
 
 	;================================
 	; dpscratch2 =  (k[p&3^e]^z)
 
-	LDA.w p : AND.w #$0003 : EOR.w e : ASL #2 : TAX ; put (p&3)^e into X
-	LDA.w KeyBase, X : EOR.w z : STA.b Scrap08+4
-	LDA.w KeyBase+2, X : EOR.w z+2 : STA.b Scrap08+6
+	LDA.w CryptoP : AND.w #$0003 : EOR.w CryptoE : ASL #2 : TAX ; put (p&3)^e into X
+	LDA.w KeyBase, X : EOR.w CryptoZ : STA.b Scrap08+4
+	LDA.w KeyBase+2, X : EOR.w CryptoZ+2 : STA.b Scrap08+6
 
 	;================================
 	; upperscratch2 =  dpscratch + dpscratch2 (== (sum^y) + (k[p&3^e]^z))
-	LDA.b Scrap08 : !ADD.b Scrap08+4 : STA.w CryptoScratch+4
+	LDA.b Scrap08 : CLC : ADC.b Scrap08+4 : STA.w CryptoScratch+4
 	LDA.b Scrap08+2 : ADC.b Scrap08+6 : STA.w CryptoScratch+6
 
 	;================================
@@ -107,7 +107,7 @@ XXTEA_Decode:
 		LDX.b #0
 		-
 			LDA.l .n_lookup, X
-			CMP.b Scrap04 : !BLT +
+			CMP.b Scrap04 : BCC +
 			INX
 			BRA -
 		+
@@ -122,39 +122,39 @@ XXTEA_Decode:
 		LDA.l .initial_sums+2, X : STA.w Sum+2
 
 		; y = v[0];
-		LDA.w v : STA.w y
-		LDA.w v+2 : STA.w y+2
+		LDA.w CryptoV : STA.w CryptoY
+		LDA.w CryptoV+2 : STA.w CryptoY+2
 		---
-			LDA.w Sum : LSR #2 : AND.w #$0003 : STA.w e ; e = (sum >> 2) & 3;
+			LDA.w Sum : LSR #2 : AND.w #$0003 : STA.w CryptoE ; e = (sum >> 2) & 3;
 
-			LDA.b Scrap04 : DEC : STA.w p
+			LDA.b Scrap04 : DEC : STA.w CryptoP
 			-- BEQ + ; for (p=n-1; p>0; p--) {
 				; z = v[p-1];
 				ASL #2 : TAX
-				LDA.w v-4, X : STA.w z
-				LDA.w v-4+2, X : STA.w z+2
+				LDA.w CryptoV-4, X : STA.w CryptoZ
+				LDA.w CryptoV-4+2, X : STA.w CryptoZ+2
 
 				; y = v[p] -= MX;
 				JSR CryptoMX
-				LDA.w p : ASL #2 : TAX
-				LDA.w v, X : !SUB.b Scrap08 : STA.w v, X : STA.w y
-				LDA.w v+2, X : SBC.b Scrap08+2 : STA.w v+2, X : STA.w y+2
+				LDA.w CryptoP : ASL #2 : TAX
+				LDA.w CryptoV, X : SEC : SBC.b Scrap08 : STA.w CryptoV, X : STA.w CryptoY
+				LDA.w CryptoV+2, X : SBC.b Scrap08+2 : STA.w CryptoV+2, X : STA.w CryptoY+2
 
-			LDA.w p : DEC : STA.w p : BRA -- ; }
+			LDA.w CryptoP : DEC : STA.w CryptoP : BRA -- ; }
 			+
 
 			; z = v[n-1];
 			LDA.b Scrap04 : DEC : ASL #2 : TAX
-			LDA.w v, X : STA.w z
-			LDA.w v+2, X : STA.w z+2
+			LDA.w CryptoV, X : STA.w CryptoZ
+			LDA.w CryptoV+2, X : STA.w CryptoZ+2
 
 			; y = v[0] -= MX;
 			JSR CryptoMX
-			LDA.w v : !SUB.b Scrap08 : STA.w v : STA.w y
-			LDA.w v+2 : SBC.b Scrap08+2 : STA.w v+2 : STA.w y+2
+			LDA.w CryptoV : SEC : SBC.b Scrap08 : STA.w CryptoV : STA.w CryptoY
+			LDA.w CryptoV+2 : SBC.b Scrap08+2 : STA.w CryptoV+2 : STA.w CryptoY+2
 
 			; sum -= DELTA;
-			LDA.w Sum : !SUB.l CryptoDelta : STA.w Sum
+			LDA.w Sum : SEC : SBC.l CryptoDelta : STA.w Sum
 			LDA.w Sum+2 : SBC.l CryptoDelta+2 : STA.w Sum+2
 
 		DEC.b Scrap06 : BEQ + : JMP --- : + ; } while (--rounds);

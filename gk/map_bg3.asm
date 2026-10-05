@@ -89,19 +89,19 @@ dw $7C60, $2EC0, $1D11
 
 macro TopOfSquares(start)
 	; silly Big Endian
-	db <start>>>8, <start>, $00, $13
+	db {start}>>8, {start}, $00, $13
 	dw $5D4C, $1D4C, $5D4C, $1D4C, $5D4C, $1D4C, $5D4C, $1D4C, $5D4C, $1D4C
 endmacro
 
 macro BottomOfSquares(start)
 	; silly Big Endian
-	db <start>>>8, <start>, $00, $13
+	db {start}>>8, {start}, $00, $13
 	dw $DD4C, $9D4C, $DD4C, $9D4C, $DD4C, $9D4C, $DD4C, $9D4C, $DD4C, $9D4C
 endmacro
 
 macro FullRow(start)
-	%TopOfSquares(<start>)
-	%BottomOfSquares(<start>+$20)
+	%TopOfSquares({start})
+	%BottomOfSquares({start}+$20)
 endmacro
 
 ; top grid

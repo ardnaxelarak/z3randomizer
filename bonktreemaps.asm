@@ -8,9 +8,9 @@ Overworld_LoadBonkTiles:
         LDA.b #$7E : PHA : PLB
         REP #$30
         ; Use it as an index into a jump table.
-        LDA.b OverworldIndex : CMP.w #$0080 : !BGE .noData
+        LDA.b OverworldIndex : CMP.w #$0080 : BCS .noData
             ASL A : TAX : JSR (Overworld_BonkTilesTable, X)
-        
+
         .noData
         PLB
 

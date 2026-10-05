@@ -34,7 +34,7 @@ RTL
 ; Output: 0 locked, 1 open
 ;--------------------------------------------------------------------------------
 CheckForZelda:
-	LDA.l ProgressIndicator : CMP.b #$02 : !BLT + ; Skip if rain is falling
+	LDA.l ProgressIndicator : CMP.b #$02 : BCC + ; Skip if rain is falling
 		LDA.b #$01 ; pretend we have zelda anyway
 		RTL
 	+
@@ -57,7 +57,7 @@ Mantle_CorrectPosition:
 		LDA.b #$03 : STA.w SpritePosXHigh, X
 		LDA.b #$90 : STA.w SpriteSpawnStep, X
 	+
-	LDA.w SpritePosYLow, X : !ADD.b #$03 ; thing we did originally
+	LDA.w SpritePosYLow, X : CLC : ADC.b #$03 ; thing we did originally
 RTL
 
 ;================================================================================

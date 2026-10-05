@@ -1,7 +1,6 @@
 ;================================================================================
 ; The Legend of Zelda, A Link to the Past - Randomizer General Development & Bugfixes
 ;================================================================================
-lorom
 
 ;===================================================================================================
 
@@ -42,34 +41,39 @@ dw !ROM_VERSION_LOW
 dw !ROM_VERSION_HIGH
 
 ;================================================================================
+macro ldaStruct(name, idx, label)
+  LDA.l {name}.{label}+{name}.size*{idx}
+endmacro
+
 !ADD = "CLC : ADC"
 !SUB = "SEC : SBC"
 !BLT = "BCC"
 !BGE = "BCS"
 
-function hexto555(h) = ((((h&$FF)/8)<<10)|(((h>>8&$FF)/8)<<5)|(((h>>16&$FF)/8)<<0))
+function color8to5(c) => ({c}&$FF)//8
+function hexto555(h) => (<{h}>>3<<10)|(>{h}>>3<<5)|(^{h}>>3)
 
 ; Feature flags, run asar with -DFEATURE_X=1 to enable
 !FEATURE_FIX_BASEROM ?= 0
 
 ;================================================================================
 
-!MULTIWORLD_ITEM = "$7EF4D2"
-!MULTIWORLD_ITEM_FROM = "$7EF4D3"
-!MULTIWORLD_ROOMID = "$7EF4D4"
-!MULTIWORLD_ROOMDATA = "$7EF4D6"
-!MULTIWORLD_SCOUT_LOCATION = "$7EF4D7"
-!MULTIWORLD_SCOUTREPLY_LOCATION = "$7EF4D8"
-!MULTIWORLD_SCOUTREPLY_ITEM = "$7EF4D9"
-!MULTIWORLD_SCOUTREPLY_PLAYER = "$7EF4DA"
-!MULTIWORLD_RECEIVING_ITEM = "$7EC057" ; 0 = default | 1 = receiving
-!MULTIWORLD_HUD_CHARACTER_DATA = "$7EC058" ; 0x40 bytes
-!MULTIWORLD_ITEM_PLAYER_ID = "$7EC098" ; 0 = disabled
-!MULTIWORLD_SPRITEITEM_PLAYER_ID = "$7EC099"
-!MULTIWORLD_HUD_TIMER = "$7EC09A"
-!MULTIWORLD_HUD_DELAY = "#120"
-!MULTIWORLD_ITEM_ID = "$7EC09B" ; for lua scripts?
-!Dungeon_ChestData = "$01E96C"
+!MULTIWORLD_ITEM = $7EF4D2
+!MULTIWORLD_ITEM_FROM = $7EF4D3
+!MULTIWORLD_ROOMID = $7EF4D4
+!MULTIWORLD_ROOMDATA = $7EF4D6
+!MULTIWORLD_SCOUT_LOCATION = $7EF4D7
+!MULTIWORLD_SCOUTREPLY_LOCATION = $7EF4D8
+!MULTIWORLD_SCOUTREPLY_ITEM = $7EF4D9
+!MULTIWORLD_SCOUTREPLY_PLAYER = $7EF4DA
+!MULTIWORLD_RECEIVING_ITEM = $7EC057 ; 0 = default | 1 = receiving
+!MULTIWORLD_HUD_CHARACTER_DATA = $7EC058 ; 0x40 bytes
+!MULTIWORLD_ITEM_PLAYER_ID = $7EC098 ; 0 = disabled
+!MULTIWORLD_SPRITEITEM_PLAYER_ID = $7EC099
+!MULTIWORLD_HUD_TIMER = $7EC09A
+!MULTIWORLD_HUD_DELAY = 120
+!MULTIWORLD_ITEM_ID = $7EC09B ; for lua scripts?
+!Dungeon_ChestData = $01E96C
 
 !FLAG_OW_MIXED = $04
 !FLAG_OW_CROSSED = $02
@@ -77,51 +81,59 @@ function hexto555(h) = ((((h&$FF)/8)<<10)|(((h>>8&$FF)/8)<<5)|(((h>>16&$FF)/8)<<
 !FLAG_OW_CUSTOM_MAP = $02
 !FLAG_OW_ADJUST_DYNAMIC_MAP_SPRITE_POSITION = $04
 
-incsrc hooks.asm
-incsrc spriteswap.asm
-incsrc hashalphabethooks.asm
-incsrc sharedplayerpalettefix.asm
-incsrc ram.asm
-incsrc sram.asm
-incsrc registers.asm
-incsrc vanillalabels.asm
+incsrc "hooks.asm"
+incsrc "spriteswap.asm"
+incsrc "hashalphabethooks.asm"
+incsrc "sharedplayerpalettefix.asm"
+
+pushpc
+bankguard off
+
+incsrc "ram.asm"
+incsrc "sram.asm"
+incsrc "registers.asm"
+incsrc "vanillalabels.asm"
+
+pullpc
+site *
+bankguard half
 
 org $A08000 ; bank $20
-incsrc itemdowngrade.asm
-incsrc bugfixes.asm
-incsrc darkworldspawn.asm
-incsrc lampmantlecone.asm
-incsrc floodgatesoftlock.asm
-incsrc heartpieces.asm
-incsrc npcitems.asm
-incsrc flipperkill.asm
-incsrc pendantcrystalhud.asm
-incsrc potions.asm
-incsrc shopkeeper.asm
-incsrc bookofmudora.asm
-incsrc crypto.asm
-incsrc tablets.asm
-incsrc fairyfixes.asm
-incsrc rngfixes.asm
-incsrc medallions.asm
-incsrc zelda.asm
-incsrc maidencrystals.asm
-incsrc flute.asm
-incsrc dungeondrops.asm
-incsrc halfmagicbat.asm
-incsrc swordswap.asm
-incsrc stats.asm
-incsrc dialog.asm
-incsrc entrances.asm
-incsrc accessibility.asm
-incsrc heartbeep.asm
-incsrc capacityupgrades.asm
-incsrc timer.asm
-incsrc doorframefixes.asm
-incsrc music.asm
-incsrc roomloading.asm
-incsrc icepalacegraphics.asm
-incsrc follower.asm
+incsrc "itemdowngrade.asm"
+incsrc "bugfixes.asm"
+incsrc "darkworldspawn.asm"
+incsrc "lampmantlecone.asm"
+incsrc "floodgatesoftlock.asm"
+incsrc "heartpieces.asm"
+incsrc "npcitems.asm"
+incsrc "flipperkill.asm"
+incsrc "pendantcrystalhud.asm"
+incsrc "potions.asm"
+incsrc "shopkeeper.asm"
+incsrc "bookofmudora.asm"
+incsrc "crypto.asm"
+incsrc "tablets.asm"
+incsrc "fairyfixes.asm"
+incsrc "rngfixes.asm"
+incsrc "medallions.asm"
+incsrc "zelda.asm"
+incsrc "maidencrystals.asm"
+incsrc "flute.asm"
+incsrc "dungeondrops.asm"
+incsrc "halfmagicbat.asm"
+incsrc "swordswap.asm"
+incsrc "stats.asm"
+incsrc "dialog.asm"
+incsrc "entrances.asm"
+incsrc "accessibility.asm"
+incsrc "heartbeep.asm"
+incsrc "capacityupgrades.asm"
+incsrc "timer.asm"
+incsrc "doorframefixes.asm"
+incsrc "music.asm"
+incsrc "roomloading.asm"
+incsrc "icepalacegraphics.asm"
+incsrc "follower.asm"
 warnpc $A18000
 
 org $9C8000 ; text tables for translation
@@ -129,11 +141,11 @@ incbin "data/i18n_en.bin"
 warnpc $9CF356
 
 org $A18000 ; static mapping area
-incsrc framehook.asm
+incsrc "framehook.asm"
 warnpc $A186B0
 
 org $A186B0 ; static mapping area, do not move
-incsrc hud.asm
+incsrc "hud.asm"
 warnpc $A18800
 
 org $A18800 ; static mapping area
@@ -141,108 +153,108 @@ org $A18800 ; static mapping area
 warnpc $A19000
 
 org $A1A000 ; static mapping area. Referenced by front end. Do not move.
-incsrc invertedstatic.asm
+incsrc "invertedstatic.asm"
 warnpc $A1A100
 
 org $A1B000
-incsrc failure.asm
+incsrc "failure.asm"
 warnpc $A1FF00
 
 
 org $A1FF00 ; static mapping area
-incsrc init.asm
+incsrc "init.asm"
 
 org $A48000 ; code bank - PUT NEW CODE HERE
-incsrc glitched.asm
-incsrc hardmode.asm
-incsrc goalitem.asm
-incsrc quickswap.asm
-incsrc cuccostorm.asm
-incsrc retro.asm
-incsrc controllerjank.asm
-incsrc boots.asm
-incsrc events.asm
-incsrc fileselect.asm
-incsrc playername.asm
-incsrc decryption.asm
-incsrc hashalphabet.asm
-incsrc inverted.asm
-incsrc invertedmaps.asm
-incsrc invertedmaps2.asm
-incsrc bonktreemaps.asm
-incsrc newhud.asm
-incsrc save.asm
-incsrc password.asm
-incsrc enemy_adjustments.asm
-;incsrc hudtext.asm
-incsrc servicerequest.asm
-incsrc elder.asm
-incsrc toast.asm
-incsrc fastcredits.asm
-incsrc msu.asm
-incsrc menu/overworldmap.asm ; Overwrites some code in bank $8A
-incsrc bossicons.asm
-incsrc hextodec.asm
-incsrc multiworld.asm
-incsrc textrenderer.asm
+incsrc "glitched.asm"
+incsrc "hardmode.asm"
+incsrc "goalitem.asm"
+incsrc "quickswap.asm"
+incsrc "cuccostorm.asm"
+incsrc "retro.asm"
+incsrc "controllerjank.asm"
+incsrc "boots.asm"
+incsrc "events.asm"
+incsrc "fileselect.asm"
+incsrc "playername.asm"
+incsrc "decryption.asm"
+incsrc "hashalphabet.asm"
+incsrc "inverted.asm"
+incsrc "invertedmaps.asm"
+incsrc "invertedmaps2.asm"
+incsrc "bonktreemaps.asm"
+incsrc "newhud.asm"
+incsrc "save.asm"
+incsrc "password.asm"
+incsrc "enemy_adjustments.asm"
+;incsrc "hudtext.asm"
+incsrc "servicerequest.asm"
+incsrc "elder.asm"
+incsrc "toast.asm"
+incsrc "fastcredits.asm"
+incsrc "msu.asm"
+incsrc "menu/overworldmap.asm" ; Overwrites some code in bank $8A
+incsrc "bossicons.asm"
+incsrc "hextodec.asm"
+incsrc "multiworld.asm"
+incsrc "textrenderer.asm"
 warnpc $A58000
 
 org $A28000
 ItemReceiptGraphicsROM:
 ; we need some empty space here so that 0000 can mean nothing
-fillbyte $00 : fill 32
+fill byte size 32 :: $00
 incbin "data/customitems.4bpp"
 PreloadedGraphicsROM:
 incbin "data/preloadedgfx.4bpp"
 warnpc $A2B000
 org $A2B000
-incsrc itemdatatables.asm ; Statically mapped
-incsrc decompresseditemgraphics.asm
-incsrc newitems.asm
-incsrc utilities.asm
-incsrc inventory.asm
-incsrc menu/hudalpha.asm
+incsrc "itemdatatables.asm" ; Statically mapped
+incsrc "decompresseditemgraphics.asm"
+incsrc "newitems.asm"
+incsrc "utilities.asm"
+incsrc "inventory.asm"
+incsrc "menu/hudalpha.asm"
 warnpc $A38000
 
 org $B98000
-incsrc gk/crystalswitchbook.asm
-incsrc gk/orange_potion.asm
-incsrc gk/mimicdash.asm
-incsrc gk/gloom.asm
-incsrc gk/special_weapons.asm
-incsrc gk/variable_ganon_vulnerability.asm
-incsrc gk/pseudoflute.asm
-incsrc gk/fast_junk.asm
-incsrc gk/dungeon_maps.asm
-incsrc gk/dungeon_indicator.asm
+incsrc "gk/crystalswitchbook.asm"
+incsrc "gk/orange_potion.asm"
+incsrc "gk/mimicdash.asm"
+incsrc "gk/gloom.asm"
+incsrc "gk/special_weapons.asm"
+incsrc "gk/variable_ganon_vulnerability.asm"
+incsrc "gk/pseudoflute.asm"
+incsrc "gk/fast_junk.asm"
+incsrc "gk/dungeon_maps.asm"
+incsrc "gk/dungeon_indicator.asm"
 print "End of B9: ", pc
 
 warnpc $B9EE00
 org $B9EE00
-incsrc gk_meta.asm
+incsrc "gk_meta.asm"
 
 org $B9F000
-incsrc gk/settings.asm
+incsrc "gk/settings.asm"
 
 org $A38000
-incsrc stats/credits.asm ; Statically mapped
-incsrc stats/main.asm
-incsrc stats/statConfig.asm
+incsrc "stats/credits.asm" ; Statically mapped
+incsrc "stats/main.asm"
+incsrc "stats/statConfig.asm"
 FontTable:
-incsrc stats/fonttable.asm
+incsrc "stats/fonttable.asm"
 
-incsrc doorrando/doorrando.asm ; bank 27/A7
+incsrc "doorrando/doorrando.asm" ; bank 27/A7
 ;bank 28/A8 for keydropshuffle / standing items
-incsrc keydrop/standing_items.asm ; bank 28/A8
-incsrc owrando.asm ; bank 2A/AA
-incsrc enemizer/main.asm ; bank 36/B6
+incsrc "keydrop/standing_items.asm" ; bank 28/A8
+incsrc "owrando.asm" ; bank 2A/AA
+incsrc "enemizer/main.asm" ; bank 36/B6
 
 org $B08000 ; bank #$30
-incsrc tables.asm
+incsrc "tables.asm"
 warnpc $B18000
 
 org $B48000
-incsrc spc.asm
+incsrc "spc.asm"
 
 org $B18000 ; bank $31
 GFX_Mire_Bombos:
@@ -340,40 +352,40 @@ DRSheet14:
 incbin "menu/dr_sheet_14.3bppc"
 
 org $8CD7DF
-incsrc data/playernamecharmap.asm
+incsrc "data/playernamecharmap.asm"
 org $8CE73D
-incbin data/playernamestripes_1.bin
+incbin "data/playernamestripes_1.bin"
 org $8CE911
-incbin data/playernamestripes_2.bin
-incsrc data/kanjireplacements.asm ; Overwrites text gfx data and masks in bank $8E
+incbin "data/playernamestripes_2.bin"
+incsrc "data/kanjireplacements.asm" ; Overwrites text gfx data and masks in bank $8E
 
 org $B28000
 Extra_Text_Table:
-incsrc itemtext.asm
+incsrc "itemtext.asm"
 warnpc $B2E000
 
 org $B2DFD0	; PC 0x195FD0
-incsrc multiworldplayernames.asm
+incsrc "multiworldplayernames.asm"
 warnpc $B30000
 
-incsrc externalhooks.asm
+incsrc "externalhooks.asm"
 ;================================================================================
 org $919100 ; PC 0x89100
 incbin "data/map_icons.gfx"
 warnpc $919401
 ;================================================================================
 org $9BB1E0
-incsrc custompalettes.asm
+incsrc "custompalettes.asm"
 warnpc $9BB880
 ;================================================================================
 org $AF8000 ; PC 0x178000
 Static_RNG: ; each line below is 512 bytes of rng
-incsrc staticrng.asm
+incsrc "staticrng.asm"
 warnpc $AF8401
 ;================================================================================
 org $AF8400
-incsrc tournament.asm
-incsrc eventdata.asm
+incsrc "tournament.asm"
+incsrc "eventdata.asm"
 warnpc $B08000
 ;================================================================================
 ;Bank Map

@@ -42,42 +42,42 @@ SpiralWarp: {
     lda.b Scrap00 : sta.b RoomIndex
     ; shift quadrant if necessary
     stz.b Scrap07 ; this is a x quad adjuster for those blasted staircase on the edges
-    lda.b Scrap01 : and.b #$01 : !SUB.b LinkQuadrantH
+    lda.b Scrap01 : and.b #$01 : SEC : SBC.b LinkQuadrantH
     bne .xQuad
     lda.w $0462 : and.b #$04 : bne .xqCont
     inc.b Scrap07
     .xqCont lda.b LinkPosX : bne .skipXQuad ; this is an edge case
     dec.b LinkPosX+1 : bra .skipXQuad ; need to -1 if $22 is 0
-    .xQuad sta.b Scrap06 : !ADD.b LinkQuadrantH : sta.b LinkQuadrantH
+    .xQuad sta.b Scrap06 : CLC : ADC.b LinkQuadrantH : sta.b LinkQuadrantH
     lda.w $0462 : and.b #$04 : bne .xCont
     inc.b Scrap07 ; up stairs are going to -1 the quad anyway during transition, need to add this back
     .xCont ldy.b #$00 : jsr ShiftQuadSimple
 
     .skipXQuad
-    lda.b LinkQuadrantV : lsr : sta.b Scrap06 : lda.b Scrap01 : and.b #$02 : lsr : !SUB.b Scrap06
+    lda.b LinkQuadrantV : lsr : sta.b Scrap06 : lda.b Scrap01 : and.b #$02 : lsr : SEC : SBC.b Scrap06
     beq .skipYQuad
-    sta.b Scrap06 : asl : !ADD.b LinkQuadrantV : sta.b LinkQuadrantV
+    sta.b Scrap06 : asl : CLC : ADC.b LinkQuadrantV : sta.b LinkQuadrantV
     ldy.b #$01 : jsr ShiftQuadSimple
 
     .skipYQuad
     lda.b Scrap01 : and.b #$04 : lsr : sta.w $048a ;fix layer calc 0->0 2->1
     lda.b Scrap01 : and.b #$08 : lsr #2 : sta.w $0492 ;fix from layer calc 0->0 2->1
     ; shift lower coordinates
-    lda.b Scrap02 : sta.b LinkPosX : bne .adjY : lda.b LinkPosX+1 : !ADD.b Scrap07 : sta.b LinkPosX+1
+    lda.b Scrap02 : sta.b LinkPosX : bne .adjY : lda.b LinkPosX+1 : CLC : ADC.b Scrap07 : sta.b LinkPosX+1
     .adjY lda.b Scrap03 : sta.b LinkPosY : bne .upDownAdj : inc.b LinkPosY+1
     .upDownAdj ldx.b #$08
     lda.w $0462 : and.b #$04 : beq .upStairs
     ldx.b #$fd
     lda.b Scrap01 : and.b #$80 : bne .set53
     ; if target is also down adjust by (6,-15)
-    lda.b #$06 : !ADD.b LinkPosY : sta.b LinkPosY : lda.b #$eb : !ADD.b LinkPosX : sta.b LinkPosX : bra .set53
+    lda.b #$06 : CLC : ADC.b LinkPosY : sta.b LinkPosY : lda.b #$eb : CLC : ADC.b LinkPosX : sta.b LinkPosX : bra .set53
     .upStairs
     lda.b Scrap01 : and.b #$80 : beq .set53
     ; if target is also up adjust by (-6, 14)
-    lda.b #$fa : !ADD.b LinkPosY : sta.b LinkPosY : lda.b #$14 : !ADD.b LinkPosX : sta.b LinkPosX
+    lda.b #$fa : CLC : ADC.b LinkPosY : sta.b LinkPosY : lda.b #$14 : CLC : ADC.b LinkPosX : sta.b LinkPosX
     bne .set53 : inc.b LinkPosX+1
     .set53
-    txa : !ADD.b LinkPosX : sta.b $53
+    txa : CLC : ADC.b LinkPosX : sta.b $53
 
     lda.b Scrap01 : and.b #$10 : sta.b Scrap07 ; zeroHzCam check
     ldy.b #$00 : jsr SetCamera
@@ -159,7 +159,7 @@ LookupSpiralOffset: {
 
     .done
     lda.b PreviousRoom : tax : lda.w SpiralOffset,x
-    !ADD.b Scrap01 ;add a thing (0 in easy case)
+    CLC : ADC.b Scrap01 ;add a thing (0 in easy case)
     rts
 }
 
@@ -207,7 +207,7 @@ InroomStairsWarp: {
             lda.w InroomStairsX,y : sta.b LinkPosX
             lda.w InroomStairsY,y
             ldy.b Scrap07 : beq +
-                !ADD.b #$07
+                CLC : ADC.b #$07
             +
             sta.b LinkPosY
             inc.b Scrap07
@@ -233,7 +233,7 @@ InroomStairsWarp: {
         ++ sta.b LinkPosY
         inc.b Scrap07 : stz.b Scrap02 : lda.b #$78 : sta.b LinkPosX
         lda.b Scrap01 : and.b #$03 : beq ++
-            cmp.b #$02 : !BGE +
+            cmp.b #$02 : BCS +
                 lda.b #$f8 : sta.b LinkPosX : stz.b Scrap07 : bra ++
             + inc.b Scrap02
         ++
@@ -245,14 +245,14 @@ InroomStairsWarp: {
     	stz.w $0476
     +
 
-    lda.b Scrap02 : !SUB.b LinkQuadrantH
+    lda.b Scrap02 : SEC : SBC.b LinkQuadrantH
     beq .skipXQuad
-        sta.b Scrap06 : !ADD.b LinkQuadrantH : sta.b LinkQuadrantH
+        sta.b Scrap06 : CLC : ADC.b LinkQuadrantH : sta.b LinkQuadrantH
         ldy.b #$00 : jsr ShiftQuadSimple
     .skipXQuad
-    lda.b LinkQuadrantV : lsr : sta.b Scrap06 : lda.b Scrap03 : !SUB.b Scrap06
+    lda.b LinkQuadrantV : lsr : sta.b Scrap06 : lda.b Scrap03 : SEC : SBC.b Scrap06
     beq .skipYQuad
-        sta.b Scrap06 : asl : !ADD.b LinkQuadrantV : sta.b LinkQuadrantV
+        sta.b Scrap06 : asl : CLC : ADC.b LinkQuadrantV : sta.b LinkQuadrantV
         ldy.b #$01 : jsr ShiftQuadSimple
     .skipYQuad
 
@@ -274,11 +274,11 @@ InroomStairsWarp: {
 ShiftQuadSimple: {
 	lda.w CoordIndex,y : tax
 	lda.b LinkPosY,x : beq .skip
-	lda.b LinkPosY+1,x : !ADD.b Scrap06 : sta.b LinkPosY+1,x ; coordinate update
+	lda.b LinkPosY+1,x : CLC : ADC.b Scrap06 : sta.b LinkPosY+1,x ; coordinate update
 	.skip
 	lda.w CamQuadIndex,y : tax
-	lda.w $0601,x : !ADD.b Scrap06 : sta.w $0601,x
-	lda.w $0605,x : !ADD.b Scrap06 : sta.w $0605,x ; high bytes of these guys
+	lda.w $0601,x : CLC : ADC.b Scrap06 : sta.w $0601,x
+	lda.w $0605,x : CLC : ADC.b Scrap06 : sta.w $0605,x ; high bytes of these guys
 	rts
 }
 
@@ -294,8 +294,8 @@ SetCamera: {
     lda.w CoordIndex,y : tax
     lda.b LinkPosY,x : beq .oddQuad
     cmp.b #$79 : bcc .adj0
-    !SUB.b #$78 : sta.b Scrap04
-    tya : asl : !ADD.b #$04 : tax : jsr AdjCamBounds : bra .done
+    SEC : SBC.b #$78 : sta.b Scrap04
+    tya : asl : CLC : ADC.b #$04 : tax : jsr AdjCamBounds : bra .done
     .oddQuad
     lda.b #$80 : sta.b Scrap04 : bra .adj1 ; this is such a weird case - quad cross boundary
     .adj0
@@ -305,16 +305,16 @@ SetCamera: {
     lda.b Scrap07 : bne .setQuad
     lda.w CoordIndex,y : tax
     lda.b LinkPosY,x : cmp.b #$78 : bcs .setQuad
-    !ADD.b #$78 : sta.b Scrap04
+    CLC : ADC.b #$78 : sta.b Scrap04
     lda.w CamQuadIndex,y : tax : lda.w $0603, x : pha
     lda.w CameraIndex,y : tax : pla : sta.b BG2H+1, x
     .adj1
-    tya : asl : !ADD.b #$08 : tax : jsr AdjCamBounds : bra .done
+    tya : asl : CLC : ADC.b #$08 : tax : jsr AdjCamBounds : bra .done
 
     .setQuad
     lda.w CamQuadIndex,y : tax : lda.w $0607, x : pha
     lda.w CameraIndex,y : tax : pla : sta.b BG2H+1, x
-    tya : asl : !ADD.b #$0c : tax : jsr AdjCamBounds : bra .done
+    tya : asl : CLC : ADC.b #$0c : tax : jsr AdjCamBounds : bra .done
 
     .done
     lda.w CameraIndex,y : tax
@@ -328,7 +328,7 @@ AdjCamBounds: {
     rep #$20 : lda.w CamBoundBaseLine, x : sta.b Scrap05
     lda.b Scrap04 : and.w #$00ff : beq .common
     lda.w CoordIndex,y : tax
-    lda.b LinkPosY, x : and.w #$00ff : !ADD.b Scrap05 : sta.b Scrap05
+    lda.b LinkPosY, x : and.w #$00ff : CLC : ADC.b Scrap05 : sta.b Scrap05
     .common
     lda.w OppCamBoundIndex,y : tax
     lda.b Scrap05 : sta.w CameraScrollN, x

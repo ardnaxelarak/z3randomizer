@@ -1,0 +1,22 @@
+[FUTABA:assemble]
+
+assembly:
+	entry              = LTTP_RND_GeneralBugfixes.asm
+	type               = hack
+	output             = alttp_rando.sfc
+	base               = alttp_jp.sfc
+
+header:
+	mapmode            = lorom
+	checksum           = true
+	fastrom            = true
+	romsize            = 2mb
+	ramsize            = 32kb
+
+debug:
+	symbols            = wla
+	overflow           = error
+	tokens             = aggressive
+	warnaserror        = false
+
+!FEATURE_FIX_BASEROM=1

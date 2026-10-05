@@ -126,8 +126,8 @@ boss_move:
         .loop_middle ; move sprites
         LDA.w SpriteTypeTable, X
         JSR ShouldMoveSprite : BCC .no_change
-        LDA.w SpritePosXLow, X : !ADD.b #$68 : STA.w SpritePosXLow, X
-        LDA.w SpritePosYLow, X : !ADD.b #$68 : STA.w SpritePosYLow, X
+        LDA.w SpritePosXLow, X : CLC : ADC.b #$68 : STA.w SpritePosXLow, X
+        LDA.w SpritePosYLow, X : CLC : ADC.b #$68 : STA.w SpritePosYLow, X
 
         .no_change
         INX : CPX.b #$10 : BNE .loop_middle
@@ -138,8 +138,8 @@ boss_move:
         CMP.b #$E3 : BNE + ;is it moving floor?
             BRA .no_change_ov
         +
-        LDA.w OverlordXLow, X : !ADD.b #$68 : STA.w OverlordXLow, X
-        LDA.w OverlordYLow, X : !ADD.b #$68 : STA.w OverlordYLow, X
+        LDA.w OverlordXLow, X : CLC : ADC.b #$68 : STA.w OverlordXLow, X
+        LDA.w OverlordYLow, X : CLC : ADC.b #$68 : STA.w OverlordYLow, X
 
         .no_change_ov
         INX : CPX.b #$08 : BNE .loop_middle2
@@ -152,8 +152,8 @@ boss_move:
         .loop_top_right ; move sprites
         LDA.w SpriteTypeTable, X
         JSR ShouldMoveSprite : BCC .no_change2
-        LDA.w SpritePosYHigh, X : !ADD.b #$00 : STA.w SpritePosYHigh, X
-        LDA.w SpritePosXHigh, X : !ADD.b #$01 : STA.w SpritePosXHigh, X
+        LDA.w SpritePosYHigh, X : CLC : ADC.b #$00 : STA.w SpritePosYHigh, X
+        LDA.w SpritePosXHigh, X : CLC : ADC.b #$01 : STA.w SpritePosXHigh, X
 
         .no_change2
         INX : CPX.b #$10 : BNE .loop_top_right
@@ -164,8 +164,8 @@ boss_move:
         CMP.b #$E3 : BNE + ;is it moving floor?
             BRA .no_change_ov2
         +
-        LDA.w OverlordXHigh, X : !ADD.b #$01 : STA.w OverlordXHigh, X
-        LDA.w OverlordYHigh, X : !ADD.b #$00 : STA.w OverlordYHigh, X
+        LDA.w OverlordXHigh, X : CLC : ADC.b #$01 : STA.w OverlordXHigh, X
+        LDA.w OverlordYHigh, X : CLC : ADC.b #$00 : STA.w OverlordYHigh, X
 
         .no_change_ov2
         INX : CPX.b #$08 : BNE .loop_top_right2
@@ -178,8 +178,8 @@ boss_move:
         .loop_bottom_right ; move sprites
         LDA.w SpriteTypeTable, X
         JSR ShouldMoveSprite : BCC .no_change3
-        LDA.w SpritePosYHigh, X : !ADD.b #$01 : STA.w SpritePosYHigh, X
-        LDA.w SpritePosXHigh, X : !ADD.b #$01 : STA.w SpritePosXHigh, X
+        LDA.w SpritePosYHigh, X : CLC : ADC.b #$01 : STA.w SpritePosYHigh, X
+        LDA.w SpritePosXHigh, X : CLC : ADC.b #$01 : STA.w SpritePosXHigh, X
 
         .no_change3
         INX : CPX.b #$10 : BNE .loop_bottom_right
@@ -190,8 +190,8 @@ boss_move:
         CMP.b #$E3 : BNE + ;is it moving floor?
             BRA .no_change_ov3
         +
-        LDA.w OverlordXHigh, X : !ADD.b #$01 : STA.w OverlordXHigh, X
-        LDA.w OverlordYHigh, X : !ADD.b #$01 : STA.w OverlordYHigh, X
+        LDA.w OverlordXHigh, X : CLC : ADC.b #$01 : STA.w OverlordXHigh, X
+        LDA.w OverlordYHigh, X : CLC : ADC.b #$01 : STA.w OverlordYHigh, X
 
         .no_change_ov3
         INX : CPX.b #$08 : BNE .loop_bottom_right2
@@ -204,8 +204,8 @@ boss_move:
         .loop_bottom_left ; move sprites
         LDA.w SpriteTypeTable, X
         JSR ShouldMoveSprite : BCC .no_change4
-        LDA.w SpritePosYHigh, X : !ADD.b #$01 : STA.w SpritePosYHigh, X
-        LDA.w SpritePosXHigh, X : !ADD.b #$00 : STA.w SpritePosXHigh, X
+        LDA.w SpritePosYHigh, X : CLC : ADC.b #$01 : STA.w SpritePosYHigh, X
+        LDA.w SpritePosXHigh, X : CLC : ADC.b #$00 : STA.w SpritePosXHigh, X
 
         .no_change4
         INX : CPX.b #$10 : BNE .loop_bottom_left
@@ -216,9 +216,9 @@ boss_move:
         CMP.b #$E3 : BNE + ;is it moving floor?
             BRA .no_change_ov4
         +
-        LDA.w OverlordXHigh, X : !ADD.b #$00 : STA.w OverlordXHigh, X
-        LDA.w OverlordYHigh, X : !ADD.b #$01 : STA.w OverlordYHigh, X
-        
+        LDA.w OverlordXHigh, X : CLC : ADC.b #$00 : STA.w OverlordXHigh, X
+        LDA.w OverlordYHigh, X : CLC : ADC.b #$01 : STA.w OverlordYHigh, X
+
         .no_change_ov4
         INX : CPX.b #$08 : BNE .loop_bottom_left2
         BRL .return

@@ -7,7 +7,7 @@ GoalItemGanonCheck:
 		BCS .success
 
 		.fail
-		LDA.w SpriteActivity, X : CMP.b #17 : !BLT .success ; decmial 17 because Acmlm's chart is decimal
+		LDA.w SpriteActivity, X : CMP.b #17 : BCC .success ; decmial 17 because Acmlm's chart is decimal
 		LDA.b #$00
 RTL
 		.success
@@ -56,7 +56,7 @@ RTL
 	dw .success
 
 .agahnim2_defeated
-	LDA.l RoomDataWRAM[$0D].high : AND.b #$08 : BEQ .fail
+	LDA.l roomDataHigh($0D) : AND.b #$08 : BEQ .fail
 .bingo ; not implemented yet
 .success
 	SEC : RTS
@@ -311,7 +311,7 @@ GTCutscene_NumberOfCrystals:
 			.use_8bit_target
 				INX : LDA.l $B00000, X : INX
 			.add_to_y
-				PHY : CLC : ADC.b 1,S : PLY : TAY : BRA .next
+				PHY : CLC : ADC 1,S : PLY : TAY : BRA .next
 		.not_8bit_compare
 			CMP.b #$14 : BEQ .custom_goal : BCS .unknown
 				; triforce hunt/collection rate - uses 16-bit targets
@@ -406,8 +406,8 @@ CheckForBossesDefeated:
 	; $20 = check pendant bosses
 	; $30 = check all bosses
 	STA.b Scrap04
-	
-	LDA.b #bank(CrystalPendantFlags_3)
+
+	LDA.b #^CrystalPendantFlags_3
 	PHA : PLB
 
 	STZ.b Scrap03 ; count of number of bosses killed
@@ -430,7 +430,7 @@ CheckForBossesDefeated:
 
 	LDA.l DungeonMapBossRooms+4, X
 	ASL A : TAX
-	LDA.l RoomDataWRAM.l, X
+	LDA.l RoomDataWRAM, X
 
 	AND.w #$0800 : BEQ .skip
 		INC.b Scrap03

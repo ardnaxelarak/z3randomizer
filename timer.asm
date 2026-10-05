@@ -7,31 +7,31 @@
 !FRAMES_PER_HOUR = 60*60*60
 ;--------------------------------------------------------------------------------
 macro DecIncr(value)
-	LDA.l <value> : INC
-		CMP.w #$000A : !BLT ?noIncr
-			LDA.l <value>+2 : INC : STA.l <value>+2
+	LDA.l {value} : INC
+		CMP.w #$000A : BCC {?}_noIncr
+			LDA.l {value}+2 : INC : STA.l {value}+2
 			LDA.w #$0000
-		?noIncr:
-	STA.l <value>
+		#{?}_noIncr:
+	STA.l {value}
 endmacro
 ;--------------------------------------------------------------------------------
 macro Sub32(minuend,subtrahend,result)
-	LDA.l <minuend>
-	!SUB.l <subtrahend>		; perform subtraction on the LSBs
-	STA.l <result>
-	LDA.l <minuend>+2		; do the same for the MSBs, with carry
-	SBC.l <subtrahend>+2	; set according to the previous result
-	STA.l <result>+2
+	LDA.l {minuend}
+	SEC : SBC.l {subtrahend} ; perform subtraction on the LSBs
+	STA.l {result}
+	LDA.l {minuend}+2        ; do the same for the MSBs, with carry
+	SBC.l {subtrahend}+2     ; set according to the previous result
+	STA.l {result}+2
 endmacro
 ;--------------------------------------------------------------------------------
 macro Blt32(value1,value2)
-	LDA.l <value1>+2
-	CMP.l <value2>+2
-	!BLT ?done
-	BNE ?done
-		LDA.l <value1>
-		CMP.l <value2>
-	?done:
+	LDA.l {value1}+2
+	CMP.l {value2}+2
+	BCC {?}_done
+	BNE {?}_done
+		LDA.l {value1}
+		CMP.l {value2}
+	#{?}_done:
 endmacro
 ;--------------------------------------------------------------------------------
 CalculateTimer:
@@ -50,14 +50,14 @@ CalculateTimer:
 		%Sub32(ChallengeTimer,NMIFrames,ClockBuffer)
 	++
 
-	%Blt32(ClockBuffer,.halfCycle) : !BGE +++ : JMP + : +++
+	%Blt32(ClockBuffer,.halfCycle) : BCS +++ : JMP + : +++
 		LDA.l TimeoutBehavior : AND.w #$00FF : BNE ++ ; DNF
 			LDA.w #$0002 : STA.l ClockStatus ; Set DNF Mode
 			LDA.l NMIFrames : STA.l ChallengeTimer
 			LDA.l NMIFrames+2 : STA.l ChallengeTimer+2
 			RTS
 		++ CMP.w #$0001 : BNE ++ ; Negative Time
-			LDA.l ClockBuffer : EOR.w #$FFFF : !ADD.w #$0001 : STA.l ClockBuffer
+			LDA.l ClockBuffer : EOR.w #$FFFF : CLC : ADC.w #$0001 : STA.l ClockBuffer
 			LDA.l ClockBuffer+2 : EOR.w #$FFFF : ADC.w #$0000 : STA.l ClockBuffer+2
 			LDA.w #$0001 : STA.l ClockStatus ; Set Negative Mode
 			BRA .prepDigits
@@ -90,39 +90,39 @@ CalculateTimer:
 	.prepDigits
 
 	-
-		%Blt32(ClockBuffer,.hour) : !BLT +
+		%Blt32(ClockBuffer,.hour) : BCC +
 		%DecIncr(ClockHours)
 		%Sub32(ClockBuffer,.hour,ClockBuffer) : BRA -
 	+ -
-		%Blt32(ClockBuffer,.minute) : !BLT +
+		%Blt32(ClockBuffer,.minute) : BCC +
 		%DecIncr(ClockMinutes)
 		%Sub32(ClockBuffer,.minute,ClockBuffer) : BRA -
 	+ -
-		%Blt32(ClockBuffer,.second) : !BLT +
+		%Blt32(ClockBuffer,.second) : BCC +
 		%DecIncr(ClockSeconds)
 		%Sub32(ClockBuffer,.second,ClockBuffer) : BRA -
 	+
 
-	LDA.l ClockHours : !ADD.w #$2490 : STA.l ClockHours ; convert decimal values to tiles
-	LDA.l ClockHours+2 : !ADD.w #$2490 : STA.l ClockHours+2
-	LDA.l ClockMinutes : !ADD.w #$2490 : STA.l ClockMinutes
-	LDA.l ClockMinutes+2 : !ADD.w #$2490 : STA.l ClockMinutes+2
-	LDA.l ClockSeconds : !ADD.w #$2490 : STA.l ClockSeconds
-	LDA.l ClockSeconds+2 : !ADD.w #$2490 : STA.l ClockSeconds+2
+	LDA.l ClockHours : CLC : ADC.w #$2490 : STA.l ClockHours ; convert decimal values to tiles
+	LDA.l ClockHours+2 : CLC : ADC.w #$2490 : STA.l ClockHours+2
+	LDA.l ClockMinutes : CLC : ADC.w #$2490 : STA.l ClockMinutes
+	LDA.l ClockMinutes+2 : CLC : ADC.w #$2490 : STA.l ClockMinutes+2
+	LDA.l ClockSeconds : CLC : ADC.w #$2490 : STA.l ClockSeconds
+	LDA.l ClockSeconds+2 : CLC : ADC.w #$2490 : STA.l ClockSeconds+2
 RTS
 ;--------------------------------------------------------------------------------
 .hour
-dw #$4BC0, #$0003
+dw $4BC0, $0003
 .minute
-dw #$0E10, #$0000
+dw $0E10, $0000
 .second
-dw #$003C, #$0000
+dw $003C, $0000
 .halfCycle
-dw #$FFFF, #$7FFF
+dw $FFFF, $7FFF
 ;--------------------------------------------------------------------------------
 DrawChallengeTimer:
         JSR CheckOHKO : BCC ++
-	        AND.w #$00FF : BEQ +
+                AND.w #$00FF : BEQ +
                         LDA.w #$2807 : STA.l HUDTileMapBuffer+$90
                         LDA.w #$280A : STA.l HUDTileMapBuffer+$92
                         LDA.w #$280B : STA.l HUDTileMapBuffer+$94
@@ -135,7 +135,7 @@ DrawChallengeTimer:
                 STA.l HUDTileMapBuffer+$96
         ++
         LDA.l TimerStyle : BNE + : RTL : + ; Hud Timer
-        LDA.w #$2807 : STA.l HUDTileMapBuffer+$92    	
+        LDA.w #$2807 : STA.l HUDTileMapBuffer+$92
         LDA.l ClockStatus : AND.w #$0002 : BEQ + ; DNF / OKHO
 
 			LDA.l TimeoutBehavior : AND.w #$00FF : BNE ++ ; DNF
@@ -165,7 +165,7 @@ DrawChallengeTimer:
 			LDA.l TimerRestart : BNE +++ : RTL : +++
 			BRA ++
 		+ ; Show Timer
-	    	LDA.l ClockStatus : AND.w #$0001 : !ADD.w #$2804 : STA.l HUDTileMapBuffer+$94
+	    	LDA.l ClockStatus : AND.w #$0001 : CLC : ADC.w #$2804 : STA.l HUDTileMapBuffer+$94
 			LDA.l ClockHours+2 : STA.l HUDTileMapBuffer+$96
 			LDA.l ClockHours : STA.l HUDTileMapBuffer+$98
 	    	LDA.w #$2806 : STA.l HUDTileMapBuffer+$9A
