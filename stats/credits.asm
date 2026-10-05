@@ -67,17 +67,14 @@ PatronCredit3Lo:
 
 ;===================================================================================================
 
-CreditsLineTable:
+piling CreditsLineTable :: 800
 fill word size 800 :: CreditsLineBlank
 
 ;===================================================================================================
 
-!CLINE = -1
-
 ;---------------------------------------------------------------------------------------------------
 
 macro smallcredits(text, color)
-	!CLINE = !CLINE+1
 	encoder creditsSmall_{color}
 
 	{?}_line:
@@ -87,15 +84,11 @@ macro smallcredits(text, color)
 		db "{text}"
 	^..size
 
-	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw {?}_line
-	pullpc
-
+	pile CreditsLineTable :: dw {?}_line
 endmacro
 
 ;---------------------------------------------------------------------------------------------------
 macro bigcredits(text)
-	!CLINE = !CLINE+1
 	encoder creditsBigHi
 
 	{?}_line_top:
@@ -105,9 +98,7 @@ macro bigcredits(text)
 		db "{text}"
 	^..size
 
-	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw {?}_line_top
-	pullpc
+	pile CreditsLineTable :: dw {?}_line_top
 
 	encoder creditsBigLo
 	{?}_line_bottom:
@@ -117,16 +108,12 @@ macro bigcredits(text)
 		db "{text}"
 	^..size
 
-	!CLINE = !CLINE+1
-	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw {?}_line_bottom
-	pullpc
+	pile CreditsLineTable :: dw {?}_line_bottom
 endmacro
 
 ;---------------------------------------------------------------------------------------------------
 
 macro bigcreditsleft(text)
-	!CLINE = !CLINE+1
 	encoder creditsBigHi
 
 	{?}_line_top:
@@ -136,9 +123,7 @@ macro bigcreditsleft(text)
 		db "{text}"
 	^..size
 
-	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw {?}_line_top
-	pullpc
+	pile CreditsLineTable :: dw {?}_line_top
 
 	encoder creditsBigLo
 	{?}_line_bottom:
@@ -148,34 +133,21 @@ macro bigcreditsleft(text)
 		db "{text}"
 	^..size
 
-
-	!CLINE = !CLINE+1
-	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw {?}_line_bottom
-	pullpc
+	pile CreditsLineTable :: dw {?}_line_bottom
 endmacro
 
 ;---------------------------------------------------------------------------------------------------
 
 macro emptyline()
-	!CLINE = !CLINE+1
-	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw CreditsEmptyLine
-	pullpc
+	pile CreditsLineTable :: dw CreditsEmptyLine
 endmacro
 
 macro blankline()
-	!CLINE = !CLINE+1
-	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw CreditsLineBlank
-	pullpc
+	pile CreditsLineTable :: dw CreditsLineBlank
 endmacro
 
-macro addarbline(l)
-	!CLINE = !CLINE+1
-	pushpc
-	org CreditsLineTable+!CLINE+!CLINE : dw {l}
-	pullpc
+macro addarbline(addr)
+	pile CreditsLineTable :: dw {addr}
 endmacro
 
 ;===================================================================================================
@@ -646,19 +618,15 @@ endif
 
 ;===================================================================================================
 
-printf "Credits line number: {0} | Expected: 302", !CLINE
+printf "Credits line table size: {0} | Expected: 606", CreditsLineTable:size
 
-if !CLINE > 302
-	error "Too many credits lines. !CLINE > 302"
-
-elseif !CLINE < 302
-	warn "Too few credits lines. !CLINE < 302; Adding additional empties for alignment."
-
+if CreditsLineTable:size > 606
+	error "Too many credits lines. CreditsLineTable:size > 606."
 endif
 
-
-; Set line always to line up with stats
-!CLINE = 302
+if CreditsLineTable:size < 606
+	error "Too few credits lines. CreditsLineTable:size < 606."
+endif
 
 ;===================================================================================================
 
