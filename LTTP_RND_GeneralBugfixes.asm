@@ -293,27 +293,28 @@ warnpc $B1B800
 org $B1C000
 IcePalaceFloorGfx:
 incbin "data/ice_palace_floor.bin"
-warnpc $B1C801
+warnpc $B1C800
 
 org $B1C800
 Damage_Table:
 incbin "data/damage_table.bin"
-warnpc $B1D001
+warnpc $B1D000
 
 org $B1D000
 FileSelectNewGraphics:
 incbin "data/fileselectgfx.2bpp"
-warnpc $B1E001
+^.size
+warnpc $B1E000
 
 org $B1E000
 InvertedCastleHole: ;address used by front end. DO NOT MOVE!
 incbin "data/sheet73.gfx"
-warnpc $B1E501
+warnpc $B1E500
 
 org $B38000
 GFX_HUD_Palette:
 incbin "data/hudpalette.pal"
-warnpc $B38041
+warnpc $B38040
 
 org $B39000
 ExpandedTrinexx:
@@ -449,6 +450,3 @@ org $80D25B ; 0x525B - HUD Main L
 db GFX_HUD_Main
 
 ;================================================================================
-
-org $8DF7F1
-dw $2862, $2863, $2872, $2873 ; Dungeon-Only Mirror

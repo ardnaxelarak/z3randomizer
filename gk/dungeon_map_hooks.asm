@@ -57,6 +57,29 @@ org $8AEE2B
 	db $F0 ; BEQ to replace BCS
 
 ;================================================================================
+; Moving MAP and LEVEL graphic to menu-specific gfx slots
+;--------------------------------------------------------------------------------
+org $8AE16E
+; .LEVEL_top
+	dw $21C8, $21C9, $21CA, $21CB, $207F
+
+org $8AE17C
+; .LEVEL_bottom
+	dw $21D8, $21D9, $21DA, $21DB, $207F
+
+; fix color on sword 2 bottom-right
+org $8DF86F
+	dw $2D26
+
+; fix color on sword 3 bottom-right
+org $8DF877
+	dw $2548
+
+; fix color and tile on sword 4 bottom-right
+org $8DF87F
+	dw $2938
+
+;================================================================================
 ; Overhaul of Dungeon Map Screen
 ;--------------------------------------------------------------------------------
 org $8AE64D

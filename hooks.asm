@@ -776,9 +776,21 @@ JSL DrawFlippersInMenuLocation : NOP
 org $8DECEB ; <- 6ECEB - equipment.asm : 1946 (LDA.w #$16E0 : STA $00)
 JSL DrawMoonPearlInMenuLocation : NOP
 
-; Fake boots icon
+; Fake Boots icon
 org $8DF851
-dw $2C29, $2C2A, $2C2B, $2C2C
+dw $2C29, $2C2A, $2C2B, $2D33
+
+; Dungeon-Only Mirror icon
+org $8DF7F1
+dw $2862, $2863, $2872, $2942
+
+; Somaria bottom-right icon
+org $8DF7C7
+dw $253E
+
+; Byrna bottom-right icon
+org $8DF7D7
+dw $2D3F
 
 ;================================================================================
 ; Zelda S&Q Mirror Fix
@@ -2849,7 +2861,7 @@ JSL CheckTransitionOverworld
 NOP
 ;--------------------------------------------------------------------------------
 org $8DF741
-dw $3CD4, $3CD5, $3CE4, $3CE5
+dw $3CD4, $3CD5, $3CE4, $3D32
 ;--------------------------------------------------------------------------------
 org $8DE58E ; bank_0D.asm@15401 (AND.w #$00FF : STA.b $02)
 JSL DrawFluteIcon

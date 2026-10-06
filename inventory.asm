@@ -420,12 +420,12 @@ AddYMarker:
 	LDA.w MenuBlink : AND.w #$0020 : BNE .drawXBubble
 
 	.drawYBubble
-	LDA.w #$3D4F
+	LDA.w #$3DBC
 	BRA .drawTile
 
 	.drawXBubble
 	JSR MakeCircleBlue
-	LDA.w #$2D3E
+	LDA.w #$2DBB
 
 	.drawTile
 	STA.w $FFC4, Y

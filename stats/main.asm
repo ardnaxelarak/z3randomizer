@@ -507,7 +507,7 @@ LoadCreditsTiles:
 	LDX.w #$8200 : STX.w VMADDL
 	LDA.b #FileSelectNewGraphics>>16 : STA.w A1B0
 	LDX.w #FileSelectNewGraphics : STX.w A1T0L
-	LDX.w #$0C00 : STX.w DAS0L
+	LDX.w #FileSelectNewGraphics.size : STX.w DAS0L
 	LDA.b #$01 : STA.w DMAENABLE
 
 	; Small characters A-Z

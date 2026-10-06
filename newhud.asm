@@ -84,9 +84,9 @@ NewHUD_DrawGoal:
         LDA.b Scrap07 : TAX : STX.w HUDGoalIndicator+6 ; draw 1's digit
 
         REP #$20
-		LDX.w #!BlankTile
+        LDX.w #!BlankTile
         LDA.w GoalCounter
-		CMP.w #100 : BCS .req : STX.w HUDGoalIndicator+$02
+        CMP.w #100 : BCS .req : STX.w HUDGoalIndicator+$02
         CMP.w #10 : BCS .req : STX.w HUDGoalIndicator+$04
 
 .req
@@ -217,9 +217,9 @@ NewHUD_DrawPrizeIcon:
 NewHUD_DrawItemCounter:
         REP #$20
         LDA.l UpdateHUDFlag : BNE .continue
-		.early_exit
-        	JMP NewHUD_DrawMagicMeter
-		.continue
+        .early_exit
+            JMP NewHUD_DrawMagicMeter
+        .continue
         LDA.l ItemCounterHUD : AND.w #$00FF : BEQ .early_exit
         LDA.w #!SlashTile : STA.w HUDGoalIndicator+$08
         LDA.l TotalItemCount : CMP.w #1000 : BCS .item_four_digits
@@ -233,9 +233,9 @@ NewHUD_DrawItemCounter:
         LDA.b Scrap06 : TAX : STX.w HUDGoalIndicator+$04
         LDA.b Scrap07 : TAX : STX.w HUDGoalIndicator+$06
         REP #$20 : LDA.w TotalItemCounter
-		LDX.w #!BlankTile
-		CMP.w #100 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$02
-		CMP.w #10 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$04
+        LDX.w #!BlankTile
+        CMP.w #100 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$02
+        CMP.w #10 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$04
         BRA NewHUD_DrawMagicMeter
 
         .item_four_digits
@@ -251,10 +251,10 @@ NewHUD_DrawItemCounter:
         LDA.b Scrap06 : TAX : STX.w HUDGoalIndicator+$04
         LDA.b Scrap07 : TAX : STX.w HUDGoalIndicator+$06
         REP #$20 : LDA.w TotalItemCounter
-		LDX.w #!BlankTile
-		CMP.w #1000 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$00
-		CMP.w #100 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$02
-		CMP.w #10 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$04
+        LDX.w #!BlankTile
+        CMP.w #1000 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$00
+        CMP.w #100 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$02
+        CMP.w #10 : BCS NewHUD_DrawMagicMeter : STX.w HUDGoalIndicator+$04
 
 ;================================================================================
 DrawMagicMeter_mp_tilemap = $0DFE0F
