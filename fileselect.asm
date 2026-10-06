@@ -196,6 +196,7 @@ DrawPlayerFileShared:
 
 	JSR FileSelectDrawHudBar
 
+.drawEquipment
 	; Bow
 	LDA.l BowTrackingSRAM : AND.w #$0040 : BEQ +
 		LDA.l EquipmentSRAM+$00 : AND.w #$00FF : BEQ ++
@@ -429,6 +430,7 @@ DrawPlayerFileShared:
 	; Moon Pearl
 	%fs_drawItemBasic(EquipmentSRAM+$17,9,28,FileSelectItems.pearl)
 
+.drawPendants
 	; Pendants
 	LDA.l EquipmentSRAM+$34 : AND.w #$0004 : BEQ +
 		%fs_drawItem(12,12,FileSelectItems.green_pendant)
