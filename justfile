@@ -37,6 +37,7 @@ gfx:
 
 prep: (testbuild)
   futaba patch -m lorom testing/testing.asm alttp_rando_fixed.sfc alttp_rando_test.sfc -c
+  cp alttp_rando_fixed.sym alttp_rando_test.sym
 
 merge *ARGS:
   git merge -Xignore-space-change {{ARGS}}

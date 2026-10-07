@@ -510,6 +510,13 @@ LoadCreditsTiles:
 	LDX.w #FileSelectNewGraphics.size : STX.w DAS0L
 	LDA.b #$01 : STA.w DMAENABLE
 
+	; Overflow item tiles
+	LDX.w #$8000 : STX.w VMADDL
+	LDA.b #FileSelectOverflowGraphics>>16 : STA.w A1B0
+	LDX.w #FileSelectOverflowGraphics : STX.w A1T0L
+	LDX.w #FileSelectOverflowGraphics.size : STX.w DAS0L
+	LDA.b #$01 : STA.w DMAENABLE
+
 	; Small characters A-Z
 	LDX.w #$7F00 : STX.w VMADDL
 	LDA.b #SmallCharacters>>16 : STA.w A1B0
