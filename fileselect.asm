@@ -802,6 +802,15 @@ LoadFullItemTiles:
         LDX.w #FileSelectNewGraphics : STX.w A1T0L
         LDX.w #FileSelectNewGraphics.size : STX.w DAS0L
         LDA.b #$01 : STA.w DMAENABLE
+
+        LDA.b #$80 : STA.w VMAIN
+        LDA.b #$01 : STA.w DMAP0
+        LDA.b #$18 : STA.w BBAD0
+        LDX.w #$3000 : STX.w VMADDL
+        LDA.b #^FileSelectOverflowGraphics : STA.w A1B0
+        LDX.w #FileSelectOverflowGraphics : STX.w A1T0L
+        LDX.w #FileSelectOverflowGraphics.size : STX.w DAS0L
+        LDA.b #$01 : STA.w DMAENABLE
 RTL
 ;--------------------------------------------------------------------------------
 ; z colon @

@@ -304,6 +304,9 @@ org $B1D000
 FileSelectNewGraphics:
 incbin "data/fileselectgfx.2bpp"
 ^.size
+FileSelectOverflowGraphics:
+incbin "data/fileselectoverflow.2bpp"
+^.size
 warnpc $B1E000
 
 org $B1E000
