@@ -214,7 +214,7 @@ DrHudDungeonItemsAdditions:
 			JSR BossStatus : STA.w $1644, Y
 			INY #2
 			lda.w #$24f5 : sta.w $1644, y ; blank out map spot
-			lda.l MapField : ora.l MapCountDisplay : ora.l MapOverlay
+			lda.l MapField : ora.l MapOverlay
 			and.l DungeonMask, x : beq + ; must have map
 				JSR MapIndicatorShort : STA.w $1644, Y
 			+ iny #2
