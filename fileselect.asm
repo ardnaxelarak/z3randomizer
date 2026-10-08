@@ -644,12 +644,14 @@ FileSelectDrawHudBar:
         LDA.b Scrap06 : AND.w #$00FF : CLC : ADC.w #$0250+!FS_COLOR_BW : %fs_draw8x8(1,11)
         LDA.b Scrap07 : AND.w #$00FF : CLC : ADC.w #$0250+!FS_COLOR_BW : %fs_draw8x8(1,12)
 
+.bombs
         LDA.w #$02CB|!FS_COLOR_BLUE : %fs_draw16x8(0,14)
         LDA.l BombsEquipmentSRAM : AND.w #$00FF
         JSL HUDHex2Digit_Long
         TYA : AND.w #$00FF : CLC : ADC.w #$0250+!FS_COLOR_BW : %fs_draw8x8(1,14)
         TXA : AND.w #$00FF : CLC : ADC.w #$0250+!FS_COLOR_BW : %fs_draw8x8(1,15)
 
+.arrows
         LDA.l BowTrackingSRAM : AND.w #$0040 : BEQ +
                 LDA.w #$02D9|!FS_COLOR_RED : %fs_draw16x8(0,17)
                 BRA ++
@@ -782,11 +784,11 @@ SetItemLayoutPriority:
   %LayoutPriority($1104)
   %LayoutPriority($1144)
   %LayoutPriority($1184)
-  %LayoutPriority($11c4)
+  %LayoutPriority($11C4)
   %LayoutPriority($1204)
   %LayoutPriority($1244)
   %LayoutPriority($1284)
-  %LayoutPriority($12c4)
+  %LayoutPriority($12C4)
   %LayoutPriority($1304)
   %LayoutPriority($1344)
 

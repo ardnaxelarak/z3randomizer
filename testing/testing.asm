@@ -12,5 +12,5 @@ org $B0804B
 org $B0821A
     db $01 ; disable music
 
-org $01EA79
+org $81EA79
     db $6A ; Triforce in sanctuary
