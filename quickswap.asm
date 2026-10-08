@@ -57,6 +57,7 @@ RCode:
 	LDA.l InventoryTracking+1 : BIT.b #$01 : BEQ +
 	RTS
 	-
+	.findItem
 		+ CPX.b #$14 : BNE + : LDX.b #$00 ;will wrap around to 1
 		+ INX
                 DEY : BEQ +
@@ -74,6 +75,7 @@ LCode:
 	LDA.l InventoryTracking+1 : BIT.b #$01 : BEQ +
 	RTS
 	-
+	.findItem
 		+ CPX.b #$01 : BNE + : LDX.b #$15 ; will wrap around to $14
 		+ DEX
                 DEY : BEQ +
