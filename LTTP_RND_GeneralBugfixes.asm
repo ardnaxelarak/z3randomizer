@@ -56,6 +56,8 @@ function hexto555(h) => (<{h}>>3<<10)|(>{h}>>3<<5)|(^{h}>>3)
 ; Feature flags, run asar with -DFEATURE_X=1 to enable
 !FEATURE_FIX_BASEROM ?= 0
 
+!CRYSTAL_PENDANT_FLAGS_3 = !CRYSTAL_PENDANT_FLAG_OVERRIDE ?? $B0EFE0
+
 ;================================================================================
 
 !MULTIWORLD_ITEM = $7EF4D2

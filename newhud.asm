@@ -193,7 +193,7 @@ NewHUD_DrawPrizeIcon:
 
 	.prize
 	TYX
-	LDA.l CrystalPendantFlags_3,X : AND.w #$00FF
+	LDA.l !CRYSTAL_PENDANT_FLAGS_3,X : AND.w #$00FF
 	ASL : TAX
 	LDA.l PrizeIconTiles_Transparent,X : BEQ .no_icon
 	TAY

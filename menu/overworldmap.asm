@@ -223,7 +223,7 @@ DrawPrizesOverride:
 
 				; determine if draw and/or continue
 				JSR WorldMap_ValidateCoords : BCC +
-					BNE .extras : BRA .advance
+					BNE .extras : JMP .advance
 				+
 				JSR WorldMap_DrawTile
 
@@ -239,7 +239,15 @@ DrawPrizesOverride:
 				JSR WorldMap_DrawTile
 				BRA .next_icon
 			.show_prizes
-			LDA.w WorldMapIcon_prize_tile,Y : BEQ .advance
+			TYA
+			LSR A
+			TAX
+			LDA.l !CRYSTAL_PENDANT_FLAGS_3, X
+			AND.w #$00FF
+			ASL A
+			TAX
+			LDA.l PrizeToIconMap, X : BEQ .advance
+			; LDA.w WorldMapIcon_prize_tile,Y : BEQ .advance
 			XBA : STA.b Scrap0C
 			LDX.b #$02 : STX.b Scrap0B ; all prize icons are wide
 
@@ -293,7 +301,7 @@ WorldMap_DrawTileOverlay:
 	LDA.l CompassMode : AND.w #$0040 : BEQ +
 		LDA.b Scrap05 : BIT.w #$0100 : BEQ .skip+1
 		LSR : AND.w #$000F : TAX
-		LDA.l CrystalPendantFlags_3,X : TAX : BEQ .skip+1
+		LDA.l !CRYSTAL_PENDANT_FLAGS_3,X : TAX : BEQ .skip+1
 		CPX.b #$08 : BCS +
 			LDA.b Scrap0C : PHA
 			LDA.l WorldMapIcon_Numbers-1,X
@@ -420,16 +428,23 @@ RTS
 
 WorldMap_CheckPrizeCollected:
 	PHX
-		TXA : LSR : TAX
-		LDA.l CrystalPendantFlags_3,X : AND.w #$00FF : BEQ .prize_not_collected
-			CMP.w #$0008 : LDA.l CrystalPendantFlags,X : BCS .pendant
-				AND.l CrystalsField : BRA .check
-				.pendant
-				AND.l PendantsField
-			.check
-			AND.w #$00FF : BEQ .prize_not_collected
-			PLX : SEC : RTS
-		.prize_not_collected
+	TXA : LSR A : TAX
+	LDA.l !CRYSTAL_PENDANT_FLAGS_3, X : AND.w #$00FF : BEQ .prize_not_collected
+	CMP.w #$0008 : BCS .pendant
+
+.crystal
+	JSL GetCrystalPendantFlags : AND.l CrystalsField : BRA .check
+
+.pendant
+	JSL GetCrystalPendantFlags : AND.l PendantsField
+
+.check
+	AND.w #$00FF : BEQ .prize_not_collected
+
+	PLX : SEC
+RTS
+
+.prize_not_collected
 	PLX : CLC
 RTS
 
@@ -546,6 +561,19 @@ WorldMap_HandleSprites:
 warnpc $8ABFB6
 
 pullpc
+
+PrizeToIconMap:
+db $00, $00 ; none
+db $34, $64 ; crystal
+db $34, $64 ; crystal
+db $34, $64 ; crystal
+db $34, $64 ; crystal
+db $32, $64 ; red crystal
+db $32, $64 ; red crystal
+db $34, $64 ; crystal
+db $38, $60 ; green pendant
+db $34, $60 ; blue pendant
+db $32, $60 ; red pendant
 
 WorldMap_LoadChrHalfSlot:
 	JSL Graphics_LoadChrHalfSlot ; what we wrote over

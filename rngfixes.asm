@@ -96,12 +96,12 @@ RNG_Ganon_Extra_Warp:
 	PLA
 	RTL
 RNG_Enemy_Drops:
-        LDA.l ProgressIndicator : CMP.b #$01 : BEQ + ; drops are static after uncle pickup & before rescuing zelda
-                JML GetRandomInt
-        +
-                LDA.b #$0F
-        _rng_done:
-        JSL GetStaticRNG
+	LDA.l ProgressIndicator : CMP.b #$01 : BEQ + ; drops are static after uncle pickup & before rescuing zelda
+		JML GetRandomInt
+	+
+		LDA.b #$0F
+	_rng_done:
+	JSL GetStaticRNG
 RTL
 ;--------------------------------------------------------------------------------
 ; In: A = RNG Index

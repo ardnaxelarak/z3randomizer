@@ -418,6 +418,32 @@ CrystalOrPendantBehavior:
         PLX : PLA
 RTS
 
+GetCrystalPendantFlags:
+	PHP
+	REP #$10
+	PHX
+	SEP #$30
+	LDA.l !CRYSTAL_PENDANT_FLAGS_3, X
+	TAX
+	LDA.l .prize_map, X
+	REP #$10
+	PLX
+	PLP
+RTL
+
+.prize_map
+db $00 ; no prize
+db $02 ; Crystal 1
+db $10 ; Crystal 2
+db $40 ; Crystal 3
+db $20 ; Crystal 4
+db $04 ; Crystal 5
+db $01 ; Crystal 6
+db $08 ; Crystal 7
+db $04 ; Pendant 1
+db $02 ; Pendant 2
+db $01 ; Pendant 3
+
 CheckDungeonWorld:
 ; Maintain vanilla door opening behavior with dungeon prizes
         TXA : CMP.b #$05 : BCS .dark_world

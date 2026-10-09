@@ -260,7 +260,7 @@ IndicatorCharacters:
 	dw $2426, $2817, $2818, $2819, $281A, $281B, $281C, $281D, $2590, $258B, $259B
 
 MapIndicator:
-	LDA.l CrystalPendantFlags_3, X : AND.w #$00FF
+	LDA.l !CRYSTAL_PENDANT_FLAGS_3, X : AND.w #$00FF
 	PHX
 		ASL : TAX : LDA.l IndicatorCharacters, X
 	PLX

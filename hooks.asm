@@ -1100,6 +1100,9 @@ org $88CCA6 : JSL PrepPrizeOAMCoordinates : NOP
 org $8985FA : JSL SetCutsceneFlag : NOP #3 : BCC AddReceivedItem_notCrystal
 org $8988B2 : JSL SetPrizeCoords : NOP
 
+org $88CC64
+	JSL GetCrystalPendantFlags
+	ORA.l CrystalsField
 
 ;================================================================================
 ; Uncle / Sage Fixes - Old Man Fixes - Link's House Fixes

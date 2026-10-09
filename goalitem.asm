@@ -407,7 +407,7 @@ CheckForBossesDefeated:
 	; $30 = check all bosses
 	STA.b Scrap04
 
-	LDA.b #^CrystalPendantFlags_3
+	LDA.b #^!CRYSTAL_PENDANT_FLAGS_3
 	PHA : PLB
 
 	STZ.b Scrap03 ; count of number of bosses killed
@@ -419,7 +419,7 @@ CheckForBossesDefeated:
 
 .next_check
 	SEP #$30
-	LDA.w CrystalPendantFlags_3+2, Y
+	LDA.w !CRYSTAL_PENDANT_FLAGS_3+2, Y
 	CLC : ADC.b Scrap04
 	TAX
 	LDA.l BossPrizeFlags, X

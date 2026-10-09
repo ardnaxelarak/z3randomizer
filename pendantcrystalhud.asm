@@ -407,7 +407,7 @@ RTL
         PHX : TXA : TAX
                 LDA.w .dungeon_reorder,X
                 LSR : TAX
-                LDA.l CrystalPendantFlags_3+1,X
+                LDA.l !CRYSTAL_PENDANT_FLAGS_3+1,X
                 AND.w #$00FF : ASL : TAX
                 LDA.w PrizeIconTiles,X : BNE +
                         LDA.w #$2826
