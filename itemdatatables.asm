@@ -137,7 +137,7 @@ macro ReceiptProps(id, y, x, gfx, sram, value, behavior, res)
 	pullpc
 endmacro
 
-%ReceiptProps($00, -5, 0, $06, $F359, $01, sword_shield, skip) ; 00 - Fighter sword & Shield
+%ReceiptProps($00, -5, 0, $52, $F359, $01, sword_shield, skip) ; 00 - Fighter sword & Shield
 %ReceiptProps($01, -5, 4, $18, $F359, $02, master_sword, skip) ; 01 - Master sword
 %ReceiptProps($02, -5, 4, $18, $F359, $03, tempered_sword, skip) ; 02 - Tempered sword
 %ReceiptProps($03, -5, 4, $18, $F359, $04, gold_sword, skip) ; 03 - Golden sword
@@ -952,7 +952,7 @@ endmacro
 ItemReceiptGraphicsOffsets:
 	dw $0860                               ; 00 - Fighter Sword and Shield
 	dw BigDecompressionBuffer+$11C0        ; 01 - Master Sword
-	dw BigDecompressionBuffer+$11C0        ; 01 - Tempered Sword
+	dw BigDecompressionBuffer+$11C0        ; 02 - Tempered Sword
 	dw BigDecompressionBuffer+$11C0        ; 03 - Butter Sword
 	dw BigDecompressionBuffer+$09E0        ; 04 - Fighter Shield
 	dw BigDecompressionBuffer+$1940        ; 05 - Fire Shield
@@ -1032,7 +1032,7 @@ ItemReceiptGraphicsOffsets:
 	dw $05A0                               ; 4D - Arrow capacity (70)
 	dw $01A0                               ; 4E - 1/2 magic
 	dw $01E0                               ; 4F - 1/4 magic
-	dw $00E0                               ; 50 - Safe master sword
+	dw BigDecompressionBuffer+$11C0        ; 50 - Safe master sword
 	dw $0420                               ; 51 - Bomb capacity (+5)
 	dw $0460                               ; 52 - Bomb capacity (+10)
 	dw $0520                               ; 53 - Arrow capacity (+5)
@@ -1058,9 +1058,9 @@ ItemReceiptGraphicsOffsets:
 	dw $0                                  ; 67 -
 	dw $0                                  ; 68 -
 	dw $0                                  ; 69 -
-	dw $0040                               ; 6A - Triforce
+	dw $0060                               ; 6A - Triforce
 	dw $11E0                               ; 6B - Power star
-	dw $0040                               ; 6C - Triforce Piece
+	dw $0060                               ; 6C - Triforce Piece
 	dw $0                                  ; 6D - Server request item
 	dw $0                                  ; 6E - Server request item (dungeon drop)
 	dw $0                                  ; 6F -
@@ -1328,9 +1328,9 @@ StandingItemGraphicsOffsets:
 	dw $0                                  ; 67 -
 	dw $0                                  ; 68 -
 	dw $0                                  ; 69 -
-	dw $0040                               ; 6A - Triforce
+	dw $0060                               ; 6A - Triforce
 	dw $11E0                               ; 6B - Power star
-	dw $0040                               ; 6C - Triforce Piece
+	dw $0060                               ; 6C - Triforce Piece
 	dw $0                                  ; 6D - Server request item
 	dw $0                                  ; 6E - Server request item (dungeon drop)
 	dw $0                                  ; 6F -
