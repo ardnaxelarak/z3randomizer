@@ -37,7 +37,7 @@ org $86D19F
 	JSL MarkSRAMForItem : NOP #2
 
 org $86D180
-	JSL BigKeyGet : BCS + : NOP #7 : +
+	JSL BigKeyGet : BCS + : NOP #5 : skip 2 : +
 
 org $86d18d ; <- 3518D - sprite_absorbable.asm : 274 (LDA $7EF36F : INC A : STA $7EF36F)
 	JSL KeyGet
@@ -145,6 +145,11 @@ org $A8ACB0
 UWEnemyItemFlags:
 ; Reserved $250 296 * 2
 
+; Fix the HC Big Key in the baserom
+if !FEATURE_FIX_BASEROM
+plop $89E327 :: db $32, $00, $F8
+plop UWEnemyItemFlags+2*$80 :: dw $2000
+endif
 
 org $A8AF00
 UWSpecialFlagIndex:
@@ -668,6 +673,13 @@ SpriteKeyDrawGFX:
         LDA.w SprRedrawFlag, X : CMP.b #$02 : BEQ +
         BRA .skipDraw
     + LDA.w SprItemReceipt, X
+
+if !FEATURE_FIX_BASEROM
+    BNE .already_set
+        LDA.b #$24
+    .already_set
+endif
+
     CMP.b #$24 : BNE +
         LDA.b RoomIndex : CMP.b #$80 : BNE ++
         LDA.w SpawnedItemFlag : BNE ++
@@ -736,13 +748,18 @@ BigKeyGet:
 	+ SEC : RTL
 
 LoadProperties_PreserveCertainProps:
-	LDA.w SpriteTypeTable, X : CMP.b #$E4 : BEQ +
-	CMP.b #$E5 : BEQ +
+if !FEATURE_FIX_BASEROM
+	JML SpritePrep_LoadProperties
+else
+	LDA.w SpriteTypeTable, X : CMP.b #$E4 : BEQ .is_key
+	CMP.b #$E5 : BEQ .is_key
 		JML SpritePrep_LoadProperties
-	+ LDA.w SpriteOAMProp, X : PHA
-    JSL SpritePrep_LoadProperties
-    PLA : STA.w SpriteOAMProp, X
-    RTL
+.is_key
+	LDA.w SpriteOAMProp, X : PHA
+	JSL SpritePrep_LoadProperties
+	PLA : STA.w SpriteOAMProp, X
+	RTL
+endif
 
 SubstitionFlow:
 	CPY.b #$04 : BNE +
