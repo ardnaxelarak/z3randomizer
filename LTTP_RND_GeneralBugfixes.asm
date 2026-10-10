@@ -139,7 +139,7 @@ incsrc "follower.asm"
 warnpc $A18000
 
 org $9C8000 ; text tables for translation
-incbin "data/i18n_en.bin"
+incsrc "data/i18n_en.asm"
 warnpc $9CF356
 
 org $A18000 ; static mapping area
