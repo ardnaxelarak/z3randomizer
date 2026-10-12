@@ -4,3 +4,5 @@ tournament.asm
 /__pycache__
 /.vscode
 build.sh
+*.bps
+*.sfc

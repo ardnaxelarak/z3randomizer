@@ -31,7 +31,7 @@ dw $7F7F
 
 ; You picked up
 Notice_Crystal:
-db $74 : dw "You picked up"
+db $74 : dw "You acquired"
 dw $7F7F
 
 ; Light World
