@@ -14,6 +14,7 @@ DoWorldFix:
 		LDA.l FollowerTravelAllowed : CMP.b #$02 : BEQ +
 			LDA.l OldManRetrievalWorld
 			BRA .noMirror
+		.mirrorCheck
 		+ LDA.l MirrorEquipment : AND.b #$02 : BEQ .noMirror ; check if we have the mirror
 	.skip_mirror_check ; alt entrance point
 	LDA.l ProgressIndicator : CMP.b #$03 : BCS .done ; check if agahnim 1 is alive
