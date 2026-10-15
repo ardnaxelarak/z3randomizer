@@ -15,3 +15,7 @@ dw $0000, $7E4E, $6F44, $1CF5, $7399, $1CE7, $02F9, $0233
 dw $7FFF, $7FFF, $0000, $5907, $6E0E, $0000, $7FBB, $7672
 .off_black
 dw $0000, $14A5, $14A5, $14A5, $14A5, $14A5, $14A5, $14A5
+.progressive_ap
+dw $0000, $1F5F, $39DC, $3B53, $5A1F, $2ADF, $55AA, $0000
+.filler_ap
+dw $7FFF, $7FFF, $7FFF, $6318, $7FFF, $7FFF, $7FFF, $7FFF

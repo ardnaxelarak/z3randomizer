@@ -240,9 +240,9 @@ endmacro
 %ReceiptProps($64, -4, 0, $FF, $F340, $FF, skip, progressive_bow) ; 64 - Progressive bow
 %ReceiptProps($65, -4, 0, $FF, $F340, $FF, skip, progressive_bow_2) ; 65 - Progressive bow
 %ReceiptProps($66, -4, 0, $FF, $F36A, $FF, skip, skip) ; 66 - 
-%ReceiptProps($67, -4, 0, $FF, $F36A, $FF, skip, skip) ; 67 - 
-%ReceiptProps($68, -4, 0, $FF, $F36A, $FF, skip, skip) ; 68 - 
-%ReceiptProps($69, -4, 0, $FF, $F36A, $FF, skip, skip) ; 69 - 
+%ReceiptProps($67, -4, 0, $5B, $F36A, $FF, skip, skip) ; 67 - Progression AP Item
+%ReceiptProps($68, -4, 0, $5C, $F36A, $FF, skip, skip) ; 68 - Useful AP Item
+%ReceiptProps($69, -4, 0, $5C, $F36A, $FF, skip, skip) ; 69 - Filler AP Item
 %ReceiptProps($6A, -4, 0, $49, $F36A, $FF, triforce, skip) ; 6A - Triforce
 %ReceiptProps($6B, -4, 0, $4A, $F36A, $FF, goal_item, skip) ; 6B - Power star
 %ReceiptProps($6C, -4, 0, $49, $F36A, $FF, goal_item, skip) ; 6C - Triforce Piece
@@ -525,9 +525,9 @@ endmacro
 %SpriteProps($64, 2, 2, $FF, $FF, $0000)                                ; 64 - Progressive bow
 %SpriteProps($65, 2, 2, $FF, $FF, $0000)                                ; 65 - Progressive bow
 %SpriteProps($66, 2, 2, $00, $00, $0000)                                ; 66 - 
-%SpriteProps($67, 2, 2, $00, $00, $0000)                                ; 67 - 
-%SpriteProps($68, 2, 2, $00, $00, $0000)                                ; 68 - 
-%SpriteProps($69, 2, 2, $00, $00, $0000)                                ; 69 - 
+%SpriteProps($67, 2, 2, $80, $80, PalettesCustom_progressive_ap)        ; 67 - Progression AP Item
+%SpriteProps($68, 2, 2, $02, $02, PalettesVanilla_blue_ice+$0E)         ; 68 - Useful AP Item
+%SpriteProps($69, 2, 2, $80, $80, PalettesCustom_filler_ap)             ; 69 - Filler AP Item
 %SpriteProps($6A, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 6A - Triforce
 %SpriteProps($6B, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 6B - Power star
 %SpriteProps($6C, 2, 2, $04, $04, PalettesVanilla_green_blue_guard+$0E) ; 6C - Triforce Piece
@@ -807,9 +807,9 @@ endmacro
 %InventoryItem($64, $00A5, $0000, $0000) ; 64 - Progressive bow
 %InventoryItem($65, $00A5, $0000, $0000) ; 65 - Progressive bow
 %InventoryItem($66, $0001, $0000, $0000) ; 66 -
-%InventoryItem($67, $0001, $0000, $0000) ; 67 -
-%InventoryItem($68, $0001, $0000, $0000) ; 68 -
-%InventoryItem($69, $0001, $0000, $0000) ; 69 -
+%InventoryItem($67, $0001, $0000, $0000) ; 67 - Progression AP Item
+%InventoryItem($68, $0001, $0000, $0000) ; 68 - Useful AP Item
+%InventoryItem($69, $0001, $0000, $0000) ; 69 - Filler AP Item
 %InventoryItem($6A, $0081, $0000, $0000) ; 6A - Triforce
 %InventoryItem($6B, $0081, $0000, $0000) ; 6B - Power star
 %InventoryItem($6C, $0081, $0000, $0000) ; 6C - Triforce Piece
@@ -1067,9 +1067,9 @@ ItemReceiptGraphicsOffsets:
 	dw $0                                  ; 64 - Progressive bow
 	dw $0                                  ; 65 - Progressive bow
 	dw $0                                  ; 66 -
-	dw $0                                  ; 67 -
-	dw $0                                  ; 68 -
-	dw $0                                  ; 69 -
+	dw $0CA0                               ; 67 - Progression AP Item
+	dw $0CE0                               ; 68 - Useful AP Item
+	dw $0CE0                               ; 69 - Filler AP Item
 	dw $0060                               ; 6A - Triforce
 	dw $11E0                               ; 6B - Power star
 	dw $0060                               ; 6C - Triforce Piece
@@ -1337,9 +1337,9 @@ StandingItemGraphicsOffsets:
 	dw $0                                  ; 64 - Progressive bow
 	dw $0                                  ; 65 - Progressive bow
 	dw $0                                  ; 66 -
-	dw $0                                  ; 67 -
-	dw $0                                  ; 68 -
-	dw $0                                  ; 69 -
+	dw $0CA0                               ; 67 - Progression AP Item
+	dw $0CE0                               ; 68 - Useful AP Item
+	dw $0CE0                               ; 69 - Filler AP Item
 	dw $0060                               ; 6A - Triforce
 	dw $11E0                               ; 6B - Power star
 	dw $0060                               ; 6C - Triforce Piece
@@ -1603,9 +1603,9 @@ VRAMAddressOffset:
 	dw $0024                               ; 64 - Progressive bow
 	dw $0024                               ; 65 - Progressive bow
 	dw $0024                               ; 66 -
-	dw $0024                               ; 67 -
-	dw $0024                               ; 68 -
-	dw $0024                               ; 69 -
+	dw $0024                               ; 67 - Progression AP Item
+	dw $0024                               ; 68 - Useful AP Item
+	dw $0024                               ; 69 - Filler AP Item
 	dw $0024                               ; 6A - Triforce
 	dw $0024                               ; 6B - Power star
 	dw $0024                               ; 6C - Triforce Piece
