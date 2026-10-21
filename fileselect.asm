@@ -899,9 +899,10 @@ DrawPlayerFile_credits:
 	%fs_draw8x16(3,8)
 
 	LDA.l EquipmentSRAM+$2C : AND.w #$00FF : LSR #3 : STA.b Scrap02
+	.startHearts
 	%fs_LDY_screenpos(0,20)
-        LDA.l HUDHeartColors.index : ASL : TAX
-        LDA.l HUDHeartColors.masks_file_select,X
+	LDA.l HUDHeartColors.index : ASL : TAX
+	LDA.l HUDHeartColors.masks_file_select,X
 	ORA.w #$02CF
 	LDX.w #$000A
 

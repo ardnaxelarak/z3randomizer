@@ -30,6 +30,7 @@ FairyPond_Init:
 		JML Sprite_ShowMessageFromPlayerContact
 	+
 	PHY : JSL Sprite_CheckDamageToPlayerSameLayerLong : BCC +
+		.checkBottles
 		LDA.l BottleContentsOne : CMP.b #$02 : BNE ++ : LDA.b #$1C : PHA : BRA .emptyBottle : ++
 		LDA.l BottleContentsTwo : CMP.b #$02 : BNE ++ : LDA.b #$1D : PHA : BRA .emptyBottle : ++
 		LDA.l BottleContentsThree : CMP.b #$02 : BNE ++ : LDA.b #$1E : PHA : BRA .emptyBottle : ++

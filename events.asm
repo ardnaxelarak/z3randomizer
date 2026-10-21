@@ -5,6 +5,7 @@ OnPrepFileSelect:
 	+
 	PHA : PHX
 	REP #$10
+.loadHashTilemap
 	JSL LoadAlphabetTilemap
 	JSL LoadFullItemTiles
 	SEP #$10

@@ -47,6 +47,7 @@ LoadAlphabetTilemap:
 			INX #2
 		CPX.b #128 : BCC -
 
+	.drawHash
 		LDY.b #00
 		LDX.b #$00 : -
 			PHX : TYX : LDA.l SeedHash, X : PLX
@@ -62,6 +63,7 @@ LoadAlphabetTilemap:
 
 		SEP #$20 ;  8-bit accumulator
 
+	.dmaTransfer
 		JSR DMAAlphabetTilemap
 	PLP : PLY : PLX : PLA : PLB
 RTL
@@ -69,18 +71,18 @@ RTL
 ; DMAAlphabetTilemap:
 ;--------------------------------------------------------------------------------
 DMAAlphabetTilemap:
-        PHA : PHX
-        REP #$10
-        LDA.b #$01 : STA.w DMAP0
-        LDA.b #$80 : STA.w VMAIN
-        LDA.b #$18 : STA.w BBAD0
-        LDX.w #$6060 : STX.w VMADDL
-        LDA.b #BigRAM>>16 : STA.w A1B0
-        LDX.w #BigRAM : STX.w A1T0L
-        LDX.w #$0080 : STX.w DAS0L
-        LDA.b #$01 : STA.w DMAENABLE
-        SEP #$10
-        PLX : PLA
+	PHA : PHX
+	REP #$10
+	LDA.b #$01 : STA.w DMAP0
+	LDA.b #$80 : STA.w VMAIN
+	LDA.b #$18 : STA.w BBAD0
+	LDX.w #$6060 : STX.w VMADDL
+	LDA.b #BigRAM>>16 : STA.w A1B0
+	LDX.w #BigRAM : STX.w A1T0L
+	LDX.w #$0080 : STX.w DAS0L
+	LDA.b #$01 : STA.w DMAENABLE
+	SEP #$10
+	PLX : PLA
 RTS
 ;--------------------------------------------------------------------------------
 HashAlphabetTilesWithBlank:
