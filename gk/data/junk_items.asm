@@ -2,7 +2,7 @@ db $00 ; 00 - Fighter Sword and Shield
 db $00 ; 01 - Master Sword
 db $00 ; 02 - Tempered Sword
 db $00 ; 03 - Butter Sword
-db $00 ; 04 - Fighter Shield
+db $01 ; 04 - Fighter Shield
 db $00 ; 05 - Fire Shield
 db $00 ; 06 - Mirror Shield
 db $00 ; 07 - Fire Rod
@@ -21,7 +21,7 @@ db $00 ; 13 - Shovel
 db $00 ; 14 - Flute
 db $00 ; 15 - Somaria
 db $00 ; 16 - Bottle
-db $00 ; 17 - Heartpiece
+db $01 ; 17 - Heartpiece
 db $00 ; 18 - Byrna
 db $00 ; 19 - Cape
 db $00 ; 1A - Mirror
@@ -102,9 +102,9 @@ db $00 ; 63 - RNG pool item (multi)
 db $00 ; 64 - Progressive bow
 db $00 ; 65 - Progressive bow
 db $00 ; 66 - Potion refill (orange)
-db $00 ; 67 -
-db $00 ; 68 -
-db $00 ; 69 -
+db $01 ; 67 - Progression AP Item
+db $01 ; 68 - Useful AP Item
+db $01 ; 69 - Filler AP Item
 db $00 ; 6A - Triforce
 db $01 ; 6B - Power star
 db $01 ; 6C - Triforce Piece

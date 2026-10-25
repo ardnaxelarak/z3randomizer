@@ -266,7 +266,7 @@ DialogItemReceive:
 	BRA .done
 
 .orange_potion
-	LDA.w #$0198
+	LDA.w #$01A2
 	BRA .done
 
 ++	LDA.w Ancilla_ReceiveItem_item_messages, Y

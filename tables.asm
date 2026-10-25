@@ -147,7 +147,7 @@ dw $000A ; #$0A - Default (10 decimal)
 ;--------------------------------------------------------------------------------
 org $B08038 ; PC 0x180038
 LampCone:
-db $01 ; #$00 = Off - #$01 = Sewers only (default) - #$11 = Always On
+db $01 ; #$00 = Off - #$01 = Sewers only (default) - #$10 = Always On - #$20 = No Dark Rooms
 ;--------------------------------------------------------------------------------
 org $B08039 ; PC 0x180039
 ItemCounterHUD:
@@ -471,7 +471,7 @@ db $00 ; #$00 = Original Behavior (default) - #$01 = Book can flip crystal switc
 ;--------------------------------------------------------------------------------
 org $B080AF ; PC 0x1800AF
 JunkItemTimer:
-db $00 ; number of frames to show junk items (#$00 = no change)
+db $88 ; number of frames to show junk items (#$00 = no change)
 ;--------------------------------------------------------------------------------
 org $B080B0 ; 0x1800B0-0x1800BF
 StaticDecryptionKey:

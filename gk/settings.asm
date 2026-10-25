@@ -39,19 +39,19 @@ LootTypeIcons:
     dw $0B00, $0B00, $0B00, $0B00 ; 00 - nothing
     dw $2DCB, $6DCB, $ADCB, $EDCB ; 01 - unknown - dot
     dw $29EB, $69EB, $29FB, $69FB ; 02 - junk - pot
-    dw $29CA, $69CA, $29DA, $29DB ; 03 - small key
+    dw $69EF, $29EF, $69FF, $29FF ; 03 - AP filler
     dw $29E9, $69E9, $29F9, $69F9 ; 04 - triforce piece
     dw $29DD, $69DD, $A9DD, $E9DD ; 05 - health - plus
-    dw $29EC, $69EC, $29FC, $69FC ; 06 - less important item - small chest
-    dw $29E8, $69E8, $29F8, $69F8 ; 07 - compass
-    dw $29CE, $29CF, $29DE, $29DF ; 08 - map
-    dw $29CA, $69CA, $29DA, $29DB ; 09 - small key
-    dw $29C8, $69C8, $29D8, $29D9 ; 0A - big key
-    dw $29ED, $69ED, $29FD, $69FD ; 0B - important inventory item - big chest
-    dw $29CC, $29CD, $29DC, $69DC ; 0C - pendant
-    dw $2DC9, $69C9, $A9C9, $EDC9 ; 0D - crystal
-    dw $29E9, $69E9, $29F9, $69F9 ; 0E - triforce piece
-    dw $29EA, $69EA, $29FA, $69FA ; 0F - triforce
+    dw $29EE, $69EE, $29FE, $69FE ; 06 - AP useful
+    dw $29EC, $69EC, $29FC, $69FC ; 07 - less important item - small chest
+    dw $29E8, $69E8, $29F8, $69F8 ; 08 - compass
+    dw $29CE, $29CF, $29DE, $29DF ; 09 - map
+    dw $29CA, $69CA, $29DA, $29DB ; 0A - small key
+    dw $69EA, $29EA, $29FE, $29FA ; 0B - AP progression
+    dw $29C8, $69C8, $29D8, $29D9 ; 0C - big key
+    dw $29ED, $69ED, $29FD, $69FD ; 0D - important inventory item - big chest
+    dw $29CC, $29CD, $29DC, $69DC ; 0E - pendant
+    dw $2DC9, $69C9, $A9C9, $EDC9 ; 0F - crystal
 
 LootTypeMapping:
     incsrc "data/item_mapping.asm"
@@ -133,19 +133,19 @@ HUDLootTypeIcons:
     dw $287F ; 00 - nothing
     dw $295C ; 01 - unknown - dot
     dw $2954 ; 02 - junk - pot
-    dw $2950 ; 03 - small key
+    dw $294A ; 03 - AP filler
     dw $2952 ; 04 - triforce piece
     dw $2955 ; 05 - health - plus
-    dw $2953 ; 06 - less important item - small chest
-    dw $2D56 ; 07 - compass
-    dw $2957 ; 08 - map
-    dw $2950 ; 09 - small key
-    dw $2951 ; 0A - big key
-    dw $295A ; 0B - important inventory item - big chest
-    dw $2D58 ; 0C - pendant
-    dw $2D59 ; 0D - crystal
-    dw $2952 ; 0E - triforce piece
-    dw $295B ; 0F - triforce
+    dw $2949 ; 06 - AP useful
+    dw $2953 ; 07 - less important item - small chest
+    dw $2D56 ; 08 - compass
+    dw $2957 ; 09 - map
+    dw $2950 ; 0A - small key
+    dw $2D39 ; 0B - AP progression
+    dw $2951 ; 0C - big key
+    dw $295A ; 0D - important inventory item - big chest
+    dw $2D58 ; 0E - pendant
+    dw $2D59 ; 0F - crystal
 
 NpcItems:
     dw $10E3 : dl $7EF411 : db $80 ; Magic Bat
@@ -212,11 +212,11 @@ MapItems:
 
 HudItems:
 .cave
-    db $00
+    db $02
 .default_dungeon
-    db $00
+    db $02
 .have_map
-    db $01
+    db $00
 .have_compass
     db $03
 .reserved

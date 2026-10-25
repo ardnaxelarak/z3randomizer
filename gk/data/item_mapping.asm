@@ -1,16 +1,20 @@
 !TIER_UNKNOWN = $01
 !TIER_JUNK = $02
-!TIER_LOW_KEY = $03
+!TIER_AP_FILLER = $03
+!TIER_TFP = $04
 !TIER_HEALTH = $05
-!TIER_MINOR = $06
-!TIER_COMPASS = $07
-!TIER_MAP = $08
-!TIER_SM_KEY = $09
-!TIER_BIG_KEY = $0A
-!TIER_MAJOR = $0B
-!TIER_PENDANT = $0C
-!TIER_CRYSTAL = $0D
-!TIER_TFP = $0E
+!TIER_AP_USEFUL = $06
+!TIER_MINOR = $07
+!TIER_COMPASS = $08
+!TIER_MAP = $09
+!TIER_SM_KEY = $0A
+!TIER_AP_PROGRESSION = $0B
+!TIER_BIG_KEY = $0C
+!TIER_MAJOR = $0D
+!TIER_PENDANT = $0E
+!TIER_CRYSTAL = $0F
+
+; triforce tier removed to make room for AP items, and was barely used anyway. show a crystal, I guess...
 !TIER_TFORCE = $0F
 
 db !TIER_MAJOR   ; 00 - Fighter Sword and Shield
@@ -117,9 +121,9 @@ db !TIER_JUNK    ; 63 - RNG pool item (multi)
 db !TIER_MAJOR   ; 64 - Progressive bow
 db !TIER_MAJOR   ; 65 - Progressive bow
 db !TIER_HEALTH  ; 66 - Potion refill (orange)
-db !TIER_JUNK    ; 67 -
-db !TIER_JUNK    ; 68 -
-db !TIER_JUNK    ; 69 -
+db !TIER_AP_PROGRESSION ; 67 - Progression AP Item
+db !TIER_AP_USEFUL      ; 68 - Useful AP Item
+db !TIER_AP_FILLER      ; 69 - Filler AP Item
 db !TIER_TFORCE  ; 6A - Triforce
 db !TIER_TFP     ; 6B - Power star
 db !TIER_TFP     ; 6C - Triforce Piece
@@ -193,7 +197,7 @@ db !TIER_SM_KEY  ; AB - Small key of Thieves' Town
 db !TIER_SM_KEY  ; AC - Small key of Turtle Rock
 db !TIER_SM_KEY  ; AD - Small key of Ganon's Tower
 db !TIER_JUNK    ; AE - Reserved
-db !TIER_LOW_KEY ; AF - Generic small key
+db !TIER_SM_KEY  ; AF - Generic small key
 db !TIER_CRYSTAL ; B0 - Crystal 6
 db !TIER_CRYSTAL ; B1 - Crystal 1
 db !TIER_CRYSTAL ; B2 - Crystal 5
