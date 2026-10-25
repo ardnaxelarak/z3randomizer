@@ -121,6 +121,8 @@ RoomIndex = $7E00A0               ; Underworld room index. Word length. High byt
                                   ; Not zeroed on exit to overworld.
 PreviousRoom = $7E00A2            ; Stores previous value of RoomIndex
                                   ;
+CurrentFloor = $7E00A4            ; Current floor in dungeons
+                                  ;
 CameraBoundH = $7E00A6            ; Which set of camera boundaries to use.
 CameraBoundV = $7E00A7            ;
                                   ;
@@ -200,6 +202,8 @@ ItemCursor = $7E0202              ; Current location of the item menu cursor.
 BottleMenuCounter = $7E0205       ; Step counter for opening bottle menu
 MenuFrameCounter = $7E0206        ; Incremented every menu frame. Never read.
 MenuBlink = $7E0207               ; Incremented every frame and masked with $10 to blink cursor
+                                  ;
+DungeonMapCurrentFloor = $7E020E  ;
                                   ;
 RaceGameFlag = $7E021B            ;
                                   ;
@@ -344,6 +348,7 @@ SpawnedItemFlag = $7E0726         ; 0x02 - one for pot, 2 for sprite drop
 SpawnedItemMWPlayer = $7E0728     ; Player Id for spawned item if Multiworld item 0x02
                                   ;
 EnemyDropIndicator = $7E072A      ; Used by HUD to indicate enemy drops remaining
+NpcItemIndicator = $7E072C        ; Flag used by HUD to indicate NPC item present
 SkipBeeTrapDisguise = $7E072D     ; Flag to skip bee trap disguise during draw routine
 
 SprDropsItem = $7E0730            ; Array for whether a sprite drops an item 0x16
@@ -361,6 +366,7 @@ DynamicDropGFXSlots = $7E07F1     ; Assume future use of this up to $0E bytes, t
                                   ; which item gfx is currently occupying each slot
 OAMBuffer = $7E0800               ; Main OAM buffer sent to OAM. $200 bytes.
 OAMBuffer2 = $7E0A00              ;
+OAMBufferAux = $7E0A20            ; high X-bit and size bit sent to OAM, one byte per sprite
                                   ;
 ; $7E0AB9-0ABC                    ; Reserved for limited run use
 TransparencyFlag = $7E0ABD        ; Flags transparency effects e.g. in Thieves Town Hellway
@@ -585,6 +591,17 @@ PegColor = $7EC172                ;
                                   ;
 GameOverSongCache = $7EC227       ;
                                   ;
+CachedDungeonID = $7EC22A         ; Cached while opening dungeon map
+CachedCurrentFloor = $7EC22B      ; to restore when closing
+                                  ;
+CurrentDisplayedRoom = $7EC22C    ; 2 bytes, used by dungeon map
+DisplayedRoomDoorIndex = $7EC22E  ; 2 bytes, used by dungeon map
+                                  ;
+DoorSlots = $7EC230               ; $32 bytes, used by dungeon map
+DoorSlotScratch = $7EC262         ; 6 bytes, used by dungeon map
+DoorSlotCursor = $7EC268          ; 2 bytes, used by dungeon map
+CurrentDoorEntrance = $7EC26A     ; 2 bytes, used by dungeon map
+                                  ;
 LastBGSet = $7EC2F8               ; Lists loaded sheets to check for decompression. 4 bytes.
 LastSpriteSet = $7EC2FC           ; Lists loaded sprite sheets to check for decompression. 4 bytes.
 PaletteBufferAux = $7EC300        ; Secondary and main palette buffer. See symbols_wram.asm
@@ -602,6 +619,8 @@ HUDMultiIndicator = $7EC790       ;
 HUDKeysObtained = $7EC7A2         ;
 HUDKeysSlash = $7EC7A4            ;
 HUDKeysTotal = $7EC7A6            ;
+HUDKeysExtraPlus = $7EC7E4        ;
+HUDKeysExtraCount = $7EC7E6       ;
                                   ;
 BigRAM = $7EC900                  ; Big buffer of free ram (0x1F00)
 ItemGFXStack = $7ECB00            ; Pointers to source of decompressed item tiles deferred to NMI loading.

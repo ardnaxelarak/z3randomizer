@@ -1,10 +1,12 @@
 !BlankTile = $207F
 !SlashTile = $2830
+!PlusTile = $2404
 !HyphenTile = $2405
 !LTile = $2D68
 !DTile = $2D60
-!RedSquare = $345E
 !BlueSquare = $2C5E
+!BossIcon = $253C
+!NPCIcon = $253B
 
 DrHudOverride:
 	PHB
@@ -29,6 +31,13 @@ DRHUD_DrawIndicators:
 	LDA.b FrameCounter : AND.b #$10 : BEQ DRHUD_EnemyDropIndicator
 
 DRHUD_BossIndicator:
+	LDA.w DungeonID : CMP.b #$FF : BNE .in_dungeon
+	LDA.w NpcItemIndicator : BEQ .early_exit
+	LDA.l HudItems_enabled : BEQ .early_exit
+	REP #$10
+	LDY.w #!NPCIcon : STY.w HUDMultiIndicator
+	JMP DRHUD_Finished
+.in_dungeon
 	LDA.l DRMode : BNE .continue
 .early_exit
 	REP #$10
@@ -46,7 +55,7 @@ DRHUD_BossIndicator:
 	SEP #$20
 	BEQ .draw_indicator
     LDA.l CompassBossIndicator, x : CMP.b RoomIndex : BNE .draw_indicator
-    LDY.w #!RedSquare
+    LDY.w #!BossIcon
 .draw_indicator
     STY.w HUDMultiIndicator
 	BRA DRHUD_DrawCurrentDungeonIndicator
@@ -59,17 +68,24 @@ DRHUD_EnemyDropIndicator:
 	SEP #$10 : TAX : REP #$10
 
 DRHUD_DrawCurrentDungeonIndicator: ; mX
-    LDA.l DRMode : BIT.b #$02 : BEQ DRHUD_Finished
+    LDA.l DRMode : BIT.b #$02 : BNE + : JMP DRHUD_Finished : +
     LDY.w #!BlankTile
     LDA.w CurrentHealth : BEQ .draw_indicator
 
-    REP #$20 : LDA.l DungeonReminderTable,X : TAY
-    SEP #$20
+    LDA.b GameMode
+    CMP.b #$0E : BNE .get_indicator
+    LDA.b GameSubMode
+    CMP.b #$03 : BNE .get_indicator
+    LDA.w SubModuleInterface
+    CMP.b #$06 : BEQ .draw_indicator
+
+.get_indicator
+    LDY.w #$2C28
 .draw_indicator
 	STY.w HUDCurrentDungeonWorld
 
 DRHUD_DrawKeyCounter:
-	LDA.l DRFlags : AND.b #$04 : BEQ DRHUD_Finished
+	LDA.l DRFlags : AND.b #$04 : BEQ .to_finished
 	LDA.l CompassMode : BIT.b #$03 : BEQ DRHUD_Finished
 	REP #$20
 	BIT.w #$0002 : BNE .skip_map_check
@@ -82,8 +98,17 @@ DRHUD_DrawKeyCounter:
 	LDA.l GenericKeys : LSR : BCS .total_only
 	LDA.w DungeonCollectedKeys, X : JSR ConvertToDisplay : STA.w HUDKeysObtained
 	LDA.w #!SlashTile : STA.w HUDKeysSlash
+
+	LDA.l ExtraChestKeys, X : AND.w #$00FF : BEQ .total_only
+	JSR ConvertToDisplay : STA.w HUDKeysExtraCount
+	LDA.w #!PlusTile : STA.w HUDKeysExtraPlus
+
 .total_only
-	LDA.l ChestKeys, x : JSR ConvertToDisplay : STA.w HUDKeysTotal
+	SEP #$20
+	LDA.l ChestKeys, X : SEC : SBC.l ExtraChestKeys, X
+	REP #$20
+	JSR ConvertToDisplay : STA.w HUDKeysTotal
+.to_finished
 	JMP DRHUD_Finished
 
 OWRHUD_DrawWorldIndicator:
@@ -140,7 +165,7 @@ DrHudDungeonItemsAdditions:
 
         ldx.w #$0002
         	- lda.w #$0000 : !ADD.l RowOffsets,x : !ADD.l ColumnOffsets, x : tay
-        	lda.l DungeonReminderTable, x : sta.w $1644, y : iny #2
+        	jsr BossStatus : sta.w $1644, y : iny #2
         	lda.w #$24f5 : sta.w $1644, y
         	lda.l MapField : and.l DungeonMask, x : beq + ; must have map
         		jsr BkStatus : sta.w $1644, y : bra .smallKey ; big key status
@@ -185,10 +210,10 @@ DrHudDungeonItemsAdditions:
         ldx.w #$0002
         	- lda.w #$0000 ; start of hud area
         	!ADD.l RowOffsets, x : !ADD.l ColumnOffsets, x : tay
-        	lda.l DungeonReminderTable, x : sta.w $1644, y
+        	jsr BossStatus : sta.w $1644, y
         	iny #2
         	lda.w #$24f5 : sta.w $1644, y ; blank out map spot
-        	lda.l MapField : ora.l MapCountDisplay : ora.l MapOverlay
+        	lda.l MapField : ora.l MapOverlay
         	and.l DungeonMask, x : beq + ; must have map
         		JSR MapIndicatorShort : STA.w $1644, Y
 			+ iny #2
@@ -249,17 +274,63 @@ BkStatus:
     + lda.w #$24f5 : rts ; black otherwise
     +++ lda.w #$2826 : rts ; check mark
 
+BossStatus:
+	LDA.l HUDDungeonItems : BIT.w #$0010 : BEQ .normal
+	PHX
+	LDA.l DungeonMapBossRooms, X
+	CMP.w #$000F
+	BEQ .no_boss
+	ASL A
+	TAX
+	LDA.l SaveDataWRAM, X
+	PLX
+	BIT.w #$0800
+	BEQ .boss_alive
+
+.boss_dead
+	LDA.l HudFlag : BIT.w #$0020 : BNE .skull
+	; palette 3 - white
+	LDA.l DungeonReminderTable, X : AND.w #$E3FF : ORA.w #$0C00 : RTS
+
+.skull
+	LDA.w #$280F : RTS
+
+.no_boss
+	PLX
+	; palette 0 - light gray
+	LDA.l DungeonReminderTable, X : AND.w #$E3FF : RTS
+
+.boss_alive
+	; palette 4 - gray
+	LDA.l DungeonReminderTable, X : AND.w #$E3FF : ORA.w #$1000 : RTS
+
+.normal
+	; default palette 3 - white
+	LDA.l DungeonReminderTable, X : RTS
+
 ConvertToDisplay:
-    and.w #$00ff : cmp.w #$000a : !BLT +
-        !ADD.w #$2519 : rts
-    + !ADD.w #$2490 : rts
+    AND.w #$00FF
+        CMP.w #$000A : !BLT .under10
+        CMP.w #$000C : !BLT .under12
+    .over11
+        !ADD.w #$2553 : RTS
+    .under12
+        !ADD.w #$2519 : RTS
+    .under10
+        !ADD.w #$2490 : RTS
 
 ConvertToDisplay2:
-    and.w #$00ff : beq ++
-        cmp.w #$000a : !BLT +
-            !ADD.w #$2517 : rts ; 2580 with 258A as "A" for non transparent digits
-        + !ADD.w #$2816 : rts
-    ++ lda.w #$2827 : rts ; 0/O for 0 or placeholder digit ;2483
+    AND.w #$00FF : BEQ .zero
+        CMP.w #$000A : !BLT .under10
+        CMP.w #$000C : !BLT .under12
+    .over11
+        !ADD.w #$2580 : RTS
+    .under12
+        !ADD.w #$2517 : RTS
+    .under10
+        !ADD.w #$2816 : RTS
+    .zero
+        LDA.w #$2827 : RTS
 
 CountAbsorbedKeys:
 	JML IncrementSmallKeysNoPrimary

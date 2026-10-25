@@ -55,7 +55,7 @@ endstruct align 2
 ; Overworld Event Data ($7EF280 - $7EF33F)
 ;--------------------------------------------------------------------------------
 ; Each overworld area has one byte. The overworld screen index is located at $8A
-; in WRAM (16-bits.) 
+; in WRAM (16-bits.)
 ;
 ; This label can be indexed with a plus symbol (e.g. The Hyrule Castle screen would
 ; be OverworldEventDataWRAM+$1B or OverworldEventDataWRAM+27)
@@ -190,7 +190,10 @@ ItemLimitCounts: skip 16        ; Keeps track of limited non-progressive items s
                                 ; See: ItemSubstitutionRules in tables.asm
                                 ; Right now this is only used for three items but extra space is
                                 ; reserved
-skip 37                         ; Unused
+skip 34                         ; Unused
+FluteBitfield: skip 1           ;
+SpecialWeaponLevel: skip 1      ; keeps track of level in special weapon modes
+ItemOnB: skip 1                 ; NYI
 ProgressIndicator: skip 1       ; $00 = Pre-Uncle | $01 = Post-Uncle item | $02 = Zelda Rescued
                                 ; $03 = Agahnim 1 defeated
                                 ; $04 and above don't do anything. $00-$02 used in standard mode
@@ -237,7 +240,9 @@ CompassCountDisplay: skip 2     ; Compass count display flags (bitfield)
                                 ; High Byte: x c e d a s p m
                                 ; x = Sewers       | c = Hyrule Castle | e = Eastern Palace | d = Desert Palace
                                 ; a = Castle Tower | s = Swamp Palace  | p = PoD            | m = Mire
-skip 10                         ;
+DungeonVisited: skip 2          ; Whether each dungeon has been entered (bitfield)
+                                ; same order of bits as CompassCountDisplay above
+skip 8                          ;
 Aga2Duck: skip 1                ; Used in lieu of pyramid hole for checking if the duck should come
                                 ; 0 = Haven't called post-Aga 2 bird | 1 = Have called post-Aga 2 bird
 NpcFlags: skip 2                ; l - c s t k z o (bitfield)
@@ -303,12 +308,12 @@ HeartContainerCounter: skip 1   ; Total number of heart containers collected (in
 DeathCounter: skip 1            ; Number of deaths (integer)
 skip 1                          ; Reserved
 FluteCounter: skip 1            ; Number of times fluted (integer)
-skip 4                          ;
+MapFrames: skip 4               ; Total map time in frames (32-bit integer)
 RNGItem: skip 2                 ; RNG Item
 SwordlessBossKills: skip 1      ; Number of bosses killed without a sword (integer)
 FaerieRevivalCounter: skip 1    ; Number of faerie revivals (integer)
 ChallengeTimer: skip 4          ; Timer used for OHKO etc
-SwordTime: skip 4               ; Time first sword found in frames (32-bit integer) 
+SwordTime: skip 4               ; Time first sword found in frames (32-bit integer)
 BootsTime: skip 4               ; Time boots found in frames (32-bit integer)
 FluteTime: skip 4               ; Time flute found in frames (32-bit integer)
 MirrorTime: skip 4              ; Time mirror found in frames (32-bit integer)

@@ -82,7 +82,10 @@ DrawBottle:
 	AND.w #$00FF : BNE +
 		LDX.w #FileSelectItems_empty_bottle
 		JMP DrawItemGray
-	+ : DEC #2 : BNE +
+	+ : DEC : BNE +
+		LDX.w #FileSelectItems_orange_potion
+		JMP DrawItem
+	+ : DEC : BNE +
 		LDX.w #FileSelectItems_empty_bottle
 		JMP DrawItem
 	+ : DEC : BNE +
@@ -248,7 +251,11 @@ DrawPlayerFileShared:
 
 	; Flute
 	LDA.l InventoryTrackingSRAM : AND.w #$0003 : BEQ +
+	LDA.l $7003C2 : AND.w #$00FF : BNE .pseudo
 		%fs_drawItem(7,16,FileSelectItems_flute)
+		BRA ++
+	.pseudo
+		%fs_drawItem(7,16,FileSelectItems_flute_green)
 		BRA ++
 	+
 		%fs_drawItemGray(7,16,FileSelectItems_flute)
@@ -539,6 +546,8 @@ FileSelectItems:
 	dw #$0264|!FS_COLOR_BROWN, #$0265|!FS_COLOR_BROWN, #$0274|!FS_COLOR_BROWN, #$0275|!FS_COLOR_BROWN
 	.flute
 	dw #$0266|!FS_COLOR_BLUE, #$0267|!FS_COLOR_BLUE, #$0276|!FS_COLOR_BLUE, #$0277|!FS_COLOR_BLUE
+	.flute_green
+	dw #$0266|!FS_COLOR_GREEN, #$0267|!FS_COLOR_GREEN, #$0276|!FS_COLOR_GREEN, #$0202|!FS_COLOR_GREEN
 	.book
 	dw #$026A|!FS_COLOR_GREEN, #$026B|!FS_COLOR_GREEN, #$027A|!FS_COLOR_GREEN, #$027B|!FS_COLOR_GREEN
 	.redcane
@@ -550,7 +559,7 @@ FileSelectItems:
 	.mirror
 	dw #$028A|!FS_COLOR_BLUE, #$028B|!FS_COLOR_BLUE, #$029A|!FS_COLOR_BLUE, #$029B|!FS_COLOR_BLUE
 	.mirrorScroll
-	dw #$02C2|!FS_COLOR_YELLOW, #$02C3|!FS_COLOR_YELLOW, #$02D2|!FS_COLOR_YELLOW, #$02d3|!FS_COLOR_YELLOW
+	dw #$028A|!FS_COLOR_YELLOW, #$028B|!FS_COLOR_YELLOW, #$029A|!FS_COLOR_YELLOW, #$0204|!FS_COLOR_YELLOW
 
 	.flippers
 	dw #$024E|!FS_COLOR_BLUE, #$024F|!FS_COLOR_BLUE, #$025F|!FS_COLOR_BLUE|!FS_HFLIP, #$025F|!FS_COLOR_BLUE
@@ -558,7 +567,7 @@ FileSelectItems:
 	.boots
 	dw #$028C|!FS_COLOR_BOOTS, #$028D|!FS_COLOR_BOOTS, #$029C|!FS_COLOR_BOOTS, #$029D|!FS_COLOR_BOOTS
 	.fakeBoots
-	dw #$028C|!FS_COLOR_BLUE, #$028D|!FS_COLOR_BLUE, #$029C|!FS_COLOR_BLUE, #$029D|!FS_COLOR_BLUE
+	dw #$028C|!FS_COLOR_BLUE, #$028D|!FS_COLOR_BLUE, #$029C|!FS_COLOR_BLUE, #$0203|!FS_COLOR_BLUE
 
 	.pearl
 	dw #$02A4|!FS_COLOR_RED, #$02A5|!FS_COLOR_RED, #$02B4|!FS_COLOR_RED, #$02B5|!FS_COLOR_RED
@@ -613,6 +622,8 @@ FileSelectItems:
 	dw #$0282|!FS_COLOR_GREEN, #$0282|!FS_COLOR_GREEN|!FS_HFLIP, #$0292|!FS_COLOR_GREEN, #$0284|!FS_COLOR_GREEN
 	.blue_potion
 	dw #$0282|!FS_COLOR_BLUE, #$0282|!FS_COLOR_BLUE|!FS_HFLIP, #$0292|!FS_COLOR_BLUE, #$0285|!FS_COLOR_BLUE
+	.orange_potion
+	dw #$0282|!FS_COLOR_BROWN, #$0282|!FS_COLOR_BROWN|!FS_HFLIP, #$0292|!FS_COLOR_BROWN, #$0286|!FS_COLOR_BROWN
 	.fairy_bottle
 	dw #$0287|!FS_COLOR_YELLOW|!FS_HFLIP, #$0287|!FS_COLOR_YELLOW, #$0296|!FS_COLOR_BLUE, #$0297|!FS_COLOR_BLUE
 	.bee_bottle
@@ -787,6 +798,12 @@ LoadFullItemTiles:
         LDA.b #FileSelectNewGraphics>>16 : STA.w A1B0
         LDX.w #FileSelectNewGraphics : STX.w A1T0L
         LDX.w #$0C00 : STX.w DAS0L
+        LDA.b #$01 : STA.w DMAENABLE
+
+        LDX.w #$3000 : STX.w VMADDL
+        LDA.b #FileSelectOverflowGraphics>>16 : STA.w A1B0
+        LDX.w #FileSelectOverflowGraphics : STX.w A1T0L
+        LDX.w #$0400 : STX.w DAS0L
         LDA.b #$01 : STA.w DMAENABLE
 RTL
 ;--------------------------------------------------------------------------------

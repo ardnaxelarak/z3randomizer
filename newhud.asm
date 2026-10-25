@@ -23,8 +23,14 @@ NewHUD_DrawBombs:
         BRA .draw
 
 .finite
+        LDA.w BombCapacity : BEQ .no_bomb_bag
         LDA.w BombsEquipment
         JSR HUDHex2Digit
+        BRA .draw
+
+.no_bomb_bag
+        LDY.w #!BlankTile
+        TYX
 
 .draw
         STY.w HUDBombCount+0
@@ -149,11 +155,20 @@ NewHUD_DrawPrizeIcon:
         REP #$10
         SEP #$20
 	LDA.b GameMode
-        CMP.b #$12 : BEQ .no_prize
-        CMP.b #$0E : BEQ +
-        LDA.l UpdateHUDFlag : BEQ NewHUD_DrawItemCounter
-	+
-        LDA.w DungeonID
+	CMP.b #$12 : BEQ .no_prize
+	CMP.b #$0E : BNE .check_hud_flag
+	LDA.b GameSubMode
+	CMP.b #$03 : BNE .check_dungeon
+	LDA.w SubModuleInterface
+	CMP.b #$06 : BNE .check_hud_flag
+	LDA.l $7EC22A
+	BRA .know_dungeon
+
+.check_hud_flag
+	LDA.l UpdateHUDFlag : BEQ NewHUD_DrawItemCounter
+.check_dungeon
+	LDA.w DungeonID
+.know_dungeon
 	CMP.b #$1A : BCS .no_prize
 	CMP.b #$04 : BCC .no_prize
 	CMP.b #$08 : BNE .dungeon
@@ -258,10 +273,8 @@ NewHUD_DrawMagicMeter:
         STA.w CurrentMagic
         TAY
 
-        LDA.b FrameCounter
         REP #$30
-        AND.w #$000C
-        LSR
+        LDA.w #$0002
         BRA .recolor
 
 .check_blink_timer
@@ -299,16 +312,16 @@ MagicMeterColorMasks:
 ;================================================================================
 PrizeIconTiles_Transparent:
 dw $0000  ; no icon
-dw $2978  ; crystal 1
-dw $2979  ; crystal 2
-dw $297A  ; crystal 3
-dw $297B  ; crystal 4
-dw $297C  ; crystal 5
-dw $297D  ; crystal 6
-dw $297E  ; crystal 7
-dw $2963  ; green pendant
-dw $295E  ; blue pendant
-dw $296E  ; red pendant
+dw $2891  ; crystal 1
+dw $2892  ; crystal 2
+dw $2893  ; crystal 3
+dw $2894  ; crystal 4
+dw $2895  ; crystal 5
+dw $2896  ; crystal 6
+dw $2897  ; crystal 7
+dw $2935  ; green pendant
+dw $2936  ; blue pendant
+dw $2937  ; red pendant
 
 ;================================================================================
 DrawCompassCounts:
@@ -452,6 +465,15 @@ HUDHex4Digit_Long:
 RTL
 
 ;================================================================================
+ClearHearts:
+	LDA.w #!BlankTile
+	LDX.b #$14
+-	STA.l HUDTileMapBuffer+$066, X
+	STA.l HUDTileMapBuffer+$0A6, X
+	DEX #2
+	BPL -
+	RTS
+;================================================================================
 UpdateHearts:
 	PHB
 	REP #$20
@@ -460,6 +482,22 @@ UpdateHearts:
 	LDX.b #$7E
 	PHX
 	PLB
+
+	; OHKO mode
+	LDA.l ChallengeModes : AND.w #$0003 : CMP.w #$0001 : BNE +
+	LDA.w #$240A
+	STA.l HUDTileMapBuffer+$068
+	INC
+	STA.l HUDTileMapBuffer+$06A
+	INC
+	STA.l HUDTileMapBuffer+$06C
+	JMP .skip_partial
++
+
+	; Gloom mode
+	LDA.l ChallengeModes : AND.w #$0003 : CMP.w #$0002 : BNE +
+	JSR ClearHearts
++
 
 	LDA.w MaximumHealth
 	LSR

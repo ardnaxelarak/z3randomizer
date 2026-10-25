@@ -137,7 +137,7 @@ macro ReceiptProps(id, y, x, gfx, sram, value, behavior, res)
 	pullpc
 endmacro
 
-%ReceiptProps($00, -5, 0, $06, $F359, $01, sword_shield, skip) ; 00 - Fighter sword & Shield
+%ReceiptProps($00, -5, 0, $52, $F359, $01, sword_shield, skip) ; 00 - Fighter sword & Shield
 %ReceiptProps($01, -5, 4, $18, $F359, $02, master_sword, skip) ; 01 - Master sword
 %ReceiptProps($02, -5, 4, $18, $F359, $03, tempered_sword, skip) ; 02 - Tempered sword
 %ReceiptProps($03, -5, 4, $18, $F359, $04, gold_sword, skip) ; 03 - Golden sword
@@ -239,7 +239,7 @@ endmacro
 %ReceiptProps($63, -4, 0, $FF, $F36A, $FF, skip, rng_multi) ; 63 - RNG pool item (multi)
 %ReceiptProps($64, -4, 0, $FF, $F340, $FF, skip, progressive_bow) ; 64 - Progressive bow
 %ReceiptProps($65, -4, 0, $FF, $F340, $FF, skip, progressive_bow_2) ; 65 - Progressive bow
-%ReceiptProps($66, -4, 0, $FF, $F36A, $FF, skip, skip) ; 66 - 
+%ReceiptProps($66, -4, 0, $51, $F36E, $FF, skip, skip) ; 66 - Potion refill (orange)
 %ReceiptProps($67, -4, 0, $5B, $F36A, $FF, skip, skip) ; 67 - Progression AP Item
 %ReceiptProps($68, -4, 0, $5C, $F36A, $FF, skip, skip) ; 68 - Useful AP Item
 %ReceiptProps($69, -4, 0, $5C, $F36A, $FF, skip, skip) ; 69 - Filler AP Item
@@ -524,7 +524,7 @@ endmacro
 %SpriteProps($63, 2, 2, $FF, $FF, $0000)                                ; 63 - RNG pool item (multi)
 %SpriteProps($64, 2, 2, $FF, $FF, $0000)                                ; 64 - Progressive bow
 %SpriteProps($65, 2, 2, $FF, $FF, $0000)                                ; 65 - Progressive bow
-%SpriteProps($66, 2, 2, $00, $00, $0000)                                ; 66 - 
+%SpriteProps($66, 2, 2, $02, $02, $0000)                                ; 66 - Potion refill (orange)
 %SpriteProps($67, 2, 2, $80, $80, PalettesCustom_progressive_ap)        ; 67 - Progression AP Item
 %SpriteProps($68, 2, 2, $02, $02, PalettesVanilla_blue_ice+$0E)         ; 68 - Useful AP Item
 %SpriteProps($69, 2, 2, $80, $80, PalettesCustom_filler_ap)             ; 69 - Filler AP Item
@@ -806,7 +806,7 @@ endmacro
 %InventoryItem($63, $0001, $0000, $0000) ; 63 - RNG pool item (multi)
 %InventoryItem($64, $00A5, $0000, $0000) ; 64 - Progressive bow
 %InventoryItem($65, $00A5, $0000, $0000) ; 65 - Progressive bow
-%InventoryItem($66, $0001, $0000, $0000) ; 66 -
+%InventoryItem($66, $0081, $0000, $0000) ; 66 - Potion refill (orange)
 %InventoryItem($67, $0001, $0000, $0000) ; 67 - Progression AP Item
 %InventoryItem($68, $0001, $0000, $0000) ; 68 - Useful AP Item
 %InventoryItem($69, $0001, $0000, $0000) ; 69 - Filler AP Item
@@ -964,7 +964,7 @@ endmacro
 ItemReceiptGraphicsOffsets:
 	dw $0860                               ; 00 - Fighter Sword and Shield
 	dw BigDecompressionBuffer+$11C0        ; 01 - Master Sword
-	dw BigDecompressionBuffer+$11C0        ; 01 - Tempered Sword
+	dw BigDecompressionBuffer+$11C0        ; 02 - Tempered Sword
 	dw BigDecompressionBuffer+$11C0        ; 03 - Butter Sword
 	dw BigDecompressionBuffer+$09E0        ; 04 - Fighter Shield
 	dw BigDecompressionBuffer+$1940        ; 05 - Fire Shield
@@ -1044,7 +1044,7 @@ ItemReceiptGraphicsOffsets:
 	dw $05A0                               ; 4D - Arrow capacity (70)
 	dw $01A0                               ; 4E - 1/2 magic
 	dw $01E0                               ; 4F - 1/4 magic
-	dw $00E0                               ; 50 - Safe master sword
+	dw BigDecompressionBuffer+$11C0        ; 50 - Safe master sword
 	dw $0420                               ; 51 - Bomb capacity (+5)
 	dw $0460                               ; 52 - Bomb capacity (+10)
 	dw $0520                               ; 53 - Arrow capacity (+5)
@@ -1066,7 +1066,7 @@ ItemReceiptGraphicsOffsets:
 	dw $0                                  ; 63 - RNG pool item (multi)
 	dw $0                                  ; 64 - Progressive bow
 	dw $0                                  ; 65 - Progressive bow
-	dw $0                                  ; 66 -
+	dw $0EE0                               ; 66 - Potion refill (orange)
 	dw $0CA0                               ; 67 - Progression AP Item
 	dw $0CE0                               ; 68 - Useful AP Item
 	dw $0CE0                               ; 69 - Filler AP Item
@@ -1336,7 +1336,7 @@ StandingItemGraphicsOffsets:
 	dw $0                                  ; 63 - RNG pool item (multi)
 	dw $0                                  ; 64 - Progressive bow
 	dw $0                                  ; 65 - Progressive bow
-	dw $0                                  ; 66 -
+	dw $0EA0                               ; 66 - Potion refill (orange)
 	dw $0CA0                               ; 67 - Progression AP Item
 	dw $0CE0                               ; 68 - Useful AP Item
 	dw $0CE0                               ; 69 - Filler AP Item
@@ -1602,7 +1602,7 @@ VRAMAddressOffset:
 	dw $0024                               ; 63 - RNG pool item (multi)
 	dw $0024                               ; 64 - Progressive bow
 	dw $0024                               ; 65 - Progressive bow
-	dw $0024                               ; 66 -
+	dw $0024                               ; 66 - Potion refill (orange)
 	dw $0024                               ; 67 - Progression AP Item
 	dw $0024                               ; 68 - Useful AP Item
 	dw $0024                               ; 69 - Filler AP Item

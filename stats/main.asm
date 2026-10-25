@@ -174,7 +174,7 @@ FindLine:
 !FRAMES_PER_SECOND = 60
 !FRAMES_PER_MINUTE = 60*60
 !FRAMES_PER_HOUR = 60*60*60
-!MAX_FRAME_COUNT = 59*60+59*60+59*60+99
+!MAX_FRAME_COUNT = (99*60*60*60)+(59*60*60)+(59*60)+59
 
 macro CountUnits(framesPerUnit, unitCounter)
 	STZ.b <unitCounter>
@@ -196,7 +196,7 @@ endmacro
 
 !ColonOffset = $8A
 !PeriodOffset = $4D
-BlankCreditsTile = $883D
+BlankCreditsTile = $3D88
 
 RenderCreditsStatCounter:
 	PHB
@@ -510,6 +510,13 @@ LoadCreditsTiles:
         LDA.b #FileSelectNewGraphics>>16 : STA.w A1B0
         LDX.w #FileSelectNewGraphics : STX.w A1T0L
         LDX.w #$0C00 : STX.w DAS0L
+        LDA.b #$01 : STA.w DMAENABLE
+
+        ; Overflow item tiles
+        LDX.w #$8000 : STX.w VMADDL
+        LDA.b #FileSelectOverflowGraphics>>16 : STA.w A1B0
+        LDX.w #FileSelectOverflowGraphics : STX.w A1T0L
+        LDX.w #$0400 : STX.w DAS0L
         LDA.b #$01 : STA.w DMAENABLE
 
         ; Small characters A-Z

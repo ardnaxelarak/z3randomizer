@@ -74,54 +74,65 @@ FreeDungeonItemNotice:
         LDA.l ScratchBufferNV+1 : PHA
 	;--------------------------------
 
-	LDA.l FreeItemText : BNE + : JMP .skip : +
+	LDA.l !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
+	LDA.b #$2F ; if not from our world, show all dungeon item and crystal notices
+	+ : ORA.l FreeItemText : BNE + : JMP .skip : +
+	STA.b Scrap00
 
 	LDA.b #$00 : STA.l ScratchBufferNV ; initialize scratch
-	LDA.l FreeItemText : AND.b #$01 : BEQ + ; show message for general small key
+
+	LDA.b Scrap00 : AND.b #$01 : BEQ + ; show message for general small key
 	LDA.l ScratchBufferV : CMP.b #$24 : BNE + ; general small key
 		%CopyDialog(Notice_SmallKeyOf)
 		LDA.l DialogReturnPointer : DEC #2 : STA.l DialogOffsetPointer
 		%CopyDialog(Notice_Self)
 		JMP .done
-	+ : LDA.l FreeItemText : AND.b #$02 : BEQ + ; show message for general compass
+
+	+ : LDA.b Scrap00 : AND.b #$02 : BEQ + ; show message for general compass
 	LDA.l ScratchBufferV : CMP.b #$25 : BNE + ; general compass
 		%CopyDialog(Notice_CompassOf)
 		LDA.l DialogReturnPointer : DEC #2 : STA.l DialogOffsetPointer
 		%CopyDialog(Notice_Self)
 		JMP .done
-	+ : LDA.l FreeItemText : AND.b #$04 : BEQ + ; show message for general map
+
+	+ : LDA.b Scrap00 : AND.b #$04 : BEQ + ; show message for general map
 	LDA.l ScratchBufferV : CMP.b #$33 : BNE + ; general map
 		%CopyDialog(Notice_MapOf)
 		LDA.l DialogReturnPointer : DEC #2 : STA.l DialogOffsetPointer
 		%CopyDialog(Notice_Self)
 		JMP .done
-	+ : LDA.l FreeItemText : AND.b #$08 : BEQ + ; show message for general big key
+
+	+ : LDA.b Scrap00 : AND.b #$08 : BEQ + ; show message for general big key
 	LDA.l ScratchBufferV : CMP.b #$32 : BNE + ; general big key
 		%CopyDialog(Notice_BigKeyOf)
 		LDA.l DialogReturnPointer : DEC #2 : STA.l DialogOffsetPointer
 		%CopyDialog(Notice_Self)
 		JMP .done
-	+
-	LDA.l FreeItemText : AND.b #$04 : BEQ + ; show message for dungeon map
+
+	+ : LDA.b Scrap00 : AND.b #$04 : BEQ + ; show message for dungeon map
 	LDA.l ScratchBufferV : AND.b #$F0 ; looking at high bits only
 	CMP.b #$70 : BNE + ; map of...
 		%CopyDialog(Notice_MapOf)
 		JMP .dungeon
-	+ : LDA.l FreeItemText : AND.b #$02 : BEQ + ; show message for dungeon compass
+
+	+ : LDA.b Scrap00 : AND.b #$02 : BEQ + ; show message for dungeon compass
 	LDA.l ScratchBufferV : AND.b #$F0 : CMP.b #$80 : BNE + ; compass of...
 		%CopyDialog(Notice_CompassOf)
 		JMP .dungeon
-	+ : LDA.l FreeItemText : AND.b #$08 : BEQ + ; show message for dungeon big key
+
+	+ : LDA.b Scrap00 : AND.b #$08 : BEQ + ; show message for dungeon big key
 	LDA.l ScratchBufferV : AND.b #$F0 : CMP.b #$90 : BNE + ; big key of...
 		%CopyDialog(Notice_BigKeyOf)
 		JMP .dungeon
-	+ : LDA.l FreeItemText : AND.b #$01 : BEQ + ; show message for dungeon small key
+
+	+ : LDA.b Scrap00 : AND.b #$01 : BEQ + ; show message for dungeon small key
 	LDA.l ScratchBufferV : AND.b #$F0 : CMP.b #$A0 : BNE + ; small key of...
 		LDA.l ScratchBufferV : CMP.b #$AF : BNE ++ : JMP .skip : ++
 		%CopyDialog(Notice_SmallKeyOf)
 		LDA.b #$01 : STA.l ScratchBufferNV ; set up a flip for small keys
 		BRA .dungeon
-	+ : LDA.l FreeItemText : AND.b #$20 : BEQ + ; show message for crystal
+
+	+ : LDA.b Scrap00 : AND.b #$20 : BEQ + ; show message for crystal
 	LDA.l ScratchBufferV : CMP.b #$B0 : !BLT + ;  crystal #
                                CMP.b #$B7 : !BGE +
 		%CopyDialog(Notice_Crystal)
@@ -141,6 +152,9 @@ FreeDungeonItemNotice:
 	LDA.l ScratchBufferNV+1
         ASL : TAX
         REP #$20
+
+        LDA.l !MULTIWORLD_ITEM_PLAYER_ID : AND.w #$00FF : BNE +
+
         LDA.l DungeonItemIDMap,X : CMP.w #$0003 : BCC .hc_sewers
                                    CMP.w DungeonID : BNE +
                 BRA .self_notice
@@ -238,6 +252,7 @@ RTL
 ;--------------------------------------------------------------------------------
 DialogItemReceive:
 	BCS .nomessage ; if doubling the item value overflowed it must be a rando item
+	CPY.b #$CC : BEQ .orange_potion
 	CPY.b #$98 : BCC ++ ;if the item is $4C or greater it must be a rando item
 .nomessage
 	if !FEATURE_LIMITED_RUN == 2604
@@ -248,6 +263,10 @@ DialogItemReceive:
 	.notSpecial
 	endif
 	LDA.w #$FFFF
+	BRA .done
+
+.orange_potion
+	LDA.w #$0198
 	BRA .done
 
 ++	LDA.w Ancilla_ReceiveItem_item_messages, Y
@@ -290,28 +309,68 @@ RTL
 ; s = silver arrow bow
 ; p = 2nd progressive bow
 DialogGanon2:
-        LDA.b #$01 : JSL CheckConditionPass
+	LDA.b #$01 : JSL CheckConditionPass
 
-        REP #$20
-        BCS +
-        LDA.w #$018D : BRA ++
-        +
-        LDA.l BowTracking
+	REP #$20
+	BCS +
+		LDA.w #$018D : JMP .done
+	+
+	LDA.l GanonVulnerabilityItem : AND.w #$007F
+	BEQ .silver_arrows
+	CMP.w #$0001 : BEQ .silver_arrows
+	CMP.w #$0004 : BEQ .bombs
+	CMP.w #$0005 : BEQ .powder
+	CMP.w #$0010 : BEQ .bee
 
-        BIT.w #$0080 : BNE + ; branch if bow
-        LDA.w #$0192 : BRA ++
-        +
-        BIT.w #$0040 : BEQ + ; branch if no silvers
-        LDA.w #$0195 : BRA ++
-        +
-        BIT.w #$0020 : BNE + ; branch if p bow
-        LDA.w #$0194 : BRA ++
-        +
-        LDA.w #$0193 : BRA ++
-        ++
-        STA.w TextID
-        SEP #$20
-        JSL Sprite_ShowMessageMinimal_Alt
+	PHX : TAX
+	LDA.l EquipmentWRAM-1, X
+	PLX
+	AND.w #$00FF : BNE .have
+	BRA .dont_have
+
+.silver_arrows
+	LDA.l BowTracking
+
+	BIT.w #$0080 : BEQ .dont_have ; no bow
+	BIT.w #$0040 : BNE .have ; have silvers
+
+	BIT.w #$0020 : BNE +
+		LDA.w #$0194 : BRA .done ; have p bow
++	LDA.w #$0193 : BRA .done ; don't have p bow
+
+.dont_have
+	LDA.w #$0192 : BRA .done
+.have
+	LDA.w #$0195 : BRA .done
+
+.bombs
+	LDA.l BombsEquipment : AND.w #$00FF : BNE .have
+	LDA.l InfiniteBombs : AND.w #$00FF : BNE .have
+	BRA .dont_have
+
+.powder
+	LDA.l InventoryTracking : BIT.w #$0010 : BNE .have
+	BRA .dont_have
+
+.bee
+	LDA.l BottleContentsOne : AND.w #$00FF
+	CMP.w #$0007 : BEQ .have
+	CMP.w #$0008 : BEQ .have
+	LDA.l BottleContentsTwo : AND.w #$00FF
+	CMP.w #$0007 : BEQ .have
+	CMP.w #$0008 : BEQ .have
+	LDA.l BottleContentsThree : AND.w #$00FF
+	CMP.w #$0007 : BEQ .have
+	CMP.w #$0008 : BEQ .have
+	LDA.l BottleContentsFour : AND.w #$00FF
+	CMP.w #$0007 : BEQ .have
+	CMP.w #$0008 : BEQ .have
+	BRA .dont_have
+
+.done
+	STA.w TextID
+	SEP #$20
+	JSL Sprite_ShowMessageMinimal_Alt
 RTL
 ;--------------------------------------------------------------------------------
 DialogEtherTablet:

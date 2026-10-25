@@ -165,6 +165,7 @@ AddInventory:
                         		LDA.l !MULTIWORLD_RECEIVING_ITEM : BNE .done
                                 REP #$30
                                 LDA.l TotalItemCounter : INC : TAY
+                                JSL UpdateLootHUD
                                 LDA.l BootsEquipment : AND.w #$00FF : BNE +
                                         TYA : STA.l PreBootsLocations
                                 +
@@ -418,12 +419,12 @@ AddYMarker:
 	LDA.w MenuBlink : AND.w #$0020 : BNE .drawXBubble
 
 	.drawYBubble
-	LDA.w #$3D4F
+	LDA.w #$3DBC
 	BRA .drawTile
 
 	.drawXBubble
 	JSR MakeCircleBlue
-	LDA.w #$2D3E
+	LDA.w #$2DBB
 
 	.drawTile
 	STA.w $FFC4, Y
@@ -646,18 +647,18 @@ RTL
 ; CollectPowder:
 ;--------------------------------------------------------------------------------
 CollectPowder:
-  LDY.w SprSourceItemId, X ; Retrieve stored item type
-  BNE +
-	; if for any reason the item value is 0 reload it, just in case
-	  %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues) : TAY
-  + PHA
-    LDA.l WitchItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
-    LDA.b #$01 : STA.l ShopEnableCount
-  PLA
-  STZ.w ItemReceiptMethod ; item from NPC
-  JSL Link_ReceiveItem
-  PHA : LDA.b #$00 : STA.l ShopEnableCount : STA.l PowderFlag : PLA
-  JSL ItemSet_Powder
+    LDY.w SprSourceItemId, X ; Retrieve stored item type
+    BNE +
+    ; if for any reason the item value is 0 reload it, just in case
+        %GetPossiblyEncryptedItem(WitchItem, SpriteItemValues) : TAY
+    + PHA
+        LDA.l WitchItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
+        LDA.b #$01 : STA.l ShopEnableCount
+    PLA
+    STZ.w ItemReceiptMethod ; item from NPC
+    JSL Link_ReceiveItem
+    PHA : LDA.b #$00 : STA.l ShopEnableCount : STA.l PowderFlag : PLA
+    JSL ItemSet_Powder
 RTL
 ;--------------------------------------------------------------------------------
 
@@ -802,22 +803,3 @@ MaybePlaySelectSFX:
                 BRA .play
         .dont_play
 RTL
-;--------------------------------------------------------------------------------
-; A = item id being collected
-ItemGetAlternateSFX:
-PEA.w $C567 ; SNES to RTS to in bank 08
-LDA.w AncillaGet,X : CMP.b #$4A : BNE +
-	; collecting pre-activated flute
-	LDA.b #$13 : JML Ancilla_SFX2_Near
-+ ; normal itemget sfx
-LDA.b #$0F : JML Ancilla_SFX3_Near ; what we wrote over
-
-; A = item id being collected
-ItemGetOverworldAlternateSFX:
-CPY.b #$4A : BNE +
-	JSL Sound_SetSfxPanWithPlayerCoords : ORA.b #$13 : STA.w SFX2
-	RTL
-+ ; normal itemget sfx
-JSL Sound_SetSfxPanWithPlayerCoords : ORA.b #$0F : STA.w SFX3 ; what we wrote over
-RTL
-;--------------------------------------------------------------------------------

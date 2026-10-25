@@ -91,7 +91,43 @@ SmithSword:
 db $02 ; #$02 = Tempered Sword (default)
 
 ;--------------------------------------------------------------------------------
-; 0x18002B- 0x180030 (Unused)
+; 0x18002B (Unused)
+;--------------------------------------------------------------------------------
+; 0x18002C (Reserved for Allowed Item on B)
+;--------------------------------------------------------------------------------
+org $B0802D
+ChallengeModes:
+; p--- mmdd
+; p - permadeath
+; m - movement modes (0 - normal, 1 - permanent ice physics)
+; d - damage modes (0 - normal, 1 - ohko, 2 - gloom)
+db $00
+;--------------------------------------------------------------------------------
+org $B0802E
+GanonVulnerabilityItem:
+; sn-i iiii
+; s - immune to sword spins in phase 4
+; n - immune to all items
+; i - index of item vulnerability
+db $00 ; $00 = default behavior (silver arrows)
+;--------------------------------------------------------------------------------
+org $B0902F
+SpecialWeapons:
+db $00
+; s - - -  m m m m (bitfield) - NYI
+; s - only swords damage can hurt enemies
+; m - special weapon mode
+; $00 = Off (default)
+; $01 = Bomb mode
+; $02 = Pseudosword
+; $03 = Byrna mode
+; $04 = Somaria mode
+; $05 = Canes mode
+; $06 = Bee mode
+; $07 = Unused
+; $08 = Bugnet mode
+;--------------------------------------------------------------------------------
+; 0x180030 (Unused)
 ;--------------------------------------------------------------------------------
 org $B08031 ; PC 0x180031
 LimitedRunEvent:
@@ -205,12 +241,8 @@ db $00
 ;a - Infinite Arrows
 ;--------------------------------------------------------------------------------
 org $B0804E ; PC 0x18004E
-UncleRefill:
+UncleRefill_deprecated: ; no longer used
 db $00
-;---- -mba
-;m - Refill Magic
-;b - Refill Bombs
-;a - Refill Arrows
 ;--------------------------------------------------------------------------------
 org $B0804F ; PC 0x18004F
 ByrnaInvulnerability:
@@ -423,7 +455,23 @@ db $01 ; #$00 = Original Behavior - #$01 = Randomizer Behavior (Default)
 Bugfix_PodEG:
 db $01 ; #$00 = Original Behavior - #$01 = Randomizer Behavior (Default)
 ;--------------------------------------------------------------------------------
-; 0x1800A5 - 0x1800AF (unused)
+org $B080A5 ; PC 0x1800A5
+MimicDash:
+db $00 ; #$00 = Original Behavior (default) - #$01 = Mimics move when link dashes
+CrystalSwitchBook:
+db $00 ; #$00 = Original Behavior (default) - #$01 = Book can flip crystal switch
+;--------------------------------------------------------------------------------
+; 0x1800A7 - 0x1800AE (unused)
+;--------------------------------------------------------------------------------
+; 0x1800AF
+; m-ff ffff
+;
+;  m - 0 = only shorten timer on multiworld items, 1 = shorten all items
+;  f - number of frames to show items
+;--------------------------------------------------------------------------------
+org $B080AF ; PC 0x1800AF
+JunkItemTimer:
+db $00 ; number of frames to show junk items (#$00 = no change)
 ;--------------------------------------------------------------------------------
 org $B080B0 ; 0x1800B0-0x1800BF
 StaticDecryptionKey:
@@ -842,7 +890,7 @@ SilverArrowsAutoEquip:
 db $01 ; #$00 = Off - #$01 = Collection Time (Default) - #$02 = Entering Ganon - #$03 = Collection Time & Entering Ganon
 ;================================================================================
 org $B08183 ; PC 0x180183
-FreeUncleItemAmount:
+RainDeathRefillRupeeBow:
 dw $12C ; 300 rupees (Default)
 ;--------------------------------------------------------------------------------
 org $B08185 ; PC 0x180185
@@ -1188,9 +1236,9 @@ db $63, $09, $00, $19, $8A, $9B, $94, $97, $8E, $87, $9F, $85, $83, $95, $96, $8
 db $62, $68, $00, $1F, $2D, $21, $1E, $9F, $25, $28, $32, $1A, $25, $9F, $29, $2B, $22, $1E, $2C, $2D
 db $62, $EB, $00, $11, $6F, $5D, $6A, $5F, $70, $71, $5D, $6E, $75
 db $63, $0B, $00, $11, $95, $83, $90, $85, $96, $97, $83, $94, $9B
-; sahasralah's homecoming
+; sahasrahla's homecoming
 db $62, $4F, $00, $01, $34
-db $62, $65, $00, $2D, $2C, $1A, $21, $1A, $2C, $2B, $1A, $25, $1A, $21, $35, $2C, $9F, $21, $28, $26, $1E, $1C, $28, $26, $22, $27, $20
+db $62, $65, $00, $2D, $2C, $1A, $21, $1A, $2C, $2B, $1A, $21, $25, $1A, $35, $2C, $9F, $21, $28, $26, $1E, $1C, $28, $26, $22, $27, $20
 db $62, $E9, $00, $19, $67, $5D, $67, $5D, $6E, $65, $67, $6B, $9F, $70, $6B, $73, $6A
 db $63, $09, $00, $19, $8D, $83, $8D, $83, $94, $8B, $8D, $91, $9F, $96, $91, $99, $90
 ; vultures rule the desert
@@ -1536,6 +1584,7 @@ dw $0000
 ; STAIRS3
 ; STAIRS4
 ;--------------------------------------------------------------------------------
+org $B0DA00
 RoomHeaders:
 org $B0DA00 : RoomHeader_0000: ; pc 0x185A00
 db $41, $21, $13, $22, $07, $3D, $00, $00, $00, $10, $C0, $00, $00, $04
@@ -2640,9 +2689,9 @@ org $B0EFFF ; PC 0x186FFF
 BallNChainDungeon: ; Dungeon ID where ball n chain guard is located. Write
 db $02             ; $FF to count ball and chain item for collection stats.
 
-;--------------------------------------------------------------------------------
-; 0x187000 - 18700F (unused)
-;--------------------------------------------------------------------------------
+org $B0F000
+ExtraChestKeys: ; PC 0x187000-0x18700F
+db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 org $B0F010
 ChestKeys: ; PC 0x187010-0x18701F

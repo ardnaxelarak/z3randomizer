@@ -92,13 +92,25 @@ org $89D62E
 ;commenting out since this address can move
 ;UWSpritesPointers: ; 0x250 bytes for 0x128 rooms' 16-bit pointers
 
-org $89D87E
+if !FEATURE_FIX_BASEROM
+	org $81DB67
+else
+	org $89D87E
+endif
 UWPotsPointers: ; 0x250 bytes for 0x128 rooms' 16-bit pointers
 
-org $89DACE
+if !FEATURE_FIX_BASEROM
+	org $01DDE7
+else
+	org $89DACE
+endif
 UWPotsData: ; variable number of bytes (max 0x11D1) for all pots data
 
-org $A88000
+if !FEATURE_FIX_BASEROM
+	org $89D92E
+else
+	org $A88000
+endif
 UWSpritesData: ; variable number of bytes (max 0x2800) for all sprites and sprite drop data
 ; First $2800 bytes of this bank (28) is reserved for the sprite tables
 
@@ -209,7 +221,8 @@ RevealPotItem:
 	STZ.w SpawnedItemIsMultiWorld
 	BIT.b Scrap08
 	BVS LoadMultiWorldPotItem
-	BMI LoadMajorPotItem
+	BPL .normal_secret
+	JMP LoadMajorPotItem
 
 .normal_secret
 	STA.b Scrap08
@@ -230,6 +243,7 @@ RevealPotItem:
 				; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 			+ REP #$10
 			LDA.l TotalItemCounter : INC : STA.l TotalItemCounter ; Increment Item Total
+			JSL UpdateLootHUD
 			LDA.w #$0001 : STA.l UpdateHUDFlag
 		.obtained
 	PLY : PLX
@@ -329,6 +343,7 @@ IncrementCountsForSubstitute:
 			; Could increment GT Tower Pre Big Key but we aren't showing that stat right now
 		+
 		LDA.l TotalItemCounter : INC : STA.l TotalItemCounter ; Increment Item Total
+		JSL UpdateLootHUD
 		LDA.w #$0001 : STA.l UpdateHUDFlag
 	.obtained
 	SEP #$30 : PLX
@@ -353,7 +368,7 @@ ClearSpriteData:
 			STZ.w SprSourceItemId, X : STZ.w SprItemReceipt, X : STZ.w SprItemMWPlayer, X
 			STZ.w SprRedrawFlag, X
 			DEX : BPL .loop
-		JSR SetupEnemyDropIndicator
+		JSL ClearLootHUD
 	PLX
 	RTL
 
@@ -400,7 +415,7 @@ SetupEnemyDropIndicator:
 
 .done
 SEP #$20
-RTS
+RTL
 
 
 ; Runs during sprite load of the room
@@ -567,7 +582,7 @@ IncrementCountForMinor:
 	LDA.l SpriteDropData, X : BIT.b Scrap0A : BNE .obtained
 		ORA.b Scrap0A : STA.l SpriteDropData, X
 		SEP #$10
-		JSR SetupEnemyDropIndicator
+		JSL UpdateLootHUD
 		REP #$20
 		LDX.w DungeonID : CPX.b #$FF : BEQ +
 			CPX.b #$00 : BNE ++
@@ -623,10 +638,10 @@ MarkSRAMForItem:
 		TYX
 		LDA.w SpawnedItemFlag : CMP.w #$0001 : BEQ +
 			LDA.l SpriteDropData, X : ORA.b Scrap00 : STA.l SpriteDropData, X
-			SEP #$10 : JSR SetupEnemyDropIndicator
 			BRA .end
 		+ LDA.l RoomPotData, X : ORA.b Scrap00 : STA.l RoomPotData, X
 	.end
+	JSL UpdateLootHUD
 	SEP #$30 : PLY : PLX
 	LDA.w RoomItemsTaken
 	RTL

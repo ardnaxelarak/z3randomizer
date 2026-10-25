@@ -41,6 +41,8 @@ OnPlayerDead:
                 JSL DynamicDropGFXClear
 		JSL SetSilverBowMode
 		JSL RefreshRainAmmo
+		LDA.b #$00
+		STA.l InfiniteMagic
 	PLA
 RTL
 ;--------------------------------------------------------------------------------
@@ -70,6 +72,8 @@ OnQuit:
 	JSL SQEGFix
 	LDA.b #$00 : STA.l AltTextFlag ; bandaid patch bug with mirroring away from text
 	LDA.b #$10 : STA.b MAINDESQ ; thing we wrote over
+	LDA.b #$00
+	STA.l InfiniteMagic
 RTL
 ;--------------------------------------------------------------------------------
 OnDeathNoSave:
@@ -79,30 +83,20 @@ RTL
 ;--------------------------------------------------------------------------------
 OnUncleItemGet:
 	PHA
-
-	LDA.l EscapeAssist
-	BIT.b #$04 : BEQ + : STA.l InfiniteMagic : +
-	BIT.b #$02 : BEQ + : STA.l InfiniteBombs : +
-	BIT.b #$01 : BEQ + : STA.l InfiniteArrows : +
-
 	LDA.l UncleItem_Player : STA.l !MULTIWORLD_ITEM_PLAYER_ID
 	PLA
 	JSL Link_ReceiveItem
 
-	LDA.l UncleRefill : BIT.b #$04 : BEQ + : LDA.b #$80 : STA.l MagicFiller : + ; refill magic
-	LDA.l UncleRefill : BIT.b #$02 : BEQ + : LDA.b #50 : STA.l BombsFiller : + ; refill bombs
-	LDA.l UncleRefill : BIT.b #$01 : BEQ + ; refill arrows
-		LDA.b #70 : STA.l ArrowsFiller
+	LDA.l ProgressIndicator : BNE +
+		LDA.b #$01 : STA.l ProgressIndicator ; set rain state
+		JSL SetEscapeAssist
+		JSL RefreshRainAmmo
 
+		; grant arrows if we started with a bow in retro mode
 		LDA.l ArrowMode : BEQ +
-			LDA.l BowTracking : ORA.b #$80 : STA.l BowTracking ; enable bow toggle
-			REP #$20 ; set 16-bit accumulator
-			LDA.l CurrentRupees : !ADD.l FreeUncleItemAmount : STA.l CurrentRupees ; rupee arrows, so also give the player some money to start
-			SEP #$20 ; set 8-bit accumulator
+		LDA.l RainDeathRefillRupeeBow : ORA.l RainDeathRefillRupeeBow+1 : BEQ +
+		LDA.b #$01 : STA.l ArrowsFiller
 	+
-        LDA.l ProgressIndicator : BNE +
-                LDA.b #$01 : STA.l ProgressIndicator ; handle rain state
-        +
 RTL
 ;--------------------------------------------------------------------------------
 OnAga1Defeated:
@@ -217,18 +211,37 @@ OnInitFileSelect:
 	JSL EnableForceBlank
 RTL
 ;--------------------------------------------------------------------------------
+OnGloomDamage:
+	LDA.b #$01
+	STA.l UpdateHUDFlag
+	LDA.l MaximumHealth
+	SEC : SBC.b #$08
+	STA.l CurrentHealth
+	BEQ +
+	STA.l MaximumHealth
++	RTL
+;--------------------------------------------------------------------------------
 OnLinkDamaged:
 	JSL IncrementDamageTakenCounter_Arb
+	LDA.l ChallengeModes : AND.b #$03 : CMP.b #$02 : BEQ .gloom
 	JML OHKOTimer
+.gloom
+	STZ.b $00
+	JML OnGloomDamage
 ;--------------------------------------------------------------------------------
 ;OnEnterWater:
 ;       JSL UnequipCapeQuiet ; what we wrote over
 ;RTL
 ;--------------------------------------------------------------------------------
 OnLinkDamagedFromPit:
+	LDA.l ChallengeModes : AND.b #$03 : CMP.b #$02 : BEQ .gloom
 	JSL OHKOTimer
+	BRA +
+.gloom
+	JSL OnGloomDamage
+	CLC : ADC.b #$08 : STA.l CurrentHealth
 
-	LDA.l AllowAccidentalMajorGlitch
++	LDA.l AllowAccidentalMajorGlitch
 	BEQ ++
 --	LDA.b #$14 : STA.b GameSubMode ; thing we wrote over
 
@@ -240,7 +253,12 @@ OnLinkDamagedFromPit:
 	RTL
 ;--------------------------------------------------------------------------------
 OnLinkDamagedFromPitOutdoors:
+	LDA.l ChallengeModes : AND.b #$03 : CMP.b #$02 : BEQ .gloom
 	JML OHKOTimer ; make sure this is last
+.gloom
+	JSL OnGloomDamage
+	CLC : ADC.b #$08
+	RTL
 ;--------------------------------------------------------------------------------
 OnOWTransition:
         JSL FloodGateReset
@@ -253,6 +271,7 @@ OnOWTransition:
 RTL
 ;--------------------------------------------------------------------------------
 OnLoadDuckMap:
+	JSL SelectFirstFluteSpot
 	LDA.l DuckMapFlag
 	BNE +
 		INC : STA.l DuckMapFlag

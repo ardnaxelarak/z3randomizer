@@ -50,7 +50,7 @@ CalculateTimer:
 		%Sub32(ChallengeTimer,NMIFrames,ClockBuffer)
 	++
 
-	%Blt32(ClockBuffer,.halfCycle) : !BLT +
+	%Blt32(ClockBuffer,.halfCycle) : !BGE +++ : JMP + : +++
 		LDA.l TimeoutBehavior : AND.w #$00FF : BNE ++ ; DNF
 			LDA.w #$0002 : STA.l ClockStatus ; Set DNF Mode
 			LDA.l NMIFrames : STA.l ChallengeTimer
@@ -65,6 +65,17 @@ CalculateTimer:
 			LDA.w #$0002 : STA.l ClockStatus ; Set DNF Mode
 			LDA.l NMIFrames : STA.l ChallengeTimer
 			LDA.l NMIFrames+2 : STA.l ChallengeTimer+2
+			RTS
+		++ CMP.w #$0004 : BNE ++ ; Drop Into Ganon
+			LDA.w $048E
+			BEQ .already_ganon
+			LDA.w #$0002 : STA.l ClockStatus ; Set DNF Mode
+			LDA.w #$0011 : STA.b GameMode
+			SEP #$20
+			LDA.b #$7B
+			STA.w $010E
+			REP #$20
+			.already_ganon
 			RTS
 		++ ; End Game
 			SEP #$30
@@ -133,6 +144,13 @@ DrawChallengeTimer:
 				LDA.w #$247F : STA.l HUDTileMapBuffer+$98
 				STA.l HUDTileMapBuffer+$9A
 				BRA +++
+			++ CMP.w #$0004 : BNE ++ ; Ganon
+				LDA.w #$247F : STA.l HUDTileMapBuffer+$92
+				STA.l HUDTileMapBuffer+$94
+				STA.l HUDTileMapBuffer+$96
+				STA.l HUDTileMapBuffer+$98
+				STA.l HUDTileMapBuffer+$9A
+				BRA +++
 			++ ; OHKO
 				LDA.w #$280A : STA.l HUDTileMapBuffer+$94
 				LDA.w #$280B : STA.l HUDTileMapBuffer+$96
@@ -163,6 +181,7 @@ RTL
 ;--------------------------------------------------------------------------------
 OHKOTimer:
 	LDA.l OHKOFlag : BNE .kill
+	LDA.l ChallengeModes : AND.b #$03 : CMP.b #$01 : BEQ .kill
 	LDA.l TimeoutBehavior : CMP.b #$02 : BNE +
 	LDA.l ClockStatus : AND.b #$02 : BEQ +
 		.kill
