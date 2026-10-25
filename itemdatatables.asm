@@ -1066,7 +1066,7 @@ ItemReceiptGraphicsOffsets:
 	dw $0                                  ; 63 - RNG pool item (multi)
 	dw $0                                  ; 64 - Progressive bow
 	dw $0                                  ; 65 - Progressive bow
-	dw $0EE0                               ; 66 - Potion refill (orange)
+	dw $10E0                               ; 66 - Potion refill (orange)
 	dw $0CA0                               ; 67 - Progression AP Item
 	dw $0CE0                               ; 68 - Useful AP Item
 	dw $0CE0                               ; 69 - Filler AP Item
@@ -1336,7 +1336,7 @@ StandingItemGraphicsOffsets:
 	dw $0                                  ; 63 - RNG pool item (multi)
 	dw $0                                  ; 64 - Progressive bow
 	dw $0                                  ; 65 - Progressive bow
-	dw $0EA0                               ; 66 - Potion refill (orange)
+	dw $10A0                               ; 66 - Potion refill (orange)
 	dw $0CA0                               ; 67 - Progression AP Item
 	dw $0CE0                               ; 68 - Useful AP Item
 	dw $0CE0                               ; 69 - Filler AP Item
