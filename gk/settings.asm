@@ -136,7 +136,7 @@ HUDLootTypeIcons:
     dw $294A ; 03 - AP filler
     dw $2952 ; 04 - triforce piece
     dw $2955 ; 05 - health - plus
-    dw $2949 ; 06 - AP useful
+    dw $2D49 ; 06 - AP useful
     dw $2953 ; 07 - less important item - small chest
     dw $2D56 ; 08 - compass
     dw $2957 ; 09 - map
