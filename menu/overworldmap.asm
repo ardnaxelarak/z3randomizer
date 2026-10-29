@@ -321,10 +321,6 @@ RTS
 
 WorldMap_DrawTile:
 	LDA.b Scrap00 : PHA
-	SEP #$20
-	LDX.b Scrap0B : TXA : STA.b (OAMPtr+2)
-	INC.b OAMPtr+2
-	REP #$20
 	LDA.l $7EC10A : BIT.w #$4000 : SEP #$20 : BNE .raw_coords ; use raw OAM coordinates
 		JSR WorldMap_CalculateOAMCoordinates
 		BCS .apply_offsets
