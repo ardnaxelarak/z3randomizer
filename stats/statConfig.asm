@@ -30,8 +30,10 @@
 !FAERIE_REVIVALS_Y = 361
 !TOTAL_MENU_TIME_X = 19
 !TOTAL_MENU_TIME_Y = 364
+!TOTAL_MAP_TIME_X = 19
+!TOTAL_MAP_TIME_Y = 367
 !TOTAL_LAG_TIME_X = 19
-!TOTAL_LAG_TIME_Y = 367
+!TOTAL_LAG_TIME_Y = 370
 !COLLECTION_RATE_X = 22
 !COLLECTION_RATE_Y = 380
 !TOTAL_TIME_X = 19
@@ -62,7 +64,8 @@ CreditsStats:
 %AddStat(SaveQuitCounter, 0, 0, 08, 2, !SAVE_AND_QUITS_X, !SAVE_AND_QUITS_Y)
 %AddStat(DeathCounter, 0, 0, 08, 2, !DEATHS_X, !DEATHS_Y)
 %AddStat(FaerieRevivalCounter, 0, 0, 08, 3, !FAERIE_REVIVALS_X, !FAERIE_REVIVALS_Y)
-%AddStat(MenuFrames, 1, 8, 32, 4, !TOTAL_MENU_TIME_X, !TOTAL_MENU_TIME_Y)
+%AddStat(MenuFrames, 1, 0, 32, 4, !TOTAL_MENU_TIME_X, !TOTAL_MENU_TIME_Y)
+%AddStat(MapFrames, 1, 0, 32, 4, !TOTAL_MAP_TIME_X, !TOTAL_MAP_TIME_Y)
 %AddStat(LagTime, 1, 0, 32, 4, !TOTAL_LAG_TIME_X, !TOTAL_LAG_TIME_Y)
 print "Collection Rate config: ", pc
 %AddStat(TotalItemCounter, 0, 0, 16, 3, !COLLECTION_RATE_X, !COLLECTION_RATE_Y)

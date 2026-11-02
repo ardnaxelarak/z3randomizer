@@ -263,6 +263,10 @@ dw $3D9E ; ~               ;
 dw $3D98 ; ,               ;
 dw $3D99 ; -               ; $FB
 dw $0000 ;                 ;
-dw $0000 ;                 ;
-dw $0000 ;                 ;
-dw $0000 ;                 ;
+
+; green ellipsis           ;
+dw $293F ;                 ; $FD
+; green period
+dw $29FE ;                 ; $FE
+; yellow dot
+dw $2DFA ;                 ; $FF

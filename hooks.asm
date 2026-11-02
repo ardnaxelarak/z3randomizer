@@ -776,9 +776,21 @@ JSL DrawFlippersInMenuLocation : NOP
 org $8DECEB ; <- 6ECEB - equipment.asm : 1946 (LDA.w #$16E0 : STA $00)
 JSL DrawMoonPearlInMenuLocation : NOP
 
-; Fake boots icon
+; Fake Boots icon
 org $8DF851
-dw $2C29, $2C2A, $2C2B, $2C2C
+dw $2C29, $2C2A, $2C2B, $2D33
+
+; Dungeon-Only Mirror icon
+org $8DF7F1
+dw $2862, $2863, $2872, $2942
+
+; Somaria bottom-right icon
+org $8DF7C7
+dw $253E
+
+; Byrna bottom-right icon
+org $8DF7D7
+dw $2D3F
 
 ;================================================================================
 ; Zelda S&Q Mirror Fix
@@ -845,10 +857,10 @@ JSL LoadModifiedIceFloorValue_a01 : NOP
 org $83FC16 ; <- 1FC16 ($A8, $B8, $3D, $D0, $B8, $3D)
 db $B1, $C6, $F9, $C9, $C6, $F9 ; data insert - 2 chests, fat fairy room
 
-; unused item receipts
+; unused item receipts - moved to pyramid fairy
 org $81E97E
-dw $0116 : db $08
-dw $0116 : db $25
+dw $0116 : db $5E
+dw $0116 : db $64
 ;--------------------------------------------------------------------------------
 org $86B489 ; <- 33489 - sprite_smithy_bros.asm : 473 (LDA $7EF359 : CMP.b #$03 : BCS .tempered_sword_or_better)
 JML GetSmithSword : NOP #4
@@ -997,6 +1009,15 @@ LDA.w BottleListExpanded, X
 
 org $89895C ; 4895C - ancilla_init.asm:1344 (LDA PotionList, X)
 LDA.w PotionListExpanded, X
+
+org $898946
+CMP.b #$00 : BNE + : skip 9 : +
+
+org $89895A
+LDX.b #$06
+
+org $89896A
+ADC.b #$01
 ;--------------------------------------------------------------------------------
 org $86D1EB ; 351EB - sprite_absorbable.asm:364 (STA $7EF375) ; bugbug commented out until i figure out why it doesn't work
 JSL HandleBombAbsorbtion
@@ -1117,7 +1138,8 @@ JSL CompareBombsToMax : NOP #11
 org $85FC7E ; <- 2FC7E - sprite_dash_item.asm : 118 (LDA $7EF36F : INC A : STA $7EF36F)
 JSL GiveBonkItem : NOP #5
 org $85FC97 ; <- 2FC97 - sprite_dash_item.asm : 126 (LDA.b #$2F : JSL Sound_SetSfx3PanLong)
-NOP #6
+JSL UpdateLootHUD
+NOP #2
 ;--------------------------------------------------------------------------------
 org $868D39 ; <- 30D39 - sprite_prep.asm : 1435 - (LDA.b #$08 : STA $0F50, X)
 JSL LoadBonkItemGFX
@@ -1164,6 +1186,8 @@ ORA.w #$8000 : STA.w $007E, Y
 ORA.w #$4000 : STA.w $0084, Y
 JSL AddYMarker : NOP #2
 ;--------------------------------------------------------------------------------
+org $8DF779 ; <- 6F779 (not in disassembly) - mushroom bottle hud tile -> orange potion
+dw $20D2, $60D2, $20E2, $202D ; (Orig: $2044, $2045, $2046, $2047)
 org $8DF789+6 ; <- 6F789+6 (not in disassembly) - red bottle hud tile, lower right
 dw $2413 ; (Orig: #$24E3)
 org $8DF789+6+8  ; green bottle hud tile, lower right
@@ -1643,7 +1667,8 @@ JSL FixAga2Bunny : NOP
 ; Open Mode Fixes
 ;--------------------------------------------------------------------------------
 org $85DF65 ; <- 2DF65 - sprite_uncle_and_priest.asm:994 - (LDA.b #$01 : STA $7EF3C5)
-NOP #6
+JSL UpdateLootHUD
+NOP #2
 ;--------------------------------------------------------------------------------
 org $85EDDF ; <- 2EDDF - sprite_zelda.asm:398 - (LDA.b #$02 : STA $7EF3C5)
 JSL EndRainState : NOP #2
@@ -2192,6 +2217,9 @@ JSL LampCheck
 ;--------------------------------------------------------------------------------
 org $81F503 ; <- F503 - Bank01.asm:14994 (LDA.b #$01 : STA $1D)
 JSL SetOverlayIfLamp
+;--------------------------------------------------------------------------------
+org $81B610 ; <- loading whether room is dark
+JSL DarkRoomCheck
 ;================================================================================
 
 ;================================================================================
@@ -2751,5 +2779,116 @@ NOP #2 ; this fixes Link's direction after mirroring and falling after entering 
 ;--------------------------------------------------------------------------------
 ; Enable new room header table
 ;--------------------------------------------------------------------------------
-org $81B5E6
-LDA.b #$30
+if !FEATURE_FIX_BASEROM == 0
+	org $81B5E6
+	LDA.b #$30
+endif
+
+;================================================================================
+;--------------------------------------------------------------------------------
+; Mimic dash changes
+;--------------------------------------------------------------------------------
+org $9EC7BE
+JSL MimicDirection
+
+;================================================================================
+;--------------------------------------------------------------------------------
+; Gloom VRAM overwrite
+;--------------------------------------------------------------------------------
+org $828068
+JSL AdjustDefaultGraphics
+
+;================================================================================
+;--------------------------------------------------------------------------------
+; Remove Overwriting HUD gfx on game over
+;--------------------------------------------------------------------------------
+org $809038
+RTS
+
+;================================================================================
+;--------------------------------------------------------------------------------
+; Dungeon Indicator VRAM overwrite
+;--------------------------------------------------------------------------------
+org $828190
+JSL LoadDungeonIndicator
+
+org $829AA2
+JSL LoadDungeonIndicator
+
+;================================================================================
+; Special Weapons Modes
+;--------------------------------------------------------------------------------
+org $86ECC3 ; Bank06.asm@4704 (PHX : TAX : LDA.l .damage_classes, X : PLX)
+JSL DamageClassCalc
+BRA + : NOP #29 : +
+;--------------------------------------------------------------------------------
+org $86ED94 ; Bank06.asm@4866 (LDA $0E60, X : AND.b #$40)
+JSL Utility_CheckImpervious
+NOP
+;--------------------------------------------------------------------------------
+
+;================================================================================
+;--------------------------------------------------------------------------------
+; Variable Ganon Vulnerability
+;--------------------------------------------------------------------------------
+org $88BBD4 ; ancilla_magic_powder.asm@253 (LDA #$0A : JSL Ancilla_CheckSpriteDamage.preset_class)
+JSL Ganon_CheckPowderVulnerability
+NOP #2
+
+org $1D8F4E ; sprite_ganon.asm@325 (LDA $04C5 : CMP #$02)
+JSL Ganon_CheckInvincible
+NOP
+
+org $0DD628 ; Bank0D.asm@1266 (LDA $0B6B, Y : AND #$02)
+JSL CheckBeeBoss
+NOP
+
+org $0DD677 ; Bank0D.asm@1303 (JSL Ancilla_CheckSpriteDamage.preset_class)
+JSL Ganon_CheckBeeVulnerability
+;--------------------------------------------------------------------------------
+
+;================================================================================
+; PseudoFlute
+;--------------------------------------------------------------------------------
+org $8AB7D5 ; bank_0A.asm@5655 (DEC.w $1AF0 : LDA.b #$20 : STA.w $012F)
+JSL SelectFlutePrev
+BRA + : NOP #2 : +
+;--------------------------------------------------------------------------------
+org $8AB7E3 ; bank_0A.asm@5665 (INC.w $1AF0 : LDA.b #$20 : STA.w $012F)
+JSL SelectFluteNext
+BRA + : NOP #2 : +
+;--------------------------------------------------------------------------------
+org $8AB877 ; bank_0A.asm@5758 (STA.b $0C : LDA.b #$00 : STA.b $0B)
+JSL SetFluteSpotPalette
+NOP #2
+;--------------------------------------------------------------------------------
+org $8AB8BF ; bank_0A.asm@5800 (STA.b $0C : LDA.b #$00 : STA.b $0B)
+JSL SetFluteSpotPalette
+NOP #2
+;--------------------------------------------------------------------------------
+org $82AFBE ; bank_02.asm@8776 (LDA.l $7EC213 : STA.b $8A)
+JSL CheckEnterOverworld
+NOP #2
+;--------------------------------------------------------------------------------
+org $82A9A1 ; bank_02.asm@7655 (STA.b $8A : STA.w $040A)
+JSL CheckTransitionOverworld
+NOP
+;--------------------------------------------------------------------------------
+org $8DF741
+dw $3CD4, $3CD5, $3CE4, $3D32
+;--------------------------------------------------------------------------------
+org $8DE58E ; bank_0D.asm@15401 (AND.w #$00FF : STA.b $02)
+JSL DrawFluteIcon
+NOP
+;--------------------------------------------------------------------------------
+org $8DFB63 ; bank_0D.asm@18092 (LDA.l $7EF33F, X : AND.w #$00FF)
+JSL CheckFluteInHUD
+NOP #3
+;--------------------------------------------------------------------------------
+
+;================================================================================
+; Orange Potion (Chateau Romani)
+;--------------------------------------------------------------------------------
+org $87A15C ; bank_07.asm@6963 (LDA.l $7EF35C, X)
+JSL CheckOrangePotion
+;--------------------------------------------------------------------------------

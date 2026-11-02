@@ -8,9 +8,26 @@ LampCheck:
 	LDA.l LampCone : AND.b #$10 : BNE .lamp ; always on
 	LDA.l LampEquipment : BNE .lamp ; skip if we already have lantern
 	LDA.w DungeonID : CMP.b #$04 : BCS +  ; are we en HC?
-		LDA.l LampCone : RTL
+		LDA.l LampCone : AND.b #$01 : RTL
 	+ : TDC
 	.lamp
+RTL
+;================================================================================
+; Dark Room checks
+;--------------------------------------------------------------------------------
+; Output: 0 for normal room, 1 for darkness
+;--------------------------------------------------------------------------------
+DarkRoomCheck:
+	LDA.l LampCone : AND.b #$20 : BNE .no_dark
+	LDA.b [$0D], Y
+	AND.b #$01
+RTL
+.no_dark
+	LDA.b $A0 : ORA.b $A1 : BNE .not_dark
+	LDA.b #$01 ; ganon's room
+RTL
+.not_dark
+	LDA.b #$00 ; not ganon's room, so no darkness
 RTL
 ;================================================================================
 ;--------------------------------------------------------------------------------
@@ -26,6 +43,9 @@ RTL
 ;================================================================================
 SetOverlayIfLamp:
         JSL LampCheck
+        BEQ +
+        LDA.b #$01
++
         STA.b SUBDESQ ; write it directly to the overlay, this isn't a terrible idea at all
 RTL
 ;================================================================================

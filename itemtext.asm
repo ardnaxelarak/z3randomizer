@@ -46,7 +46,7 @@ dw $7F7F
 
 ; Ganons Tower
 Notice_GTower:
-db $76 : dw "Ganons Tower"
+db $76 : dw "Ganon's Tower"
 dw $7F7F
 
 ; Turtle Rock
@@ -81,7 +81,7 @@ dw $7F7F
 
 ; Dark Palace
 Notice_PoD:
-db $76 : dw "Dark Palace"
+db $76 : dw "Palace of Darkness"
 dw $7F7F
 
 ; Swamp Palace

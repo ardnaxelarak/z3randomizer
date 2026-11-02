@@ -146,32 +146,57 @@ macro SetMinimum(base,filler,compare)
 endmacro
 RefreshRainAmmo:
 	LDA.l ProgressIndicator : CMP.b #$01 : BEQ .rain ; check if we're in rain state
-	RTL
-	.rain
-		LDA.l StartingEntrance
-		+ CMP.b #$03 : BNE + ; Uncle
-			%SetMinimum(CurrentMagic,MagicFiller,RainDeathRefillMagic_Uncle)
-			%SetMinimum(BombsEquipment,BombsFiller,RainDeathRefillBombs_Uncle)
-			LDA.l ArrowMode : BEQ ++
-			LDA.l BowEquipment : BEQ +++
-			++ %SetMinimum(CurrentArrows,ArrowsFiller,RainDeathRefillArrows_Uncle)
-			+++ BRA .done
-		+ CMP.b #$02 : BNE + ; Cell
-			%SetMinimum(CurrentMagic,MagicFiller,RainDeathRefillMagic_Cell)
-			%SetMinimum(BombsEquipment,BombsFiller,RainDeathRefillBombs_Cell)
-			LDA.l ArrowMode : BEQ ++
-			LDA.l BowEquipment : BEQ .done
-			++ %SetMinimum(CurrentArrows,ArrowsFiller,RainDeathRefillArrows_Cell)
-			BRA .done
-		+ CMP.b #$04 : BNE + ; Mantle
-			%SetMinimum(CurrentMagic,MagicFiller,RainDeathRefillMagic_Mantle)
-			%SetMinimum(BombsEquipment,BombsFiller,RainDeathRefillBombs_Mantle)
-			LDA.l ArrowMode : BEQ ++
-			LDA.l BowEquipment : BEQ .done
-			++ %SetMinimum(CurrentArrows,ArrowsFiller,RainDeathRefillArrows_Mantle)
-		+
-	.done
 RTL
+.rain
+	LDA.l StartingEntrance : BEQ .uncle
+	CMP.b #$03 : BNE + ; Uncle
+		.uncle
+		LDA.l RainDeathRefillMagic_Uncle : JSR .refillMagic
+		LDA.l RainDeathRefillBombs_Uncle : JSR .refillBombs
+		LDA.l ArrowMode : BNE .rupeeBow
+		LDA.l RainDeathRefillArrows_Uncle : JSR .refillArrows
+		BRA .done
+	+ CMP.b #$02 : BNE + ; Cell
+		LDA.l RainDeathRefillMagic_Cell : JSR .refillMagic
+		LDA.l RainDeathRefillBombs_Cell : JSR .refillBombs
+		LDA.l ArrowMode : BNE .rupeeBow
+		LDA.l RainDeathRefillArrows_Cell : JSR .refillArrows
+		BRA .done
+	+ CMP.b #$04 : BNE + ; Mantle
+		LDA.l RainDeathRefillMagic_Mantle : JSR .refillMagic
+		LDA.l RainDeathRefillBombs_Mantle : JSR .refillBombs
+		LDA.l ArrowMode : BNE .rupeeBow
+		LDA.l RainDeathRefillArrows_Mantle : JSR .refillArrows
+		BRA .done
+	+ BRA .done
+
+	.rupeeBow
+		REP #$20
+		LDA.l RainDeathRefillRupeeBow : JSR .refillRupees
+		SEP #$20
+
+.done
+RTL
+
+.refillMagic
+	SEC : SBC.l CurrentMagic : BCC +
+		STA.l MagicFiller
+	+ RTS
+
+.refillBombs
+	SEC : SBC.l BombsEquipment : BCC +
+		STA.l BombsFiller
+	+ RTS
+
+.refillArrows
+	SEC : SBC.l CurrentArrows : BCC +
+		STA.l ArrowsFiller
+	+ RTS
+
+.refillRupees
+	CMP.l CurrentRupees : BCC +
+		STA.l CurrentRupees
+	+ RTS
 ;--------------------------------------------------------------------------------
 SetEscapeAssist:
 	LDA.l ProgressIndicator : CMP.b #$01 : BNE .no_train ; check if we're in rain state

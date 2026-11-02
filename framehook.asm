@@ -2,21 +2,28 @@
 ; Frame Hook
 ;--------------------------------------------------------------------------------
 FrameHookAction:
-        JSL Module_MainRouting
-        JSL CheckMusicLoadRequest
-        PHP : REP #$30 : PHA
-        SEP #$20
-        LDA.l StatsLocked : BNE ++
-                REP #$20 ; set 16-bit accumulator
-                LDA.l LoopFrames : INC : STA.l LoopFrames : BNE +
-                        LDA.l LoopFrames+2 : INC : STA.l LoopFrames+2
-                                +
-                                LDA.l GameMode : CMP.w #$010E : BNE ++ ; move this to nmi hook?
-                                LDA.l MenuFrames : INC : STA.l MenuFrames : BNE ++
-                                        LDA.l MenuFrames+2 : INC : STA.l MenuFrames+2
-                ++
-        REP #$30 : PLA : PLP
-
+	JSL Module_MainRouting
+	JSL CheckMusicLoadRequest
+	PHP : REP #$30 : PHA
+	SEP #$20
+	LDA.l StatsLocked : BNE ++
+		REP #$20 ; set 16-bit accumulator
+		LDA.l LoopFrames : INC : STA.l LoopFrames : BNE +
+		LDA.l LoopFrames+2 : INC : STA.l LoopFrames+2
+		+
+		; move this to nmi hook?
+		LDA.l GameMode : CMP.w #$010E : BNE +
+		; item select menu
+		LDA.l MenuFrames : INC : STA.l MenuFrames : BNE ++
+		LDA.l MenuFrames+2 : INC : STA.l MenuFrames+2
+		+
+		LDA.l GameMode : CMP.w #$030E : BEQ .map ; underworld map
+		LDA.l GameMode : CMP.w #$070E : BNE ++ ; overworld map
+		.map
+		LDA.l MapFrames : INC : STA.l MapFrames : BNE ++
+		LDA.l MapFrames+2 : INC : STA.l MapFrames+2
+		++
+	REP #$30 : PLA : PLP
 RTL
 
 !NMI_MW = "$7F5047"

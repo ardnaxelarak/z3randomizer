@@ -50,6 +50,7 @@ dw !ROM_VERSION_HIGH
 function hexto555(h) = ((((h&$FF)/8)<<10)|(((h>>8&$FF)/8)<<5)|(((h>>16&$FF)/8)<<0))
 
 ; Feature flags, run asar with -DFEATURE_X=1 to enable
+!FEATURE_FIX_BASEROM ?= 0
 
 ;================================================================================
 
@@ -180,7 +181,7 @@ incsrc toast.asm
 incsrc fastcredits.asm
 incsrc msu.asm
 incsrc menu/overworldmap.asm ; Overwrites some code in bank $8A
-incsrc dungeonmap.asm
+incsrc bossicons.asm
 incsrc hextodec.asm
 incsrc multiworld.asm
 incsrc textrenderer.asm
@@ -226,6 +227,26 @@ incsrc owrando.asm ; bank 2A/AA
 incsrc limited/limited_hooks.asm ; bank 2D/AD
 incsrc enemizer/main.asm ; bank 36/B6
 
+org $B98000 ; bank 39/B9
+incsrc "gk/crystalswitchbook.asm"
+incsrc "gk/orange_potion.asm"
+incsrc "gk/mimicdash.asm"
+incsrc "gk/gloom.asm"
+incsrc "gk/special_weapons.asm"
+incsrc "gk/variable_ganon_vulnerability.asm"
+incsrc "gk/pseudoflute.asm"
+incsrc "gk/fast_junk.asm"
+incsrc "gk/dungeon_maps.asm"
+incsrc "gk/dungeon_indicator.asm"
+print "End of B9: ", pc
+
+warnpc $B9EE00
+org $B9EE00
+incsrc "gk_meta.asm"
+
+org $B9F000
+incsrc "gk/settings.asm"
+
 org $B08000 ; bank #$30
 incsrc tables.asm
 warnpc $B18000
@@ -255,7 +276,7 @@ warnpc $B1A000
 
 org $B1A000
 GFX_HUD_Items:
-incbin "menu/drsheetdc.2bppc"
+incbin "menu/dr_sheet_dc.2bppc"
 warnpc $B1A800
 
 org $B1A800
@@ -280,6 +301,8 @@ warnpc $B1D001
 org $B1D000
 FileSelectNewGraphics:
 incbin "data/fileselectgfx.2bpp"
+FileSelectOverflowGraphics:
+incbin "data/fileselectoverflow.2bpp"
 warnpc $B1E001
 
 org $B1E000
@@ -308,6 +331,26 @@ NewFontInverted:
 incbin "data/newfont_inverted.bin"
 SmallCharacters:
 incbin "data/smallchars.2bpp"
+
+DungeonMapIcons1:
+incbin "menu/map_icons_1.3bppc"
+DungeonMapIcons2:
+incbin "menu/map_icons_2.3bppc"
+DungeonMapIcons3:
+incbin "menu/map_icons_3.3bppc"
+DungeonMapIcons4:
+incbin "menu/map_icons_4.3bppc"
+DungeonMapIcons5:
+incbin "menu/map_icons_5.3bppc"
+DungeonMapIcons6:
+incbin "menu/map_icons_6.3bppc"
+DungeonMapDoorConnectors:
+incbin "menu/door_connectors.3bppc"
+MapSheetD4:
+incbin "menu/map_sheet_d4.3bppc"
+DRSheet14:
+incbin "menu/dr_sheet_14.3bppc"
+
 org $8CD7DF
 incsrc data/playernamecharmap.asm
 org $8CE73D
@@ -367,6 +410,7 @@ warnpc $B08000
 ;$33 Graphics Bank
 ;$36 reserved for Enemizer
 ;$37 Room data if needed for DR/Pottery/Enemizer
+;$39 GwaaKiwi Code Bank
 ;$3A reserved for downstream use
 ;$3B reserved for downstream use
 ;$3F reserved for internal debugging

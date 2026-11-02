@@ -752,13 +752,12 @@ endif
 
 %blankline()
 
+%bigcreditsleft("TOTAL MAP TIME")
+
+%blankline()
+
 %bigcreditsleft("TOTAL LAG TIME")
 
-%blankline()
-%blankline()
-
-
-%blankline()
 %blankline()
 
 

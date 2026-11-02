@@ -188,10 +188,12 @@ ItemBehavior:
         BRA .store_inventory_tracking
 
         .flute_inactive
+        LDA.b #$00 : STA.l FluteBitfield
         LDA.l InventoryTracking : ORA.b #$02
         BRA .store_inventory_tracking
 
         .flute_active
+        LDA.b #$00 : STA.l FluteBitfield
         LDA.l InventoryTracking : ORA.b #$01
         BRA .store_inventory_tracking
 
@@ -947,7 +949,7 @@ BottleListExpanded:
     db $16, $2B, $2C, $2D, $3D, $3C, $48
 
 PotionListExpanded:
-    db $2E, $2F, $30, $FF, $0E
+    db $66, $FF, $2E, $2F, $30, $FF, $0E
 ;--------------------------------------------------------------------------------
 HandleBowTracking:
 ; In: A - Item Receipt ID
