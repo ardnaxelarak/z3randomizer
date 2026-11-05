@@ -23,7 +23,7 @@ dw $FFFF
 
 WarpTable:
 dw $2009, $104B ; PoD Basement (start)
-dw $100A, $1009 ; PoD Stalfos Basement
+dw $100A, $2009 ; PoD Stalfos Basement
 dw $100B, $206A ; PoD Turtle Room to Boss
 dw $104B, $2009 ; PoD Basement (mimics)
 dw $207B, $209D ; GT post-compass island hardhat
