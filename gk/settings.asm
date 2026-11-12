@@ -42,10 +42,10 @@ LootTypeIcons:
     dw $69EF, $29EF, $69FF, $29FF ; 03 - AP filler
     dw $29E9, $69E9, $29F9, $69F9 ; 04 - triforce piece
     dw $29DD, $69DD, $A9DD, $E9DD ; 05 - health - plus
-    dw $29EE, $69EE, $29FE, $69FE ; 06 - AP useful
-    dw $29EC, $69EC, $29FC, $69FC ; 07 - less important item - small chest
-    dw $29E8, $69E8, $29F8, $69F8 ; 08 - compass
-    dw $29CE, $29CF, $29DE, $29DF ; 09 - map
+    dw $29E8, $69E8, $29F8, $69F8 ; 06 - compass
+    dw $29CE, $29CF, $29DE, $29DF ; 07 - map
+    dw $29EE, $69EE, $29FE, $69FE ; 08 - AP useful
+    dw $29EC, $69EC, $29FC, $69FC ; 09 - less important item - small chest
     dw $29CA, $69CA, $29DA, $29DB ; 0A - small key
     dw $69EA, $29EA, $29FE, $29FA ; 0B - AP progression
     dw $29C8, $69C8, $29D8, $29D9 ; 0C - big key
@@ -136,10 +136,10 @@ HUDLootTypeIcons:
     dw $294A ; 03 - AP filler
     dw $2952 ; 04 - triforce piece
     dw $2955 ; 05 - health - plus
-    dw $2D49 ; 06 - AP useful
-    dw $2953 ; 07 - less important item - small chest
-    dw $2D56 ; 08 - compass
-    dw $2957 ; 09 - map
+    dw $2D56 ; 06 - compass
+    dw $2957 ; 07 - map
+    dw $2D49 ; 08 - AP useful
+    dw $2953 ; 09 - less important item - small chest
     dw $2950 ; 0A - small key
     dw $2D39 ; 0B - AP progression
     dw $2951 ; 0C - big key

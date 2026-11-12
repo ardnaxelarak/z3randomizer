@@ -155,7 +155,7 @@ dw $FFFF, $038F, $434A, $0363 ; 99
 dw $FFFF, $FFFF, $FFFF, $FFFF ; 9A - unused
 dw $839B, $0381, $435E, $0378 ; 9B
 dw $C350, $8350, $4341, $0341 ; 9C
-dw $0116, $83B2, $43B1, $035E ; 9D
+dw $0116, $C39B, $43B1, $035E ; 9D
 dw $FFFF, $439A, $838D, $03B9 ; 9E
 dw $FFFF, $FFFF, $439B, $FFFF ; 9F
 dw $839B, $C39C, $FFFF, $FFFF ; A0

@@ -35,8 +35,8 @@ db $00 ; 21 - Net
 db $00 ; 22 - Blue Mail
 db $00 ; 23 - Red Mail
 db $00 ; 24 - Small Key
-db $00 ; 25 - Compass
-db $00 ; 26 - Heart Container from 4/4
+db $01 ; 25 - Compass
+db $01 ; 26 - Heart Container from 4/4
 db $01 ; 27 - Bomb
 db $01 ; 28 - 3 bombs
 db $00 ; 29 - Mushroom
@@ -49,7 +49,7 @@ db $00 ; 2F - Potion refill (green)
 db $00 ; 30 - Potion refill (blue)
 db $01 ; 31 - 10 bombs
 db $00 ; 32 - Big key
-db $00 ; 33 - Map
+db $01 ; 33 - Map
 db $01 ; 34 - 1 rupee
 db $01 ; 35 - 5 rupees
 db $01 ; 36 - 20 rupees
@@ -60,8 +60,8 @@ db $00 ; 3A - Tossed bow
 db $00 ; 3B - Silvers
 db $00 ; 3C - Full bottle (bee)
 db $00 ; 3D - Full bottle (fairy)
-db $00 ; 3E - Boss heart
-db $00 ; 3F - Sanc heart
+db $01 ; 3E - Boss heart
+db $01 ; 3F - Sanc heart
 db $01 ; 40 - 100 rupees
 db $01 ; 41 - 50 rupees
 db $01 ; 42 - Heart
@@ -112,39 +112,39 @@ db $00 ; 6D - Server request item
 db $00 ; 6E - Server request item (dungeon drop)
 db $00 ; 6F -
 
-db $00 ; 70 - Map of Light World
-db $00 ; 71 - Map of Dark World
-db $00 ; 72 - Map of Ganon's Tower
-db $00 ; 73 - Map of Turtle Rock
-db $00 ; 74 - Map of Thieves' Town
-db $00 ; 75 - Map of Tower of Hera
-db $00 ; 76 - Map of Ice Palace
-db $00 ; 77 - Map of Skull Woods
-db $00 ; 78 - Map of Misery Mire
-db $00 ; 79 - Map of Dark Palace
-db $00 ; 7A - Map of Swamp Palace
-db $00 ; 7B - Map of Agahnim's Tower
-db $00 ; 7C - Map of Desert Palace
-db $00 ; 7D - Map of Eastern Palace
-db $00 ; 7E - Map of Hyrule Castle
-db $00 ; 7F - Map of Sewers
+db $01 ; 70 - Map of Light World
+db $01 ; 71 - Map of Dark World
+db $01 ; 72 - Map of Ganon's Tower
+db $01 ; 73 - Map of Turtle Rock
+db $01 ; 74 - Map of Thieves' Town
+db $01 ; 75 - Map of Tower of Hera
+db $01 ; 76 - Map of Ice Palace
+db $01 ; 77 - Map of Skull Woods
+db $01 ; 78 - Map of Misery Mire
+db $01 ; 79 - Map of Dark Palace
+db $01 ; 7A - Map of Swamp Palace
+db $01 ; 7B - Map of Agahnim's Tower
+db $01 ; 7C - Map of Desert Palace
+db $01 ; 7D - Map of Eastern Palace
+db $01 ; 7E - Map of Hyrule Castle
+db $01 ; 7F - Map of Sewers
 
-db $00 ; 80 - Compass of Light World
-db $00 ; 81 - Compass of Dark World
-db $00 ; 82 - Compass of Ganon's Tower
-db $00 ; 83 - Compass of Turtle Rock
-db $00 ; 84 - Compass of Thieves' Town
-db $00 ; 85 - Compass of Tower of Hera
-db $00 ; 86 - Compass of Ice Palace
-db $00 ; 87 - Compass of Skull Woods
-db $00 ; 88 - Compass of Misery Mire
-db $00 ; 89 - Compass of Dark Palace
-db $00 ; 8A - Compass of Swamp Palace
-db $00 ; 8B - Compass of Agahnim's Tower
-db $00 ; 8C - Compass of Desert Palace
-db $00 ; 8D - Compass of Eastern Palace
-db $00 ; 8E - Compass of Hyrule Castle
-db $00 ; 8F - Compass of Sewers
+db $01 ; 80 - Compass of Light World
+db $01 ; 81 - Compass of Dark World
+db $01 ; 82 - Compass of Ganon's Tower
+db $01 ; 83 - Compass of Turtle Rock
+db $01 ; 84 - Compass of Thieves' Town
+db $01 ; 85 - Compass of Tower of Hera
+db $01 ; 86 - Compass of Ice Palace
+db $01 ; 87 - Compass of Skull Woods
+db $01 ; 88 - Compass of Misery Mire
+db $01 ; 89 - Compass of Dark Palace
+db $01 ; 8A - Compass of Swamp Palace
+db $01 ; 8B - Compass of Agahnim's Tower
+db $01 ; 8C - Compass of Desert Palace
+db $01 ; 8D - Compass of Eastern Palace
+db $01 ; 8E - Compass of Hyrule Castle
+db $01 ; 8F - Compass of Sewers
 
 db $00 ; 90 - Skull key
 db $00 ; 91 - Reserved
